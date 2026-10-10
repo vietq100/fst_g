@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
+[ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootEntry_0"]
+script = ExtResource("2_entry")
+item_id = &"iron_ore"
+quantity_min = 5
+quantity_max = 5
+chance = 1.0
+
+[sub_resource type="Resource" id="LootEntry_1"]
+script = ExtResource("2_entry")
+item_id = &"beast_fang"
+quantity_min = 3
+quantity_max = 3
+chance = 1.0
+
+[sub_resource type="Resource" id="LootEntry_2"]
+script = ExtResource("2_entry")
+item_id = &"dark_essence"
+quantity_min = 2
+quantity_max = 2
+chance = 1.0
+
+[sub_resource type="Resource" id="LootEntry_3"]
+script = ExtResource("2_entry")
+item_id = &"fang_blade"
+quantity_min = 1
+quantity_max = 1
+chance = 0.1
+
+[resource]
+script = ExtResource("1_table")
+id = &"forest_guardian_first"
+display_name = "Forest Guardian First"
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1"), SubResource("LootEntry_2"), SubResource("LootEntry_3")])

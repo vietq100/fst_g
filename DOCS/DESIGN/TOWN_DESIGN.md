@@ -36,6 +36,8 @@ Canonical layout (also used by `MAP_DESIGN.md`, see `DECISIONS.md` D8):
 
 Training Yard is an open area next to Town Hall, not a building.
 
+Implemented (`world/town/town.tscn`, 360 × 800 px, front-wall base positions): Tavern (90, 250), Blacksmith (272, 250), Training Yard (22–126, 330–430), Town Hall (248, 440), plaza (180, 530), Hospital (90, 650), Warehouse (272, 650), South Gate (180, 772). Drag to pan; tap a building, the gate or a Hunter to select it.
+
 ## 4. Building visual language
 
 All buildings should share:

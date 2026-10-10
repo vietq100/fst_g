@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/trait_definition.gd" id="1_trait"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="StatModifier_0"]
+script = ExtResource("2_mod")
+stat = &"damage_dealt"
+type = 1
+value = 0.15
+condition = &""
+
+[sub_resource type="Resource" id="StatModifier_1"]
+script = ExtResource("2_mod")
+stat = &"damage_taken"
+type = 1
+value = 0.1
+condition = &""
+
+[resource]
+script = ExtResource("1_trait")
+id = &"reckless"
+display_name = "Reckless"
+description = "Hits harder and gets hit harder. Bored by long rests."
+modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0"), SubResource("StatModifier_1")])
+activity_rate_modifiers = Dictionary[StringName, float]({})
+mood_likes = Array[StringName]([&"boss_fight"])
+mood_dislikes = Array[StringName]([&"long_rest"])

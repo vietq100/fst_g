@@ -4,6 +4,10 @@
 
 Dark Hunter Tycoon
 
+## Platform
+
+Mobile (Android and iOS), portrait, touch. Short play sessions; the town keeps progressing while the app is closed (`DECISIONS.md` D24).
+
 ## Genre
 
 2D:

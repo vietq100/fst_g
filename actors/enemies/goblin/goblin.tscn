@@ -1,0 +1,45 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://actors/common/placeholder_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://actors/common/health_controller.gd" id="3_health"]
+[ext_resource type="Script" path="res://actors/common/combat_controller.gd" id="4_combat"]
+[ext_resource type="Script" path="res://actors/common/state_controller.gd" id="5_state"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 6.0
+
+[node name="Goblin" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_enemy")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_visual")
+body_color = Color(0.42, 0.31, 0.2, 1)
+accent_color = Color(0.25, 0.2, 0.15, 1)
+skin_color = Color(0.49, 0.67, 0.31, 1)
+body_size = Vector2(12, 15)
+ear_length = 5.0
+weapon_color = Color(0.55, 0.4, 0.25, 1)
+weapon_length = 9.0
+weapon_width = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -3)
+shape = SubResource("CircleShape2D_body")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 4.0
+target_desired_distance = 4.0
+radius = 7.0
+
+[node name="HealthController" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="CombatController" type="Node" parent="."]
+script = ExtResource("4_combat")
+
+[node name="StateController" type="Node" parent="."]
+script = ExtResource("5_state")

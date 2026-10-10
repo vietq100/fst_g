@@ -2,7 +2,8 @@
 
 ## Mode
 
-Real-time. The player can watch the expedition scene. No offline progress.
+Real-time. The player can watch the expedition scene.
+Expeditions only progress while the app is open and pause when it goes to background. No offline expedition progress (town timers do progress offline, `DECISIONS.md` D24).
 One expedition active at a time in MVP. No manual recall in MVP.
 
 ## Flow
@@ -65,6 +66,13 @@ On success:
 - autosave
 
 The expedition stays repeatable. Repeat boss clears give reduced rewards (`BALANCE.md`).
+
+## Implementation (Phase 4)
+
+- `ExpeditionService` owns the rules: validation, Hunter lifecycle, XP/gold per kill, success/failure rewards. Emits `expedition_started`, `section_started`, `expedition_finished`, `autosave_requested`.
+- `ExpeditionScene` (one per map) owns pacing and presentation: party walks to a section's rally marker → that section's enemies spawn at its markers → when cleared, walk to the next → boss at the boss arena → walk to the exit → `complete()`. Party wipe → `fail()`.
+- Gold drops go to the stash during the run (items in Phase 5). Repeat boss clears halve the boss's gold.
+- Main switches hub ↔ expedition with a fade, shows a VICTORY/DEFEAT banner for 2 s, and pauses the scene tree while the app is in background.
 
 ## Warehouse overflow
 

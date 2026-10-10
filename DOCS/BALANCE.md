@@ -10,6 +10,9 @@ Tune during Phase 11. Update this file when values change.
 - Required XP for next level: `20 * pow(level, 1.5)`
 - Stat: `(base + level_growth * (level - 1) + Σflat) * (1 + Σpercent)`
 
+## Offline
+- Offline progress cap: 8 hours (town timers only)
+
 ## Warrior (class template)
 | Stat | Base | Per level |
 |---|---|---|
@@ -20,6 +23,7 @@ Tune during Phase 11. Update this file when values change.
 | Move speed | 80 px/s | — |
 | Crit chance | 5% | — |
 | Crit damage | ×1.5 | — |
+| Attack range | 20 px | — |
 | Recruit cost | 100 gold | — |
 
 Recruits roll ±10% on HP/Attack/Defense.
@@ -31,6 +35,13 @@ Recruits roll ±10% on HP/Attack/Defense.
 | Goblin | 50 | 10 | 3 | 1.0 | 70 | 10 | 4–8 |
 | Wolf | 40 | 12 | 1 | 1.4 | 120 | 12 | 3–6 |
 | Forest Guardian | 900 | 28 | 10 | 0.5 | 40 | 150 | 150 |
+
+Attack range (feet to feet): Slime 18, Goblin 20, Wolf 20, Forest Guardian 30 px.
+Hit radius (extra body size added to attackers' reach): Forest Guardian 14 px, others 0.
+
+## Progression
+- Level-up heals 20% of max HP.
+- Hunter level cap = Town Hall level × 10 (Town Hall level is 1 until Phase 6).
 
 Drops:
 - Goblin: Iron Ore ×1 (40%)
@@ -81,6 +92,9 @@ Materials sell: Iron Ore 3, Beast Fang 4, Dark Essence 25. Stack size 99, one sl
 Events: success +10, failure −15, injured −10, trait like +5, trait dislike −5, third consecutive expedition without rest −5.
 
 ## Activities (tick = 10 s)
+
+> ⚠ Tuning note (found in Phase 9): with offline progress, +3 XP per training tick is ~1,080 XP/hour, and Lv 1→10 needs ~2,200 XP, so 2 hours away takes a fresh roster to the level cap. Revisit the training XP (or cap offline training) in Phase 11.
+
 | Activity | Per tick |
 |---|---|
 | Resting | +5% max HP, +2 mood |

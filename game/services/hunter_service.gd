@@ -1,0 +1,250 @@
+class_name HunterService
+extends RefCounted
+## Owns the Hunter roster and computes Hunter stats (CHARACTER_SYSTEM.md).
+## Other systems add stat modifiers through modifier sources (equipment, traits, mood, bonds),
+## so every stat goes through one pipeline (DECISIONS.md D18).
+
+signal hunter_added(hunter: HunterRuntime)
+signal hunter_changed(hunter: HunterRuntime)
+## Emitted after level and HP were updated; `healed` is the HP restored by the level-up.
+signal hunter_leveled_up(hunter: HunterRuntime, new_level: int, healed: float)
+
+const MAX_HP := &"max_hp"
+const ATTACK := &"attack"
+const DEFENSE := &"defense"
+const ATTACK_SPEED := &"attack_speed"
+const MOVE_SPEED := &"move_speed"
+const CRITICAL_CHANCE := &"critical_chance"
+const CRITICAL_DAMAGE := &"critical_damage"
+## Multiplier stats (base 1.0): only percent modifiers make sense for them.
+const DAMAGE_DEALT := &"damage_dealt"
+const DAMAGE_TAKEN := &"damage_taken"
+const GOLD_FIND := &"gold_find"
+const XP_GAIN := &"xp_gain"
+
+const MULTIPLIER_STATS: Array[StringName] = [DAMAGE_DEALT, DAMAGE_TAKEN, GOLD_FIND, XP_GAIN]
+## Stats that receive a random roll at recruitment.
+const ROLLED_STATS: Array[StringName] = [MAX_HP, ATTACK, DEFENSE]
+const ACCENT_COUNT := 8
+
+## DataRegistry autoload (or a test instance).
+var _registry: Node
+var _stats: StatService
+var _config: GameConfig
+var _hunters: Dictionary[StringName, HunterRuntime] = {}
+var _next_id := 1
+## Callables `func(hunter: HunterRuntime) -> Array[StatModifier]`.
+var _modifier_sources: Array[Callable] = []
+
+
+func _init(registry: Node, stats: StatService, config: GameConfig) -> void:
+	_registry = registry
+	_stats = stats
+	_config = config
+
+
+## Registers a provider of stat modifiers for a Hunter (equipment, traits, mood, bonds).
+func add_modifier_source(source: Callable) -> void:
+	_modifier_sources.append(source)
+
+
+## Breaks the service reference cycles created by modifier sources (tests, shutdown).
+func clear_modifier_sources() -> void:
+	_modifier_sources.clear()
+
+
+## A new Hunter that is NOT in the roster yet (Tavern candidate). Null if the class is unknown.
+func generate_candidate(definition_id: StringName, rng: RandomNumberGenerator) -> HunterRuntime:
+	var definition := _get_definition_by_id(definition_id)
+	if definition == null:
+		return null
+	var hunter := HunterRuntime.new()
+	hunter.definition_id = definition_id
+	hunter.display_name = _pick_name(definition, rng)
+	hunter.accent_index = rng.randi_range(0, ACCENT_COUNT - 1)
+	var variance := definition.stat_roll_variance
+	for stat in ROLLED_STATS:
+		hunter.stat_rolls[stat] = rng.randf_range(-variance, variance)
+	hunter.mood = _config.mood_start
+	hunter.current_hp = get_stat(hunter, MAX_HP)
+	return hunter
+
+
+## Adds a generated Hunter to the roster and gives it a unique id.
+func add_hunter(hunter: HunterRuntime) -> HunterRuntime:
+	hunter.unique_id = StringName("h_%d" % _next_id)
+	_next_id += 1
+	_hunters[hunter.unique_id] = hunter
+	hunter_added.emit(hunter)
+	return hunter
+
+
+## Generate + add in one step (debug, tests, new game).
+func create_hunter(definition_id: StringName, rng: RandomNumberGenerator) -> HunterRuntime:
+	var hunter := generate_candidate(definition_id, rng)
+	return add_hunter(hunter) if hunter != null else null
+
+
+func get_hunter(unique_id: StringName) -> HunterRuntime:
+	return _hunters.get(unique_id)
+
+
+func get_all() -> Array[HunterRuntime]:
+	var result: Array[HunterRuntime] = []
+	result.assign(_hunters.values())
+	return result
+
+
+func count() -> int:
+	return _hunters.size()
+
+
+func get_definition(hunter: HunterRuntime) -> HunterDefinition:
+	return _get_definition_by_id(hunter.definition_id)
+
+
+## Final stat after all modifiers. `conditions` activates conditional modifiers (e.g. &"vs_boss").
+func get_stat(hunter: HunterRuntime, stat: StringName, conditions: Array[StringName] = []) -> float:
+	var definition := get_definition(hunter)
+	if definition == null:
+		return 0.0
+	var base := 0.0
+	var growth := 0.0
+	match stat:
+		MAX_HP:
+			base = definition.base_hp
+			growth = definition.hp_per_level
+		ATTACK:
+			base = definition.base_attack
+			growth = definition.attack_per_level
+		DEFENSE:
+			base = definition.base_defense
+			growth = definition.defense_per_level
+		ATTACK_SPEED:
+			base = definition.attack_speed
+		MOVE_SPEED:
+			base = definition.move_speed
+		CRITICAL_CHANCE:
+			base = definition.critical_chance
+		CRITICAL_DAMAGE:
+			base = definition.critical_damage
+		_:
+			if not MULTIPLIER_STATS.has(stat):
+				push_error("HunterService: unknown stat '%s'" % stat)
+				return 0.0
+			base = 1.0
+	base *= 1.0 + hunter.stat_rolls.get(stat, 0.0)
+	return _stats.compute_stat(stat, base, growth, hunter.level, get_modifiers(hunter), conditions)
+
+
+func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
+	var modifiers: Array[StatModifier] = []
+	for source in _modifier_sources:
+		modifiers.append_array(source.call(hunter))
+	return modifiers
+
+
+## Re-emits hunter_changed after something that affects stats changed (equipment, mood…).
+func notify_changed(hunter: HunterRuntime) -> void:
+	hunter.current_hp = minf(hunter.current_hp, get_stat(hunter, MAX_HP))
+	hunter_changed.emit(hunter)
+
+
+## Debug/progression hook. Keeps current HP but clamps it to the new max.
+func set_level(hunter: HunterRuntime, level: int) -> void:
+	hunter.level = maxi(level, 1)
+	notify_changed(hunter)
+
+
+## Adds XP (scaled by the Hunter's xp_gain multiplier) and levels up while XP allows, up to
+## `level_cap`. XP beyond the cap is kept for when the cap rises (PROGRESSION_SYSTEM.md).
+## Returns the number of levels gained.
+func add_xp(hunter: HunterRuntime, amount: int, level_cap: int) -> int:
+	if amount <= 0:
+		return 0
+	hunter.xp += maxi(roundi(amount * get_stat(hunter, XP_GAIN)), 0)
+	var gained := 0
+	while hunter.level < level_cap and hunter.xp >= _stats.required_xp(hunter.level):
+		hunter.xp -= _stats.required_xp(hunter.level)
+		hunter.level += 1
+		gained += 1
+		var max_hp := get_stat(hunter, MAX_HP)
+		var healed := 0.0
+		if not hunter.injured and hunter.current_hp > 0.0:
+			healed = minf(max_hp * _config.level_up_heal_ratio, max_hp - hunter.current_hp)
+			hunter.current_hp += healed
+		hunter_leveled_up.emit(hunter, hunter.level, healed)
+	if gained > 0:
+		hunter_changed.emit(hunter)
+	return gained
+
+
+func set_lifecycle_state(hunter: HunterRuntime, state: HunterRuntime.LifecycleState) -> void:
+	if hunter.state == state:
+		return
+	hunter.state = state
+	hunter_changed.emit(hunter)
+
+
+## Downed on an expedition: the Hospital starts the recovery timer on its next tick.
+func mark_injured(hunter: HunterRuntime) -> void:
+	hunter.injured = true
+	hunter.current_hp = 0.0
+	hunter.recovery_remaining = HunterRuntime.RECOVERY_NOT_STARTED
+	hunter.state = HunterRuntime.LifecycleState.RECOVERING
+	hunter_changed.emit(hunter)
+
+
+## Fully recovered (Hospital finished / debug).
+func recover(hunter: HunterRuntime) -> void:
+	hunter.injured = false
+	hunter.recovery_remaining = 0.0
+	hunter.current_hp = get_stat(hunter, MAX_HP)
+	hunter.state = HunterRuntime.LifecycleState.AVAILABLE
+	hunter_changed.emit(hunter)
+
+
+## Plain data for saving.
+func to_dict() -> Dictionary:
+	var list: Array = []
+	for hunter in _hunters.values():
+		list.append(hunter.to_dict())
+	return {"next_id": _next_id, "hunters": list}
+
+
+## Replaces the roster with saved data. Entries with a missing/duplicate id or an unknown
+## class are dropped and reported. Does not emit hunter_added (not new recruits).
+func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
+	_hunters.clear()
+	var highest := 0
+	var entries: Variant = data.get("hunters", [])
+	if not entries is Array:
+		entries = []
+	for entry in entries:
+		if not entry is Dictionary:
+			warnings.append("hunters: dropped a non-object entry")
+			continue
+		var hunter := HunterRuntime.from_dict(entry)
+		if hunter.unique_id == &"" or _hunters.has(hunter.unique_id):
+			warnings.append("hunters: dropped entry with missing/duplicate id '%s'" % hunter.unique_id)
+			continue
+		if get_definition(hunter) == null:
+			warnings.append("hunters: dropped %s (unknown class '%s')" % [hunter.unique_id, hunter.definition_id])
+			continue
+		_hunters[hunter.unique_id] = hunter
+		highest = maxi(highest, String(hunter.unique_id).trim_prefix("h_").to_int())
+	_next_id = maxi(int(data.get("next_id", 1)), highest + 1)
+
+
+func _pick_name(definition: HunterDefinition, rng: RandomNumberGenerator) -> String:
+	var used: Dictionary[String, bool] = {}
+	for hunter in _hunters.values():
+		used[hunter.display_name] = true
+	var free := Array(definition.name_pool).filter(func(name: String) -> bool: return not used.has(name))
+	if not free.is_empty():
+		return free[rng.randi_range(0, free.size() - 1)]
+	return "%s #%d" % [definition.display_name, _next_id]
+
+
+func _get_definition_by_id(definition_id: StringName) -> HunterDefinition:
+	return _registry.find_def(&"hunter", definition_id) as HunterDefinition

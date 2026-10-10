@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/wolf/wolf.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"wolf"
+display_name = "Wolf"
+hp = 40.0
+attack = 12.0
+defense = 1.0
+attack_speed = 1.4
+move_speed = 120.0
+critical_chance = 0.0
+critical_damage = 1.5
+attack_range = 20.0
+xp_reward = 12
+gold_min = 3
+gold_max = 6
+loot_table_id = &"wolf"
+actor_scene = ExtResource("2_scene")

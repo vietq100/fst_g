@@ -37,7 +37,8 @@ Use genre inspiration only.
 - Godot 4.x
 - GDScript
 - 2D
-- Desktop-first MVP
+- Mobile game: Android and iOS, portrait orientation, touch input
+- Desktop is used only for development/testing
 - Pixel-art-inspired presentation
 
 ## 4. Design before implementation

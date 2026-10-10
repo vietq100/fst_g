@@ -38,6 +38,10 @@ Entrance
 
 Enemy groups per section: `BALANCE.md` → Dark Forest.
 
+Portrait: the forest runs bottom (entrance) → top (boss arena); the camera follows the party vertically.
+
+Implemented map (`world/expedition/dark_forest.tscn`): 360 × 1440 px. Trail from the entrance (y ≈ 1400) through four section rally points (y ≈ 1290, 1070, 840, 630) to the boss clearing (centre y ≈ 330, radius 120, stone circle) and the exit gate (y ≈ 120). Trees line both edges and fill the space away from the trail; they are navigation obstacles (group `navigation_obstacles`, baked at runtime).
+
 Avoid excessive maze complexity.
 
 ## 5. Navigation
@@ -59,6 +63,7 @@ Each expedition defines:
 
 Camera should:
 - follow active gameplay
+- in town, allow drag-to-pan within bounds
 - stay within map boundaries
 - avoid exposing unfinished areas
 

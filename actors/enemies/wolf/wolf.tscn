@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://actors/enemies/wolf/wolf_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://actors/common/health_controller.gd" id="3_health"]
+[ext_resource type="Script" path="res://actors/common/combat_controller.gd" id="4_combat"]
+[ext_resource type="Script" path="res://actors/common/state_controller.gd" id="5_state"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 6.0
+
+[node name="Wolf" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_enemy")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_visual")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_body")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 4.0
+target_desired_distance = 4.0
+radius = 7.0
+
+[node name="HealthController" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="CombatController" type="Node" parent="."]
+script = ExtResource("4_combat")
+
+[node name="StateController" type="Node" parent="."]
+script = ExtResource("5_state")

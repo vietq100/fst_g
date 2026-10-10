@@ -34,9 +34,10 @@ Initial target:
 These values are targets, not absolute constraints.
 
 Display (`DECISIONS.md` D20):
-- base viewport 640×360, window 1280×720
+- portrait, base viewport 360×640 (expands on taller/wider screens)
 - stretch mode `viewport`, integer scaling, nearest filtering
 - 4-direction sprites
+- about 11 tiles across the screen width: keep silhouettes readable on a phone
 
 ## 4. Palette
 

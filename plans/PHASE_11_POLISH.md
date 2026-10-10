@@ -14,7 +14,9 @@ Make the vertical slice look, sound and feel like the target, and stable.
 - [ ] VFX: hit flash, crit, death, loot sparkle, level-up, boss attack effects (no excessive screen shake)
 - [ ] Audio: music (town, wilderness, boss) and required SFX list
 - [ ] Balancing pass; update `DOCS/BALANCE.md`
-- [ ] Performance check (retargeting, navigation, UI refresh)
+- [ ] Performance check on mid-range Android + iPhone (60 fps target, battery, memory)
+- [ ] Export presets: Android (AAB/APK), iOS (Xcode project); app icon, splash, portrait lock
+- [ ] Exclude `tests/` from exports
 - [ ] Bug fixing and regression tests
 
 ## Acceptance criteria

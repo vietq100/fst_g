@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/slime/slime.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"slime"
+display_name = "Slime"
+hp = 30.0
+attack = 6.0
+defense = 1.0
+attack_speed = 0.7
+move_speed = 40.0
+critical_chance = 0.0
+critical_damage = 1.5
+attack_range = 18.0
+xp_reward = 5
+gold_min = 2
+gold_max = 4
+actor_scene = ExtResource("2_scene")

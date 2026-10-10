@@ -14,7 +14,7 @@ HunterRuntime:
 - unique_id
 - definition_id (class)
 - display_name
-- appearance (colour accents / variant ids)
+- accent_index (colour accent from the art palette; more appearance variants later)
 - stat_rolls (±10% on HP/Attack/Defense)
 - level
 - xp

@@ -1,0 +1,94 @@
+class_name Hunter
+extends Actor
+## Scene presentation of one HunterRuntime. Holds no gameplay rules.
+
+const GROUP := &"hunters"
+const DEFAULT_WEAPON_TINT := Color("d8dde3")
+const DEFAULT_BODY_TINT := Color("8f969e")
+
+var runtime: HunterRuntime
+var _service: HunterService
+var _equipment: EquipmentService
+
+
+## Call after the node is in the tree. `equipment` (optional) shows equipped items' tints.
+func setup(hunter: HunterRuntime, service: HunterService, combat_service: CombatService,
+		retarget_interval: float, equipment: EquipmentService = null) -> void:
+	runtime = hunter
+	_service = service
+	_equipment = equipment
+	name = String(hunter.unique_id)
+	add_to_group(GROUP)
+	(visual as PlaceholderVisual).set_accent_index(hunter.accent_index)
+	_refresh_equipment_look()
+	health.setup(_service.get_stat(hunter, HunterService.MAX_HP), hunter.current_hp)
+	health.health_changed.connect(_on_health_changed)
+	_service.hunter_changed.connect(_on_hunter_changed)
+	_service.hunter_leveled_up.connect(_on_hunter_leveled_up)
+	var definition := _service.get_definition(hunter)
+	combat.setup(Enemy.GROUP, definition.attack_range, retarget_interval, combat_service)
+	auto_combat = true
+	if hunter.injured or hunter.current_hp <= 0.0:
+		# Injured Hunters are shown downed until they recover.
+		_on_died()
+
+
+func get_team_group() -> StringName:
+	return GROUP
+
+
+func get_move_speed() -> float:
+	return _service.get_stat(runtime, HunterService.MOVE_SPEED)
+
+
+func get_combat_stats(against: Actor = null) -> CombatStats:
+	var conditions: Array[StringName] = []
+	if against is Enemy and (against as Enemy).definition != null and (against as Enemy).definition.is_boss:
+		conditions.append(&"vs_boss")
+	var stats := CombatStats.new()
+	stats.attack = _service.get_stat(runtime, HunterService.ATTACK, conditions)
+	stats.defense = _service.get_stat(runtime, HunterService.DEFENSE, conditions)
+	stats.attack_speed = _service.get_stat(runtime, HunterService.ATTACK_SPEED, conditions)
+	stats.critical_chance = _service.get_stat(runtime, HunterService.CRITICAL_CHANCE, conditions)
+	stats.critical_damage = _service.get_stat(runtime, HunterService.CRITICAL_DAMAGE, conditions)
+	stats.damage_dealt = _service.get_stat(runtime, HunterService.DAMAGE_DEALT, conditions)
+	stats.damage_taken = _service.get_stat(runtime, HunterService.DAMAGE_TAKEN, conditions)
+	return stats
+
+
+func _on_health_changed(current: float, _maximum: float) -> void:
+	runtime.current_hp = current
+
+
+func _on_hunter_changed(hunter: HunterRuntime) -> void:
+	if hunter != runtime:
+		return
+	# Read before set_max_health: its health_changed signal writes the actor's HP back to runtime.
+	var runtime_hp := hunter.current_hp
+	health.set_max_health(_service.get_stat(hunter, HunterService.MAX_HP))
+	# Out of combat, HP can change in town (resting): follow the runtime value.
+	if not hunter.injured and not health.is_dead() and not combat.is_valid_target(combat.target) \
+			and not is_equal_approx(health.current_health, runtime_hp):
+		health.setup(health.max_health, runtime_hp)
+	_refresh_equipment_look()
+
+
+func _on_hunter_leveled_up(hunter: HunterRuntime, _new_level: int, healed: float) -> void:
+	if hunter != runtime:
+		return
+	health.set_max_health(_service.get_stat(hunter, HunterService.MAX_HP))
+	health.heal(healed)
+	visual.play_level_up()
+
+
+## Equipment is visible on the placeholder: blade colour = weapon, body colour = armor
+## (CHARACTER_DESIGN.md §10).
+func _refresh_equipment_look() -> void:
+	var look := visual as PlaceholderVisual
+	if look == null:
+		return
+	var weapon := _equipment.get_equipped_item(runtime, &"weapon") if _equipment != null else null
+	var armor := _equipment.get_equipped_item(runtime, &"armor") if _equipment != null else null
+	look.weapon_color = weapon.tint if weapon != null else DEFAULT_WEAPON_TINT
+	look.body_color = armor.tint if armor != null else DEFAULT_BODY_TINT
+	look.weapon_length = 14.0 if weapon != null and weapon.rarity >= ItemDefinition.Rarity.UNCOMMON else 12.0

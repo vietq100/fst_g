@@ -28,6 +28,17 @@ Button
 - Notifications
 - Modal dialogs
 
+## Implemented flow
+
+Button (in a `Sheet`)
+→ service action (e.g. `RecruitmentService.recruit`)
+→ service signal (`candidates_changed`, `gold_changed`…)
+→ every open sheet that watches that signal rebuilds once at the end of the frame (`Sheet._watch`, coalesced)
+→ errors returned by the service are shown as toasts (`Sheet.run_action`).
+
+World → UI: `Town.building_tapped` / `hunter_tapped` → `UIRoot.open_building` / `open_hunter`.
+UI → World: `UIRoot.depart_requested(expedition_id, party)` → `Town.depart` (walk to gate) → `ExpeditionService.start`.
+
 ## UI refresh
 
 Prefer event-driven updates.

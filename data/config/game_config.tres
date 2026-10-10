@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="GameConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/game_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+defense_factor = 0.5
+min_damage = 1.0
+retarget_interval = 0.5
+base_xp = 20.0
+xp_exponent = 1.5
+level_cap_per_town_level = 10
+level_up_heal_ratio = 0.2
+start_gold = 200
+starting_hunter_class = &"warrior"
+starting_hunter_count = 1
+mood_start = 60.0
+mood_max = 100.0
+mood_high_threshold = 70.0
+mood_low_threshold = 30.0
+mood_high_stat_bonus = 0.05
+mood_low_stat_penalty = -0.1
+mood_high_xp_bonus = 0.1
+mood_low_xp_penalty = -0.1
+mood_success = 10.0
+mood_failure = -15.0
+mood_injured = -10.0
+mood_trait_like = 5.0
+mood_trait_dislike = -5.0
+mood_overwork = -5.0
+overwork_expeditions = 3
+back_to_back_expeditions = 2
+idle_cycles_for_event = 2
+long_rest_ticks = 3
+activity_event_every_ticks = 6
+rest_when_mood_below = 50.0
+traits_min = 1
+traits_max = 2
+bond_max = 100.0
+bond_shared_expedition = 20.0
+bonded_attack_bonus = 0.05
+bonded_social_mood = 2.0
+day_length_seconds = 300.0
+offline_cap_hours = 8.0
+max_party_size = 3
+failure_loot_keep_ratio = 0.5

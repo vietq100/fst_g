@@ -2,13 +2,24 @@
 
 All definitions are Resources loaded by `DataRegistry`. Values: `BALANCE.md`.
 
-## Modifier (shared format)
+Code: classes in `res://game/definitions/`, data in `res://data/<category>/*.tres`. Every definition extends `GameDefinition` (`id`, `display_name`).
+
+## GameConfig (`res://data/config/game_config.tres`)
+
+Formula and rule constants: defense_factor, min_damage, retarget_interval, base_xp, xp_exponent, level_cap_per_town_level, level_up_heal_ratio, start_gold, starting_hunter_class, starting_hunter_count, mood values (start, max, thresholds, state modifiers, event amounts), overwork / trait event thresholds, traits_min/max, bond values, day_length_seconds, offline_cap_hours, max_party_size, failure_loot_keep_ratio.
+
+Building effect keys used by code: `hunter_capacity` (Town Hall), `candidate_count`, `refresh_cost` (Tavern), `recipe_level` (Blacksmith), `recovery_seconds`, `speedup_gold_per_minute` (Hospital), `inventory_slots` (Warehouse).
+
+## StatModifier (shared format)
 
 - stat
-- type: `flat` | `percent`
-- value
+- type: `FLAT` | `PERCENT`
+- value (PERCENT as fraction, 0.15 = +15%)
+- condition (optional tag, e.g. `vs_boss`; empty = always active)
 
 Final stat = `(base + level_growth * (level - 1) + Σflat) * (1 + Σpercent)`.
+
+Helper resources: `ItemAmount` (item_id, quantity), `LootEntry`, `BuildingLevel`, `EnemyGroup`, `EnemySpawn`.
 
 ## HunterDefinition (class template)
 
@@ -25,9 +36,13 @@ Final stat = `(base + level_growth * (level - 1) + Σflat) * (1 + Σpercent)`.
 - move_speed
 - critical_chance
 - critical_damage
+- attack_range (px, feet to feet)
 - portrait
-- sprite
+- sprite_frames
 - recruit_cost
+- stat_roll_variance (±fraction applied to recruits)
+- name_pool (names for recruits, unused first)
+- starting_items (created and equipped on every recruit)
 
 Individual identity (name, appearance, stat rolls, traits) lives in `HunterRuntime`.
 
@@ -47,8 +62,9 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 - id
 - display_name
 - location_id
+- player_assignable
 - tick_seconds
-- effects (hp_percent, mood, xp, bond per tick)
+- effects per tick: hp_percent, mood, xp, bond
 
 ## EnemyDefinition
 
@@ -62,6 +78,10 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 - critical_chance
 - critical_damage
 - is_boss
+- attack_range (px, feet to feet)
+- hit_radius (extra body size added to attackers' reach; big bosses)
+- actor_scene (scene with an `Enemy` root, spawned for this definition)
+- sprite_frames
 - xp_reward
 - gold_min
 - gold_max
@@ -71,6 +91,8 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 
 - id
 - entries (item_id, quantity_min, quantity_max, chance)
+
+MVP tables: `goblin`, `wolf`, `forest_guardian_first`, `forest_guardian_repeat`. Bosses leave `loot_table_id` empty; their drops come from the expedition's first-clear / repeat tables.
 
 ## ItemDefinition
 
@@ -84,6 +106,7 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 - equipment_slot
 - modifiers (list of Modifier)
 - icon
+- tint (colour on placeholder characters)
 
 ## RecipeDefinition
 
@@ -97,17 +120,19 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 
 - id
 - display_name
-- max_level (data only; can grow over time)
-- levels (per level: costs, requirements, effects, visual variant)
+- levels: Array[BuildingLevel] (index 0 = level 1; max level = size, can grow over time)
+  - gold_cost, material_costs, required_flags, effects (key → value), visual_variant
 
 ## ExpeditionDefinition
 
 - id
 - display_name
 - recommended_level
-- enemy_groups (list of sections, each a list of enemy_id + count)
+- enemy_groups: Array[EnemyGroup] (section_id + spawns of enemy_id/count), entrance first
 - boss_id
 - completion_bonus_gold
-- first_clear_rewards
-- repeat_clear_rewards
-- unlock_requirement
+- first_clear_loot_table_id
+- repeat_clear_loot_table_id
+- first_clear_flags (e.g. `first_boss_clear`)
+- unlock_flag (empty = always available)
+- scene

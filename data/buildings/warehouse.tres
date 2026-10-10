@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/building_definition.gd" id="1_building"]
+[ext_resource type="Script" path="res://game/definitions/building_level.gd" id="2_level"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="3_amount"]
+
+[sub_resource type="Resource" id="BuildingLevel_0"]
+script = ExtResource("2_level")
+gold_cost = 0
+material_costs = Array[ExtResource("3_amount")]([])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"inventory_slots": 40.0})
+visual_variant = &"lv1"
+
+[sub_resource type="Resource" id="ItemAmount_0"]
+script = ExtResource("3_amount")
+item_id = &"iron_ore"
+quantity = 5
+
+[sub_resource type="Resource" id="BuildingLevel_1"]
+script = ExtResource("2_level")
+gold_cost = 250
+material_costs = Array[ExtResource("3_amount")]([SubResource("ItemAmount_0")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"inventory_slots": 80.0})
+visual_variant = &"lv2"
+
+[resource]
+script = ExtResource("1_building")
+id = &"warehouse"
+display_name = "Warehouse"
+levels = Array[ExtResource("2_level")]([SubResource("BuildingLevel_0"), SubResource("BuildingLevel_1")])

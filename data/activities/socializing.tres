@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ActivityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/activity_definition.gd" id="1_activity"]
+
+[resource]
+script = ExtResource("1_activity")
+id = &"socializing"
+display_name = "Socializing"
+location_id = &"tavern"
+player_assignable = true
+tick_seconds = 10.0
+hp_percent = 0.0
+mood = 3.0
+xp = 0.0
+bond = 2.0

@@ -3,6 +3,10 @@
 Source of truth: `DOCS/`. Phase order follows `DOCS/ROADMAP/ROADMAP.md` (Phase 0–11).
 Each phase has its own file in this folder, written with the `DOCS/ROADMAP/AGENT_TASK_TEMPLATE.md` structure.
 
+## Platform
+
+Mobile (Android + iOS), portrait, touch (`DECISIONS.md` D20, D23). Town progresses offline, expeditions do not (D24). Desktop is for development only.
+
 ## Goal
 
 Playable vertical slice:
@@ -15,17 +19,17 @@ No endgame. Bosses and regions are milestones, not endings.
 
 | # | Phase | File | Result |
 |---|---|---|---|
-| 0 | Foundation | `PHASE_00_FOUNDATION.md` | Project skeleton, autoloads, data registry |
-| 1 | Character | `PHASE_01_CHARACTER.md` | Warrior with stats/HP, placeholder visuals |
-| 2 | Enemy | `PHASE_02_ENEMY.md` | Slime, targeting, movement |
-| 3 | Combat | `PHASE_03_COMBAT.md` | Auto combat, damage, death, feedback |
-| 4 | Expedition | `PHASE_04_EXPEDITION.md` | Dark Forest run, boss, completion, return |
-| 5 | Loot | `PHASE_05_LOOT.md` | Loot tables, gold, materials, inventory |
-| 6 | Town | `PHASE_06_TOWN.md` | Town scene, buildings, upgrades |
-| 7 | Equipment | `PHASE_07_EQUIPMENT.md` | Weapon/armor, stat modifiers |
-| 8 | Hunter Life | `PHASE_08_HUNTER_LIFE.md` | Traits, mood, activities, bonds, history |
-| 9 | Save | `PHASE_09_SAVE.md` | Versioned save/load, autosave, migration |
-| 10 | UI | `PHASE_10_UI.md` | HUD and panels |
+| 0 | Foundation ✅ | `PHASE_00_FOUNDATION.md` | Project skeleton, autoloads, data registry |
+| 1 | Character ✅ | `PHASE_01_CHARACTER.md` | Warrior with stats/HP, placeholder visuals |
+| 2 | Enemy ✅ | `PHASE_02_ENEMY.md` | Slime, targeting, movement |
+| 3 | Combat ✅ (device test pending) | `PHASE_03_COMBAT.md` | Auto combat, damage, death, feedback |
+| 4 | Expedition ✅ | `PHASE_04_EXPEDITION.md` | Dark Forest run, boss, completion, return |
+| 5 | Loot ✅ | `PHASE_05_LOOT.md` | Loot tables, gold, materials, inventory |
+| 6 | Town ✅ | `PHASE_06_TOWN.md` | Town scene, buildings, upgrades |
+| 7 | Equipment ✅ | `PHASE_07_EQUIPMENT.md` | Weapon/armor, stat modifiers |
+| 8 | Hunter Life ✅ | `PHASE_08_HUNTER_LIFE.md` | Traits, mood, activities, bonds, history |
+| 9 | Save ✅ | `PHASE_09_SAVE.md` | Versioned save/load, autosave, migration |
+| 10 | UI ✅ | `PHASE_10_UI.md` | HUD and panels |
 | 11 | Polish | `PHASE_11_POLISH.md` | Art, VFX, audio, balance |
 
 ## Decisions and numbers
@@ -58,7 +62,7 @@ If a new conflict appears: report it, do not silently pick one (`00_RULES.md` §
 
 ## Milestones
 
-- **M1 – Combat sandbox:** end of Phase 3
+- **M1 – Combat sandbox:** end of Phase 3, including first Android device smoke test
 - **M2 – Expedition loop:** end of Phase 5 (expedition + loot)
 - **M3 – Management loop:** end of Phase 8 (town + equipment + Hunter life)
 - **M4 – Vertical slice:** end of Phase 10 (save + UI)

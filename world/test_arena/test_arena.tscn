@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://world/test_arena/test_arena.gd" id="1_arena"]
+[ext_resource type="Script" path="res://world/test_arena/target_lines.gd" id="2_lines"]
+[ext_resource type="Script" path="res://world/vfx/combat_feedback.gd" id="3_feedback"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_arena"]
+outlines = Array[PackedVector2Array]([PackedVector2Array(16, 176, 344, 176, 344, 624, 16, 624)])
+parsed_geometry_type = 1
+agent_radius = 6.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rock"]
+size = Vector2(96, 32)
+
+[node name="TestArena" type="Node2D"]
+script = ExtResource("1_arena")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_arena")
+
+[node name="Rock" type="StaticBody2D" parent="NavigationRegion2D"]
+position = Vector2(180, 384)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/Rock"]
+shape = SubResource("RectangleShape2D_rock")
+
+[node name="Visual" type="Polygon2D" parent="NavigationRegion2D/Rock"]
+color = Color(0.36, 0.36, 0.4, 1)
+polygon = PackedVector2Array(-48, -16, 48, -16, 48, 16, -48, 16)
+
+[node name="Actors" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="TargetLines" type="Node2D" parent="."]
+script = ExtResource("2_lines")
+
+[node name="CombatFeedback" type="Node2D" parent="."]
+script = ExtResource("3_feedback")

@@ -82,7 +82,7 @@ Activities (tick = 10 s, effects in `BALANCE.md`):
 
 - The player can assign Resting, Socializing or Training.
 - Default for an idle Hunter: Resting if HP < 100% or mood < 50, otherwise Training.
-- Timers run only while the game runs (no offline progress).
+- Activity ticks and Hospital timers also progress while the app is closed, capped (`DECISIONS.md` D24).
 - Hunters walk to their activity location in the town scene.
 
 Activity effects are defined in `ActivityDefinition` data.
@@ -127,6 +127,14 @@ Do not implement a large narrative/dialogue system. Events are short, data-drive
 - Bonds are stored in a separate collection owned by `BondService`.
 - Services emit signals (`mood_changed`, `bond_changed`, `activity_changed`); UI subscribes.
 - Updates happen on events (expedition end, activity tick), not every frame.
+
+## 8b. Implementation (Phase 8)
+
+- `TraitService` (random 1–2 traits for candidates, trait modifiers, activity rates, like/dislike reactions), `MoodService` (states, modifiers, expedition events), `BondService` (pair values, party attack bonus, shared-expedition growth), `ActivityService` (10 s ticks; default rule; assignments; socializing bonds).
+- All are modifier sources of `HunterService`, so traits, mood and bonds go through the same stat pipeline as equipment.
+- Combat uses multiplier stats `damage_dealt` / `damage_taken`; Hunters get the `vs_boss` condition when attacking a boss.
+- History counters live in `HunterRuntime.history`; event tags and numbers: `DECISIONS.md` D26, `GameConfig`.
+- Town: Hunters walk to their activity spot (Tavern for resting/socializing, Training Yard, Hospital beds). The Hunter panel shows traits, mood, activity (with Auto/Rest/Train/Social), bonds and history; Tavern candidates show their traits; the gate warns about low mood.
 
 ## 9. Out of scope for MVP
 

@@ -10,6 +10,8 @@ Priority:
 5. continue to next group (loot is auto-collected on kill in MVP)
 6. return after boss or when the expedition ends
 
+Hunters and enemies share the same chase logic (`Actor`): walk to an engagement slot of the target, attack while in range, wait on an outer ring if all slots are taken (`COMBAT_SYSTEM.md`).
+
 ## Enemy AI
 
 Priority:

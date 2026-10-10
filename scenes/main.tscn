@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://1qmw5xlyjx37"]
+
+[ext_resource type="Script" uid="uid://chcrf4fny0o8m" path="res://scenes/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://ui/debug/debug_panel.tscn" id="2_debug"]
+[ext_resource type="Script" path="res://ui/ui_root.gd" id="3_ui"]
+
+[node name="Main" type="Node" unique_id=149048808]
+script = ExtResource("1_main")
+
+[node name="GameRoot" type="Node" parent="." unique_id=1299347289]
+
+[node name="WorldContainer" type="Node2D" parent="." unique_id=1423807994]
+process_mode = 1
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=25646302]
+
+[node name="UIRoot" type="Control" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_ui")
+
+[node name="DebugPanel" parent="UI" unique_id=1362534717 instance=ExtResource("2_debug")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -84.0
+offset_top = 40.0
+offset_right = -4.0
+offset_bottom = 84.0
+grow_horizontal = 0
+
+[node name="Transition" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Fade" type="ColorRect" parent="Transition"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.03, 0.03, 0.04, 0)
+
+[node name="Banner" type="Label" parent="Transition"]
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0.086, 0.086, 0.11, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+text = "VICTORY"
+horizontal_alignment = 1
+vertical_alignment = 1

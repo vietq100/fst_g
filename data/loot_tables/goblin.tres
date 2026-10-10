@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
+[ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootEntry_0"]
+script = ExtResource("2_entry")
+item_id = &"iron_ore"
+quantity_min = 1
+quantity_max = 1
+chance = 0.4
+
+[resource]
+script = ExtResource("1_table")
+id = &"goblin"
+display_name = "Goblin"
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0")])
