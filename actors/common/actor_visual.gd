@@ -25,6 +25,16 @@ var downed := false:
 		downed = value
 		_on_downed_changed()
 		queue_redraw()
+## True while the actor walks along a path (visuals may animate steps).
+var moving := false
+## Moving fast (chasing a target, hasted): visuals may show a run instead of a walk.
+var running := false
+## Body colour from status effects (D48), e.g. green while poisoned. The hit flash returns to it.
+var status_tint := Color.WHITE:
+	set(value):
+		status_tint = value
+		if _flash_tween == null or not _flash_tween.is_running():
+			self_modulate = status_tint
 
 var _flash_tween: Tween
 var _lunge_tween: Tween
@@ -35,7 +45,7 @@ func play_hit_flash() -> void:
 		_flash_tween.kill()
 	self_modulate = HIT_FLASH_COLOR
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(self, ^"self_modulate", Color.WHITE, HIT_FLASH_DURATION)
+	_flash_tween.tween_property(self, ^"self_modulate", status_tint, HIT_FLASH_DURATION)
 
 
 ## Short step towards `direction` and back.
@@ -46,6 +56,12 @@ func play_attack_lunge(direction: Vector2) -> void:
 	_lunge_tween = create_tween()
 	_lunge_tween.tween_property(self, ^"position", direction.normalized() * LUNGE_DISTANCE, LUNGE_DURATION * 0.4)
 	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, LUNGE_DURATION * 0.6)
+
+
+## One-shot action animation by name (ChibiAnimations: skill, pickup, loot, interact...).
+## Visuals without such animations ignore it.
+func play_action(_action: StringName) -> void:
+	pass
 
 
 ## Light burst (VFX_DESIGN.md → Level up).

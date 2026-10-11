@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+id = &"regeneration"
+display_name = "Regen"
+kind = 0
+duration = 8.0
+stacking = 0
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.03
+tick_is_ratio = true
+stuns = false
+roots = false
+disarms = false
+invulnerable = false
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(0.3725, 0.8157, 0.4078, 1)
+icon = "+"
+aura = 4
+tints_actor = false

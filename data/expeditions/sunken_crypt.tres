@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExpeditionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/expedition_definition.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"sunken_crypt"
+display_name = "Sunken Crypt"
+recommended_level = 10
+unlock_flag = &"coming_later"
+region_id = &"ancient_ruins"
+entrance_tile = Vector2i(56, -1)
+locked = true

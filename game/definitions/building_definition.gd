@@ -4,6 +4,18 @@ extends GameDefinition
 
 @export var levels: Array[BuildingLevel] = []
 
+@export_group("Placement")
+## Gold to build one (0 = cannot be built from the build menu, e.g. Town Hall).
+@export var build_cost: int = 0
+## Tiles occupied (gx × gy), anchored at the building's tile.
+@export var footprint: Vector2i = Vector2i(2, 2)
+## Only one may exist (core buildings). Houses are not unique.
+@export var unique: bool = true
+## May the player remove it?
+@export var removable: bool = true
+## Where new games place it (one entry per instance).
+@export var default_tiles: Array[Vector2i] = []
+
 
 func get_max_level() -> int:
 	return levels.size()

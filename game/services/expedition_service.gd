@@ -11,6 +11,9 @@ signal expedition_finished(run: ExpeditionRun)
 ## SaveManager listens (Phase 9, DECISIONS.md D21).
 signal autosave_requested(reason: StringName)
 
+## `func(hunter: HunterRuntime, expedition_id: StringName)` for party members who fell: in the
+## world they come out of the dungeon as bodies at its entrance (D30, D35). Unset: injured (D4).
+var downed_handler: Callable
 var current_run: ExpeditionRun
 
 var _registry: Node
@@ -61,7 +64,7 @@ func validate(expedition_id: StringName, hunter_ids: Array[StringName]) -> Strin
 		var hunter := _hunters.get_hunter(hunter_id)
 		if hunter == null:
 			return "Unknown Hunter '%s'" % hunter_id
-		if hunter.injured or hunter.state != HunterRuntime.LifecycleState.AVAILABLE:
+		if hunter.injured or not hunter.alive or hunter.state != HunterRuntime.LifecycleState.AVAILABLE:
 			return "%s is not available" % hunter.display_name
 	return ""
 
@@ -188,7 +191,10 @@ func _finish(result: ExpeditionRun.Phase) -> void:
 			_add_history(hunter, HunterRuntime.BOSSES_DEFEATED)
 		if current_run.downed_ids.has(hunter.unique_id):
 			_add_history(hunter, HunterRuntime.TIMES_INJURED)
-			_hunters.mark_injured(hunter)
+			if downed_handler.is_valid():
+				downed_handler.call(hunter, current_run.expedition_id)
+			else:
+				_hunters.mark_injured(hunter)
 		else:
 			_hunters.set_lifecycle_state(hunter, HunterRuntime.LifecycleState.AVAILABLE)
 	expedition_finished.emit(current_run)

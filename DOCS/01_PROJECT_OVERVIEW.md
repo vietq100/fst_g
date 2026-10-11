@@ -24,7 +24,7 @@ The player owns and develops a dangerous frontier settlement.
 
 Hunters arrive, live in the town, train, bond with each other, equip themselves, travel into monster territory, fight automatically, collect resources and return.
 
-The player acts as the settlement manager and as the one who raises these Hunters.
+The player is the **village chief** (D38): the settlement manager and the one who raises these Hunters.
 
 ## Core fantasy
 
@@ -54,19 +54,22 @@ Power growth makes Hunters capable.
 Life growth makes them individuals the player cares about.
 Each axis must influence the other (see `SYSTEMS/HUNTER_LIFE_SYSTEM.md`).
 
+## World structure (redesign, `DECISIONS.md` D27–D36)
+
+One continuous **isometric world map**: the Town on top, Dark Forest (left), Ancient Ruins (right) and Goblin Cave (bottom), joined by gates. Each hunting region has dungeon entrances on its outer edges. The screen is a window onto this world: drag, zoom, or follow a Hunter.
+
+Hunters **live on their own**: they sleep in houses, walk out to hunt in a region by themselves and sell the materials they farm to the village. The chief turns materials into food (Tavern) and medicine (Hospital) that Hunters buy with their own money. A Hunter who dies leaves a body; village staff (or another Hunter) carry it to the Temple, where it is revived at a small XP cost. The chief builds and arranges the town, crafts, equips and guides Hunters, manages money, and sends parties into dungeons.
+
 ## Core loop
 
-Recruit
-→ care for (rest, train, socialize)
-→ prepare
-→ assign
-→ expedition
-→ auto combat
-→ loot
-→ return
-→ recover
-→ upgrade
-→ unlock
+Build / arrange the town (houses, buildings)
+→ recruit
+→ Hunters live: sleep, eat, train, socialize
+→ Hunters hunt in regions on their own (or where assigned)
+→ loot to the Warehouse, gold to their own purse
+→ deaths: bodies carried home, revived at the Hospital
+→ craft, equip, transfer money, upgrade
+→ send parties into dungeons for bosses and rare loot
 → repeat
 
 ## Design pillars
@@ -91,9 +94,13 @@ The player makes decisions rather than manually attacking every enemy.
 
 ## MVP
 
-- one town
-- Town Hall, Tavern, Blacksmith, Hospital, Warehouse
-- one expedition region (Dark Forest), party of 1–3 Hunters
+- one isometric world: Town + Dark Forest + Goblin Cave + Ancient Ruins, connected by gates
+- free building placement in the Town (build, move, remove); Houses (4 beds each)
+- Town Hall, Tavern, Blacksmith, Hospital, Warehouse, Houses
+- autonomous hunting in the three regions; Hunter needs (HP, stamina, energy); personal purses
+- bodies and corpse retrieval; revival at the Hospital
+- one active dungeon (Forest Guardian's Grove, the former Dark Forest expedition), party of 1–3 Hunters; other dungeon entrances shown as locked
+- camera: drag, pinch/wheel zoom, follow a Hunter
 - one Hunter class
 - three normal enemies
 - one boss (a milestone, repeatable)
@@ -106,7 +113,7 @@ The player makes decisions rather than manually attacking every enemy.
 - **traits (small starter set with real gameplay effect)**
 - **mood/morale (simple)**
 - **bonds between Hunters (simple, one level)**
-- **basic town life: Hunters rest, train or socialize when not on expedition**
+- **basic town life: Hunters sleep, eat, rest, train or socialize when not hunting**
 - save/load
 
 Detailed MVP decisions: `DECISIONS.md`. Starting numbers: `BALANCE.md`.

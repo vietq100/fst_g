@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+id = &"root"
+display_name = "Rooted"
+kind = 1
+duration = 3.0
+stacking = 0
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.0
+tick_is_ratio = false
+stuns = false
+roots = true
+disarms = false
+invulnerable = false
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(0.5412, 0.4157, 0.2314, 1)
+icon = "#"
+aura = 7
+tints_actor = false

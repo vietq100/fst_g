@@ -30,7 +30,10 @@ No endgame. Bosses and regions are milestones, not endings.
 | 8 | Hunter Life ✅ | `PHASE_08_HUNTER_LIFE.md` | Traits, mood, activities, bonds, history |
 | 9 | Save ✅ | `PHASE_09_SAVE.md` | Versioned save/load, autosave, migration |
 | 10 | UI ✅ | `PHASE_10_UI.md` | HUD and panels |
-| 11 | Polish | `PHASE_11_POLISH.md` | Art, VFX, audio, balance |
+| 11 | World redesign ✅ (owner review pending) | `PHASE_11_WORLD.md` | Isometric world, autonomous Hunters, needs, Houses, building placement, bodies, purses (D27–D37) |
+| 11b | Village economy | `PHASE_11B_VILLAGE.md` | Chief role, materials sold to the village, food and medicine crafting, Temple revival, cleanup staff, XP rebalance (D38–D44) |
+| 11c | Classes and talents | `PHASE_11C_CLASSES.md` | Ranger, Rogue, Guardian; Cook / Herbalist talents crafting in the field (D45–D46) |
+| 12 | Polish | `PHASE_12_POLISH.md` | Art, VFX, audio, balance |
 
 ## Decisions and numbers
 

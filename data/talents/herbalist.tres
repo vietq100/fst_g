@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TalentDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/talent_definition.gd" id="1_talent"]
+
+[resource]
+script = ExtResource("1_talent")
+id = &"herbalist"
+display_name = "Herbalist"
+description = "Makes bandages and potions in the field from the materials in its bag."
+weight = 0.35
+recipe_ids = Array[StringName]([&"healing_potion", &"bandage"])

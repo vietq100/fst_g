@@ -12,12 +12,16 @@ const REPATH_DISTANCE := 6.0
 ## Must stay below the distance between neighbouring engagement slots (~13.5 px).
 const SEPARATION_DISTANCE := 12.0
 const SEPARATION_SPEED := 30.0
+## Move speed above base × this shows the run animation.
+const RUN_SPEED_FACTOR := 1.15
 
 @onready var visual: ActorVisual = $Visual
 @onready var nav_agent: NavigationAgent2D = $NavigationAgent2D
 @onready var health: HealthController = $HealthController
 @onready var combat: CombatController = $CombatController
 @onready var state: StateController = $StateController
+## Buffs/debuffs (D48). Created in code so every actor scene gets one.
+var effects: StatusEffectController
 
 ## When true the actor chases and attacks its CombatController target on its own.
 var auto_combat := false
@@ -31,6 +35,12 @@ var _manual_move := false
 
 
 func _ready() -> void:
+	effects = StatusEffectController.new()
+	effects.name = "StatusEffects"
+	add_child(effects)
+	var effect_view := StatusEffectView.new()
+	add_child(effect_view)
+	effect_view.bind(self)
 	health.died.connect(_on_died)
 	health.damaged.connect(func(_amount: float) -> void: visual.play_hit_flash())
 	combat.attacked.connect(_on_attacked)
@@ -51,6 +61,21 @@ func get_combat_stats(_against: Actor = null) -> CombatStats:
 	return CombatStats.new()
 
 
+## Combat stats after active status effects (D48). CombatService uses this.
+func get_final_combat_stats(against: Actor = null) -> CombatStats:
+	return effects.modify_combat_stats(get_combat_stats(against))
+
+
+## Effects this actor's hits may apply. Overridden by subclasses.
+func get_on_hit_effects() -> Array[StatusEffectChance]:
+	return []
+
+
+## Move speed after status effects (slow, haste).
+func get_final_move_speed() -> float:
+	return effects.modify_stat(HunterService.MOVE_SPEED, get_move_speed())
+
+
 ## Extra body size beyond a standard actor; attackers add it to their reach.
 func get_hit_radius() -> float:
 	return 0.0
@@ -62,7 +87,7 @@ func is_targetable() -> bool:
 
 
 func can_attack() -> bool:
-	return not _manual_move and not state.is_state(StateController.State.DOWNED)
+	return not _manual_move and not state.is_state(StateController.State.DOWNED) and effects.can_attack()
 
 
 ## Player/debug command: walk to a point, ignoring combat until arrival.
@@ -80,12 +105,14 @@ func move_to(target: Vector2) -> void:
 func stop() -> void:
 	_manual_move = false
 	velocity = Vector2.ZERO
+	visual.moving = false
 	if state.is_state(StateController.State.MOVING):
 		state.change(StateController.State.IDLE)
 
 
 ## Brings a downed actor back (Hospital / debug).
 func revive(amount: float) -> void:
+	effects.clear_all()
 	health.revive(amount)
 	state.revive()
 	visual.downed = false
@@ -96,7 +123,12 @@ func face_towards(point: Vector2) -> void:
 	visual.facing = Facing.from_vector(point - global_position, visual.facing)
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if not effects.can_move():
+		# Stunned / rooted: keep the current order, just do not move.
+		velocity = Vector2.ZERO
+		visual.moving = false
+		return
 	if auto_combat and not _manual_move and not state.is_state(StateController.State.DOWNED):
 		_update_chase()
 	if not state.is_state(StateController.State.MOVING):
@@ -110,8 +142,13 @@ func _physics_process(_delta: float) -> void:
 	if to_next.length() <= ARRIVE_DISTANCE and nav_agent.is_target_reached():
 		stop()
 		return
-	velocity = to_next.normalized() * get_move_speed()
+	# Never step past the next path point (large steps would oscillate around it).
+	velocity = to_next.normalized() * minf(get_final_move_speed(), to_next.length() / maxf(delta, 0.0001))
 	visual.facing = Facing.from_vector(velocity, visual.facing)
+	visual.moving = true
+	# Chasing a target or hasted: run (presentation only, speed is unchanged).
+	visual.running = (auto_combat and not _manual_move and combat.is_valid_target(combat.target)) \
+		or get_final_move_speed() > get_move_speed() * RUN_SPEED_FACTOR
 	move_and_slide()
 
 
@@ -181,6 +218,8 @@ func _on_attacked(target: Actor) -> void:
 func _on_died() -> void:
 	_manual_move = false
 	velocity = Vector2.ZERO
+	effects.clear_all()
 	state.change(StateController.State.DOWNED)
 	combat.stop()
+	visual.moving = false
 	visual.downed = true

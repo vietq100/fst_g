@@ -51,6 +51,21 @@ Gameplay:
 - medium damage
 - lower defense
 
+## 4b. Skeleton (Ancient Ruins)
+
+Role:
+- sturdy undead of the Ruins (region monster, D29)
+
+Visual:
+- pale bone body, no ears
+- long grey blade
+
+Gameplay:
+- slow, hits hard, good defense
+- numbers: BALANCE.md → Enemies
+
+Region monsters (all of the above except the boss) get a level from their region; level scales stats and rewards (BALANCE.md → Regions).
+
 ## 5. Boss: Forest Guardian
 
 Role:

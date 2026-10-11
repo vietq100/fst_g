@@ -26,6 +26,10 @@ var attack_range := 0.0
 var target: Actor
 ## False pauses attacking (targeting continues), e.g. while following a player command.
 var attacks_enabled := true
+## Optional rules (the world map): `func(candidate: Actor) -> bool`. `acquire_filter` limits new
+## targets (aggro range), `keep_filter` also drops the current one (leash, left the region).
+var acquire_filter: Callable
+var keep_filter: Callable
 
 var _service: CombatService
 var _timer: Timer
@@ -49,6 +53,11 @@ func setup(group: StringName, range_px: float, retarget_interval: float, service
 		add_child(_timer)
 	_timer.wait_time = retarget_interval
 	resume()
+
+
+## The service resolving this actor's attacks (null before setup).
+func get_service() -> CombatService:
+	return _service
 
 
 ## Stops targeting and attacking (e.g. when the owner is downed).
@@ -76,11 +85,23 @@ func refresh_target() -> void:
 	if not _active or target_group == &"" or is_valid_target(target):
 		return
 	var origin := _owner_actor().global_position
-	_set_target(pick_nearest(origin, get_tree().get_nodes_in_group(target_group), is_valid_target))
+	_set_target(pick_nearest(origin, get_tree().get_nodes_in_group(target_group), _can_acquire))
 
 
 func is_valid_target(candidate: Actor) -> bool:
-	return is_instance_valid(candidate) and candidate != _owner_actor() and candidate.is_targetable()
+	return is_instance_valid(candidate) and candidate != _owner_actor() and candidate.is_targetable() \
+		and (not keep_filter.is_valid() or keep_filter.call(candidate))
+
+
+## Drops the current target if it is no longer valid and looks for a new one now.
+func recheck() -> void:
+	if target != null and not is_valid_target(target):
+		_set_target(null)
+	refresh_target()
+
+
+func _can_acquire(candidate: Actor) -> bool:
+	return is_valid_target(candidate) and (not acquire_filter.is_valid() or acquire_filter.call(candidate))
 
 
 func is_target_in_range() -> bool:

@@ -11,5 +11,5 @@ player_assignable = true
 tick_seconds = 10.0
 hp_percent = 0.0
 mood = 0.0
-xp = 3.0
+xp = 1.0
 bond = 0.0

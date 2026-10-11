@@ -31,7 +31,9 @@ func test_every_sheet_builds() -> void:
 		HuntersSheet.new(), HunterSheet.new(hunter), InventorySheet.new(),
 		ExpeditionSheet.new(&"dark_forest", [hunter.unique_id] as Array[StringName]),
 		MessageSheet.new("Test", PackedStringArray(["line"])),
-		MessageSheet.for_offline({"seconds": 4000.0, "capped": false, "recovered": PackedStringArray(["A"]), "xp": 10, "levels": 1}),
+		MessageSheet.for_offline({"seconds": 4000.0, "capped": false, "recovered": PackedStringArray(["A"]), "xp": 10, "levels": 1,
+			"meals": 2, "hungry_ticks": 1}),
+		BuildSheet.new(), ExpeditionSheet.new(&"sunken_crypt", [] as Array[StringName]),
 	]
 	for building_id in _game.buildings.get_ids():
 		sheets.append(BuildingSheet.new(building_id))
@@ -51,9 +53,25 @@ func test_sheet_actions_report_errors() -> void:
 
 func test_expedition_sheet_party_validation() -> void:
 	var sheet := _show(ExpeditionSheet.new(&"dark_forest", [] as Array[StringName]))
-	var depart := _find_button(sheet, "Depart")
+	var depart := _find_button(sheet, "Walk to the entrance")
 	assert_not_null(depart)
 	assert_true(depart.disabled, "empty party cannot depart")
+
+
+func test_locked_dungeon_has_no_depart_button() -> void:
+	var sheet := _show(ExpeditionSheet.new(&"goblin_warren", [] as Array[StringName]))
+	assert_null(_find_button(sheet, "Walk to the entrance"))
+
+
+func test_hunter_sheet_offers_follow_and_duty() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var sheet := _show(HunterSheet.new(hunter)) as HunterSheet
+	var followed: Array = []
+	sheet.follow_requested.connect(func(id: StringName) -> void: followed.append(id))
+	_find_button(sheet, "Follow").pressed.emit()
+	assert_eq(followed, [hunter.unique_id])
+	assert_not_null(_find_button(sheet, "Auto"))
+	assert_not_null(_find_button(sheet, "Give 50"))
 
 
 func test_kit_formatting() -> void:

@@ -19,15 +19,23 @@ var wallet: WalletService
 var progress: ProgressService
 var inventory: InventoryService
 var loot: LootService
+var world: WorldService
 var buildings: BuildingService
+var housing: HousingService
 var recruitment: RecruitmentService
-var hospital: HospitalService
+var temple: TempleService
 var equipment: EquipmentService
 var crafting: CraftingService
 var traits: TraitService
 var mood: MoodService
 var bonds: BondService
 var activities: ActivityService
+var purses: PurseService
+var supply: SupplyService
+var needs: NeedsService
+var regions: RegionService
+var corpses: CorpseService
+var talents: TalentService
 var expeditions: ExpeditionService
 
 
@@ -49,21 +57,33 @@ func build(data_registry: Node) -> void:
 	progress = ProgressService.new()
 	inventory = InventoryService.new(registry, wallet)
 	loot = LootService.new(registry, rng)
-	buildings = BuildingService.new(registry, wallet, inventory, progress)
+	world = WorldService.new(registry)
+	buildings = BuildingService.new(registry, wallet, inventory, progress, world)
+	housing = HousingService.new(hunters, buildings)
 	recruitment = RecruitmentService.new(registry, hunters, buildings, wallet, rng)
-	hospital = HospitalService.new(hunters, buildings, wallet)
+	recruitment.housing = housing
+	temple = TempleService.new(hunters, buildings, wallet, stats, config)
 	equipment = EquipmentService.new(registry, hunters, inventory)
 	crafting = CraftingService.new(registry, buildings, wallet, inventory)
 	traits = TraitService.new(registry, hunters, config, rng)
 	mood = MoodService.new(hunters, traits, config)
 	bonds = BondService.new(hunters, config)
 	activities = ActivityService.new(registry, hunters, traits, mood, bonds, stats, progress, config)
+	purses = PurseService.new(wallet, config)
+	supply = SupplyService.new(registry, inventory, purses, hunters, buildings)
+	needs = NeedsService.new(hunters, housing, supply, mood, config)
+	activities.needs = needs
+	corpses = CorpseService.new(hunters, wallet, config)
+	regions = RegionService.new(registry, world, hunters, purses, inventory, wallet, loot, stats, progress, config, rng)
+	talents = TalentService.new(registry, hunters, regions, config, rng)
+	needs.talents = talents
 	expeditions = ExpeditionService.new(registry, hunters, wallet, progress, inventory, loot, stats, config, rng)
 	_connect_services()
 
 
 func _connect_services() -> void:
 	recruitment.add_candidate_decorator(traits.assign_random_traits)
+	recruitment.add_candidate_decorator(talents.assign_random_talent)
 	recruitment.hunter_recruited.connect(equipment.give_starting_gear)
 	hunters.hunter_added.connect(func(hunter: HunterRuntime) -> void:
 		hunter.history[HunterRuntime.RECRUIT_DAY] = progress.day)
@@ -73,6 +93,12 @@ func _connect_services() -> void:
 		mood.on_expedition_finished(run, expeditions.get_definition(run.expedition_id))
 		bonds.on_expedition_finished(run)
 		recruitment.refresh_candidates())
+	expeditions.downed_handler = func(hunter: HunterRuntime, expedition_id: StringName) -> void:
+		var definition := expeditions.get_definition(expedition_id)
+		if definition != null and definition.region_id != &"":
+			corpses.die(hunter, world.get_entrance_point(definition))
+		else:
+			hunters.mark_injured(hunter)
 	for service in [expeditions, buildings, recruitment, crafting]:
 		service.autosave_requested.connect(autosave_requested.emit)
 
@@ -84,7 +110,10 @@ func start_new_game() -> void:
 	for i in config.starting_hunter_count:
 		var candidate := hunters.generate_candidate(config.starting_hunter_class, rng)
 		traits.assign_random_traits(candidate)
+		talents.assign_random_talent(candidate)
 		equipment.give_starting_gear(hunters.add_hunter(candidate))
+	for item_id in config.starting_food:
+		inventory.add_item(item_id, config.starting_food[item_id])
 	recruitment.refresh_candidates()
 
 
@@ -92,6 +121,7 @@ func start_new_game() -> void:
 func reset_to_new_game() -> void:
 	var warnings := PackedStringArray()
 	expeditions.current_run = null
+	corpses.clear()
 	hunters.from_dict({}, warnings)
 	inventory.from_dict({}, warnings)
 	bonds.from_dict({}, warnings)
@@ -106,11 +136,12 @@ func _process(delta: float) -> void:
 
 ## Real-time town timers: Hospital, activities, day counter. Also the entry point for offline
 ## catch-up (DECISIONS.md D24).
-func advance_town_time(seconds: float) -> void:
+## `offline`: Hunters out in the regions are frozen while the app is closed (D36).
+func advance_town_time(seconds: float, offline: bool = false) -> void:
 	if seconds <= 0.0:
 		return
-	hospital.tick(seconds)
-	activities.tick(seconds)
+	temple.tick(seconds)
+	activities.tick(seconds, not offline)
 	progress.advance(seconds, registry.config.day_length_seconds)
 
 

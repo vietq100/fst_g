@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExpeditionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/expedition_definition.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"deep_mine"
+display_name = "Deep Mine"
+recommended_level = 10
+unlock_flag = &"coming_later"
+region_id = &"goblin_cave"
+entrance_tile = Vector2i(74, 56)
+locked = true

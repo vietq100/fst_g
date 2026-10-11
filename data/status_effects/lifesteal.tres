@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+id = &"lifesteal"
+display_name = "Lifesteal"
+kind = 0
+duration = 8.0
+stacking = 0
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.0
+tick_is_ratio = false
+stuns = false
+roots = false
+disarms = false
+invulnerable = false
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.25
+color = Color(0.8157, 0.1922, 0.3529, 1)
+icon = "L"
+aura = 13
+tints_actor = false

@@ -13,6 +13,7 @@ const GRASS := Color("2f4a34")
 const GRASS_ALT := Color("2b4430")
 const WALKABLE_TINT := Color(1, 1, 1, 0.04)
 const LOG_LINES := 4
+const EFFECT_BUTTONS_PER_ROW := 5
 
 @onready var _actors: Node2D = $Actors
 @onready var _navigation: NavigationRegion2D = $NavigationRegion2D
@@ -50,9 +51,16 @@ func setup_debug(panel: DebugPanel) -> void:
 		["Slime x6", _spawn_six_slimes],
 	])
 	panel.add_button_row([
+		["Skill", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.SKILL))],
+		["Pickup", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.PICKUP))],
+		["Loot", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.LOOT))],
+		["Use", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.INTERACT))],
+	])
+	panel.add_button_row([
 		["Town", func() -> void: GameManager.request_world(&"town")],
 		["Heal all", _heal_all],
 	])
+	_add_effect_buttons(panel)
 	_info_label = panel.add_label("No Hunter selected")
 	_refresh_info()
 	_log_label = panel.add_label("")
@@ -64,7 +72,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var world_position := get_canvas_transform().affine_inverse() * touch.position
 	var tapped := _find_hunter_at(world_position)
-	if tapped != null:
+	if tapped != null and tapped == _selected:
+		_deselect()
+	elif tapped != null:
 		_select(tapped)
 	elif _selected != null:
 		_selected.command_move_to(world_position)
@@ -92,6 +102,35 @@ func spawn_warrior() -> Hunter:
 
 
 
+
+
+## One button per status effect (D48): applies to the selected Hunter, or to every enemy when
+## no Hunter is selected. Tap the selected Hunter again to deselect.
+func _add_effect_buttons(panel: DebugPanel) -> void:
+	panel.add_separator()
+	panel.add_label("Effects: selected Hunter, else all enemies")
+	var row: Array = []
+	for definition in DataRegistry.get_all(DataRegistry.STATUS_EFFECT):
+		var effect := definition as StatusEffectDefinition
+		row.append([effect.display_name.left(6), func() -> void: _apply_effect(effect)])
+		if row.size() == EFFECT_BUTTONS_PER_ROW:
+			panel.add_button_row(row)
+			row = []
+	row.append(["Cleanse", func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.DEBUFF))])
+	row.append(["Purge", func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.BUFF))])
+	panel.add_button_row(row)
+
+
+func _apply_effect(effect: StatusEffectDefinition) -> void:
+	_for_effect_targets(func(actor: Actor) -> void: actor.effects.apply(effect))
+
+
+func _for_effect_targets(action: Callable) -> void:
+	if _selected != null:
+		action.call(_selected)
+		return
+	for node in get_tree().get_nodes_in_group(Enemy.GROUP):
+		action.call(node)
 
 
 ## Debug stand-in for the Hospital (Phase 6).
@@ -145,6 +184,14 @@ func _select(hunter: Hunter) -> void:
 	_selected = hunter
 	_selected.visual.selected = true
 	_refresh_info()
+
+
+func _deselect() -> void:
+	if _selected != null:
+		_selected.visual.selected = false
+	_selected = null
+	if _info_label != null:
+		_info_label.text = "No Hunter selected"
 
 
 func _with_selected(action: Callable) -> void:

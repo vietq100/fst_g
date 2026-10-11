@@ -23,7 +23,8 @@ func test_real_data_loads_without_errors() -> void:
 func test_config_matches_balance() -> void:
 	var config: GameConfig = _registry.config
 	assert_almost_eq(config.defense_factor, 0.5)
-	assert_almost_eq(config.base_xp, 20.0)
+	assert_almost_eq(config.base_xp, 30.0)
+	assert_almost_eq(config.xp_exponent, 2.2)
 	assert_eq(config.level_cap_per_town_level, 10)
 	assert_eq(config.max_party_size, 3)
 	assert_almost_eq(config.offline_cap_hours, 8.0)
@@ -97,7 +98,8 @@ func test_buildings_match_balance() -> void:
 		&"town_hall": [500, {&"iron_ore": 10}, [&"first_boss_clear"], {&"hunter_capacity": 3.0}, {&"hunter_capacity": 5.0}],
 		&"tavern": [300, {}, [], {&"candidate_count": 3.0, &"refresh_cost": 30.0}, {&"candidate_count": 4.0, &"refresh_cost": 30.0}],
 		&"blacksmith": [300, {&"iron_ore": 5}, [], {&"recipe_level": 1.0}, {&"recipe_level": 2.0}],
-		&"hospital": [300, {}, [], {&"recovery_seconds": 120.0, &"speedup_gold_per_minute": 20.0}, {&"recovery_seconds": 84.0, &"speedup_gold_per_minute": 20.0}],
+		&"hospital": [300, {}, [], {}, {}],
+		&"temple": [300, {&"dark_essence": 2}, [], {&"recovery_seconds": 180.0, &"speedup_gold_per_minute": 20.0}, {&"recovery_seconds": 120.0, &"speedup_gold_per_minute": 20.0}],
 		&"warehouse": [250, {&"iron_ore": 5}, [], {&"inventory_slots": 40.0}, {&"inventory_slots": 80.0}],
 	}
 	for building_id: StringName in expected:
@@ -132,7 +134,7 @@ func test_recipes_match_balance() -> void:
 		var materials := {}
 		for cost in recipe.material_costs:
 			materials[cost.item_id] = cost.quantity
-		assert_eq([recipe.gold_cost, materials, recipe.required_blacksmith_level], expected[recipe_id], String(recipe_id))
+		assert_eq([recipe.gold_cost, materials, recipe.required_level], expected[recipe_id], String(recipe_id))
 	var warrior := _registry.find_def(&"hunter", &"warrior") as HunterDefinition
 	assert_eq(warrior.starting_items, [&"rusty_sword", &"leather_armor"] as Array[StringName])
 
@@ -164,7 +166,7 @@ func test_items_match_balance() -> void:
 
 
 func test_loot_tables_reference_real_items() -> void:
-	assert_eq(_registry.get_count(&"loot_table"), 4)
+	assert_eq(_registry.get_count(&"loot_table"), 6)
 	for table: LootTableDefinition in _registry.get_all(&"loot_table"):
 		for entry in table.entries:
 			assert_true(_registry.has_def(&"item", entry.item_id), "%s → %s" % [table.id, entry.item_id])

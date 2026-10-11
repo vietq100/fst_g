@@ -4,6 +4,10 @@ extends Node2D
 ## Spawns the party and each section's enemies at the scene's markers, walks the party
 ## between sections and reports kills, downs and the end of the run to ExpeditionService.
 ##
+## Embedded in the world map (D35): `embedded` = true before it enters the tree; the world's
+## Hunter actors are handed over in `start` and the world camera follows them; its enemies only
+## fight inside the dungeon.
+##
 ## Expected children: NavigationRegion2D, World/Actors, Markers/{HunterSpawn, Sections/*,
 ## BossRally, BossSpawn, Exit}, Camera2D. Each Sections child is a rally Marker2D whose own
 ## Marker2D children are enemy spawn points.
@@ -28,9 +32,14 @@ enum Stage { TRAVEL, FIGHT, TO_EXIT, DONE }
 @onready var _boss_spawn: Marker2D = $Markers/BossSpawn
 @onready var _exit: Marker2D = $Markers/Exit
 
+## Size of the dungeon map (local), used to keep its enemies inside.
+const MAP_RECT := Rect2(0, 0, 360, 1440)
+
+var embedded := false
 var _service: ExpeditionService
 var _definition: ExpeditionDefinition
 var _party: Array[Hunter] = []
+var _downed_callbacks: Array[Callable] = []
 var _enemies: Array[Enemy] = []
 var _stage := Stage.DONE
 ## Section the party is walking to or fighting in; == enemy_groups.size() is the boss.
@@ -40,27 +49,55 @@ var _status_label: Label
 
 
 func _ready() -> void:
+	if embedded:
+		# The world camera shows the dungeon.
+		_camera.queue_free()
+		_camera = null
 	# Bake at runtime so props in the `navigation_obstacles` group carve the walkable area.
 	_navigation.bake_navigation_polygon(false)
 
 
-## Called by Main once the run has started.
-func start(service: ExpeditionService) -> void:
+## Called once the run has started. `party`: existing Hunter actors (embedded); otherwise the
+## party is spawned here.
+func start(service: ExpeditionService, party: Array[Hunter] = []) -> void:
 	_service = service
 	_definition = service.get_current_definition()
 	var index := 0
 	for hunter_id in service.current_run.party_ids:
 		var runtime := GameManager.hunters.get_hunter(hunter_id)
-		var hunter := HUNTER_SCENE.instantiate() as Hunter
-		_actors.add_child(hunter)
+		var hunter: Hunter = null
+		for actor in party:
+			if actor.runtime == runtime:
+				hunter = actor
+		if hunter == null:
+			hunter = HUNTER_SCENE.instantiate() as Hunter
+			_actors.add_child(hunter)
+			hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment)
 		hunter.global_position = _hunter_spawn.global_position + FORMATION[index % FORMATION.size()]
-		hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment)
-		hunter.health.died.connect(_on_hunter_downed.bind(hunter))
+		hunter.travel_target = Vector2.INF
+		var on_downed := _on_hunter_downed.bind(hunter)
+		hunter.health.died.connect(on_downed)
+		_downed_callbacks.append(on_downed)
 		_party.append(hunter)
 		index += 1
-	_camera.party = _party
-	_camera.snap_to_party()
+	if _camera != null:
+		_camera.party = _party
+		_camera.snap_to_party()
 	_go_to_section(0)
+
+
+func get_party() -> Array[Hunter]:
+	return _party
+
+
+## Hands the world's Hunter actors back (embedded): stop listening to them.
+func release_party() -> void:
+	for i in _party.size():
+		var hunter := _party[i]
+		if is_instance_valid(hunter) and hunter.health.died.is_connected(_downed_callbacks[i]):
+			hunter.health.died.disconnect(_downed_callbacks[i])
+	_party.clear()
+	_downed_callbacks.clear()
 
 
 func setup_debug(panel: DebugPanel) -> void:
@@ -135,6 +172,9 @@ func _spawn_enemy(enemy_id: StringName, at: Vector2) -> void:
 	_actors.add_child(enemy)
 	enemy.global_position = at
 	enemy.setup(definition, GameManager.combat, DataRegistry.config.retarget_interval)
+	if embedded:
+		enemy.combat.acquire_filter = is_inside
+		enemy.combat.keep_filter = is_inside
 	enemy.health.died.connect(_on_enemy_died.bind(enemy))
 	_enemies.append(enemy)
 
@@ -175,6 +215,11 @@ func _on_hunter_downed(hunter: Hunter) -> void:
 		_stage = Stage.DONE
 		_service.fail()
 	_refresh_status()
+
+
+## True for actors standing inside this dungeon (embedded runs keep fights inside).
+func is_inside(actor: Actor) -> bool:
+	return MAP_RECT.has_point(actor.global_position - global_position)
 
 
 func _set_travel(point: Vector2) -> void:

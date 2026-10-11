@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
+[ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootEntry_0"]
+script = ExtResource("2_entry")
+item_id = &"slime_gel"
+quantity_min = 1
+quantity_max = 1
+chance = 0.6
+
+[sub_resource type="Resource" id="LootEntry_1"]
+script = ExtResource("2_entry")
+item_id = &"wild_herb"
+quantity_min = 1
+quantity_max = 1
+chance = 0.2
+
+[resource]
+script = ExtResource("1_table")
+id = &"slime"
+display_name = "Slime"
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1")])

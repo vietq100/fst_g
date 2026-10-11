@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+id = &"stun"
+display_name = "Stunned"
+kind = 1
+duration = 1.5
+stacking = 2
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.0
+tick_is_ratio = false
+stuns = true
+roots = false
+disarms = false
+invulnerable = false
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(1, 0.8235, 0.2471, 1)
+icon = "S"
+aura = 5
+tints_actor = false

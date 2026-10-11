@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/skeleton/skeleton.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"skeleton"
+display_name = "Skeleton"
+hp = 70.0
+attack = 16.0
+defense = 6.0
+attack_speed = 0.9
+move_speed = 60.0
+critical_chance = 0.0
+critical_damage = 1.5
+attack_range = 20.0
+xp_reward = 18
+gold_min = 8
+gold_max = 14
+loot_table_id = &"skeleton"
+actor_scene = ExtResource("2_scene")

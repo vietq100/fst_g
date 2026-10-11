@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="HunterDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/hunter_definition.gd" id="1_hunter"]
+
+[resource]
+script = ExtResource("1_hunter")
+id = &"guardian"
+display_name = "Guardian"
+class_id = &"guardian"
+base_hp = 160.0
+base_attack = 10.0
+base_defense = 9.0
+hp_per_level = 16.0
+attack_per_level = 1.5
+defense_per_level = 1.5
+attack_speed = 0.8
+move_speed = 70.0
+critical_chance = 0.0
+critical_damage = 1.5
+attack_range = 22.0
+recruit_cost = 130
+stat_roll_variance = 0.1
+name_pool = PackedStringArray("Ansel", "Borin", "Castor", "Dagny", "Egil", "Frida", "Gunnar", "Helga", "Ingrid", "Jorund", "Knut", "Leif", "Magnus", "Njal", "Olaf", "Ragna", "Sigrun", "Torvald", "Ulf", "Ylva")
+starting_items = Array[StringName]([&"rusty_sword", &"leather_armor"])
+body_size = Vector2(17, 23)
+weapon_length = 11.0
+weapon_width = 2.0

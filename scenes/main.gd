@@ -1,11 +1,12 @@
 extends Node
 ## Game root (ARCHITECTURE.md → Scene structure).
-## GameRoot: non-visual runtime nodes. WorldContainer: active Town/expedition scene. UI: the game
+## GameRoot: non-visual runtime nodes. WorldContainer: active world map / expedition scene. UI: the game
 ## UI (UIRoot) and the developer debug panel. Switches worlds with a fade and pauses expeditions
 ## when the app goes to background (D2).
 
 const WORLDS := {
-	&"town": preload("res://world/town/town.tscn"),
+	## The main map (Town + regions, D27).
+	&"town": preload("res://world/world/world.tscn"),
 	## Combat sandbox for development (debug builds).
 	&"sandbox": preload("res://world/test_arena/test_arena.tscn"),
 }
@@ -33,8 +34,28 @@ func _ready() -> void:
 	GameManager.world_change_requested.connect(_on_world_change_requested)
 	SaveManager.offline_progress_applied.connect(_on_offline_progress)
 	_ui.depart_requested.connect(_on_depart_requested)
+	_ui.build_requested.connect(func(building_id: StringName) -> void:
+		if _world is WorldMap:
+			_world.begin_build(building_id))
+	_ui.move_requested.connect(func(instance_id: StringName) -> void:
+		if _world is WorldMap:
+			_world.begin_move(instance_id))
+	_ui.placement_confirmed.connect(func() -> void:
+		if _world is WorldMap:
+			var error: String = _world.confirm_placement()
+			if not error.is_empty():
+				_ui.toast(error, true))
+	_ui.placement_cancelled.connect(func() -> void:
+		if _world is WorldMap:
+			_world.cancel_placement())
+	_ui.follow_requested.connect(func(unique_id: StringName) -> void:
+		if _world is WorldMap and not _world.follow_hunter(unique_id):
+			_ui.toast("Not on the map right now", true))
+	_ui.recenter_requested.connect(func() -> void:
+		if _world is WorldMap and not _world.is_in_dungeon():
+			_world.recenter_on_town())
 	_ui.party_picker = func() -> Array:
-		return _world.pick_party() if _world is Town else []
+		return _world.pick_party() if _world is WorldMap else []
 	_banner.visible = false
 	_fade.color.a = 0.0
 	_show_world(WORLDS[&"town"].instantiate())
@@ -69,11 +90,19 @@ func _on_world_change_requested(world_id: StringName) -> void:
 
 
 func _on_depart_requested(expedition_id: StringName, party: Array[StringName]) -> void:
-	if _world is Town:
+	if _world is WorldMap:
+		var definition := DataRegistry.get_expedition(expedition_id)
+		_ui.toast("The party heads to %s" % definition.display_name)
 		_world.depart(expedition_id, party)
 
 
+## Dungeons run inside the world map (D35); other worlds (sandbox) still switch scenes.
 func _on_expedition_started(_run: ExpeditionRun) -> void:
+	if _world is WorldMap:
+		_world.enter_dungeon()
+		_ui.set_mode(UIRoot.Mode.EXPEDITION)
+		_rebuild_debug_panel()
+		return
 	var definition := GameManager.expeditions.get_current_definition()
 	var scene := definition.scene.instantiate() as ExpeditionScene
 	await _switch_world(scene)
@@ -88,6 +117,13 @@ func _on_expedition_finished(run: ExpeditionRun) -> void:
 	_banner.visible = true
 	await get_tree().create_timer(RESULT_BANNER_TIME).timeout
 	_banner.visible = false
+	if _world is WorldMap:
+		_world.exit_dungeon(run)
+		_ui.set_mode(UIRoot.Mode.TOWN)
+		_rebuild_debug_panel()
+		_ui.show_message(MessageSheet.for_expedition(run))
+		_pending_result = null
+		return
 	await _switch_world(WORLDS[&"town"].instantiate())
 
 
@@ -110,14 +146,16 @@ func _show_world(next_world: Node) -> void:
 		_world.queue_free()
 	_world = next_world
 	_world_container.add_child(_world)
-	if _world is Town:
+	if _world is WorldMap:
 		_ui.set_mode(UIRoot.Mode.TOWN)
-		var town := _world as Town
-		town.input_blocker = func(point: Vector2) -> bool:
+		var map := _world as WorldMap
+		map.input_blocker = func(point: Vector2) -> bool:
 			return _ui.blocks_point(point) or (_has_debug_panel() and _debug_panel.get_global_rect().has_point(point))
-		town.building_tapped.connect(_ui.open_building)
-		town.hunter_tapped.connect(_ui.open_hunter)
-		town.depart_failed.connect(func(reason: String) -> void: _ui.toast(reason, true))
+		map.building_tapped.connect(_ui.open_building)
+		map.hunter_tapped.connect(_ui.open_hunter)
+		map.entrance_tapped.connect(_ui.open_entrance)
+		map.placement_changed.connect(_ui.set_placement)
+		map.depart_failed.connect(func(reason: String) -> void: _ui.toast(reason, true))
 		if _pending_result != null:
 			_ui.show_message(MessageSheet.for_expedition(_pending_result))
 			_pending_result = null
@@ -143,7 +181,7 @@ func _rebuild_debug_panel() -> void:
 func _on_offline_progress(summary: Dictionary) -> void:
 	if float(summary.get("seconds", 0.0)) < OFFLINE_SHEET_MIN_SECONDS:
 		return
-	if _world is Town and not _ui.has_sheet():
+	if _world is WorldMap and not _ui.has_sheet():
 		_ui.show_message(MessageSheet.for_offline(summary))
 
 

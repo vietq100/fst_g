@@ -63,7 +63,7 @@ spawns = Array[ExtResource("3_spawn")]([SubResource("EnemySpawn_3_0"), SubResour
 [resource]
 script = ExtResource("1_def")
 id = &"dark_forest"
-display_name = "Dark Forest"
+display_name = "Forest Guardian's Grove"
 recommended_level = 4
 enemy_groups = Array[ExtResource("2_group")]([SubResource("EnemyGroup_0"), SubResource("EnemyGroup_1"), SubResource("EnemyGroup_2"), SubResource("EnemyGroup_3")])
 boss_id = &"forest_guardian"
@@ -72,3 +72,6 @@ first_clear_loot_table_id = &"forest_guardian_first"
 repeat_clear_loot_table_id = &"forest_guardian_repeat"
 first_clear_flags = Array[StringName]([&"first_boss_clear"])
 scene = ExtResource("4_scene")
+region_id = &"dark_forest"
+entrance_tile = Vector2i(-1, 56)
+locked = false

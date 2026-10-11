@@ -34,5 +34,9 @@ extends GameDefinition
 @export var starting_items: Array[StringName] = []
 
 @export_group("Visuals")
+## Placeholder look of the class (D45): body size and weapon shape.
+@export var body_size := Vector2(14, 22)
+@export var weapon_length: float = 12.0
+@export var weapon_width: float = 1.0
 @export var portrait: Texture2D
 @export var sprite_frames: SpriteFrames

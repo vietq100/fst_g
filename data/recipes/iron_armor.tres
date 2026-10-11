@@ -15,4 +15,4 @@ display_name = "Iron Armor"
 result_item_id = &"iron_armor"
 gold_cost = 60
 material_costs = Array[ExtResource("2_amount")]([SubResource("ItemAmount_0")])
-required_blacksmith_level = 1
+required_level = 1

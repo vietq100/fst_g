@@ -1,6 +1,7 @@
 class_name CraftingService
 extends RefCounted
-## Blacksmith crafting (BALANCE.md → Equipment, DECISIONS.md D7, D9).
+## Crafting in village buildings (BALANCE.md → Equipment / Village economy, DECISIONS.md D7, D9,
+## D40, D41): Blacksmith equipment, Tavern food, Hospital medicine. Results go to the Warehouse.
 
 signal item_crafted(recipe: RecipeDefinition, instance_id: StringName)
 signal autosave_requested(reason: StringName)
@@ -18,10 +19,13 @@ func _init(registry: Node, buildings: BuildingService, wallet: WalletService, in
 	_inventory = inventory
 
 
-func get_recipes() -> Array[RecipeDefinition]:
+## Recipes of one building (empty id: all).
+func get_recipes(building_id: StringName = &"") -> Array[RecipeDefinition]:
 	var recipes: Array[RecipeDefinition] = []
 	for definition in _registry.get_all(&"recipe"):
-		recipes.append(definition as RecipeDefinition)
+		var recipe := definition as RecipeDefinition
+		if building_id == &"" or recipe.building_id == building_id:
+			recipes.append(recipe)
 	recipes.sort_custom(func(a: RecipeDefinition, b: RecipeDefinition) -> bool:
 		return a.gold_cost < b.gold_cost)
 	return recipes
@@ -32,21 +36,28 @@ func can_craft(recipe_id: StringName) -> String:
 	var recipe := _registry.find_def(&"recipe", recipe_id) as RecipeDefinition
 	if recipe == null:
 		return "Unknown recipe '%s'" % recipe_id
-	var level := int(_buildings.get_effect(BuildingService.BLACKSMITH, BuildingService.RECIPE_LEVEL))
-	if level < recipe.required_blacksmith_level:
-		return "Needs Blacksmith Lv %d" % recipe.required_blacksmith_level
+	var building := _buildings.get_definition(recipe.building_id)
+	var building_name := building.display_name if building != null else String(recipe.building_id)
+	var level := _buildings.get_level(recipe.building_id)
+	if level <= 0:
+		return "Needs a %s" % building_name
+	if level < recipe.required_level:
+		return "Needs %s Lv %d" % [building_name, recipe.required_level]
 	if not _wallet.can_spend(recipe.gold_cost):
 		return "Needs %d gold" % recipe.gold_cost
 	for cost in recipe.material_costs:
 		if not _inventory.has(cost.item_id, cost.quantity):
 			var item := _registry.find_def(&"item", cost.item_id) as ItemDefinition
 			return "Needs %d %s" % [cost.quantity, item.display_name if item != null else String(cost.item_id)]
-	if _inventory.free_slots() <= 0:
+	var result := _registry.find_def(&"item", recipe.result_item_id) as ItemDefinition
+	var stacks_onto_existing := result != null and result.stackable and _inventory.count(recipe.result_item_id) > 0
+	if _inventory.free_slots() <= 0 and not stacks_onto_existing:
 		return "Warehouse is full"
 	return ""
 
 
-## Returns the new instance id, or &"" if it cannot be crafted.
+## Returns the new instance id (equipment) or the result item id (stackables), or &"" if it
+## cannot be crafted.
 func craft(recipe_id: StringName) -> StringName:
 	if not can_craft(recipe_id).is_empty():
 		return &""
@@ -54,9 +65,10 @@ func craft(recipe_id: StringName) -> StringName:
 	_wallet.spend(recipe.gold_cost)
 	for cost in recipe.material_costs:
 		_inventory.remove_item(cost.item_id, cost.quantity)
+	var result := _registry.find_def(&"item", recipe.result_item_id) as ItemDefinition
 	var before := _inventory.get_instances_of(recipe.result_item_id)
-	_inventory.add_item(recipe.result_item_id, 1)
-	var instance_id := &""
+	_inventory.add_item(recipe.result_item_id, maxi(recipe.result_quantity, 1))
+	var instance_id := recipe.result_item_id if result != null and result.stackable else &""
 	for candidate in _inventory.get_instances_of(recipe.result_item_id):
 		if not before.has(candidate):
 			instance_id = candidate

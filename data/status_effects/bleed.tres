@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+id = &"bleed"
+display_name = "Bleed"
+kind = 1
+duration = 5.0
+stacking = 1
+max_stacks = 3
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.01
+heal_per_tick = 0.0
+tick_is_ratio = true
+stuns = false
+roots = false
+disarms = false
+invulnerable = false
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(0.7686, 0.1882, 0.2275, 1)
+icon = "b"
+aura = 3
+tints_actor = false

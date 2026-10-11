@@ -20,4 +20,4 @@ display_name = "Fang Blade"
 result_item_id = &"fang_blade"
 gold_cost = 150
 material_costs = Array[ExtResource("2_amount")]([SubResource("ItemAmount_0"), SubResource("ItemAmount_1")])
-required_blacksmith_level = 2
+required_level = 2

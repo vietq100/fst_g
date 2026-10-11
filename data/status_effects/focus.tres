@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_modifier"]
+
+[sub_resource type="Resource" id="StatModifier_1"]
+script = ExtResource("2_modifier")
+stat = &"critical_chance"
+type = 0
+value = 0.25
+
+[sub_resource type="Resource" id="StatModifier_2"]
+script = ExtResource("2_modifier")
+stat = &"critical_damage"
+type = 0
+value = 0.5
+
+[resource]
+script = ExtResource("1_effect")
+id = &"focus"
+display_name = "Focus"
+kind = 0
+duration = 8.0
+stacking = 0
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.0
+tick_is_ratio = false
+stuns = false
+roots = false
+disarms = false
+invulnerable = false
+modifiers = Array[ExtResource("2_modifier")]([SubResource("StatModifier_1"), SubResource("StatModifier_2")])
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(1, 0.8902, 0.4196, 1)
+icon = "C"
+aura = 4
+tints_actor = false

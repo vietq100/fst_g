@@ -78,10 +78,10 @@ func test_level_up_from_kills() -> void:
 	hunter.current_hp = 50.0
 	var boss := _registry.find_def(&"enemy", &"forest_guardian") as EnemyDefinition
 	_service.record_kill(boss)
-	# 150 XP: L1→2 needs 20, L2→3 needs 57 → level 3 with 73 left (L3→4 needs 104).
-	assert_eq(hunter.level, 3)
-	assert_eq(hunter.xp, 73)
-	assert_eq(_service.current_run.levels_gained[ids[0]], 2)
+	# 150 XP: L1→2 needs 30, L2→3 needs 138 → level 2 with 120 left (D44).
+	assert_eq(hunter.level, 2)
+	assert_eq(hunter.xp, 120)
+	assert_eq(_service.current_run.levels_gained[ids[0]], 1)
 	assert_true(hunter.current_hp > 50.0, "level-up heals")
 
 

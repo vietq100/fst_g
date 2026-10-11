@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RegionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/region_definition.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"dark_forest"
+display_name = "Dark Forest"
+tile_rect = Rect2i(0, 38, 36, 36)
+is_town = false
+min_hunter_level = 1
+monster_ids = Array[StringName]([&"slime", &"wolf"])
+monster_level_min = 1
+monster_level_max = 3
+population_cap = 16
+respawn_seconds = 15.0
+ground_color = Color(0.12, 0.2, 0.14, 1)
+ground_alt_color = Color(0.14, 0.23, 0.16, 1)
+props = 1
+prop_density = 0.16

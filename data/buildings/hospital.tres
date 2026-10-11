@@ -9,7 +9,7 @@ script = ExtResource("2_level")
 gold_cost = 0
 material_costs = Array[ExtResource("3_amount")]([])
 required_flags = Array[StringName]([])
-effects = Dictionary[StringName, float]({&"recovery_seconds": 120.0, &"speedup_gold_per_minute": 20.0})
+effects = Dictionary[StringName, float]({})
 visual_variant = &"lv1"
 
 [sub_resource type="Resource" id="BuildingLevel_1"]
@@ -17,7 +17,7 @@ script = ExtResource("2_level")
 gold_cost = 300
 material_costs = Array[ExtResource("3_amount")]([])
 required_flags = Array[StringName]([])
-effects = Dictionary[StringName, float]({&"recovery_seconds": 84.0, &"speedup_gold_per_minute": 20.0})
+effects = Dictionary[StringName, float]({})
 visual_variant = &"lv2"
 
 [resource]
@@ -25,3 +25,8 @@ script = ExtResource("1_building")
 id = &"hospital"
 display_name = "Hospital"
 levels = Array[ExtResource("2_level")]([SubResource("BuildingLevel_0"), SubResource("BuildingLevel_1")])
+build_cost = 200
+footprint = Vector2i(2, 2)
+unique = true
+removable = true
+default_tiles = Array[Vector2i]([Vector2i(6, 24)])

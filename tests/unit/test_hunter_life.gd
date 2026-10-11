@@ -184,9 +184,16 @@ func test_training_xp_with_trait_rates() -> void:
 	for hunter in [normal, disciplined]:
 		hunter.mood = 60.0
 	_activities.tick(30.0)
-	assert_eq(normal.xp, 9)
-	# 3 × 1.5 = 4.5 → 5 per tick (rounded).
-	assert_eq(disciplined.xp, 15)
+	assert_eq(normal.xp, 3)
+	# 1 × 1.5 per tick; fractions carry over: 1.5, 3.0, 4.5 → 4.
+	assert_eq(disciplined.xp, 4)
+
+
+func test_offline_training_gives_a_quarter() -> void:
+	var hunter := _hunter()
+	hunter.mood = 60.0
+	_activities.tick(400.0, false)
+	assert_eq(hunter.xp, 10, "40 ticks × 1 XP × 0.25")
 
 
 func test_hunters_on_expedition_do_nothing_in_town() -> void:

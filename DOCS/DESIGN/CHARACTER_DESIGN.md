@@ -35,6 +35,22 @@ Every playable Hunter should support:
 
 MVP may use simplified animations.
 
+Implemented for Hunters: the chibi core (D49, `actors/hunter/chibi/`). A 15×29 px body (bald, white tank top, shorts in the Hunter's dye) on a 32×48 canvas, split into head, torso, two arms and two legs that frames move by whole pixels. Views: front, back, side (left = mirrored).
+
+```
+Hunter
+├── Movement: idle (4 fps loop), walk (8 fps), run (12 fps; chasing or hasted)
+├── Combat:   attack (14 fps, weapon swing + slash arc), skill (12 fps, crouch → jump → slam,
+│             charge glow + burst ring), hit (white flash + flinch), death (buckle → lie down, dust;
+│             holds; downed = darker, dead body = cold grey + rising soul)
+└── Utility:  pickup (crouch, hand down), loot (crouch → raise the item, sparkles),
+              interact (reach and tap twice)
+```
+
+One-shot actions play over the state loop by priority: death > attack / skill > hit > pickup / loot / interact.
+Triggers: attack on each attack, hit on damage, pickup when lifting a body, loot when a kill drops items, interact at the Warehouse, Hospital and Temple. Skill has no gameplay trigger yet (test arena button).
+- victory: not yet
+
 ## 4. Direction
 
 MVP: 4-direction movement and sprites. 8-direction is post-MVP.
@@ -108,11 +124,15 @@ Portrait size can be larger, but:
 - same class identity
 - same palette
 
+Implemented (D47): the portrait is a 40×40 crop around the face of the 2x composed sprite, drawn at an integer scale.
+
 ## 10. Equipment visibility
 
 Where practical, equipment changes should be visually noticeable.
 
 MVP can use equipment icons instead of dynamic sprite composition.
+
+Implemented (D47): Hunters are composed from two reference bodies (male, female; 3/4 view facing right). The equipped armor picks one of 30 outfits (5 armor classes × 6: cloth, leather, chain, plate, robe); the Hunter's dye colour recolours the cloth parts. The weapon is still a tinted line. Visual reference: `DESIGN/character_wardrobe_preview.html`.
 
 ## 11. Personality
 
@@ -132,7 +152,7 @@ Personality may be hinted visually (posture, idle animation variation) where pra
 
 ## 12. Character generation
 
-Random Hunters should vary in:
+Random Hunters should vary in (D47: body type, 10 hairstyles, 10 hair colours, 4 skin tones, 8 dyes; always random, the player does not pick a look):
 - face/hair
 - small color accents
 - name

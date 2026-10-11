@@ -7,7 +7,7 @@ Tune during Phase 11. Update this file when values change.
 - Damage: `max(1, attack - defense * 0.5)`
 - Critical: `damage *= critical_damage` when `randf() < critical_chance`
 - Attack cooldown: `1 / attack_speed` s
-- Required XP for next level: `20 * pow(level, 1.5)`
+- Required XP for next level: `30 * pow(level, 2.2)` (D44: Lv1 30, Lv2 138, Lv3 337, Lv4 634, Lv5 1035, Lv9 3771)
 - Stat: `(base + level_growth * (level - 1) + Σflat) * (1 + Σpercent)`
 
 ## Offline
@@ -28,6 +28,25 @@ Tune during Phase 11. Update this file when values change.
 
 Recruits roll ±10% on HP/Attack/Defense.
 
+## Classes (D45)
+| Class | HP (+/lv) | Atk (+/lv) | Def (+/lv) | Atk spd | Move | Crit | Crit dmg | Range | Recruit | Starting gear |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Warrior | 120 (+12) | 14 (+2) | 6 (+1) | 1.0 | 80 | 5% | ×1.5 | 20 | 100 | Rusty Sword, Leather Armor |
+| Ranger | 90 (+9) | 12 (+2) | 3 (+0.5) | 1.1 | 85 | 10% | ×1.6 | 110 | 120 | Short Bow, Leather Armor |
+| Rogue | 100 (+10) | 13 (+2) | 4 (+0.7) | 1.4 | 95 | 20% | ×1.8 | 18 | 110 | Rusty Dagger, Leather Armor |
+| Guardian | 160 (+16) | 10 (+1.5) | 9 (+1.5) | 0.8 | 70 | 0% | ×1.5 | 22 | 130 | Rusty Sword, Leather Armor |
+
+Short Bow: +3 Atk (sell 5). Rusty Dagger: +2 Atk, +5% crit (sell 5).
+
+## Talents (D46)
+| Talent | Chance at recruitment | Field recipes (time) |
+|---|---|---|
+| Cook | 35% | Meat Stew 8 s, Herb Soup 6 s |
+| Herbalist | 35% | Bandage 5 s, Healing Potion 10 s |
+| none | 30% | — |
+
+Field crafting uses the same ingredients and output as the village recipe; no gold, no building level.
+
 ## Enemies
 | Enemy | HP | Atk | Def | Atk spd | Move | XP | Gold |
 |---|---|---|---|---|---|---|---|
@@ -39,6 +58,58 @@ Recruits roll ±10% on HP/Attack/Defense.
 Attack range (feet to feet): Slime 18, Goblin 20, Wolf 20, Forest Guardian 30 px.
 Hit radius (extra body size added to attackers' reach): Forest Guardian 14 px, others 0.
 
+| Skeleton (Ruins, new) | 70 | 16 | 6 | 0.9 | 60 | 18 | 8–14 |
+
+Skeleton attack range 20 px; drops Iron Ore ×1 (30%), Dark Essence ×1 (4%).
+
+## Regions (world redesign, D27, D29)
+| Region | Monsters | Monster level | Min Hunter level (Auto) | Population cap | Respawn |
+|---|---|---|---|---|---|
+| Dark Forest | Slime, Wolf | 1–3 | 1 | 16 | 15 s |
+| Goblin Cave | Goblin, Wolf | 4–7 | 5 | 18 | 15 s |
+| Ancient Ruins | Skeleton, Goblin | 8–12 | 9 | 18 | 15 s |
+
+Regions are 36 × 36 tiles; population caps were doubled with the map (4× the area, so monsters are half as dense as in the 18 × 18 draft).
+
+Monster level L scales HP/ATK/DEF by `1 + 0.12 × (L − 1)` and XP/gold by `1 + 0.10 × (L − 1)`.
+Aggro range 90 px; monsters leash back to their spawn after 220 px.
+
+## Needs (D31) — per 10 s tick
+| Need | Change |
+|---|---|
+| Stamina while active (walking, hunting, carrying) | −1.5 |
+| Stamina sleeping in a House bed | +6 |
+| Stamina sleeping outdoors | +3 (and −1 mood) |
+| Energy (always, except sleeping: −0.3) | −0.6 |
+| Eating one portion of food (D40) | the food's energy (see Village economy), its price from the purse to the treasury |
+| Energy at 0 | −2% max HP and −1 mood per tick |
+
+Brain thresholds: sleep below 25 stamina (until 95), eat below 35 energy, go home to rest below 35% HP (until 90%), go home when the loot bag (10 items) is full.
+Stamina 0: −40% move speed, −30% attack speed.
+
+## Bodies (D30)
+- Carrier speed when dragging a body: carrier move speed × 0.7.
+- Revival at the Temple (D42): Temple revival time; revived with 50% HP, stamina and energy; loses 10% of the XP needed for its current level.
+- Staff (D43): 2, move speed 70 px/s, fee 15 gold per trip.
+- A Hunter carrier needs ≥ 25 stamina and must not be asleep.
+- Nobody able to carry a body for 120 s: the town brings it to the Temple.
+
+## Money (D34)
+- New Hunter purse: 20 gold. Treasury ↔ purse transfer fee: 10% (receiver gets 90%).
+
+## Building placement (D33)
+| Building | Build cost | Footprint (tiles) | Unique |
+|---|---|---|---|
+| Town Hall | — (cannot be removed) | 3 × 3 | yes |
+| Tavern | 200 gold | 2 × 2 | yes |
+| Blacksmith | 200 gold | 2 × 2 | yes |
+| Hospital | 200 gold | 2 × 2 | yes |
+| Temple | 250 gold | 2 × 2 | yes |
+| Warehouse | 150 gold | 2 × 2 | yes |
+| House (4 beds) | 120 gold | 2 × 2 | no |
+
+Removing refunds 50% of the build cost. Moving is free.
+
 ## Progression
 - Level-up heals 20% of max HP.
 - Hunter level cap = Town Hall level × 10 (Town Hall level is 1 until Phase 6).
@@ -48,7 +119,7 @@ Drops:
 - Wolf: Beast Fang ×1 (50%)
 - Forest Guardian: Iron Ore ×5, Beast Fang ×3, Dark Essence ×2 (first clear) / ×1 at 50% (repeat), Rare equipment 10%; repeat clears give 50% boss gold.
 
-## Dark Forest
+## Forest Guardian's Grove (dungeon, former Dark Forest expedition)
 - Recommended level: 4
 - Completion bonus: 50 gold
 - Groups:
@@ -64,12 +135,37 @@ Drops:
 | Town Hall | capacity 3, level cap 10 | 500 gold + 10 Iron Ore (requires first boss clear) | capacity 5, level cap 20 |
 | Tavern | 3 candidates, refresh 30 gold | 300 gold | 4 candidates |
 | Blacksmith | Common/Uncommon recipes | 300 gold + 5 Iron Ore | Rare recipes |
-| Hospital | recovery 120 s | 300 gold | recovery 84 s (−30%) |
+| Hospital | Bandages | 300 gold | + Healing Potions |
+| Temple | revival 180 s | 300 gold + 2 Dark Essence | revival 120 s |
 | Warehouse | 40 slots | 250 gold + 5 Iron Ore | 80 slots |
 
 Town Hall Lv3 (post-MVP reference): 1500 gold + 30 Iron Ore + 3 Dark Essence → capacity 8, level cap 30.
 
-Hospital speed-up: 20 gold per remaining started minute.
+Temple speed-up: 20 gold per remaining started minute.
+
+## Village economy (D38–D41)
+Materials (village buy price = Hunter's income at the Warehouse):
+
+| Material | Price | Drops |
+|---|---|---|
+| Slime Gel | 2 | Slime 60% |
+| Raw Meat | 3 | Wolf 50% |
+| Wild Herb | 4 | Goblin 35%, Slime 20% |
+| Bone Dust | 5 | Skeleton 45% |
+| Iron Ore | 3 | Goblin 40%, Skeleton 30% |
+| Beast Fang | 4 | Wolf 50% |
+| Dark Essence | 25 | Skeleton 4%, boss |
+
+Recipes (crafted by the chief; output goes to the Warehouse):
+
+| Building | Recipe | Cost | Makes | Effect | Price to Hunters |
+|---|---|---|---|---|---|
+| Tavern Lv1 | Meat Stew | 2 Raw Meat | 3 | +60 energy | 12 |
+| Tavern Lv1 | Herb Soup | 1 Wild Herb + 1 Slime Gel | 2 | +40 energy | 8 |
+| Hospital Lv1 | Bandage | 2 Slime Gel | 3 | heals 30% max HP | 8 |
+| Hospital Lv2 | Healing Potion | 1 Wild Herb + 1 Bone Dust | 1 | heals 70% max HP | 25 |
+
+New village: 6 Meat Stew in stock.
 
 ## Equipment
 | Item | Rarity | Slot | Modifiers | Source / recipe | Sell |
@@ -93,13 +189,13 @@ Events: success +10, failure −15, injured −10, trait like +5, trait dislike 
 
 ## Activities (tick = 10 s)
 
-> ⚠ Tuning note (found in Phase 9): with offline progress, +3 XP per training tick is ~1,080 XP/hour, and Lv 1→10 needs ~2,200 XP, so 2 hours away takes a fresh roster to the level cap. Revisit the training XP (or cap offline training) in Phase 11.
+> Tuning (D44): training was +3 XP per tick (~1,080 XP/hour offline) against a flat curve; now +1 XP per tick online, a quarter of that offline (~90 XP/hour), against `30 × level^2.2`.
 
 | Activity | Per tick |
 |---|---|
 | Resting | +5% max HP, +2 mood |
 | Socializing | +3 mood, +2 bond with each other socializing Hunter |
-| Training | +3 XP |
+| Training | +1 XP (offline: ×0.25, D44) |
 | Recovering | Hospital timer runs |
 
 ## Bonds (0–100, bonded at 100)

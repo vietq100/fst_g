@@ -14,3 +14,11 @@ extends GameDefinition
 ## Progress flag required to start. Empty means always available.
 @export var unlock_flag: StringName
 @export var scene: PackedScene
+
+@export_group("Dungeon entrance (D35)")
+## Region whose edge holds the entrance.
+@export var region_id: StringName
+## Tile just outside the region edge where the entrance stands.
+@export var entrance_tile: Vector2i
+## Shown in the world but not enterable yet (content comes later).
+@export var locked: bool = false

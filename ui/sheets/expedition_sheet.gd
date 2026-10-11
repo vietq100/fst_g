@@ -1,9 +1,10 @@
 class_name ExpeditionSheet
 extends Sheet
-## Expedition preparation (UI_DESIGN.md → Expedition panel): destination, recommended level,
-## enemy preview, rewards, party selection (mood, traits, bonds shown), start button.
+## Dungeon preparation (UI_DESIGN.md → Expedition panel, D35): where the entrance is,
+## recommended level, enemy preview, rewards, party selection (mood, traits, bonds, needs shown),
+## start button. Locked dungeons only show that they are sealed.
 
-## Party chosen; UIRoot forwards it to the Town, which walks the party to the gate.
+## Party chosen; UIRoot forwards it to the world, which walks the party to the entrance.
 signal depart_requested(expedition_id: StringName, party: Array[StringName])
 
 var expedition_id: StringName
@@ -24,6 +25,12 @@ func _build(content: VBoxContainer) -> void:
 	var gm := GameManager
 	var definition := gm.expeditions.get_definition(expedition_id)
 	set_title(definition.display_name)
+	var region := gm.world.get_region(definition.region_id)
+	if region != null:
+		content.add_child(UIKit.label("Entrance on the edge of the %s. The rest of the world keeps living while the party is inside." % region.display_name, &"MutedLabel"))
+	if definition.locked:
+		content.add_child(UIKit.label("Sealed — this dungeon opens in a later update.", &"WarningLabel"))
+		return
 	content.add_child(UIKit.label("Recommended level %d" % definition.recommended_level, &"AccentLabel"))
 	content.add_child(UIKit.label("Enemies: %s\nBoss: %s" % [_enemy_preview(definition), _enemy_name(definition.boss_id)], &"MutedLabel"))
 	content.add_child(UIKit.label("Rewards: gold, Iron Ore, Beast Fang; boss: Dark Essence, chance of a Fang Blade; +%d gold for clearing%s" % [
@@ -37,7 +44,8 @@ func _build(content: VBoxContainer) -> void:
 	for warning in warnings:
 		content.add_child(UIKit.label(warning, &"WarningLabel"))
 	var reason := gm.expeditions.validate(expedition_id, _party)
-	content.add_child(UIKit.button("Depart through the South Gate", func() -> void:
+	content.add_child(UIKit.label("Fallen members come out as bodies at the entrance and are carried home.", &"MutedLabel"))
+	content.add_child(UIKit.button("Walk to the entrance", func() -> void:
 		depart_requested.emit(expedition_id, _party.duplicate()), &"PrimaryButton", reason))
 
 
@@ -51,7 +59,9 @@ func _member_row(runtime: HunterRuntime) -> Control:
 	var mood: String = MoodService.State.keys()[gm.mood.get_state(runtime)]
 	var detail := "%s · Mood %s" % [", ".join(traits), mood.capitalize()]
 	if not available:
-		detail = "Injured" if runtime.injured else "Busy"
+		detail = "Fallen" if not runtime.alive else ("Injured" if runtime.injured else "Busy")
+	elif GameManager.needs.is_exhausted(runtime) or GameManager.needs.is_hungry(runtime):
+		detail += " · tired or hungry"
 	var info := UIKit.vbox([UIKit.label("%s  Lv %d" % [runtime.display_name, runtime.level], &"", false),
 		UIKit.label(detail, &"MutedLabel")], 2)
 	var full := _party.size() >= DataRegistry.config.max_party_size
@@ -87,7 +97,7 @@ func _warnings(definition: ExpeditionDefinition) -> PackedStringArray:
 
 
 static func _is_available(runtime: HunterRuntime) -> bool:
-	return runtime != null and not runtime.injured and runtime.state == HunterRuntime.LifecycleState.AVAILABLE
+	return runtime != null and runtime.alive and not runtime.injured and runtime.state == HunterRuntime.LifecycleState.AVAILABLE
 
 
 static func _enemy_preview(definition: ExpeditionDefinition) -> String:

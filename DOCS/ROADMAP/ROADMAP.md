@@ -84,7 +84,20 @@ See `SYSTEMS/HUNTER_LIFE_SYSTEM.md`.
 - building panel
 - activity assignment
 
-## Phase 11 — Polish
+## Phase 11 — World redesign (owner request, D27–D37) ✅ (W1–W7 done; review pending)
+Plan: `plans/PHASE_11_WORLD.md`. Sub-phases, each playable and tested:
+- W1 Isometric world map (4 regions, gates, dungeon entrances, navigation) + camera (drag, zoom, follow)
+- W2 Buildings as placed instances + build / move / remove + Houses (beds)
+- W3 Needs (stamina, energy), purses, Tavern meals, treasury transfers (10% fee), sleep in Houses
+- W4 Region monsters + Hunter brains (autonomous hunting, loot bag, deposit)
+- W5 Death, bodies, carriers, revival at the Hospital
+- W6 Dungeons in the living world (Forest Guardian's Grove; others locked)
+- W7 UI (build mode, Hunter needs/purse/duty/follow, dungeon panel) + save schema 2 + migration
+
+## Phase 11b — Village economy (owner request, D38–D44)
+Plan: `plans/PHASE_11B_VILLAGE.md`. The player is the village chief: Hunters sell materials to the village, the chief crafts food (Tavern) and medicine (Hospital) sold back to Hunters, the Temple revives at an XP cost, two staff carry bodies, steeper XP curve and weaker offline training.
+
+## Phase 12 — Polish
 - art
 - animation
 - VFX

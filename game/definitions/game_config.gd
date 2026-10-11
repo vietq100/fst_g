@@ -11,8 +11,8 @@ extends Resource
 
 @export_group("Progression")
 ## required_xp = base_xp * pow(level, xp_exponent)
-@export var base_xp: float = 20.0
-@export var xp_exponent: float = 1.5
+@export var base_xp: float = 30.0
+@export var xp_exponent: float = 2.2
 ## Hunter max level = Town Hall level × this (DECISIONS.md D12).
 @export var level_cap_per_town_level: int = 10
 ## Fraction of max HP restored on level-up.
@@ -21,6 +21,8 @@ extends Resource
 @export_group("New game")
 ## DECISIONS.md D25.
 @export var start_gold: int = 200
+## Food in the Warehouse of a new village (D40): item id -> portions.
+@export var starting_food: Dictionary[StringName, int] = {&"meat_stew": 6}
 @export var starting_hunter_class: StringName = &"warrior"
 @export var starting_hunter_count: int = 1
 
@@ -63,9 +65,70 @@ extends Resource
 ## Real seconds per in-game day (Hunter history dates).
 @export var day_length_seconds: float = 300.0
 
+@export_group("Needs")
+## Stamina / energy 0..needs_max, changed once per activity tick (BALANCE.md → Needs, D31).
+@export var needs_max: float = 100.0
+@export var stamina_drain_active: float = 1.5
+@export var stamina_sleep_bed: float = 6.0
+@export var stamina_sleep_outdoors: float = 3.0
+@export var outdoors_sleep_mood: float = -1.0
+@export var energy_drain: float = 0.6
+@export var energy_drain_sleeping: float = 0.3
+## Energy at 0: this share of max HP lost per tick (never below 1 HP) and this mood change.
+@export var starving_hp_ratio: float = 0.02
+@export var starving_mood: float = -1.0
+## Brain thresholds: sleep below / wake at; eat below.
+@export var sleep_below_stamina: float = 25.0
+@export var wake_at_stamina: float = 95.0
+@export var eat_below_energy: float = 35.0
+## Stamina 0: percent modifiers on move / attack speed.
+@export var exhausted_move_speed: float = -0.4
+@export var exhausted_attack_speed: float = -0.3
+
+@export_group("Regions")
+## Region monsters (BALANCE.md → Regions, D29): level L scales stats by 1 + per_level × (L − 1).
+@export var monster_stat_per_level: float = 0.12
+@export var monster_reward_per_level: float = 0.10
+## Monsters notice Hunters this close and give up past this distance from their spawn point.
+@export var monster_aggro_range: float = 90.0
+@export var monster_leash_range: float = 220.0
+## Hunters engage monsters this close while hunting.
+@export var hunter_engage_range: float = 150.0
+## Items a Hunter carries before walking home to the Warehouse.
+@export var loot_bag_capacity: int = 10
+## Go home to rest below this share of max HP, leave again from this share.
+@export var rest_below_hp_ratio: float = 0.35
+@export var rest_until_hp_ratio: float = 0.9
+
+@export_group("Bodies")
+## D30: a carrier drags a body at this share of its speed; carriers need this much stamina;
+## revived Hunters start with this share of HP, stamina and energy.
+@export var carry_speed_ratio: float = 0.7
+@export var carrier_min_stamina: float = 25.0
+@export_range(0.0, 1.0) var revive_ratio: float = 0.5
+## Nobody able to carry a body for this long (everyone fell): the town brings it to the Hospital.
+@export var body_rescue_seconds: float = 120.0
+## D42: share of the XP needed for the current level lost on revival.
+@export_range(0.0, 1.0) var revive_xp_loss_ratio: float = 0.1
+## D43: village staff that carry bodies, their speed and the fee per trip.
+@export var staff_count: int = 2
+@export var staff_move_speed: float = 70.0
+@export var staff_fee: int = 15
+
+@export_group("Talents")
+## D46: chance weight of recruiting a Hunter without a talent.
+@export var talent_none_weight: float = 0.3
+
+@export_group("Money")
+## D34: purse of a new Hunter; share of a treasury ↔ purse transfer lost as fee.
+@export var purse_start: int = 20
+@export_range(0.0, 1.0) var transfer_fee: float = 0.1
+
 @export_group("Offline")
 ## Max real time applied to town timers after the app was closed (DECISIONS.md D24).
 @export var offline_cap_hours: float = 8.0
+## Share of Training XP gained while the app is closed (D44).
+@export_range(0.0, 1.0) var offline_training_ratio: float = 0.25
 
 @export_group("Expedition")
 @export var max_party_size: int = 3

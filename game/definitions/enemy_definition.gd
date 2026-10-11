@@ -17,6 +17,9 @@ extends GameDefinition
 ## Extra body size beyond a standard actor; added to attackers' reach (big bosses).
 @export var hit_radius: float = 0.0
 
+## Status effects this enemy's hits may apply (D48), e.g. a venomous bite.
+@export var on_hit_effects: Array[StatusEffectChance] = []
+
 @export_group("Rewards")
 @export var xp_reward: int = 0
 @export var gold_min: int = 0

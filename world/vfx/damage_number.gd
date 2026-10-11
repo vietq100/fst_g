@@ -14,10 +14,15 @@ const OUTLINE := Color("16161c")
 
 ## `hurt_hunter` uses a red tint so the player can tell incoming from outgoing damage.
 func setup(amount: float, is_critical: bool, hurt_hunter: bool) -> void:
-	var label := Label.new()
-	label.text = "%d%s" % [roundi(amount), "!" if is_critical else ""]
-	label.add_theme_font_size_override("font_size", CRITICAL_FONT_SIZE if is_critical else FONT_SIZE)
 	var color := CRITICAL_COLOR if is_critical else (HUNTER_HURT_COLOR if hurt_hunter else COLOR)
+	show_text("%d%s" % [roundi(amount), "!" if is_critical else ""], color, CRITICAL_FONT_SIZE if is_critical else FONT_SIZE)
+
+
+## Any floating text: status effect damage, heals, "Immune", effect names (D48).
+func show_text(text: String, color: Color, font_size: int = FONT_SIZE) -> void:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", OUTLINE)
 	label.add_theme_constant_override("outline_size", 4)

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RegionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/region_definition.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"ancient_ruins"
+display_name = "Ancient Ruins"
+tile_rect = Rect2i(38, 0, 36, 36)
+is_town = false
+min_hunter_level = 9
+monster_ids = Array[StringName]([&"skeleton", &"goblin"])
+monster_level_min = 8
+monster_level_max = 12
+population_cap = 18
+respawn_seconds = 15.0
+ground_color = Color(0.42, 0.41, 0.36, 1)
+ground_alt_color = Color(0.46, 0.45, 0.4, 1)
+props = 3
+prop_density = 0.07

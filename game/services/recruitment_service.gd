@@ -10,6 +10,8 @@ signal hunter_recruited(hunter: HunterRuntime)
 signal autosave_requested(reason: StringName)
 
 var candidates: Array[HunterRuntime] = []
+## Beds (DECISIONS.md D32); optional so the service also works standalone.
+var housing: HousingService
 
 var _registry: Node
 var _hunters: HunterService
@@ -76,6 +78,8 @@ func can_recruit(index: int) -> String:
 		return "No such candidate"
 	if _hunters.count() >= get_capacity():
 		return "Roster full (%d/%d) — upgrade the Town Hall" % [_hunters.count(), get_capacity()]
+	if housing != null and housing.get_free_beds() <= 0:
+		return "No free bed — build a House"
 	if not _wallet.can_spend(get_recruit_cost(index)):
 		return "Needs %d gold" % get_recruit_cost(index)
 	return ""

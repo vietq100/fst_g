@@ -4,7 +4,6 @@ extends Actor
 
 const GROUP := &"hunters"
 const DEFAULT_WEAPON_TINT := Color("d8dde3")
-const DEFAULT_BODY_TINT := Color("8f969e")
 
 var runtime: HunterRuntime
 var _service: HunterService
@@ -19,7 +18,6 @@ func setup(hunter: HunterRuntime, service: HunterService, combat_service: Combat
 	_equipment = equipment
 	name = String(hunter.unique_id)
 	add_to_group(GROUP)
-	(visual as PlaceholderVisual).set_accent_index(hunter.accent_index)
 	_refresh_equipment_look()
 	health.setup(_service.get_stat(hunter, HunterService.MAX_HP), hunter.current_hp)
 	health.health_changed.connect(_on_health_changed)
@@ -66,6 +64,9 @@ func _on_hunter_changed(hunter: HunterRuntime) -> void:
 	# Read before set_max_health: its health_changed signal writes the actor's HP back to runtime.
 	var runtime_hp := hunter.current_hp
 	health.set_max_health(_service.get_stat(hunter, HunterService.MAX_HP))
+	if health.is_dead():
+		# A downed actor must not overwrite a revived Hunter's HP; the world revives the actor.
+		hunter.current_hp = runtime_hp
 	# Out of combat, HP can change in town (resting): follow the runtime value.
 	if not hunter.injured and not health.is_dead() and not combat.is_valid_target(combat.target) \
 			and not is_equal_approx(health.current_health, runtime_hp):
@@ -81,14 +82,17 @@ func _on_hunter_leveled_up(hunter: HunterRuntime, _new_level: int, healed: float
 	visual.play_level_up()
 
 
-## Equipment is visible on the placeholder: blade colour = weapon, body colour = armor
-## (CHARACTER_DESIGN.md §10).
+## Skin and dye from the Hunter's look; the weapon tints the blade line (D49).
+## Outfits are not drawn yet (the chibi body has no outfit layer).
 func _refresh_equipment_look() -> void:
-	var look := visual as PlaceholderVisual
+	var look := visual as ChibiVisual
 	if look == null:
 		return
 	var weapon := _equipment.get_equipped_item(runtime, &"weapon") if _equipment != null else null
-	var armor := _equipment.get_equipped_item(runtime, &"armor") if _equipment != null else null
+	look.appearance = runtime.appearance
+	look.dead = not runtime.alive
 	look.weapon_color = weapon.tint if weapon != null else DEFAULT_WEAPON_TINT
-	look.body_color = armor.tint if armor != null else DEFAULT_BODY_TINT
-	look.weapon_length = 14.0 if weapon != null and weapon.rarity >= ItemDefinition.Rarity.UNCOMMON else 12.0
+	var definition := _service.get_definition(runtime)
+	var base_length := definition.weapon_length if definition != null else 12.0
+	look.weapon_width = definition.weapon_width if definition != null else look.weapon_width
+	look.weapon_length = base_length + (2.0 if weapon != null and weapon.rarity >= ItemDefinition.Rarity.UNCOMMON else 0.0)

@@ -8,13 +8,20 @@ const GROUP := &"enemies"
 const DEATH_DURATION := 0.5
 
 var definition: EnemyDefinition
+## Region monster level (BALANCE.md → Regions); 1 = base stats.
+var level := 1
+## HP / attack / defense multiplier for `level` (set by the spawner).
+var stat_scale := 1.0
 
 
 ## Call after the node is in the tree.
-func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, retarget_interval: float) -> void:
+func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, retarget_interval: float,
+		monster_level: int = 1, monster_stat_scale: float = 1.0) -> void:
 	definition = enemy_definition
+	level = monster_level
+	stat_scale = monster_stat_scale
 	add_to_group(GROUP)
-	health.setup(definition.hp)
+	health.setup(definition.hp * stat_scale)
 	combat.setup(Hunter.GROUP, definition.attack_range, retarget_interval, combat_service)
 	auto_combat = true
 	repositions_in_range = not definition.is_boss
@@ -34,12 +41,16 @@ func get_hit_radius() -> float:
 
 func get_combat_stats(_against: Actor = null) -> CombatStats:
 	var stats := CombatStats.new()
-	stats.attack = definition.attack
-	stats.defense = definition.defense
+	stats.attack = definition.attack * stat_scale
+	stats.defense = definition.defense * stat_scale
 	stats.attack_speed = definition.attack_speed
 	stats.critical_chance = definition.critical_chance
 	stats.critical_damage = definition.critical_damage
 	return stats
+
+
+func get_on_hit_effects() -> Array[StatusEffectChance]:
+	return definition.on_hit_effects if definition != null else [] as Array[StatusEffectChance]
 
 
 func _on_died() -> void:

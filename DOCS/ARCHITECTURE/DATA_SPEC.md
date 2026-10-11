@@ -80,12 +80,25 @@ Individual identity (name, appearance, stat rolls, traits) lives in `HunterRunti
 - is_boss
 - attack_range (px, feet to feet)
 - hit_radius (extra body size added to attackers' reach; big bosses)
+- on_hit_effects (StatusEffectChance list: effect, chance, stacks; D48)
 - actor_scene (scene with an `Enemy` root, spawned for this definition)
 - sprite_frames
 - xp_reward
 - gold_min
 - gold_max
 - loot_table_id
+
+## StatusEffectDefinition (D48)
+
+- id, display_name
+- kind (BUFF / DEBUFF), duration (s; ≤ 0 = until removed), stacking (REFRESH / STACK / IGNORE), max_stacks, dispellable
+- tick_interval, damage_per_tick, heal_per_tick, tick_is_ratio (fraction of max HP)
+- stuns, roots, disarms, invulnerable
+- modifiers (StatModifier list on attack, defense, attack_speed, move_speed, critical_chance, critical_damage, damage_dealt, damage_taken)
+- shield, thorns, lifesteal
+- color, icon (glyph), aura, tints_actor (visuals)
+
+Data: `data/status_effects/` (20 effects, see `COMBAT_SYSTEM.md` → Status effects).
 
 ## LootTableDefinition
 
@@ -107,6 +120,11 @@ MVP tables: `goblin`, `wolf`, `forest_guardian_first`, `forest_guardian_repeat`.
 - modifiers (list of Modifier)
 - icon
 - tint (colour on placeholder characters)
+- outfit_id (armor only: Hunter outfit shown while worn, id in `wardrobe.json`; empty = default outfit, D47)
+
+## Hunter body art (D49)
+
+The chibi body is a pixel map in `actors/hunter/chibi/chibi_body.gd` (art, not balance data). The D47 wardrobe (`wardrobe.json`, reference bodies, outfits, hair styles) was removed; `HunterAppearance` and `ItemDefinition.outfit_id` stay in data/saves for the future hair and outfit layers.
 
 ## RecipeDefinition
 

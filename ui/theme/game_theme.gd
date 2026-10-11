@@ -18,6 +18,8 @@ const DANGER := Color("c9503f")
 const GOOD := Color("6fbf5f")
 const INFO := Color("5fa8ff")
 const MOOD := Color("e8c547")
+const STAMINA := Color("4fc1b0")
+const ENERGY := Color("e0874a")
 
 const BODY_SIZE := 12
 const SMALL_SIZE := 10
@@ -65,6 +67,8 @@ static func _create() -> Theme:
 	_bar(theme, &"HpBar", GOOD)
 	_bar(theme, &"XpBar", INFO)
 	_bar(theme, &"MoodBar", MOOD)
+	_bar(theme, &"StaminaBar", STAMINA)
+	_bar(theme, &"EnergyBar", ENERGY)
 	_bar(theme, &"TimerBar", ACCENT)
 	theme.set_stylebox(&"panel", &"ScrollContainer", StyleBoxEmpty.new())
 	return theme

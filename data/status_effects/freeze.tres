@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="StatusEffectDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/status_effect_definition.gd" id="1_effect"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_modifier"]
+
+[sub_resource type="Resource" id="StatModifier_1"]
+script = ExtResource("2_modifier")
+stat = &"damage_taken"
+type = 1
+value = 0.15
+
+[resource]
+script = ExtResource("1_effect")
+id = &"freeze"
+display_name = "Frozen"
+kind = 1
+duration = 2.0
+stacking = 0
+max_stacks = 1
+dispellable = true
+tick_interval = 1.0
+damage_per_tick = 0.0
+heal_per_tick = 0.0
+tick_is_ratio = false
+stuns = true
+roots = false
+disarms = false
+invulnerable = false
+modifiers = Array[ExtResource("2_modifier")]([SubResource("StatModifier_1")])
+shield = 0.0
+thorns = 0.0
+lifesteal = 0.0
+color = Color(0.5608, 0.8275, 1, 1)
+icon = "F"
+aura = 6
+tints_actor = true

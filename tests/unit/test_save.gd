@@ -63,10 +63,18 @@ func _rich_game() -> Node:
 	game.equipment.equip_best(roster[0])
 	game.bonds.add(roster[0].unique_id, roster[1].unique_id, 60.0)
 	game.hunters.mark_injured(roster[2])
-	game.hospital.tick(30.0)
+	game.temple.tick(30.0)
 	game.progress.set_flag(&"first_boss_clear")
 	game.buildings.upgrade(&"warehouse")
+	game.buildings.build(&"house", Vector2i(14, 6))
+	game.buildings.move(game.buildings.find_first(&"warehouse").instance_id, Vector2i(1, 1))
 	game.mood.change(roster[1], 25.0)
+	roster[1].duty = &"goblin_cave"
+	roster[1].task = HunterRuntime.HUNTING
+	roster[1].world_position = Vector2(400, 700)
+	roster[1].stamina = 42.5
+	game.regions.add_to_bag(roster[1], &"iron_ore", 2)
+	game.purses.earn(roster[1], 33)
 	game.activities.set_assignment(roster[1], ActivityService.SOCIALIZING)
 	roster[0].history[HunterRuntime.BOSSES_DEFEATED] = 3
 	game.advance_town_time(25.0)
@@ -186,7 +194,7 @@ func test_migration_from_schema_0() -> void:
 	var warnings := PackedStringArray()
 	var old := {"gold": 10, "materials": {"iron_ore": 4}, "inventory": {"stacks": {"iron_ore": 1}}}
 	var migrated: Dictionary = SaveCodec.migrate(old, warnings)
-	assert_eq(int(migrated["schema_version"]), 1)
+	assert_eq(int(migrated["schema_version"]), SaveCodec.SCHEMA_VERSION)
 	assert_eq(int(migrated["inventory"]["stacks"]["iron_ore"]), 5)
 	assert_false(migrated.has("materials"))
 	assert_true(migrated.has("saved_at_unix"))
@@ -194,6 +202,35 @@ func test_migration_from_schema_0() -> void:
 	SaveCodec.restore(game, migrated, warnings)
 	assert_eq(game.inventory.count(&"iron_ore"), 5)
 	assert_null(SaveCodec.migrate({"schema_version": 99}, warnings), "newer schema refused")
+
+
+func test_migration_from_schema_2_adds_a_temple() -> void:
+	var warnings := PackedStringArray()
+	var game := _game(5)
+	var data := SaveCodec.capture(game)
+	data["schema_version"] = 2
+	var instances: Array = data["buildings"]["instances"]
+	data["buildings"]["instances"] = instances.filter(func(entry: Dictionary) -> bool: return entry["building_id"] != "temple")
+	var copy := _game(6)
+	SaveCodec.restore(copy, SaveCodec.migrate(data, warnings), warnings)
+	assert_true(copy.buildings.has_building(&"temple"))
+	assert_eq(copy.buildings.get_instances().size(), 7)
+
+
+func test_migration_from_schema_1_keeps_building_levels() -> void:
+	var warnings := PackedStringArray()
+	var old := {"schema_version": 1, "gold": 10, "buildings": {"town_hall": 2, "warehouse": 2, "tavern": 1},
+		"hunters": {"hunters": [{"unique_id": "h_3", "definition_id": "warrior"}]}}
+	var migrated: Dictionary = SaveCodec.migrate(old, warnings)
+	assert_eq(int(migrated["schema_version"]), SaveCodec.SCHEMA_VERSION)
+	var game := _game(5)
+	SaveCodec.restore(game, migrated, warnings)
+	assert_eq(game.buildings.get_level(&"town_hall"), 2)
+	assert_eq(game.buildings.get_level(&"warehouse"), 2)
+	assert_eq(game.buildings.get_instances().size(), 7, "default layout incl. the first House and the Temple")
+	assert_eq(game.inventory.capacity, 80)
+	assert_eq(game.hunters.get_hunter(&"h_3").purse, SaveCodec.MIGRATED_PURSE)
+	assert_eq(game.housing.get_used_beds(), game.hunters.count(), "migrated Hunters get beds")
 
 
 func test_expedition_in_progress_is_not_saved() -> void:

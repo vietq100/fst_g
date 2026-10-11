@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RegionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/region_definition.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"goblin_cave"
+display_name = "Goblin Cave"
+tile_rect = Rect2i(38, 38, 36, 36)
+is_town = false
+min_hunter_level = 5
+monster_ids = Array[StringName]([&"goblin", &"wolf"])
+monster_level_min = 4
+monster_level_max = 7
+population_cap = 18
+respawn_seconds = 15.0
+ground_color = Color(0.29, 0.25, 0.21, 1)
+ground_alt_color = Color(0.32, 0.28, 0.23, 1)
+props = 2
+prop_density = 0.08

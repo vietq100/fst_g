@@ -34,11 +34,15 @@ Main
 ├── WorldContainer
 └── UI
 
-Town
-├── World
-├── Buildings
-├── Actors
-└── Navigation
+WorldMap (main map: Town + regions, D27)
+├── Ground
+├── NavigationRegion2D (baked from WorldService outlines; rebaked on layout change)
+├── Entities (y-sorted)
+│   ├── Buildings (IsoBuilding ← BuildingService instances)
+│   ├── Props (trees / rocks / columns)
+│   ├── Actors
+│   └── gates, dungeon entrances
+└── WorldCamera (drag, pinch / wheel zoom, follow)
 
 Expedition
 ├── World
@@ -53,7 +57,9 @@ Hunter
 ├── NavigationAgent2D
 ├── HealthController
 ├── CombatController
-└── StateController
+├── StateController
+├── StatusEffects (StatusEffectController, added in code, D48)
+└── StatusEffectView (added in code, D48)
 
 Avoid giant Hunter.gd.
 
@@ -114,7 +120,9 @@ Plain classes or nodes owned by `GameManager` (not autoloads):
 - `game/runtime/` — runtime state objects (`HunterRuntime`, …): ids and plain values, serializable
 - `actors/common/` — reusable actor components (`HealthController`, `StateController`, `CombatController`, `Facing`, `PlaceholderVisual`)
 - `actors/hunter/` — Hunter actor scene
-- `world/town/` — the hub: `town.tscn` (layout D8), `Town` (selection, building panels, departure), `TownBuilding` + `BuildingVisual`, ground, drag camera
+- `actors/hunter/chibi/` — the chibi Hunter (D49): `ChibiBody` (32×48 body map, parts, facings, skin/dye recolour, cached frames and portraits), `ChibiAnimations` (frame tables), `ChibiVisual` (animation state machine, weapon, action effects)
+- `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `IsoBuilding` + `IsoBuildingVisual`, `WorldProp`, `GateVisual`, `DungeonEntrance`, ground, `WorldCamera`
+- `game/services/world_service.gd` — isometric geometry: tile ↔ world, regions, gates, navigation outlines
 - `world/test_arena/` — combat sandbox, reachable from the Town debug panel (debug builds only)
 - `world/vfx/` — world-space feedback (`CombatFeedback`, `DamageNumber`, `LevelUpBurst`, `LootPopup`)
 - `save/` — `SaveCodec` (snapshot ↔ services, migrations); `core/save_manager.gd` handles files, autosave and offline catch-up

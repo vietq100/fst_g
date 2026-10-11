@@ -3,7 +3,9 @@ extends RefCounted
 ## Converts the game state (a GameManager-like node with the service properties) to and from
 ## plain JSON-safe data (SAVE_SYSTEM.md, DECISIONS.md D21). No Nodes are ever saved.
 
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 3
+## Purse given to Hunters of schema 1 saves (BALANCE.md → Money, new Hunter purse).
+const MIGRATED_PURSE := 20
 
 
 ## Snapshot of everything that persists. An expedition in progress is not saved: its party
@@ -26,7 +28,7 @@ static func capture(game: Node) -> Dictionary:
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"gold": game.wallet.gold,
 		"progress": game.progress.to_dict(),
-		"buildings": game.buildings.get_levels(),
+		"buildings": game.buildings.to_dict(),
 		"hunters": hunters,
 		"bonds": game.bonds.to_dict(),
 		"inventory": game.inventory.to_dict(),
@@ -41,15 +43,25 @@ static func capture(game: Node) -> Dictionary:
 static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -> void:
 	var config: GameConfig = game.registry.config
 	game.expeditions.current_run = null
+	game.corpses.clear()
 	game.wallet.gold = maxi(int(data.get("gold", 0)), 0)
 	game.progress.from_dict(_section(data, "progress", warnings))
-	game.buildings.set_levels(_section(data, "buildings", warnings))
+	var buildings := _section(data, "buildings", warnings)
+	if buildings.has("instances"):
+		game.buildings.from_dict(buildings, warnings)
+		var ensure: Variant = buildings.get("ensure", [])
+		for building_id in (ensure if ensure is Array else []):
+			game.buildings.ensure_building(StringName(str(building_id)))
+	else:
+		# Schema 1 levels, or no section at all: the default layout.
+		var levels: Variant = buildings.get("legacy_levels", {})
+		game.buildings.set_levels(levels if levels is Dictionary else {})
 	game.hunters.from_dict(_section(data, "hunters", warnings), warnings)
 	game.inventory.from_dict(_section(data, "inventory", warnings), warnings)
 	for hunter: HunterRuntime in game.hunters.get_all():
 		hunter.mood = clampf(hunter.mood, 0.0, config.mood_max)
 		hunter.expedition_id = &""
-		if hunter.injured:
+		if hunter.injured or not hunter.alive:
 			hunter.state = HunterRuntime.LifecycleState.RECOVERING
 		elif hunter.state != HunterRuntime.LifecycleState.AVAILABLE:
 			hunter.state = HunterRuntime.LifecycleState.AVAILABLE
@@ -61,6 +73,8 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 	game.bonds.from_dict(_section(data, "bonds", warnings), warnings)
 	game.recruitment.from_dict(data.get("tavern_candidates", []), warnings)
 	game.activities.set_accumulator(float(data.get("activity_time", 0.0)))
+	# Buildings were restored before the Hunters: hand out beds now (old saves have none).
+	game.housing.assign_beds()
 
 
 ## Upgrades older snapshots step by step to SCHEMA_VERSION. Returns null if the data is from
@@ -74,6 +88,10 @@ static func migrate(data: Dictionary, warnings: PackedStringArray) -> Variant:
 		match version:
 			0:
 				data = _migrate_0_to_1(data)
+			1:
+				data = _migrate_1_to_2(data)
+			2:
+				data = _migrate_2_to_3(data)
 		version += 1
 		data["schema_version"] = version
 		warnings.append("migrated save to schema %d" % version)
@@ -94,6 +112,30 @@ static func _migrate_0_to_1(data: Dictionary) -> Dictionary:
 	data.erase("materials")
 	if not data.has("saved_at_unix"):
 		data["saved_at_unix"] = Time.get_unix_time_from_system()
+	return data
+
+
+## Schema 1 → 2 (D37): buildings were levels per type in a fixed layout; they become placed
+## instances at their default tiles with those levels. Hunters get a starting purse; other new
+## fields (needs, duty) take their defaults when HunterRuntime reads the entry.
+static func _migrate_1_to_2(data: Dictionary) -> Dictionary:
+	var levels: Variant = data.get("buildings", {})
+	data["buildings"] = {"legacy_levels": levels if levels is Dictionary else {}}
+	var hunters: Variant = data.get("hunters", {})
+	var entries: Variant = hunters.get("hunters", []) if hunters is Dictionary else []
+	if entries is Array:
+		for entry: Variant in entries:
+			if entry is Dictionary and not entry.has("purse"):
+				entry["purse"] = MIGRATED_PURSE
+	return data
+
+
+## Schema 2 → 3 (D42): layouts saved before the Temple existed get one (default spot or the
+## nearest free one).
+static func _migrate_2_to_3(data: Dictionary) -> Dictionary:
+	var buildings: Variant = data.get("buildings", {})
+	if buildings is Dictionary and buildings.has("instances"):
+		buildings["ensure"] = ["temple"]
 	return data
 
 

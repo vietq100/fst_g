@@ -2,7 +2,8 @@ class_name ActivityService
 extends RefCounted
 ## Town life between expeditions (HUNTER_LIFE_SYSTEM.md §4, DECISIONS.md D14, D24).
 ## Every tick (10 s of real time, also offline) each Hunter in town does an activity:
-## Resting / Training / Socializing, or Recovering while injured.
+## Resting / Training / Socializing, or Recovering while injured. Needs come first (D31):
+## Sleeping when out of stamina, Eating at the Tavern when hungry and able to pay.
 
 signal activity_changed(hunter: HunterRuntime)
 
@@ -10,6 +11,10 @@ const RESTING := &"resting"
 const SOCIALIZING := &"socializing"
 const TRAINING := &"training"
 const RECOVERING := &"recovering"
+const SLEEPING := &"sleeping"
+const EATING := &"eating"
+## Out in a region (the Hunter brain's task, also "returning"); needs drain as active.
+const HUNTING := HunterRuntime.HUNTING
 
 var _registry: Node
 var _hunters: HunterService
@@ -20,6 +25,10 @@ var _stats: StatService
 var _progress: ProgressService
 var _config: GameConfig
 var _accumulator := 0.0
+## Fractional Training XP per Hunter (offline training gives less than 1 XP per tick).
+var _xp_carry: Dictionary[StringName, float] = {}
+## Optional (set by GameManager): stamina / energy ticks and sleep / meal decisions.
+var needs: NeedsService
 
 
 func _init(registry: Node, hunters: HunterService, traits: TraitService, mood: MoodService,
@@ -44,13 +53,14 @@ func get_tick_seconds() -> float:
 
 
 ## Advances real time; runs one activity tick per tick_seconds. Returns the ticks run.
-func tick(seconds: float) -> int:
+## `include_outside` false (offline, D36): Hunters out in the regions are frozen.
+func tick(seconds: float, include_outside: bool = true) -> int:
 	_accumulator += seconds
 	var ticks := 0
 	var length := get_tick_seconds()
 	while _accumulator >= length:
 		_accumulator -= length
-		_tick_once()
+		_tick_once(include_outside)
 		ticks += 1
 	return ticks
 
@@ -70,6 +80,11 @@ func set_assignment(hunter: HunterRuntime, activity_id: StringName) -> String:
 func decide(hunter: HunterRuntime) -> StringName:
 	if hunter.injured:
 		return RECOVERING
+	if needs != null:
+		if needs.wants_sleep(hunter, hunter.activity == SLEEPING):
+			return SLEEPING
+		if needs.wants_meal(hunter):
+			return EATING
 	if hunter.assigned_activity != &"":
 		return hunter.assigned_activity
 	var hp_full := hunter.current_hp >= _hunters.get_stat(hunter, HunterService.MAX_HP) - 0.01
@@ -79,7 +94,7 @@ func decide(hunter: HunterRuntime) -> StringName:
 
 
 func is_in_town(hunter: HunterRuntime) -> bool:
-	return hunter.expedition_id == &""
+	return hunter.expedition_id == &"" and hunter.task == &""
 
 
 ## Partial tick time (saved so short sessions add up).
@@ -91,12 +106,25 @@ func set_accumulator(seconds: float) -> void:
 	_accumulator = clampf(seconds, 0.0, get_tick_seconds())
 
 
-func _tick_once() -> void:
+func _tick_once(include_outside: bool = true) -> void:
 	var socializing: Array[HunterRuntime] = []
 	for hunter in _hunters.get_all():
+		if not hunter.alive and not hunter.injured:
+			# A body lying in the world: nothing ticks (D30).
+			continue
+		if hunter.expedition_id == &"" and hunter.task != &"":
+			if include_outside:
+				_set_activity(hunter, hunter.task)
+				if needs != null:
+					needs.tick_hunter(hunter, true, false)
+			continue
 		if not is_in_town(hunter):
 			continue
 		_update_activity(hunter)
+		if needs != null and not hunter.injured:
+			if hunter.activity == EATING:
+				needs.eat(hunter)
+			needs.tick_hunter(hunter, hunter.activity == TRAINING, hunter.activity == SLEEPING)
 		var definition := get_definition(hunter.activity)
 		if definition == null:
 			continue
@@ -113,7 +141,10 @@ func _tick_once() -> void:
 					_mood.trait_event(hunter, TraitService.LONG_REST)
 				_hunters.notify_changed(hunter)
 			TRAINING:
-				var xp := roundi(definition.xp * rate)
+				var gained := definition.xp * rate * (1.0 if include_outside else _config.offline_training_ratio)
+				gained += _xp_carry.get(hunter.unique_id, 0.0)
+				var xp := floori(gained)
+				_xp_carry[hunter.unique_id] = gained - xp
 				_hunters.add_xp(hunter, xp, _stats.level_cap(_progress.town_level))
 			SOCIALIZING:
 				_mood.change(hunter, definition.mood * rate)
@@ -137,7 +168,18 @@ func _socialize(group: Array[HunterRuntime]) -> void:
 
 
 func _update_activity(hunter: HunterRuntime) -> void:
-	var activity := decide(hunter)
+	_set_activity(hunter, decide(hunter))
+
+
+## Called by the Hunter brain when it leaves for / comes back from a region.
+func refresh(hunter: HunterRuntime) -> void:
+	if hunter.expedition_id == &"" and hunter.task != &"":
+		_set_activity(hunter, hunter.task)
+	elif is_in_town(hunter):
+		_update_activity(hunter)
+
+
+func _set_activity(hunter: HunterRuntime, activity: StringName) -> void:
 	if hunter.activity == activity:
 		return
 	hunter.activity = activity

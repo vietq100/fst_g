@@ -18,4 +18,5 @@ attack_range = 18.0
 xp_reward = 5
 gold_min = 2
 gold_max = 4
+loot_table_id = &"slime"
 actor_scene = ExtResource("2_scene")

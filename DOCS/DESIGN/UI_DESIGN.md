@@ -21,19 +21,22 @@ UI should feel like:
 ## Main HUD
 
 Top:
-- Gold
-- Dark Essence
+- Treasury (village funds, D34, D38)
+- Food portions in stock (D40)
+- Beds used / total (D32)
 - Warehouse usage (slots used / capacity)
 - Town level
 
 Bottom:
-- navigation bar (Town, Hunters, Expedition, Inventory)
-- Hunter status
-- Expedition status
+- navigation bar: Town (recenter the camera on the Town), Build, Hunters, Dungeon, Items
+- placement bar while placing a building (title, reason it cannot be placed, Confirm / Cancel)
+- expedition HUD while a party is in a dungeon
+
+World (D28): drag to pan, pinch / wheel to zoom, tap a Hunter to select and follow it, tap a building for its panel, tap a dungeon entrance for its panel.
 
 ## Offline summary
 
-On resume after time away: short "while you were away" sheet (recovered Hunters, XP from training, mood changes).
+On resume after time away: short "while you were away" sheet (recovered Hunters, XP from training, meals eaten, hunger warning).
 
 ## Panels
 
@@ -48,7 +51,11 @@ Show:
 - equipment
 - traits
 - mood (icon/colour state)
-- current activity (resting / training / socializing / recovering)
+- current activity / task (resting / training / socializing / sleeping / eating / hunting / returning / fetching / carrying / fallen)
+- stamina and energy bars (D31)
+- purse with Give 50 / Take all (10% fee shown, D34)
+- duty: Auto / Dark Forest / Goblin Cave / Ancient Ruins / Stay (D29) and the loot bag
+- Follow on the map (D28)
 - bonds (who they are close to)
 - short history (expeditions, bosses, injuries)
 
@@ -59,10 +66,19 @@ Show:
 - function
 - upgrade cost
 - requirements
+- Move / Remove (refund shown, tap twice to remove; D33)
+- House: residents and beds
+- Tavern: kitchen (food recipes, stock) and candidates; Hospital: pharmacy (medicine recipes); Blacksmith: forge; Temple: revivals (time, XP loss, speed-up) and staff status
+- Upgrade preview lists the recipes the next level unlocks
 
-### Expedition panel
+### Build panel
+- every building that can be bought: cost, description, why it cannot be built now
+- Place → placement mode on the map (ghost at the nearest free spot, tap to move, Confirm / Cancel)
+
+### Dungeon panel (expedition panel, D35)
+Opened from a dungeon entrance or the Dungeon button. Locked dungeons only say they are sealed.
 Show:
-- destination
+- destination and where its entrance is
 - recommended level
 - enemy preview
 - rewards

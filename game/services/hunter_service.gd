@@ -67,6 +67,11 @@ func generate_candidate(definition_id: StringName, rng: RandomNumberGenerator) -
 		hunter.stat_rolls[stat] = rng.randf_range(-variance, variance)
 	hunter.mood = _config.mood_start
 	hunter.current_hp = get_stat(hunter, MAX_HP)
+	hunter.stamina = _config.needs_max
+	hunter.energy = _config.needs_max
+	hunter.purse = _config.purse_start
+	# Seeded from the rolls above so the shared RNG sequence is not changed (D47).
+	hunter.appearance = HunterAppearance.from_seed("%s|%s|%s" % [hunter.display_name, definition_id, hunter.stat_rolls], hunter.accent_index)
 	return hunter
 
 
@@ -195,11 +200,18 @@ func mark_injured(hunter: HunterRuntime) -> void:
 	hunter_changed.emit(hunter)
 
 
-## Fully recovered (Hospital finished / debug).
+## Fully recovered (Hospital finished / debug). A dead Hunter is revived instead, with
+## `revive_ratio` of its HP, stamina and energy (D30).
 func recover(hunter: HunterRuntime) -> void:
+	var reviving := not hunter.alive
+	hunter.alive = true
 	hunter.injured = false
 	hunter.recovery_remaining = 0.0
-	hunter.current_hp = get_stat(hunter, MAX_HP)
+	hunter.current_hp = get_stat(hunter, MAX_HP) * (_config.revive_ratio if reviving else 1.0)
+	if reviving:
+		var floor_value := _config.needs_max * _config.revive_ratio
+		hunter.stamina = maxf(hunter.stamina, floor_value)
+		hunter.energy = maxf(hunter.energy, floor_value)
 	hunter.state = HunterRuntime.LifecycleState.AVAILABLE
 	hunter_changed.emit(hunter)
 

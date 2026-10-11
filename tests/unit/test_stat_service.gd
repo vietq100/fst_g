@@ -58,10 +58,10 @@ func test_attack_cooldown() -> void:
 
 
 func test_required_xp() -> void:
-	# 20 × level^1.5, rounded up
-	assert_eq(_stats.required_xp(1), 20)
-	assert_eq(_stats.required_xp(2), 57)
-	assert_eq(_stats.required_xp(4), 160)
+	# 30 × level^2.2, rounded up (D44)
+	assert_eq(_stats.required_xp(1), 30)
+	assert_eq(_stats.required_xp(2), 138)
+	assert_eq(_stats.required_xp(4), 634)
 
 
 func test_level_cap() -> void:

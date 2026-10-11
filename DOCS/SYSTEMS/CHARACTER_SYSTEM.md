@@ -14,7 +14,8 @@ HunterRuntime:
 - unique_id
 - definition_id (class)
 - display_name
-- accent_index (colour accent from the art palette; more appearance variants later)
+- accent_index (colour accent from the art palette)
+- appearance (`HunterAppearance`, D47): gender (body type), hair_style, hair_color, skin, dye. Rolled from a seed at recruitment (does not consume the recruitment RNG); dye = accent_index. The outfit is not stored: it follows the equipped armor.
 - stat_rolls (±10% on HP/Attack/Defense)
 - level
 - xp

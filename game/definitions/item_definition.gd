@@ -16,3 +16,12 @@ enum EquipmentSlot { NONE, WEAPON, ARMOR, ACCESSORY }
 @export var icon: Texture2D
 ## Colour of the item on placeholder characters (weapon blade / armor body).
 @export var tint: Color = Color.WHITE
+## Armor only: Hunter outfit shown while worn (id in res://data/appearance/wardrobe.json, D47).
+## Empty = the wearer's default outfit.
+@export var outfit_id: StringName
+
+@export_group("Consumable")
+## Food (D40): energy gained per portion. Medicine (D41): share of max HP healed.
+## Hunters pay `sell_price` into the treasury for one.
+@export var energy: float = 0.0
+@export_range(0.0, 1.0) var heal_ratio: float = 0.0

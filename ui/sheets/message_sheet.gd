@@ -38,7 +38,7 @@ static func for_expedition(run: ExpeditionRun) -> MessageSheet:
 			var hunter := GameManager.hunters.get_hunter(id)
 			if hunter != null:
 				names.append(hunter.display_name)
-		lines.append("Injured: %s — recovering at the Hospital" % ", ".join(names))
+		lines.append("Fallen: %s — lying at the entrance until someone carries them home" % ", ".join(names))
 	return MessageSheet.new("Victory" if success else "Defeat", lines)
 
 
@@ -52,6 +52,10 @@ static func for_offline(summary: Dictionary) -> MessageSheet:
 		lines.append("Recovered at the Hospital: " + ", ".join(recovered))
 	if int(summary.get("xp", 0)) > 0:
 		lines.append("Training: +%d XP across your Hunters%s" % [int(summary["xp"]), " · %d level-ups" % int(summary["levels"]) if int(summary.get("levels", 0)) > 0 else ""])
+	if int(summary.get("meals", 0)) > 0:
+		lines.append("Meals at the Tavern: %d" % int(summary["meals"]))
+	if int(summary.get("hungry_ticks", 0)) > 0:
+		lines.append("Some Hunters went hungry — give them gold for food.")
 	if lines.size() == 1:
 		lines.append("Your Hunters rested in town.")
 	return MessageSheet.new("While you were away", lines)

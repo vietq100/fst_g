@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://actors/hunter/hunter.gd" id="1_hunter"]
-[ext_resource type="Script" path="res://actors/common/placeholder_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://actors/hunter/chibi/chibi_visual.gd" id="2_visual"]
 [ext_resource type="Script" path="res://actors/common/health_controller.gd" id="3_health"]
 [ext_resource type="Script" path="res://actors/common/combat_controller.gd" id="4_combat"]
 [ext_resource type="Script" path="res://actors/common/state_controller.gd" id="5_state"]

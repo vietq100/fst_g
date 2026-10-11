@@ -131,15 +131,18 @@ func apply_offline_progress(elapsed: float) -> Dictionary:
 	var cap: float = game.registry.config.offline_cap_hours * 3600.0
 	var seconds := clampf(elapsed, 0.0, cap)
 	var before := _snapshot()
+	game.needs.take_report()
 	if seconds > 0.0:
-		game.advance_town_time(seconds)
+		game.advance_town_time(seconds, true)
 	last_offline_summary = make_summary(seconds, elapsed, before)
+	last_offline_summary.merge(game.needs.take_report())
 	if seconds >= 1.0:
 		offline_progress_applied.emit(last_offline_summary)
 	return last_offline_summary
 
 
-## Keys: seconds (applied), capped (bool), recovered (names), xp (total), levels (total).
+## Keys: seconds (applied), capped (bool), recovered (names), xp (total), levels (total);
+## apply_offline_progress adds meals and hungry_ticks (NeedsService.take_report).
 func make_summary(seconds: float, elapsed: float, before: Dictionary) -> Dictionary:
 	var recovered := PackedStringArray()
 	var xp := 0

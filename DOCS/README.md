@@ -21,6 +21,8 @@ The game is open-ended: **no endgame, no final boss, no win state.**
 Its goal is to build the town and nurture Hunters along two axes: power growth and life growth (traits, mood, bonds).
 See `01_PROJECT_OVERVIEW.md` and `SYSTEMS/HUNTER_LIFE_SYSTEM.md`.
 
+Since the world redesign (D27–D37) the hub is one isometric world map where Hunters live and hunt on their own; see `SYSTEMS/AUTONOMY_SYSTEM.md` and `SYSTEMS/BUILD_SYSTEM.md`.
+
 ## Design vs implementation
 
 DESIGN answers:

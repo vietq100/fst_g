@@ -16,6 +16,9 @@ const ITEM := &"item"
 const RECIPE := &"recipe"
 const BUILDING := &"building"
 const EXPEDITION := &"expedition"
+const REGION := &"region"
+const TALENT := &"talent"
+const STATUS_EFFECT := &"status_effect"
 
 ## Category -> [folder under the data root, expected definition class].
 const CATEGORIES := {
@@ -28,6 +31,9 @@ const CATEGORIES := {
 	RECIPE: ["recipes", &"RecipeDefinition"],
 	BUILDING: ["buildings", &"BuildingDefinition"],
 	EXPEDITION: ["expeditions", &"ExpeditionDefinition"],
+	REGION: ["regions", &"RegionDefinition"],
+	TALENT: ["talents", &"TalentDefinition"],
+	STATUS_EFFECT: ["status_effects", &"StatusEffectDefinition"],
 }
 
 ## Push load problems to the Godot error log. Tests turn this off.
@@ -133,6 +139,10 @@ func get_recipe(id: StringName) -> RecipeDefinition:
 
 func get_building(id: StringName) -> BuildingDefinition:
 	return get_def(BUILDING, id) as BuildingDefinition
+
+
+func get_region(id: StringName) -> RegionDefinition:
+	return get_def(REGION, id) as RegionDefinition
 
 
 func get_expedition(id: StringName) -> ExpeditionDefinition:

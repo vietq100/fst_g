@@ -6,6 +6,15 @@ extends Control
 
 ## The player confirmed a party in the expedition sheet.
 signal depart_requested(expedition_id: StringName, party: Array[StringName])
+## Build menu "Place" / building sheet "Move": Main starts the world's placement mode (D33).
+signal build_requested(building_id: StringName)
+signal move_requested(instance_id: StringName)
+## Placement bar buttons.
+signal placement_confirmed
+signal placement_cancelled
+## Hunter sheet "Follow" / navigation "Town" (recenter the camera on the Town).
+signal follow_requested(unique_id: StringName)
+signal recenter_requested
 
 enum Mode { TOWN, EXPEDITION, SANDBOX }
 
@@ -22,6 +31,9 @@ var _safe: MarginContainer
 var _top_bar: PanelContainer
 var _resources: Label
 var _nav: PanelContainer
+var _placement_bar: PanelContainer
+var _placement_label: Label
+var _placement_confirm: Button
 var _sheet_area: Control
 var _sheet: Sheet
 var _toasts: VBoxContainer
@@ -46,7 +58,10 @@ func _ready() -> void:
 	_sheet_area = Control.new()
 	_sheet_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_sheet_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Sheets opened before the first layout pass (offline summary) need a re-layout.
+	_sheet_area.resized.connect(_layout_sheet)
 	layout.add_child(_sheet_area)
+	_build_placement_bar(layout)
 	_build_nav(layout)
 	_connect_notifications()
 	get_viewport().size_changed.connect(_apply_safe_area)
@@ -59,6 +74,7 @@ func set_mode(new_mode: Mode) -> void:
 	close_sheet()
 	_top_bar.visible = mode != Mode.EXPEDITION
 	_nav.visible = mode == Mode.TOWN
+	_placement_bar.visible = false
 	if _expedition_hud != null:
 		_expedition_hud.queue_free()
 		_expedition_hud = null
@@ -70,7 +86,7 @@ func set_mode(new_mode: Mode) -> void:
 
 ## True if a screen point is covered by UI that should not let taps reach the world.
 func blocks_point(point: Vector2) -> bool:
-	for control: Control in [_top_bar, _nav, _sheet]:
+	for control: Control in [_top_bar, _nav, _sheet, _placement_bar]:
 		if control != null and is_instance_valid(control) and control.is_visible_in_tree() and control.get_global_rect().has_point(point):
 			return true
 	return false
@@ -99,11 +115,40 @@ func has_sheet() -> bool:
 	return _sheet != null and is_instance_valid(_sheet)
 
 
-func open_building(building_id: StringName) -> void:
-	if building_id == &"gate":
-		open_expedition()
-	else:
-		open_sheet(BuildingSheet.new(building_id))
+## `id`: a placed building instance id or a building type.
+func open_building(id: StringName) -> void:
+	var sheet := BuildingSheet.new(id)
+	sheet.move_requested.connect(func(instance_id: StringName) -> void:
+		close_sheet()
+		move_requested.emit(instance_id))
+	open_sheet(sheet)
+
+
+func open_build() -> void:
+	var sheet := BuildSheet.new()
+	sheet.build_requested.connect(func(building_id: StringName) -> void:
+		close_sheet()
+		build_requested.emit(building_id))
+	open_sheet(sheet)
+
+
+## A dungeon entrance in the world was tapped (D35).
+func open_entrance(expedition_id: StringName) -> void:
+	var definition := DataRegistry.get_expedition(expedition_id)
+	if definition == null:
+		return
+	open_expedition(expedition_id)
+
+
+## Placement mode bar above the navigation (`active` false hides it). `reason` empty = can place.
+func set_placement(active: bool, title: String = "", reason: String = "") -> void:
+	_placement_bar.visible = active
+	_nav.visible = mode == Mode.TOWN and not active
+	if active:
+		close_sheet()
+		_placement_label.text = title if reason.is_empty() else "%s\n%s" % [title, reason]
+		_placement_label.theme_type_variation = &"" if reason.is_empty() else &"WarningLabel"
+		_placement_confirm.disabled = not reason.is_empty()
 
 
 func open_hunters() -> void:
@@ -111,7 +156,11 @@ func open_hunters() -> void:
 
 
 func open_hunter(runtime: HunterRuntime) -> void:
-	open_sheet(HunterSheet.new(runtime))
+	var sheet := HunterSheet.new(runtime)
+	sheet.follow_requested.connect(func(unique_id: StringName) -> void:
+		close_sheet()
+		follow_requested.emit(unique_id))
+	open_sheet(sheet)
 
 
 func open_inventory() -> void:
@@ -159,8 +208,23 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 
 func _refresh_resources() -> void:
 	var gm := GameManager
-	_resources.text = "Gold %d    Dark Essence %d    Slots %d/%d    Town Lv %d" % [
-		gm.wallet.gold, gm.inventory.count(&"dark_essence"), gm.inventory.used_slots(), gm.inventory.capacity, gm.progress.town_level]
+	_resources.text = "Treasury %d   Food %d   Beds %d/%d   Slots %d/%d" % [
+		gm.wallet.gold, gm.supply.get_food_stock(), gm.housing.get_used_beds(), gm.housing.get_total_beds(), gm.inventory.used_slots(), gm.inventory.capacity]
+
+
+func _build_placement_bar(layout: VBoxContainer) -> void:
+	_placement_bar = PanelContainer.new()
+	_placement_bar.theme_type_variation = &"TopBar"
+	_placement_label = UIKit.label("")
+	_placement_confirm = UIKit.button("Confirm", func() -> void: placement_confirmed.emit(), &"PrimaryButton")
+	_placement_confirm.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_placement_confirm.custom_minimum_size.x = 76
+	var cancel := UIKit.button("Cancel", func() -> void: placement_cancelled.emit())
+	cancel.size_flags_horizontal = Control.SIZE_SHRINK_END
+	cancel.custom_minimum_size.x = 68
+	_placement_bar.add_child(UIKit.hbox([_placement_label, _placement_confirm, cancel]))
+	_placement_bar.visible = false
+	layout.add_child(_placement_bar)
 
 
 ## Bottom navigation: one-handed, primary actions in the bottom third (UI_DESIGN.md).
@@ -168,7 +232,10 @@ func _build_nav(layout: VBoxContainer) -> void:
 	_nav = PanelContainer.new()
 	_nav.theme_type_variation = &"TopBar"
 	var buttons := UIKit.hbox([], 0)
-	for entry in [["Town", close_sheet], ["Hunters", open_hunters], ["Expedition", open_expedition.bind(&"dark_forest")], ["Inventory", open_inventory]]:
+	for entry in [["Town", func() -> void:
+			close_sheet()
+			recenter_requested.emit()], ["Build", open_build], ["Hunters", open_hunters],
+			["Dungeon", open_expedition.bind(&"dark_forest")], ["Items", open_inventory]]:
 		var button := UIKit.button(entry[0], entry[1], &"NavButton")
 		button.custom_minimum_size.y = 48
 		buttons.add_child(button)
@@ -201,6 +268,9 @@ func _connect_notifications() -> void:
 	var gm := GameManager
 	gm.wallet.gold_changed.connect(func(_g: int, _d: int) -> void: _refresh_resources())
 	gm.inventory.inventory_changed.connect(_refresh_resources)
+	gm.buildings.layout_changed.connect(_refresh_resources)
+	gm.housing.beds_changed.connect(_refresh_resources)
+	gm.hunters.hunter_added.connect(func(_h: HunterRuntime) -> void: _refresh_resources())
 	gm.buildings.building_upgraded.connect(func(id: StringName, level: int) -> void:
 		_refresh_resources()
 		toast("%s reached Lv %d" % [gm.buildings.get_definition(id).display_name, level]))
@@ -209,8 +279,12 @@ func _connect_notifications() -> void:
 			toast("%s reached Lv %d" % [hunter.display_name, level]))
 	gm.recruitment.hunter_recruited.connect(func(hunter: HunterRuntime) -> void:
 		toast("%s joined the roster" % hunter.display_name))
-	gm.hospital.hunter_recovered.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s has recovered" % hunter.display_name))
+	gm.temple.hunter_recovered.connect(func(hunter: HunterRuntime) -> void:
+		toast("%s is back on their feet" % hunter.display_name))
+	gm.corpses.hunter_died.connect(func(hunter: HunterRuntime) -> void:
+		toast("%s has fallen" % hunter.display_name, true))
+	gm.corpses.body_delivered.connect(func(hunter: HunterRuntime) -> void:
+		toast("%s was carried to the Temple" % hunter.display_name))
 	gm.bonds.bond_changed.connect(func(a: StringName, b: StringName, _value: float) -> void:
 		if gm.bonds.is_bonded(a, b):
 			toast("%s and %s are now bonded" % [gm.hunters.get_hunter(a).display_name, gm.hunters.get_hunter(b).display_name]))

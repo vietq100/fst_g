@@ -1,70 +1,48 @@
 # WORLD DESIGN
 
-## World structure
+## World structure (D27)
 
-The world begins with a safe settlement surrounded by dangerous regions.
+One continuous isometric world. The screen (portrait) is a window onto it: drag, zoom, follow.
 
-Hierarchy:
+```
+                 ◇ TOWN ◇
+               gate     gate
+     ◇ DARK FOREST ◇   ◇ ANCIENT RUINS ◇
+  dungeon ×2   gate     gate   dungeon ×2
+              ◇ GOBLIN CAVE ◇
+                dungeon ×2
+```
 
-WORLD
-├── Town
-├── Wilderness
-│   ├── Dark Forest
-│   ├── Goblin Cave
-│   └── Ancient Ruins
-└── Major Dungeons (optional, future)
+- **Town** (top): safe, buildings placed by the player, Hunters live here.
+- **Dark Forest** (left): first hunting ground (Slimes, Wolves). Dungeon: Forest Guardian's Grove (MVP) + one locked.
+- **Ancient Ruins** (right): late hunting ground (Skeletons, Goblins). Two locked dungeons.
+- **Goblin Cave** (bottom): mid hunting ground (Goblins, Wolves). Two locked dungeons. Reached through the Forest or the Ruins.
+- Gates (stone arches) connect Town–Forest, Town–Ruins, Forest–Cave, Ruins–Cave.
 
-## Progression
-
-The world is open-ended. There is no final region and no endgame.
-
-Regions are optional expansions the player can unlock over time:
-
-Town
-→ Forest
-→ Cave
-→ Ruins
-→ further regions (added over time, e.g. Demon territory)
-
-Unlocking a region opens new content and new risk/reward. It is never a final goal.
-
-MVP only needs:
-Town + Dark Forest.
+The world is open-ended: new regions and dungeons can be added later. There is no final region.
 
 ## Environmental storytelling
 
 The environment should visually explain:
-- safety
-- danger
-- progression
-- resources
-- civilization vs wilderness
+- safety (warm Town) vs danger (darker regions)
+- progression (Forest → Cave → Ruins)
+- where gates and dungeon entrances are
 
 ## Biome identity
 
 ### Town
-Warm, organized, inhabited.
+Warm grass, roads, the player's buildings.
 
-### Forest
-Dense, green, mysterious.
+### Dark Forest
+Dense dark green, many trees.
 
-### Cave
-Dark, enclosed, mineral-rich.
+### Goblin Cave
+Rocky brown-grey ground, boulders.
 
-### Ruins
-Ancient stone, magical remnants.
-
-### Demon territory
-Corrupted, dangerous, supernatural.
+### Ancient Ruins
+Pale stone, broken columns, magical remnants.
 
 ## Traversal
 
-Maps should have:
-- walkable space
-- obstacles
-- clear entrances
-- clear exits
-- spawn points
-- navigation data
-
-Avoid overly complicated mazes.
+- One navigation mesh for the whole world: region diamonds + gate corridors; buildings, trees, rocks and columns are obstacles.
+- Clear gates and entrances; no mazes.
