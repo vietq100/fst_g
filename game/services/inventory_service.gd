@@ -18,6 +18,8 @@ var _stacks: Dictionary[StringName, int] = {}
 var _instances: Dictionary[StringName, StringName] = {}
 ## Equipped instance id -> Hunter id.
 var _equipped: Dictionary[StringName, StringName] = {}
+## Forge enhancement level per equipment instance (absent = +0).
+var _enhance: Dictionary[StringName, int] = {}
 var _next_instance := 1
 
 
@@ -72,8 +74,23 @@ func remove_instance(instance_id: StringName) -> bool:
 	if not is_stored(instance_id):
 		return false
 	_instances.erase(instance_id)
+	_enhance.erase(instance_id)
 	inventory_changed.emit()
 	return true
+
+
+func get_enhance(instance_id: StringName) -> int:
+	return _enhance.get(instance_id, 0)
+
+
+func set_enhance(instance_id: StringName, level: int) -> void:
+	if not _instances.has(instance_id):
+		return
+	if level <= 0:
+		_enhance.erase(instance_id)
+	else:
+		_enhance[instance_id] = level
+	inventory_changed.emit()
 
 
 ## Stack count for materials, number of stored instances for equipment.
@@ -182,6 +199,7 @@ func to_dict() -> Dictionary:
 		"instances": _instances.duplicate(),
 		"equipped": _equipped.duplicate(),
 		"next_instance": _next_instance,
+		"enhance": _enhance.duplicate(),
 	}
 
 
@@ -190,6 +208,7 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 	_stacks.clear()
 	_instances.clear()
 	_equipped.clear()
+	_enhance.clear()
 	var stacks: Dictionary = data.get("stacks", {})
 	for item_id in stacks:
 		var item := _get_item(StringName(item_id))
@@ -208,6 +227,11 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 	for instance_id in equipped:
 		if _instances.has(StringName(instance_id)):
 			_equipped[StringName(instance_id)] = StringName(equipped[instance_id])
+	var enhance: Variant = data.get("enhance", {})
+	if enhance is Dictionary:
+		for instance_id in enhance:
+			if _instances.has(StringName(instance_id)) and int(enhance[instance_id]) > 0:
+				_enhance[StringName(instance_id)] = int(enhance[instance_id])
 	_next_instance = maxi(int(data.get("next_instance", 1)), _instances.size() + 1)
 	inventory_changed.emit()
 

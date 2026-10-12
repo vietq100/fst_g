@@ -54,6 +54,9 @@ func _ready() -> void:
 	_ui.recenter_requested.connect(func() -> void:
 		if _world is WorldMap and not _world.is_in_dungeon():
 			_world.recenter_on_town())
+	_ui.focus_region_requested.connect(func(region_id: StringName) -> void:
+		if _world is WorldMap and not _world.is_in_dungeon():
+			_world.focus_region(region_id))
 	_ui.party_picker = func() -> Array:
 		return _world.pick_party() if _world is WorldMap else []
 	_banner.visible = false

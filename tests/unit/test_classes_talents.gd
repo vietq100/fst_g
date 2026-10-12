@@ -37,7 +37,7 @@ func test_four_classes_match_balance() -> void:
 		&"rogue": [100.0, 13.0, 4.0, 1.4, 95.0, 0.2, 18.0, 110, &"rusty_dagger"],
 		&"guardian": [160.0, 10.0, 9.0, 0.8, 70.0, 0.0, 22.0, 130, &"rusty_sword"],
 	}
-	assert_eq(_registry.get_count(&"hunter"), 4)
+	assert_eq(_registry.get_count(&"hunter"), 12, "4 base classes + 8 subclasses")
 	for class_id: StringName in expected:
 		var d := _registry.find_def(&"hunter", class_id) as HunterDefinition
 		var values: Array = expected[class_id]

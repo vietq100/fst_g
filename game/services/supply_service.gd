@@ -24,6 +24,11 @@ func _init(registry: Node, inventory: InventoryService, purses: PurseService, hu
 	_buildings = buildings
 
 
+## Extra energy from every meal while a Restaurant stands (Evil Hunter Tycoon's food building).
+func get_food_bonus() -> float:
+	return _buildings.get_effect(BuildingService.RESTAURANT, BuildingService.FOOD_BONUS, 0.0)
+
+
 ## Food items (energy > 0), most energy first.
 func get_foods() -> Array[ItemDefinition]:
 	return _consumables(func(item: ItemDefinition) -> bool: return item.energy > 0.0, func(item: ItemDefinition) -> float: return item.energy)

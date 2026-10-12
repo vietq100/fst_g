@@ -33,6 +33,8 @@ static func capture(game: Node) -> Dictionary:
 		"bonds": game.bonds.to_dict(),
 		"inventory": game.inventory.to_dict(),
 		"tavern_candidates": game.recruitment.to_dict(),
+		"trading": game.trading.to_dict(),
+		"quests": game.quests.to_dict(),
 		"activity_time": game.activities.get_accumulator(),
 	}
 
@@ -72,6 +74,8 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 		hunter.current_hp = minf(hunter.current_hp, game.hunters.get_stat(hunter, HunterService.MAX_HP))
 	game.bonds.from_dict(_section(data, "bonds", warnings), warnings)
 	game.recruitment.from_dict(data.get("tavern_candidates", []), warnings)
+	game.trading.from_dict(data.get("trading", []))
+	game.quests.from_dict(data.get("quests", {}))
 	game.activities.set_accumulator(float(data.get("activity_time", 0.0)))
 	# Buildings were restored before the Hunters: hand out beds now (old saves have none).
 	game.housing.assign_beds()

@@ -13,6 +13,8 @@ signal toast_requested(text: String, is_error: bool)
 var title := ""
 var _content: VBoxContainer
 var _title_label: Label
+## Title row; subclasses may add buttons to it.
+var _header: HBoxContainer
 var _rebuild_queued := false
 var _watched: Array[Array] = []
 
@@ -23,10 +25,14 @@ func _ready() -> void:
 	var layout := UIKit.vbox([], 6)
 	add_child(layout)
 	_title_label = UIKit.label(title, &"TitleLabel", false)
-	var close := UIKit.button("Close", func() -> void: closed.emit())
+	var close := UIKit.button("", func() -> void: closed.emit(), &"RoundButton")
+	close.icon = PixelIcons.texture(&"close", 2)
+	close.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	close.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	close.size_flags_horizontal = Control.SIZE_SHRINK_END
-	close.custom_minimum_size.x = 72
-	layout.add_child(UIKit.hbox([_title_label, close]))
+	close.custom_minimum_size = Vector2(36, 36)
+	_header = UIKit.hbox([_title_label, close])
+	layout.add_child(_header)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL

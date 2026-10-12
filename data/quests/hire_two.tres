@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/quest_definition.gd" id="1_q"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amt"]
+
+[resource]
+script = ExtResource("1_q")
+id = &"hire_two"
+display_name = "Grow the Roster"
+description = "Have 2 Hunters in the village."
+order = 0
+kind = 2
+target_id = &""
+amount = 2
+reward_gold = 150
+reward_items = Array[ExtResource("2_amt")]([])

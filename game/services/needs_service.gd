@@ -89,7 +89,7 @@ func eat(hunter: HunterRuntime) -> bool:
 	var food := _supply.buy_food(hunter)
 	if food == null:
 		return false
-	hunter.energy = minf(hunter.energy + food.energy, _config.needs_max)
+	hunter.energy = minf(hunter.energy + food.energy * (1.0 + _supply.get_food_bonus()), _config.needs_max)
 	_meals += 1
 	needs_changed.emit(hunter)
 	return true

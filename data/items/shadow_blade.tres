@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/item_definition.gd" id="1_item"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"attack"
+value = 20.0
+
+[sub_resource type="Resource" id="M1"]
+script = ExtResource("2_mod")
+stat = &"critical_chance"
+value = 0.08
+
+[resource]
+script = ExtResource("1_item")
+id = &"shadow_blade"
+display_name = "Shadow Blade"
+item_type = 0
+rarity = 4
+stackable = false
+max_stack = 1
+sell_price = 150
+equipment_slot = 1
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])
+tint = Color(0.55, 0.3, 0.8, 1)

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="HunterDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/hunter_definition.gd" id="1_hunter"]
+
+[resource]
+script = ExtResource("1_hunter")
+id = &"assassin"
+display_name = "Assassin"
+class_id = &"assassin"
+base_hp = 95.0
+base_attack = 16.9
+base_defense = 3.6
+hp_per_level = 9.5
+attack_per_level = 2.6
+defense_per_level = 0.63
+attack_speed = 1.54
+move_speed = 95.0
+critical_chance = 0.2
+critical_damage = 1.8
+attack_range = 18.0
+promotion_of = &"rogue"
+recruit_cost = 110
+stat_roll_variance = 0.1
+name_pool = PackedStringArray("Blix", "Corvin", "Dusk", "Eira", "Finch", "Grey", "Hollis", "Iris", "Jinx", "Kit", "Lyra", "Mace", "Nell", "Onyx", "Pip", "Quinn", "Raven", "Shade", "Vex", "Zeph")
+starting_items = Array[StringName]([&"rusty_dagger", &"leather_armor"])
+body_size = Vector2(12, 20)
+weapon_length = 8.0
+weapon_width = 1.0

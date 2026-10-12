@@ -112,8 +112,8 @@ func test_build_costs_gold_and_unique_buildings_are_limited() -> void:
 
 func test_move_and_remove() -> void:
 	var warehouse := _buildings.find_first(BuildingService.WAREHOUSE)
-	assert_eq(_buildings.move(warehouse.instance_id, Vector2i(1, 1)), "")
-	assert_eq(warehouse.tile, Vector2i(1, 1))
+	assert_eq(_buildings.move(warehouse.instance_id, Vector2i(20, 1)), "")
+	assert_eq(warehouse.tile, Vector2i(20, 1))
 	assert_eq(_buildings.move(warehouse.instance_id, _buildings.find_first(BuildingService.TOWN_HALL).tile), "Space is taken")
 	assert_eq(_buildings.get_refund(warehouse.instance_id), 75)
 	assert_eq(_buildings.remove(warehouse.instance_id), "")
@@ -165,3 +165,9 @@ func test_recruiting_needs_a_free_bed() -> void:
 	_buildings.remove(_buildings.find_first(BuildingService.HOUSE).instance_id)
 	assert_eq(_housing.get_total_beds(), 0)
 	assert_eq(recruitment.can_recruit(0), "No free bed — build a House")
+
+
+func test_pond_blocks_building() -> void:
+	var pond := _world.get_town_pond()
+	assert_true(pond.size != Vector2i.ZERO)
+	assert_eq(_buildings.can_place(&"house", pond.position), "The pond is in the way")

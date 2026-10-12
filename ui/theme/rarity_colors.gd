@@ -5,6 +5,8 @@ extends RefCounted
 const COMMON := Color("e6e2d8")
 const UNCOMMON := Color("7fd36b")
 const RARE := Color("5fa8ff")
+const SUPERIOR := Color("c58bff")
+const EPIC := Color("ff9a3d")
 const GOLD := Color("ffd23f")
 
 
@@ -14,4 +16,8 @@ static func of(rarity: ItemDefinition.Rarity) -> Color:
 			return UNCOMMON
 		ItemDefinition.Rarity.RARE:
 			return RARE
+		ItemDefinition.Rarity.SUPERIOR:
+			return SUPERIOR
+		ItemDefinition.Rarity.EPIC:
+			return EPIC
 	return COMMON

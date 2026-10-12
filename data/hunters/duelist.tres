@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="HunterDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/hunter_definition.gd" id="1_hunter"]
+
+[resource]
+script = ExtResource("1_hunter")
+id = &"duelist"
+display_name = "Duelist"
+class_id = &"duelist"
+base_hp = 120.0
+base_attack = 16.8
+base_defense = 5.4
+hp_per_level = 12.0
+attack_per_level = 2.4
+defense_per_level = 0.9
+attack_speed = 1.0
+move_speed = 80.0
+critical_chance = 0.05
+critical_damage = 1.5
+attack_range = 20.0
+promotion_of = &"warrior"
+recruit_cost = 100
+stat_roll_variance = 0.1
+name_pool = PackedStringArray("Aldric", "Brenna", "Caius", "Dara", "Edrin", "Fenna", "Garrick", "Hale", "Isolde", "Joren", "Kestra", "Lucan", "Mira", "Nolan", "Orla", "Perrin", "Quill", "Rowan", "Sela", "Tobin", "Una", "Varek", "Wren", "Yorick")
+starting_items = Array[StringName]([&"rusty_sword", &"leather_armor"])
+body_size = Vector2(14, 22)
+weapon_length = 12.0
+weapon_width = 1.0

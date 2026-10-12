@@ -10,3 +10,4 @@ description = "Trains slowly, rests well. Dislikes back-to-back expeditions."
 activity_rate_modifiers = Dictionary[StringName, float]({&"training": 0.5, &"resting": 1.5})
 mood_likes = Array[StringName]([&"resting"])
 mood_dislikes = Array[StringName]([&"back_to_back"])
+academy_cost = 0

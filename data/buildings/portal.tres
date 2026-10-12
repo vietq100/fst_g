@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/building_definition.gd" id="1_building"]
+[ext_resource type="Script" path="res://game/definitions/building_level.gd" id="2_level"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="3_amount"]
+
+[sub_resource type="Resource" id="Lvl_0"]
+script = ExtResource("2_level")
+gold_cost = 0
+material_costs = Array[ExtResource("3_amount")]([])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({})
+visual_variant = &"lv1"
+
+[resource]
+script = ExtResource("1_building")
+id = &"portal"
+display_name = "Reincarnation Portal"
+levels = Array[ExtResource("2_level")]([SubResource("Lvl_0")])
+required_town_level = 3
+build_cost = 1000
+footprint = Vector2i(2, 2)
+unique = true
+removable = true
+default_tiles = Array[Vector2i]([])

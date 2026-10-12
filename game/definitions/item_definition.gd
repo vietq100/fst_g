@@ -3,7 +3,7 @@ extends GameDefinition
 ## Equipment, material or consumable (ITEM_DESIGN.md, INVENTORY_SYSTEM.md).
 
 enum ItemType { WEAPON, ARMOR, ACCESSORY, MATERIAL, CONSUMABLE }
-enum Rarity { COMMON, UNCOMMON, RARE }
+enum Rarity { COMMON, UNCOMMON, RARE, SUPERIOR, EPIC }
 enum EquipmentSlot { NONE, WEAPON, ARMOR, ACCESSORY }
 
 @export var item_type: ItemType = ItemType.MATERIAL

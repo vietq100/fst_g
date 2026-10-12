@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/item_definition.gd" id="1_item"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"defense"
+value = 14.0
+
+[sub_resource type="Resource" id="M1"]
+script = ExtResource("2_mod")
+stat = &"max_hp"
+value = 55.0
+
+[resource]
+script = ExtResource("1_item")
+id = &"shadow_armor"
+display_name = "Shadow Armor"
+item_type = 1
+rarity = 4
+stackable = false
+max_stack = 1
+sell_price = 160
+equipment_slot = 2
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])
+tint = Color(0.3, 0.22, 0.45, 1)
+outfit_id = &"iron_plate"

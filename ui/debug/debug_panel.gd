@@ -42,6 +42,8 @@ func toggle() -> void:
 	reset_size()
 	# Anchored top-right: keep the right edge fixed while the size changes.
 	position.x = get_parent_area_size().x - size.x - 4.0
+	# Below the HUD header so it never covers the shortcuts.
+	position.y = 196.0
 
 
 func set_status(text: String) -> void:

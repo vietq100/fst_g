@@ -21,6 +21,12 @@ const HOSPITAL := &"hospital"
 const TEMPLE := &"temple"
 const WAREHOUSE := &"warehouse"
 const HOUSE := &"house"
+const TRADING_POST := &"trading_post"
+const INN := &"inn"
+const ACADEMY := &"academy"
+const FORGE := &"forge"
+const PORTAL := &"portal"
+const RESTAURANT := &"restaurant"
 
 ## Effect keys used by code. Values live in data.
 const HUNTER_CAPACITY := &"hunter_capacity"
@@ -31,6 +37,11 @@ const RECOVERY_SECONDS := &"recovery_seconds"
 const SPEEDUP_GOLD_PER_MINUTE := &"speedup_gold_per_minute"
 const INVENTORY_SLOTS := &"inventory_slots"
 const BEDS := &"beds"
+const REQUEST_SLOTS := &"request_slots"
+const MAX_ENHANCE := &"max_enhance"
+const SKILL_LEVEL := &"skill_level"
+const MAX_TRAITS := &"max_traits"
+const FOOD_BONUS := &"food_bonus"
 
 ## Share of the build cost refunded on removal (BALANCE.md → Building placement).
 const REFUND_RATIO := 0.5
@@ -56,6 +67,7 @@ var _inventory: InventoryService
 var _progress: ProgressService
 var _town_rect := Rect2i(0, 0, 36, 36)
 var _reserved: Array[Rect2i] = []
+var _pond := Rect2i()
 var _placed: Array[Placed] = []
 var _next_id := 1
 
@@ -68,6 +80,7 @@ func _init(registry: Node, wallet: WalletService, inventory: InventoryService, p
 	_progress = progress
 	if world != null and world.get_town() != null:
 		_town_rect = world.get_town().tile_rect
+		_pond = world.get_town_pond()
 		for gate in world.gates_of(world.get_town().id):
 			_reserved.append(_approach(gate.tiles))
 	reset()
@@ -128,6 +141,10 @@ func get_level(building_id: StringName) -> int:
 	return placed.level if placed != null else 0
 
 
+func get_town_level() -> int:
+	return maxi(get_level(TOWN_HALL), 1)
+
+
 ## Effect of the (unique) building's current level, or `default` if missing.
 func get_effect(building_id: StringName, key: StringName, default: float = 0.0) -> float:
 	var placed := find_first(building_id)
@@ -167,6 +184,8 @@ func can_place(building_id: StringName, tile: Vector2i, ignore: StringName = &""
 	for reserved in _reserved:
 		if reserved.intersects(rect):
 			return "Keep the gate road free"
+	if _pond.intersects(rect):
+		return "The pond is in the way"
 	var door := get_door_tile(rect)
 	if not _town_rect.has_point(door):
 		return "The door must face the Town"
@@ -221,6 +240,8 @@ func can_build(building_id: StringName) -> String:
 		return "%s cannot be built" % definition.display_name
 	if definition.unique and has_building(building_id):
 		return "Already built"
+	if get_town_level() < definition.required_town_level:
+		return "Requires Town Hall Lv %d" % definition.required_town_level
 	if not _wallet.can_spend(definition.build_cost):
 		return "Needs %d gold" % definition.build_cost
 	return ""

@@ -46,7 +46,8 @@ func get_refresh_cost() -> int:
 ## Free refresh (after an expedition returns / new game).
 func refresh_candidates() -> void:
 	candidates.clear()
-	var class_ids: Array[StringName] = _registry.get_ids(&"hunter")
+	var class_ids: Array[StringName] = _registry.get_ids(&"hunter").filter(func(id: StringName) -> bool:
+		return (_registry.find_def(&"hunter", id) as HunterDefinition).promotion_of == &"")
 	if class_ids.is_empty():
 		return
 	var count := int(_buildings.get_effect(BuildingService.TAVERN, BuildingService.CANDIDATE_COUNT))

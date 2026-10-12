@@ -7,6 +7,9 @@ signal flag_set(flag: StringName)
 signal day_passed(day: int)
 
 var town_level: int = 1
+## Selected difficulty (index into GameConfig.difficulty_*) and reincarnations done in total.
+var difficulty: int = 0
+var total_reincarnations: int = 0
 var day: int = 1
 ## Seconds into the current day.
 var day_time: float = 0.0
@@ -35,7 +38,8 @@ func clear_flags() -> void:
 
 
 func to_dict() -> Dictionary:
-	return {"flags": get_flags(), "day": day, "day_time": day_time}
+	return {"flags": get_flags(), "day": day, "day_time": day_time,
+		"difficulty": difficulty, "total_reincarnations": total_reincarnations}
 
 
 ## Town level is not saved: BuildingService derives it from the Town Hall level.
@@ -45,6 +49,8 @@ func from_dict(data: Dictionary) -> void:
 	if flags is Array:
 		for flag in flags:
 			_flags[StringName(str(flag))] = true
+	difficulty = maxi(int(data.get("difficulty", 0)), 0)
+	total_reincarnations = maxi(int(data.get("total_reincarnations", 0)), 0)
 	day = maxi(int(data.get("day", 1)), 1)
 	day_time = maxf(float(data.get("day_time", 0.0)), 0.0)
 

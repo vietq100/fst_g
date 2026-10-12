@@ -25,6 +25,8 @@ extends GameDefinition
 @export var attack_range: float = 0.0
 
 @export_group("Recruitment")
+## Subclass: the base class it is promoted from at the Academy (empty = base class, can be recruited).
+@export var promotion_of: StringName
 @export var recruit_cost: int = 0
 ## Random roll applied to HP/Attack/Defense of each recruit, e.g. 0.1 = ±10%.
 @export_range(0.0, 1.0) var stat_roll_variance: float = 0.0

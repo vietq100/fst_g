@@ -280,3 +280,20 @@ These decisions replace the ones they name. Older decisions that are not mention
 - Facing: front, back, side; left mirrors right.
 - Skin tone (4) and dye (shorts, 8 = accent palette) come from `HunterAppearance`. Hair, body type and outfits are not drawn; their saved values are kept for future layers. The D47 wardrobe, composer, reference sprites and `HunterSpriteVisual` were removed.
 - `ActorVisual` gained `running` and `play_action(name)` so gameplay can trigger actions without knowing the art.
+
+## D50. Evil Hunter Tycoon systems (owner request, 2026-10-12; see REFERENCE_EVIL_HUNTER_TYCOON.md)
+- **Town Hall gates buildings**: `BuildingDefinition.required_town_level`. Town Hall now has 5 levels (Hunter level cap = 10 × level, capacity 3/5/8/12/16).
+- **New buildings** (unique, built from the Build menu): Trading Post (Lv2), Inn (Lv2, 6/10 beds), Academy (Lv3), Enhancement Forge (Lv3), Reincarnation Portal (Lv3).
+- **Trading Post**: the chief posts material requests; Hunters selling that material get a bounty (50% of the price) from the treasury on top of the normal sale. Slots 2/3/5.
+- **Academy**: gold-priced skills (`data/skills`, per-level modifiers, Academy level gates them) and traits bought with rebirth points; flaws can be forgotten for 300 gold.
+- **Forge**: per-instance enhancement (+12% item modifiers per level, limit 3/6/9 by Forge level; gold ×(n+1)^1.5 and Iron Ore).
+- **Reincarnation** (Lv20, Portal; content tops out near level 12 monsters, so 30 was unreachable): level back to 1, +6% HP/ATK/DEF and +10% XP gain permanently per rebirth, 1 rebirth point (2 every third). Repeatable, no end (keeps the "no endgame" pillar).
+- **Difficulty** (Easy/Normal/Hard/Nightmare): unlocked by total reincarnations (0/1/3/6); scales region monster stats ×1/1.4/2/3 and rewards ×1/1.5/2.2/3.5.
+- **Quests** (`data/quests`): ordered guided objectives with gold/item rewards, claimed in the Quests sheet.
+- Save schema unchanged: all new fields are optional with defaults.
+- **Subclasses**: 8 (Duelist/Slayer, Hawkeye/Sniper, Assassin/Nightblade, Crusader/Templar), `HunterDefinition.promotion_of`; not recruitable. Academy class change needs 2 reincarnations and 5000 gold.
+- **Restaurant** (Town Hall Lv2): meals restore +25% / +50% energy (needs the Tavern's food).
+- **Item tiers**: Rarity gains Superior and Epic; Steel and Shadow weapons/armor are Blacksmith recipes.
+- **Trading Post pull**: Auto-duty Hunters pick the hardest region whose monsters drop a requested material.
+- The world stays isometric (D27), as in the original game.
+- UI icons are 12×12 pixel-art bitmaps in code (`ui/theme/pixel_icons.gd`) used by the top bar and the navigation bar.

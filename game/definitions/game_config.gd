@@ -134,3 +134,25 @@ extends Resource
 @export var max_party_size: int = 3
 ## Share of stash gold/materials kept on failure (DECISIONS.md D4).
 @export_range(0.0, 1.0) var failure_loot_keep_ratio: float = 0.5
+
+@export_group("Reincarnation")
+## Hunter level needed to reincarnate at the Portal.
+@export var reincarnate_level: int = 20
+## Permanent bonus per reincarnation to max HP / attack / defense.
+@export var reincarnation_stat_bonus: float = 0.06
+## Total reincarnations needed to unlock each difficulty (index = difficulty).
+@export var difficulty_unlocks: Array[int] = [0, 1, 3, 6]
+@export var difficulty_names: PackedStringArray = ["Easy", "Normal", "Hard", "Nightmare"]
+## Monster stat and reward multipliers per difficulty.
+@export var difficulty_stat_scale: Array[float] = [1.0, 1.4, 2.0, 3.0]
+@export var difficulty_reward_scale: Array[float] = [1.0, 1.5, 2.2, 3.5]
+
+@export_group("Enhancement")
+## Gold = enhance_gold_base × (level + 1) ^ 1.5; stat modifiers grow by this much per level.
+@export var enhance_gold_base: int = 40
+@export var enhance_stat_bonus: float = 0.12
+@export var enhance_ore_per_level: int = 2
+
+@export_group("Trading Post")
+## Bounty paid to the Hunter on top of the village price, as a share of the price.
+@export var bounty_ratio: float = 0.5

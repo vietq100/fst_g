@@ -115,3 +115,20 @@ Do not overwhelm the screen.
 - Theme (`GameTheme`): dark warm panels, gold accents. Button variations: Primary (main action), Danger (selling), Selected (chosen state), disabled (greyed, reason shown as a red label). Progress bars: HP green, XP blue, mood/bond yellow, timers gold.
 - Placeholder portraits (`HunterPortrait`) use the same accent and armor colours as the world sprite.
 - The developer debug panel stays (collapsed "Dev +" button, top right; removed in release builds).
+
+## Evil Hunter Tycoon HUD (2026-10-12, from the owner's reference screenshots)
+
+- Header over the map: difficulty badge (skull + name, opens the Portal), big outlined numbers for gold, food, Warehouse slots and ready quests; Hunters count / capacity at the right with Quests (book), Portal (trophy) and Recruit (mail) shortcuts.
+- Quest bubble under the header: the active quest, progress bar; tap opens the Quests sheet.
+- Bottom bar: Construct, Dungeon, Hunters, Storage, Shop (Shop = every service building and Quests).
+- Floating: "Hunters Waiting" (Tavern candidates) bottom-left; round Town / I / II / III buttons bottom-right jump the camera to the Town and the hunting regions; a 3-line event feed top-left (bag sales).
+- Map: dark moody palette, cobbled roads, stone retaining wall around the Town over a teal moat.
+
+## Drawer and Hunter tab (2026-10-12)
+
+- Drawers (sheets) are 45% of the screen height with a round ✕ button; the nav tab of the open drawer is highlighted (light tab).
+- Hunter tab: 4-column grid of cards — star (talent), name, grade (N / R / S / L by reincarnations), Lv + class, portrait, current place or activity, Info and Locate. Header buttons: "Hunting grounds" (cycles everyone's duty) and "Sort" (level / name / class).
+
+## Hunter dialog (2026-10-12)
+
+Tapping Info on a Hunter card opens `HunterDialog` (full-screen dialog, HUD hidden): name, reincarnation stars and purse, paper doll (weapon / accessory left, armor right, enhancement "+N" on worn items), rebirth points, tabs Info (grade, Lv + class, DPS, HP / satiety / mood / stamina / XP bars, ATK / DEF / CRIT / ATK SPD / MOVE), Skill&Trait, Gear (equip / remove) and Life (needs, purse transfers, duty, activity, bonds, history), and a red Close button.

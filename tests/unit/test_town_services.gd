@@ -37,9 +37,10 @@ func after_each() -> void:
 
 
 func test_buildings_start_at_level_one_with_effects() -> void:
-	assert_eq(_buildings.get_ids().size(), 7, "six core buildings + House")
+	assert_eq(_buildings.get_ids().size(), 13, "six core buildings + House + six Town Hall unlocks")
 	for building_id in _buildings.get_ids():
-		assert_eq(_buildings.get_level(building_id), 1, String(building_id))
+		var unlocked_later: bool = _buildings.get_definition(building_id).required_town_level > 1
+		assert_eq(_buildings.get_level(building_id), 0 if unlocked_later else 1, String(building_id))
 	assert_eq(_inventory.capacity, 40, "warehouse Lv1")
 	assert_eq(_progress.town_level, 1)
 	assert_eq(_recruitment.get_capacity(), 3)

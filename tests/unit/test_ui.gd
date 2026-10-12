@@ -28,7 +28,7 @@ func _show(sheet: Sheet) -> Sheet:
 func test_every_sheet_builds() -> void:
 	var hunter: HunterRuntime = _game.hunters.get_all()[0]
 	var sheets: Array[Sheet] = [
-		HuntersSheet.new(), HunterSheet.new(hunter), InventorySheet.new(),
+		HuntersSheet.new(), HunterSheet.new(hunter), HunterDialog.new(hunter), InventorySheet.new(),
 		ExpeditionSheet.new(&"dark_forest", [hunter.unique_id] as Array[StringName]),
 		MessageSheet.new("Test", PackedStringArray(["line"])),
 		MessageSheet.for_offline({"seconds": 4000.0, "capped": false, "recovered": PackedStringArray(["A"]), "xp": 10, "levels": 1,

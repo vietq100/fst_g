@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"critical_chance"
+type = 0
+value = 0.02
+
+[resource]
+script = ExtResource("1_skill")
+id = &"keen_eye"
+display_name = "Keen Eye"
+description = "+2% critical chance per level."
+max_level = 4
+gold_per_level = 250
+required_academy_level = 2
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

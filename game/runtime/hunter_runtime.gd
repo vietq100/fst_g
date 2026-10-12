@@ -68,6 +68,10 @@ var alive: bool = true
 var world_position: Vector2 = Vector2.ZERO
 ## &"" = town life; HUNTING while out in a region (set by the Hunter brain).
 var task: StringName
+## Evil Hunter Tycoon systems: reincarnation count, unspent points (Academy traits), Academy skills.
+var reincarnations: int = 0
+var rebirth_points: int = 0
+var skills: Dictionary[StringName, int] = {}
 ## Items carried back from hunting (item id -> quantity).
 var loot_bag: Dictionary[StringName, int] = {}
 
@@ -107,6 +111,9 @@ func to_dict() -> Dictionary:
 		"alive": alive,
 		"world_position": [world_position.x, world_position.y],
 		"loot_bag": loot_bag.duplicate(),
+		"reincarnations": reincarnations,
+		"rebirth_points": rebirth_points,
+		"skills": skills.duplicate(),
 	}
 
 
@@ -165,4 +172,10 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 	if bag is Dictionary:
 		for item_id in bag:
 			hunter.loot_bag[StringName(str(item_id))] = maxi(int(bag[item_id]), 0)
+	hunter.reincarnations = maxi(int(data.get("reincarnations", 0)), 0)
+	hunter.rebirth_points = maxi(int(data.get("rebirth_points", 0)), 0)
+	var learned: Variant = data.get("skills", {})
+	if learned is Dictionary:
+		for skill_id in learned:
+			hunter.skills[StringName(str(skill_id))] = maxi(int(learned[skill_id]), 0)
 	return hunter

@@ -17,7 +17,8 @@ func _init(hunters: HunterService, buildings: BuildingService) -> void:
 
 
 func get_total_beds() -> int:
-	return int(_buildings.get_total_effect(BuildingService.HOUSE, BuildingService.BEDS))
+	return int(_buildings.get_total_effect(BuildingService.HOUSE, BuildingService.BEDS)
+		+ _buildings.get_total_effect(BuildingService.INN, BuildingService.BEDS))
 
 
 func get_used_beds() -> int:
@@ -36,7 +37,7 @@ func get_home(hunter: HunterRuntime) -> BuildingService.Placed:
 ## Keeps valid assignments, drops beds in removed Houses, fills free beds in House order.
 func assign_beds() -> void:
 	var used: Dictionary[StringName, int] = {}
-	var houses := _buildings.get_instances_of(BuildingService.HOUSE)
+	var houses := _buildings.get_instances_of(BuildingService.HOUSE) + _buildings.get_instances_of(BuildingService.INN)
 	var capacity: Dictionary[StringName, int] = {}
 	for house in houses:
 		capacity[house.instance_id] = int(_buildings.get_instance_effect(house, BuildingService.BEDS))

@@ -26,3 +26,4 @@ modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0"), SubResou
 activity_rate_modifiers = Dictionary[StringName, float]({})
 mood_likes = Array[StringName]([&"boss_fight"])
 mood_dislikes = Array[StringName]([&"long_rest"])
+academy_cost = 0

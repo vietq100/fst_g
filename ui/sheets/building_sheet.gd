@@ -16,12 +16,23 @@ const DESCRIPTIONS := {
 	&"temple": "Fallen Hunters are revived here (they lose a little XP). Two village staff live here and carry bodies home for a fee.",
 	&"warehouse": "Stores materials and spare equipment. More levels, more slots.",
 	&"house": "Hunters sleep here. Every House has beds for four.",
+	&"trading_post": "Post material requests. Hunters who bring the material home are paid a bounty on top of the normal price.",
+	&"restaurant": "Hunters enjoy their meals more: every portion restores extra energy. Needs a Tavern to cook the food.",
+	&"inn": "Rooms for weary Hunters: many beds in one building.",
+	&"academy": "Train skills for gold. Rebirth points teach new traits.",
+	&"forge": "Enhance weapons and armor. Each level makes the item stronger; the Forge's level sets the limit.",
+	&"portal": "Hunters who reach the required level may reincarnate: back to level 1, permanently stronger, with rebirth points. Higher difficulties unlock with total reincarnations.",
 }
+
+## Request sizes offered by the Trading Post.
+const ORDER_SIZES := [5, 10, 20]
 
 var building_id: StringName
 var instance_id: StringName
 var _timer: Timer
 var _confirm_remove := false
+## Hunter chosen in the Academy / Portal pickers (kept across rebuilds).
+var _picked: StringName
 
 
 ## `id` is a placed instance id, or a building type (its first instance).
@@ -50,7 +61,8 @@ func _watch() -> Array:
 	return [
 		[gm.buildings, &"building_upgraded"], [gm.wallet, &"gold_changed"], [gm.inventory, &"inventory_changed"],
 		[gm.recruitment, &"candidates_changed"], [gm.temple, &"hunter_recovered"], [gm.hunters, &"hunter_added"],
-		[gm.housing, &"beds_changed"],
+		[gm.housing, &"beds_changed"], [gm.trading, &"requests_changed"], [gm.hunters, &"hunter_changed"],
+		[gm.reincarnation, &"difficulty_changed"],
 	]
 
 
@@ -82,8 +94,18 @@ func _build(content: VBoxContainer) -> void:
 			_build_recipes(content, "Forge", "")
 		BuildingService.WAREHOUSE:
 			_build_warehouse(content)
-		BuildingService.HOUSE:
+		BuildingService.HOUSE, BuildingService.INN:
 			_build_house(content, placed)
+		BuildingService.RESTAURANT:
+			content.add_child(UIKit.label("Meals give +%d%% energy." % roundi(GameManager.supply.get_food_bonus() * 100.0)))
+		BuildingService.TRADING_POST:
+			_build_trading_post(content)
+		BuildingService.ACADEMY:
+			_build_academy(content)
+		BuildingService.FORGE:
+			_build_forge(content)
+		BuildingService.PORTAL:
+			_build_portal(content)
 
 
 func _build_upgrade(content: VBoxContainer, buildings: BuildingService, definition: BuildingDefinition,
@@ -269,3 +291,186 @@ func _build_house(content: VBoxContainer, placed: BuildingService.Placed) -> voi
 	for runtime: HunterRuntime in residents:
 		content.add_child(UIKit.label("· %s" % runtime.display_name, &"MutedLabel"))
 	content.add_child(UIKit.label("Town beds: %d free of %d" % [housing.get_free_beds(), housing.get_total_beds()], &"MutedLabel"))
+
+
+# --- Evil Hunter Tycoon style buildings -------------------------------------------------------------
+
+func _build_trading_post(content: VBoxContainer) -> void:
+	var trading := GameManager.trading
+	content.add_child(UIKit.label("Requests %d / %d" % [trading.requests.size(), trading.get_slots()], &"AccentLabel"))
+	if trading.requests.is_empty():
+		content.add_child(UIKit.label("No open requests. Order a material below.", &"MutedLabel"))
+	for i in trading.requests.size():
+		var request: Dictionary = trading.requests[i]
+		var item := DataRegistry.get_item(request["item_id"])
+		var info := UIKit.vbox([
+			UIKit.label("%s ×%d" % [item.display_name, request["quantity"]]),
+			UIKit.bar(request["delivered"], request["quantity"], &"TimerBar", "%d / %d delivered" % [request["delivered"], request["quantity"]]),
+			UIKit.label("Bounty +%d g each for the Hunter who brings it" % trading.get_bounty(item.id), &"MutedLabel"),
+		], 2)
+		var cancel := UIKit.button("Cancel", func() -> void:
+			trading.cancel(i)
+			request_rebuild())
+		cancel.size_flags_horizontal = Control.SIZE_SHRINK_END
+		cancel.custom_minimum_size.x = 64
+		content.add_child(UIKit.card(UIKit.hbox([info, cancel])))
+	content.add_child(UIKit.separator())
+	content.add_child(UIKit.label("Order materials", &"AccentLabel"))
+	for item in trading.get_orderable_items():
+		var buttons := UIKit.hbox([], 4)
+		for size: int in ORDER_SIZES:
+			var reason := trading.can_order(item.id, size)
+			var order := UIKit.button("×%d" % size, func() -> void:
+				run_action("" if trading.order(item.id, size) else trading.can_order(item.id, size),
+					"Requested %d %s" % [size, item.display_name]), &"PrimaryButton", reason)
+			order.custom_minimum_size.x = 48
+			buttons.add_child(order)
+		var info := UIKit.vbox([
+			UIKit.label("%s · price %d g · in stock %d" % [item.display_name, item.sell_price, GameManager.inventory.count(item.id)]),
+		], 2)
+		content.add_child(UIKit.card(UIKit.hbox([info, buttons])))
+
+
+## Dropdown of the roster; returns the chosen Hunter (kept in `_picked`).
+func _hunter_picker(content: VBoxContainer) -> HunterRuntime:
+	var roster := GameManager.hunters.get_all()
+	if roster.is_empty():
+		content.add_child(UIKit.label("No Hunters.", &"MutedLabel"))
+		return null
+	var chosen := GameManager.hunters.get_hunter(_picked)
+	if chosen == null:
+		chosen = roster[0]
+		_picked = chosen.unique_id
+	var picker := OptionButton.new()
+	picker.custom_minimum_size.y = GameTheme.TOUCH
+	picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for i in roster.size():
+		picker.add_item("%s · Lv %d" % [roster[i].display_name, roster[i].level])
+		if roster[i] == chosen:
+			picker.select(i)
+	picker.item_selected.connect(func(index: int) -> void:
+		_picked = roster[index].unique_id
+		request_rebuild())
+	content.add_child(picker)
+	return chosen
+
+
+func _build_academy(content: VBoxContainer) -> void:
+	var academy := GameManager.academy
+	var hunter := _hunter_picker(content)
+	if hunter == null:
+		return
+	content.add_child(UIKit.label("Rebirth points: %d · Trait slots %d / %d" % [
+		hunter.rebirth_points, hunter.trait_ids.size(), academy.get_max_traits()], &"AccentLabel"))
+	var promotions := academy.get_promotions(hunter)
+	if not promotions.is_empty():
+		content.add_child(UIKit.label("Class change (needs %d reincarnations, %d g)" % [AcademyService.PROMOTION_REINCARNATIONS, AcademyService.PROMOTION_COST], &"AccentLabel"))
+		for target in promotions:
+			var reason := academy.can_change_class(hunter, target.id)
+			var change := UIKit.button("Become\n%s" % target.display_name, func() -> void:
+				run_action("" if academy.change_class(hunter, target.id) else academy.can_change_class(hunter, target.id),
+					"%s is now a %s" % [hunter.display_name, target.display_name]), &"PrimaryButton", reason)
+			content.add_child(change)
+	content.add_child(UIKit.label("Skills", &"AccentLabel"))
+	for skill in academy.get_skills():
+		var level := academy.get_skill_level(hunter, skill.id)
+		var reason := academy.can_learn_skill(hunter, skill.id)
+		var info := UIKit.vbox([
+			UIKit.label("%s  %d / %d" % [skill.display_name, level, skill.max_level]),
+			UIKit.label(skill.description, &"MutedLabel"),
+		], 2)
+		if not reason.is_empty() and level < skill.max_level:
+			info.add_child(UIKit.label(reason, &"WarningLabel"))
+		var learn := UIKit.button("Train\n%d g" % academy.get_next_skill_cost(hunter, skill) if level < skill.max_level else "Max",
+			func() -> void:
+				run_action("" if academy.learn_skill(hunter, skill.id) else academy.can_learn_skill(hunter, skill.id),
+					"%s trained" % skill.display_name), &"PrimaryButton", reason)
+		learn.size_flags_horizontal = Control.SIZE_SHRINK_END
+		learn.custom_minimum_size.x = 64
+		content.add_child(UIKit.card(UIKit.hbox([info, learn])))
+	content.add_child(UIKit.separator())
+	content.add_child(UIKit.label("Known traits", &"AccentLabel"))
+	for trait_def in GameManager.traits.get_traits(hunter):
+		var forget := UIKit.button("Forget\n%d g" % AcademyService.FORGET_COST, func() -> void:
+			run_action("" if academy.forget_trait(hunter, trait_def.id) else academy.can_forget_trait(hunter, trait_def.id),
+				"%s forgotten" % trait_def.display_name), &"", academy.can_forget_trait(hunter, trait_def.id))
+		forget.size_flags_horizontal = Control.SIZE_SHRINK_END
+		forget.custom_minimum_size.x = 72
+		content.add_child(UIKit.card(UIKit.hbox([UIKit.vbox([UIKit.label(trait_def.display_name), UIKit.label(trait_def.description, &"MutedLabel")], 2), forget])))
+	content.add_child(UIKit.label("Learn a trait (rebirth points)", &"AccentLabel"))
+	for trait_def in academy.get_learnable_traits(hunter):
+		var reason := academy.can_learn_trait(hunter, trait_def.id)
+		var learn := UIKit.button("Learn\n%d pt" % trait_def.academy_cost, func() -> void:
+			run_action("" if academy.learn_trait(hunter, trait_def.id) else academy.can_learn_trait(hunter, trait_def.id),
+				"%s learned" % trait_def.display_name), &"PrimaryButton", reason)
+		learn.size_flags_horizontal = Control.SIZE_SHRINK_END
+		learn.custom_minimum_size.x = 64
+		content.add_child(UIKit.card(UIKit.hbox([UIKit.vbox([UIKit.label(trait_def.display_name), UIKit.label(trait_def.description, &"MutedLabel")], 2), learn])))
+
+
+func _build_forge(content: VBoxContainer) -> void:
+	var forge := GameManager.forge
+	var inventory := GameManager.inventory
+	content.add_child(UIKit.label("Enhancement limit: +%d · Iron Ore: %d" % [forge.get_max_level(), inventory.count(ForgeService.ORE)], &"AccentLabel"))
+	var entries: Array = []
+	for instance_id in inventory.get_equipped():
+		var wearer := GameManager.hunters.get_hunter(inventory.get_equipped()[instance_id])
+		entries.append([instance_id, "worn by %s" % wearer.display_name if wearer != null else "worn"])
+	for instance_id in inventory.get_instances():
+		entries.append([instance_id, "in the Warehouse"])
+	if entries.is_empty():
+		content.add_child(UIKit.label("No equipment to enhance.", &"MutedLabel"))
+	for entry in entries:
+		var instance_id: StringName = entry[0]
+		var item := GameManager.equipment.get_item(instance_id)
+		if item == null or item.equipment_slot == ItemDefinition.EquipmentSlot.NONE:
+			continue
+		var level := forge.get_level(instance_id)
+		var reason := forge.can_enhance(instance_id)
+		var name_label := UIKit.label("%s%s · %s" % [item.display_name, " +%d" % level if level > 0 else "", entry[1]])
+		name_label.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
+		var info := UIKit.vbox([name_label, UIKit.label(UIKit.describe_modifiers(item), &"AccentLabel"),
+			UIKit.label("Next: %d g + %d Iron Ore" % [forge.get_gold_cost(instance_id), forge.get_ore_cost(instance_id)], &"MutedLabel")], 2)
+		if not reason.is_empty():
+			info.add_child(UIKit.label(reason, &"WarningLabel"))
+		var enhance := UIKit.button("Enhance", func() -> void:
+			run_action("" if forge.enhance(instance_id) else forge.can_enhance(instance_id), "%s enhanced" % item.display_name),
+			&"PrimaryButton", reason)
+		enhance.size_flags_horizontal = Control.SIZE_SHRINK_END
+		enhance.custom_minimum_size.x = 72
+		content.add_child(UIKit.card(UIKit.hbox([UIKit.swatch(RarityColors.of(item.rarity), 14), info, enhance])))
+
+
+func _build_portal(content: VBoxContainer) -> void:
+	var gm := GameManager
+	var rein := gm.reincarnation
+	content.add_child(UIKit.label("Difficulty", &"AccentLabel"))
+	content.add_child(UIKit.label("Total reincarnations: %d" % gm.progress.total_reincarnations, &"MutedLabel"))
+	var row := UIKit.hbox([], 4)
+	for difficulty in rein.get_difficulty_count():
+		var unlocked := rein.is_unlocked(difficulty)
+		var label := rein.get_difficulty_name(difficulty) if unlocked else "%s\n(%d)" % [rein.get_difficulty_name(difficulty), rein.get_unlock_requirement(difficulty)]
+		var button := UIKit.button(label, func() -> void:
+			run_action(rein.set_difficulty(difficulty)), &"SelectedButton" if gm.progress.difficulty == difficulty else &"",
+			"" if unlocked else "Locked")
+		row.add_child(button)
+	content.add_child(row)
+	content.add_child(UIKit.label("Monsters are %.1f× stronger and give %.1f× rewards." % [
+		DataRegistry.config.difficulty_stat_scale[clampi(gm.progress.difficulty, 0, DataRegistry.config.difficulty_stat_scale.size() - 1)],
+		DataRegistry.config.difficulty_reward_scale[clampi(gm.progress.difficulty, 0, DataRegistry.config.difficulty_reward_scale.size() - 1)]], &"MutedLabel"))
+	content.add_child(UIKit.separator())
+	content.add_child(UIKit.label("Reincarnate a Hunter", &"AccentLabel"))
+	for runtime: HunterRuntime in gm.hunters.get_all():
+		var reason := rein.can_reincarnate(runtime)
+		var info := UIKit.vbox([
+			UIKit.label("%s · Lv %d · reborn %d×" % [runtime.display_name, runtime.level, runtime.reincarnations]),
+			UIKit.label("+%d%% HP/ATK/DEF per rebirth · +%d point(s) next" % [roundi(DataRegistry.config.reincarnation_stat_bonus * 100.0), rein.points_for_next(runtime)], &"MutedLabel"),
+		], 2)
+		if not reason.is_empty():
+			info.add_child(UIKit.label(reason, &"WarningLabel"))
+		var go := UIKit.button("Reincarnate", func() -> void:
+			run_action("" if rein.reincarnate(runtime) else rein.can_reincarnate(runtime), "%s was reborn" % runtime.display_name),
+			&"PrimaryButton", reason)
+		go.size_flags_horizontal = Control.SIZE_SHRINK_END
+		go.custom_minimum_size.x = 88
+		content.add_child(UIKit.card(UIKit.hbox([info, go])))

@@ -46,3 +46,9 @@ Pale stone, broken columns, magical remnants.
 
 - One navigation mesh for the whole world: region diamonds + gate corridors; buildings, trees, rocks and columns are obstacles.
 - Clear gates and entrances; no mazes.
+
+## Map redesign (2026-10-12, Evil Hunter Tycoon look)
+
+- Every region and gate is a raised plateau with cliff faces and a grass lip; the void around them is a dark teal.
+- Town: cobbled plaza around the Town Hall, dirt roads with kerbs (one to each gate plus a "main street" west and north), flowers and grass tufts, a pond in the north corner (blocks building and walking: `WorldService.get_town_pond`), a wooden fence and a tree line along the two back edges.
+- Dark Forest: mossy patches and leaf litter; Goblin Cave: cracked rock; Ancient Ruins: pale paving with moss. Layout, gates and navigation are unchanged.

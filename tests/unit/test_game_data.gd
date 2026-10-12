@@ -106,7 +106,7 @@ func test_buildings_match_balance() -> void:
 		var values: Array = expected[building_id]
 		var building := _registry.find_def(&"building", building_id) as BuildingDefinition
 		assert_not_null(building, String(building_id))
-		assert_eq(building.get_max_level(), 2, String(building_id))
+		assert_eq(building.get_max_level(), 5 if building_id == &"town_hall" else 2, String(building_id))
 		var lv1 := building.get_level(1)
 		var lv2 := building.get_level(2)
 		assert_eq(lv1.gold_cost, 0, String(building_id))

@@ -37,6 +37,11 @@ var regions: RegionService
 var corpses: CorpseService
 var talents: TalentService
 var expeditions: ExpeditionService
+var reincarnation: ReincarnationService
+var academy: AcademyService
+var forge: ForgeService
+var trading: TradingService
+var quests: QuestService
 
 
 func _ready() -> void:
@@ -78,6 +83,11 @@ func build(data_registry: Node) -> void:
 	talents = TalentService.new(registry, hunters, regions, config, rng)
 	needs.talents = talents
 	expeditions = ExpeditionService.new(registry, hunters, wallet, progress, inventory, loot, stats, config, rng)
+	reincarnation = ReincarnationService.new(hunters, buildings, progress, config)
+	academy = AcademyService.new(registry, hunters, buildings, wallet)
+	forge = ForgeService.new(registry, buildings, wallet, inventory, hunters, config)
+	trading = TradingService.new(registry, buildings, wallet, purses, config)
+	quests = QuestService.new(registry, buildings, hunters, progress, wallet, inventory)
 	_connect_services()
 
 
@@ -99,7 +109,19 @@ func _connect_services() -> void:
 			corpses.die(hunter, world.get_entrance_point(definition))
 		else:
 			hunters.mark_injured(hunter)
-	for service in [expeditions, buildings, recruitment, crafting]:
+	regions.bag_deposited.connect(trading.on_bag_deposited)
+	regions.wanted_items = trading.get_wanted_item_ids
+	forge.enhanced.connect(func(_id: StringName, _level: int) -> void: quests.note_enhanced())
+	var refresh_quests := func(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void: quests.refresh()
+	buildings.layout_changed.connect(refresh_quests)
+	buildings.building_upgraded.connect(refresh_quests)
+	hunters.hunter_added.connect(refresh_quests)
+	hunters.hunter_leveled_up.connect(refresh_quests)
+	progress.flag_set.connect(refresh_quests)
+	academy.skill_learned.connect(refresh_quests)
+	reincarnation.reincarnated.connect(refresh_quests)
+	reincarnation.difficulty_changed.connect(refresh_quests)
+	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests]:
 		service.autosave_requested.connect(autosave_requested.emit)
 
 
@@ -126,6 +148,8 @@ func reset_to_new_game() -> void:
 	inventory.from_dict({}, warnings)
 	bonds.from_dict({}, warnings)
 	progress.from_dict({})
+	trading.from_dict([])
+	quests.from_dict({})
 	buildings.reset()
 	start_new_game()
 

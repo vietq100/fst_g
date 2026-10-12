@@ -45,7 +45,8 @@ func _build(content: VBoxContainer) -> void:
 	var required := gm.stats.required_xp(runtime.level)
 	var cap := gm.stats.level_cap(gm.progress.town_level)
 	var header := UIKit.vbox([
-		UIKit.label("%s · Lv %d%s" % [definition.display_name, runtime.level, " (cap)" if runtime.level >= cap else ""]),
+		UIKit.label("%s · Lv %d%s%s" % [definition.display_name, runtime.level, " (cap)" if runtime.level >= cap else "",
+			" · reborn %d×" % runtime.reincarnations if runtime.reincarnations > 0 else ""]),
 		UIKit.bar(runtime.current_hp, max_hp, &"HpBar", "HP %d / %d" % [roundi(runtime.current_hp), roundi(max_hp)]),
 		UIKit.bar(runtime.xp, required, &"XpBar", "XP %d / %d" % [runtime.xp, required]),
 		UIKit.label("ATK %.1f · DEF %.1f · SPD %d · Crit %d%%" % [
@@ -54,6 +55,7 @@ func _build(content: VBoxContainer) -> void:
 			&"MutedLabel"),
 		UIKit.label(_status_text(), &"AccentLabel"),
 		UIKit.label(_talent_text(), &"MutedLabel"),
+		UIKit.label(_skills_text(), &"MutedLabel"),
 	], 3)
 	var portrait := HunterPortrait.new().setup(runtime, gm.equipment)
 	portrait.custom_minimum_size = Vector2(64, 64)
@@ -65,6 +67,17 @@ func _build(content: VBoxContainer) -> void:
 	_build_traits_and_mood(content)
 	_build_activity(content)
 	_build_bonds_and_history(content)
+
+
+func _skills_text() -> String:
+	var parts := PackedStringArray()
+	for skill_id in runtime.skills:
+		var skill := GameManager.academy.get_skill(skill_id)
+		if skill != null and runtime.skills[skill_id] > 0:
+			parts.append("%s %d" % [skill.display_name, runtime.skills[skill_id]])
+	if runtime.rebirth_points > 0:
+		parts.append("%d rebirth pt" % runtime.rebirth_points)
+	return "Skills: %s" % (", ".join(parts) if not parts.is_empty() else "none")
 
 
 func _talent_text() -> String:

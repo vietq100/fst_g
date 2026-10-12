@@ -10,3 +10,5 @@ extends GameDefinition
 @export var mood_likes: Array[StringName] = []
 @export var mood_dislikes: Array[StringName] = []
 @export var icon: Texture2D
+## Academy: reincarnation points needed to learn it (0 = cannot be learned, e.g. flaws).
+@export var academy_cost: int = 1

@@ -18,6 +18,8 @@ var _inventory: InventoryService
 var _wallet: WalletService
 var _loot: LootService
 var _stats: StatService
+## `func() -> Array[StringName]`: materials the Trading Post wants (Auto duty follows them).
+var wanted_items: Callable = Callable()
 var _progress: ProgressService
 var _config: GameConfig
 var _rng: RandomNumberGenerator
@@ -56,10 +58,28 @@ func get_duty_region(hunter: HunterRuntime) -> RegionDefinition:
 		if fixed != null and not fixed.is_town:
 			return fixed
 	var best: RegionDefinition = null
+	var wanted: Array[StringName] = wanted_items.call() if wanted_items.is_valid() else []
+	var wanted_region: RegionDefinition = null
 	for region in get_hunting_regions():
 		if region.min_hunter_level <= hunter.level:
 			best = region
-	return best
+			# Trading Post requests pull Auto Hunters to a region whose monsters drop the material.
+			if region_drops_any(region, wanted):
+				wanted_region = region
+	return wanted_region if wanted_region != null else best
+
+
+## True when a monster of the region can drop one of `item_ids`.
+func region_drops_any(region: RegionDefinition, item_ids: Array[StringName]) -> bool:
+	for monster_id in region.monster_ids:
+		var enemy := _registry.find_def(&"enemy", monster_id) as EnemyDefinition
+		var table := _registry.find_def(&"loot_table", enemy.loot_table_id) as LootTableDefinition if enemy != null else null
+		if table == null:
+			continue
+		for entry in table.entries:
+			if item_ids.has(entry.item_id):
+				return true
+	return false
 
 
 ## Valid duty choices: &"" (Auto), each hunting region id, STAY_IN_TOWN.
@@ -101,11 +121,17 @@ func roll_level(region: RegionDefinition) -> int:
 
 
 func get_stat_scale(level: int) -> float:
-	return 1.0 + _config.monster_stat_per_level * (maxi(level, 1) - 1)
+	return (1.0 + _config.monster_stat_per_level * (maxi(level, 1) - 1)) * _difficulty_value(_config.difficulty_stat_scale)
 
 
 func get_reward_scale(level: int) -> float:
-	return 1.0 + _config.monster_reward_per_level * (maxi(level, 1) - 1)
+	return (1.0 + _config.monster_reward_per_level * (maxi(level, 1) - 1)) * _difficulty_value(_config.difficulty_reward_scale)
+
+
+func _difficulty_value(values: Array[float]) -> float:
+	if values.is_empty():
+		return 1.0
+	return values[clampi(_progress.difficulty, 0, values.size() - 1)]
 
 
 # --- Kill rewards and the loot bag ---------------------------------------------------------------

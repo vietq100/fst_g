@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/trait_definition.gd" id="1_trait"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"attack_speed"
+type = 1
+value = 0.12
+
+[resource]
+script = ExtResource("1_trait")
+id = &"swift"
+display_name = "Swift"
+description = "Quick hands: +12% attack speed."
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])
+activity_rate_modifiers = Dictionary[StringName, float]({})
+mood_likes = Array[StringName]([])
+mood_dislikes = Array[StringName]([])
+academy_cost = 1

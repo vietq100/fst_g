@@ -24,6 +24,12 @@ const STYLES := {
 	&"warehouse": {"wall": Color("7d6448"), "roof": Color("5b4430"), "trim": Color("b08d57"), "height": 36.0},
 	&"house": {"wall": Color("b48a62"), "roof": Color("8a4b3a"), "trim": Color("e8d3a8"), "height": 32.0},
 	&"temple": {"wall": Color("d8d2c2"), "roof": Color("b8913a"), "trim": Color("f2d16b"), "height": 46.0},
+	&"trading_post": {"wall": Color("a67c52"), "roof": Color("2f6f5e"), "trim": Color("f2d16b"), "height": 34.0},
+	&"restaurant": {"wall": Color("c27a4a"), "roof": Color("a83a3a"), "trim": Color("f4f1ea"), "height": 36.0},
+	&"inn": {"wall": Color("c9a37a"), "roof": Color("5b6c8f"), "trim": Color("f4f1ea"), "height": 42.0},
+	&"academy": {"wall": Color("b9b4c9"), "roof": Color("5a3f8c"), "trim": Color("9fd6ff"), "height": 48.0},
+	&"forge": {"wall": Color("4a4a50"), "roof": Color("8a3b24"), "trim": Color("ff7a2e"), "height": 36.0},
+	&"portal": {"wall": Color("2e2a45"), "roof": Color("6a3fb8"), "trim": Color("c79bff"), "height": 30.0},
 }
 
 @export var building_id: StringName = &"house":
@@ -103,6 +109,13 @@ func _draw() -> void:
 	var right_face := PackedVector2Array([bottom, right, right + up, bottom + up])
 	draw_colored_polygon(left_face, wall.darkened(0.12) * tint)
 	draw_colored_polygon(right_face, wall.lightened(0.05) * tint)
+	# Masonry courses: thin lines parallel to the base on both wall faces.
+	if not ghost:
+		var rows := int(h / 7.0)
+		for k in range(1, rows):
+			var lift := up * (float(k) / rows)
+			draw_line(left + lift, bottom + lift, wall.darkened(0.3) * tint, 1.0)
+			draw_line(bottom + lift, right + lift, wall.darkened(0.22) * tint, 1.0)
 	draw_polyline(PackedVector2Array([left, left + up, bottom + up, right + up, right, bottom, left]), OUTLINE, 1.0)
 	draw_line(bottom, bottom + up, OUTLINE, 1.0)
 	# Pyramid roof over the raised footprint.
@@ -114,6 +127,13 @@ func _draw() -> void:
 	var r := right + up + Vector2(eave, 0)
 	draw_colored_polygon(PackedVector2Array([l, b, apex]), roof.darkened(0.15) * tint)
 	draw_colored_polygon(PackedVector2Array([b, r, apex]), roof * tint)
+	# Shingle rows, then the outline.
+	if not ghost:
+		for t: float in [0.22, 0.44, 0.66, 0.85]:
+			draw_line(l.lerp(apex, t), b.lerp(apex, t), roof.darkened(0.35), 1.0)
+			draw_line(b.lerp(apex, t), r.lerp(apex, t), roof.darkened(0.25), 1.0)
+		draw_line(l, b, roof.lightened(0.18), 2.0)
+		draw_line(b, r, roof.lightened(0.25), 2.0)
 	draw_polyline(PackedVector2Array([l, b, r, apex, l]), OUTLINE, 1.0)
 	draw_line(b, apex, OUTLINE, 1.0)
 	if not ghost:
@@ -135,10 +155,14 @@ func _draw_details(style: Dictionary, left: Vector2, bottom: Vector2, right: Vec
 	var door_base := bottom.lerp(right, 0.5)
 	var door := PackedVector2Array([door_base + Vector2(-6, 3), door_base + Vector2(6, -3), door_base + Vector2(6, -21), door_base + Vector2(-6, -15)])
 	draw_colored_polygon(door, Color("3a2a1e"))
+	draw_polyline(PackedVector2Array([door[0], door[3], door[2], door[1]]), style["trim"], 1.0)
+	draw_circle(door_base + Vector2(3, -8), 1.0, Color("e8c547"))
 	for t: float in [0.3, 0.7]:
 		var spot := left.lerp(bottom, t) + Vector2(0, -h * 0.6)
-		draw_colored_polygon(PackedVector2Array([spot + Vector2(-5, -2), spot + Vector2(5, 3), spot + Vector2(5, -6), spot + Vector2(-5, -11)]),
-			WINDOW if building_id != &"hospital" else Color("bfe3ff"))
+		var pane := PackedVector2Array([spot + Vector2(-5, -2), spot + Vector2(5, 3), spot + Vector2(5, -6), spot + Vector2(-5, -11)])
+		draw_colored_polygon(pane, WINDOW if building_id != &"hospital" else Color("bfe3ff"))
+		draw_polyline(pane + PackedVector2Array([pane[0]]), OUTLINE, 1.0)
+		draw_line((pane[0] + pane[3]) * 0.5, (pane[1] + pane[2]) * 0.5, OUTLINE, 1.0)
 	var face_mid := left.lerp(bottom, 0.5) + Vector2(0, -h * 0.25)
 	match building_id:
 		&"town_hall":
@@ -164,6 +188,33 @@ func _draw_details(style: Dictionary, left: Vector2, bottom: Vector2, right: Vec
 				draw_rect(Rect2(left + Vector2(5, 1) + offset, Vector2(8, 8)), trim)
 		&"house":
 			draw_line(apex, apex + Vector2(0, -6), OUTLINE, 2.0)
+		&"trading_post":
+			draw_rect(Rect2(face_mid + Vector2(-9, -22), Vector2(18, 10)), OUTLINE)
+			draw_rect(Rect2(face_mid + Vector2(-8, -21), Vector2(16, 8)), trim)
+			draw_circle(face_mid + Vector2(0, -17), 2.5, OUTLINE)
+		&"restaurant":
+			draw_circle(face_mid + Vector2(0, -16), 7.0, OUTLINE)
+			draw_circle(face_mid + Vector2(0, -16), 6.0, trim)
+			draw_line(apex, apex + Vector2(0, -6), OUTLINE, 2.0)
+		&"inn":
+			draw_rect(Rect2(face_mid + Vector2(-6, -22), Vector2(12, 8)), OUTLINE)
+			draw_rect(Rect2(face_mid + Vector2(-5, -21), Vector2(10, 6)), trim)
+			draw_line(apex, apex + Vector2(0, -6), OUTLINE, 2.0)
+		&"academy":
+			_draw_banner(apex)
+			for t: float in [0.3, 0.5, 0.7]:
+				var column := left.lerp(bottom, t)
+				draw_line(column, column + Vector2(0, -h + 4), Color(1, 1, 1, 0.45), 2.0)
+		&"forge":
+			var chimney_pos := apex + Vector2(8, 6)
+			draw_rect(Rect2(chimney_pos + Vector2(-4, -16), Vector2(8, 18)), OUTLINE)
+			draw_rect(Rect2(chimney_pos + Vector2(-3, -15), Vector2(6, 16)), Color("4a4542"))
+			draw_circle(right + Vector2(-6, -8), 7.0, Color(trim, 0.5))
+		&"portal":
+			var ring := right.lerp(bottom, 0.5) + Vector2(0, -h - 6)
+			draw_circle(ring, 11.0, OUTLINE)
+			draw_circle(ring, 9.0, trim)
+			draw_circle(ring, 5.0, Color("120d24"))
 		&"temple":
 			# Spire with a golden sun.
 			draw_line(apex, apex + Vector2(0, -14), OUTLINE, 3.0)

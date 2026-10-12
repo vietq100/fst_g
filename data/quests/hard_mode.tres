@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/quest_definition.gd" id="1_q"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amt"]
+
+[resource]
+script = ExtResource("1_q")
+id = &"hard_mode"
+display_name = "Into the Fire"
+description = "Unlock and select the Normal difficulty."
+order = 15
+kind = 5
+target_id = &""
+amount = 1
+reward_gold = 3000
+reward_items = Array[ExtResource("2_amt")]([])

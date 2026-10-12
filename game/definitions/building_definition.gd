@@ -9,6 +9,8 @@ extends GameDefinition
 @export var build_cost: int = 0
 ## Tiles occupied (gx × gy), anchored at the building's tile.
 @export var footprint: Vector2i = Vector2i(2, 2)
+## Town Hall level needed before it can be built (Evil Hunter Tycoon style unlocks).
+@export var required_town_level: int = 1
 ## Only one may exist (core buildings). Houses are not unique.
 @export var unique: bool = true
 ## May the player remove it?

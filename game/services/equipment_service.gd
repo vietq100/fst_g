@@ -11,6 +11,9 @@ const SLOT_NAMES := {
 	ItemDefinition.EquipmentSlot.ACCESSORY: &"accessory",
 }
 
+## Stat growth per Forge level (mirrors GameConfig.enhance_stat_bonus).
+const ENHANCE_BONUS := 0.12
+
 var _registry: Node
 var _hunters: HunterService
 var _inventory: InventoryService
@@ -26,9 +29,22 @@ func _init(registry: Node, hunters: HunterService, inventory: InventoryService) 
 func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 	var modifiers: Array[StatModifier] = []
 	for slot in hunter.equipment:
-		var item := get_item(hunter.equipment[slot])
-		if item != null:
+		var instance_id: StringName = hunter.equipment[slot]
+		var item := get_item(instance_id)
+		if item == null:
+			continue
+		var enhance := _inventory.get_enhance(instance_id)
+		if enhance <= 0:
 			modifiers.append_array(item.modifiers)
+			continue
+		# Forge enhancement scales every modifier of the item.
+		for modifier in item.modifiers:
+			var scaled := StatModifier.new()
+			scaled.stat = modifier.stat
+			scaled.type = modifier.type
+			scaled.value = modifier.value * (1.0 + ENHANCE_BONUS * enhance)
+			scaled.condition = modifier.condition
+			modifiers.append(scaled)
 	return modifiers
 
 

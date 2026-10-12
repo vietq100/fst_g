@@ -30,7 +30,7 @@ const PROP_CLEARANCE := 3
 const PROP_SEED := 20261011
 ## Props closer than this leave slivers in the baked navigation mesh; keep them apart.
 const PROP_SPACING := 34.0
-const START_ZOOM := 1.0
+const START_ZOOM := 0.6
 const CARRIER_CHECK_INTERVAL := 1.0
 ## A sleeping Hunter this close to its House door goes inside (hidden).
 const ENTER_DISTANCE := 10.0
@@ -107,7 +107,9 @@ func _build_scene() -> void:
 	_ground.name = "Ground"
 	_ground.set_script(preload("res://world/world/world_ground.gd"))
 	add_child(_ground)
-	_ground.setup(world, _town_roads())
+	var plaza := _town_plaza()
+	_ground.setup(world, _town_roads(plaza), plaza, world.get_town_pond())
+	RenderingServer.set_default_clear_color(Color("1b3d4a"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"
 	var polygon := NavigationPolygon.new()
@@ -312,6 +314,15 @@ func recenter_on_town() -> void:
 	_camera.center_on(world.region_center(world.get_town()))
 
 
+## Hex buttons I / II / III: camera over a hunting region.
+func focus_region(region_id: StringName) -> void:
+	var region := world.get_region(region_id)
+	if region == null:
+		return
+	_camera.zoom = Vector2(START_ZOOM, START_ZOOM)
+	_camera.center_on(world.region_center(region))
+
+
 func get_hunter_actor(unique_id: StringName) -> Hunter:
 	return _hunter_actors.get(unique_id)
 
@@ -330,7 +341,8 @@ func _set_selected_hunter(hunter: Hunter) -> void:
 
 func _hunter_at(world_position: Vector2) -> Hunter:
 	var best: Hunter = null
-	var best_distance := SELECT_RADIUS
+	# Hit radius is in screen terms: the farther out the camera, the larger in world px.
+	var best_distance := SELECT_RADIUS / _camera.zoom.x * 0.6
 	for hunter: Hunter in _hunter_actors.values():
 		if not hunter.visible:
 			continue
@@ -527,6 +539,8 @@ func _spawn_props() -> void:
 		if expedition.region_id != &"":
 			keep_clear.append(Rect2i(expedition.entrance_tile, Vector2i.ONE).grow(PROP_CLEARANCE))
 	var placed: Array[Vector2] = []
+	_spawn_pond_obstacle(props)
+	_spawn_town_border(props, rng, placed)
 	for region in world.get_regions():
 		if region.props == RegionDefinition.Props.NONE or region.prop_density <= 0.0:
 			continue
@@ -561,8 +575,49 @@ func _spawn_props() -> void:
 				props.add_child(prop)
 
 
+## The pond blocks walking (a navigation obstacle over its water).
+func _spawn_pond_obstacle(props: Node2D) -> void:
+	var pond := world.get_town_pond()
+	if pond.size == Vector2i.ZERO:
+		return
+	var body := StaticBody2D.new()
+	body.collision_layer = 1
+	body.collision_mask = 0
+	body.add_to_group(&"navigation_obstacles")
+	var shape := CollisionPolygon2D.new()
+	shape.polygon = WorldService.rect_polygon(pond, 0.1)
+	body.add_child(shape)
+	props.add_child(body)
+
+
+## Trees along the Town's back edges (the screen's top corner) so it feels enclosed.
+func _spawn_town_border(props: Node2D, rng: RandomNumberGenerator, placed: Array[Vector2]) -> void:
+	var town := world.get_town()
+	if town == null:
+		return
+	var rect := town.tile_rect
+	var pond := world.get_town_pond().grow(1)
+	for gx in range(rect.position.x, rect.end.x):
+		for gy in range(rect.position.y, rect.end.y):
+			if gx - rect.position.x > 1 and gy - rect.position.y > 1:
+				continue
+			var tile := Vector2i(gx, gy)
+			if pond.has_point(tile) or rng.randf() > 0.55:
+				continue
+			var at := WorldService.tile_to_world(Vector2(tile) + Vector2(rng.randf_range(0.3, 0.7), rng.randf_range(0.3, 0.7)))
+			if placed.any(func(other: Vector2) -> bool: return other.distance_to(at) < PROP_SPACING * 0.8):
+				continue
+			placed.append(at)
+			var prop := WorldProp.new()
+			prop.position = at
+			prop.size = rng.randf_range(0.9, 1.25)
+			prop.kind = WorldProp.Kind.TREE
+			prop.tint = Color("2f6a36").lerp(Color("3f8a40"), rng.randf())
+			props.add_child(prop)
+
+
 ## Decorative dirt roads in the Town: from the Town Hall's default spot to every Town gate.
-func _town_roads() -> Dictionary[Vector2i, bool]:
+func _town_roads(plaza: Dictionary[Vector2i, bool] = {}) -> Dictionary[Vector2i, bool]:
 	var roads: Dictionary[Vector2i, bool] = {}
 	var town := world.get_town()
 	var hall: BuildingDefinition = DataRegistry.get_building(BuildingService.TOWN_HALL)
@@ -579,11 +634,27 @@ func _town_roads() -> Dictionary[Vector2i, bool]:
 			for y in range(hall_rect.end.y, g.position.y):
 				for x in range(g.position.x, g.end.x):
 					roads[Vector2i(x, y)] = true
-	# A plaza ring around the Town Hall.
-	for x in range(hall_rect.position.x - 1, hall_rect.end.x + 1):
-		for y in range(hall_rect.position.y - 1, hall_rect.end.y + 1):
-			roads[Vector2i(x, y)] = true
+	# A path from the Town Hall up to the pond and to the west edge, so the map has a "main street".
+	for x in range(hall_rect.position.x - 1, 8, -1):
+		roads[Vector2i(x, hall_rect.position.y + 1)] = true
+	for y in range(hall_rect.position.y + 1, 7, -1):
+		roads[Vector2i(8, y)] = true
+	for tile in plaza:
+		roads.erase(tile)
 	return roads
+
+
+## Cobbled plaza around the Town Hall (two tiles wide).
+func _town_plaza() -> Dictionary[Vector2i, bool]:
+	var plaza: Dictionary[Vector2i, bool] = {}
+	var hall: BuildingDefinition = DataRegistry.get_building(BuildingService.TOWN_HALL)
+	if hall == null or hall.default_tiles.is_empty():
+		return plaza
+	var hall_rect := Rect2i(hall.default_tiles[0], hall.footprint)
+	for x in range(hall_rect.position.x - 2, hall_rect.end.x + 2):
+		for y in range(hall_rect.position.y - 2, hall_rect.end.y + 2):
+			plaza[Vector2i(x, y)] = true
+	return plaza
 
 
 # --- Regions: monsters, points -------------------------------------------------------------------

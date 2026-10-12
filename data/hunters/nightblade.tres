@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="HunterDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/hunter_definition.gd" id="1_hunter"]
+
+[resource]
+script = ExtResource("1_hunter")
+id = &"nightblade"
+display_name = "Nightblade"
+class_id = &"nightblade"
+base_hp = 110.0
+base_attack = 15.6
+base_defense = 4.4
+hp_per_level = 11.0
+attack_per_level = 2.4
+defense_per_level = 0.77
+attack_speed = 1.54
+move_speed = 95.0
+critical_chance = 0.2
+critical_damage = 1.8
+attack_range = 18.0
+promotion_of = &"rogue"
+recruit_cost = 110
+stat_roll_variance = 0.1
+name_pool = PackedStringArray("Blix", "Corvin", "Dusk", "Eira", "Finch", "Grey", "Hollis", "Iris", "Jinx", "Kit", "Lyra", "Mace", "Nell", "Onyx", "Pip", "Quinn", "Raven", "Shade", "Vex", "Zeph")
+starting_items = Array[StringName]([&"rusty_dagger", &"leather_armor"])
+body_size = Vector2(12, 20)
+weapon_length = 8.0
+weapon_width = 1.0

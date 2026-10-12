@@ -62,6 +62,14 @@ static func rect_polygon(rect: Rect2i, grow: float = 0.0) -> PackedVector2Array:
 	])
 
 
+## The Town's decorative pond (north corner): blocks building placement and walking.
+func get_town_pond() -> Rect2i:
+	var town := get_town()
+	if town == null:
+		return Rect2i()
+	return Rect2i(town.tile_rect.position + Vector2i(2, 2), Vector2i(5, 4))
+
+
 func get_regions() -> Array[RegionDefinition]:
 	return _regions
 

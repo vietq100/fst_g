@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/quest_definition.gd" id="1_q"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amt"]
+
+[resource]
+script = ExtResource("1_q")
+id = &"train_skill"
+display_name = "Study Hard"
+description = "Train 3 skill levels at the Academy."
+order = 10
+kind = 7
+target_id = &""
+amount = 3
+reward_gold = 500
+reward_items = Array[ExtResource("2_amt")]([])

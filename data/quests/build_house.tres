@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/quest_definition.gd" id="1_q"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amt"]
+
+[resource]
+script = ExtResource("1_q")
+id = &"build_house"
+display_name = "A Roof Overhead"
+description = "Build a second House for your Hunters."
+order = 1
+kind = 0
+target_id = &"house"
+amount = 2
+reward_gold = 100
+reward_items = Array[ExtResource("2_amt")]([])
