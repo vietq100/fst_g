@@ -44,16 +44,30 @@ func test_body_map_is_well_formed() -> void:
 	for row: String in ChibiBody.BODY:
 		for symbol in row:
 			assert_true(symbol == "." or symbols.has(symbol), "symbol " + symbol)
+	for outfit: StringName in ChibiBody.OUTFITS:
+		var rows: Array = ChibiBody.OUTFITS[outfit]
+		assert_eq(rows.size(), ChibiBody.BODY_SIZE.y - ChibiBody.TORSO_ROW, "outfit %s rows" % outfit)
+		for row: String in rows:
+			assert_eq(row.length(), ChibiBody.BODY_SIZE.x, "outfit %s" % outfit)
+			for symbol in row:
+				assert_true(symbol == "." or symbols.has(symbol), "outfit %s symbol %s" % [outfit, symbol])
+	for style in ChibiBody.HAIR_STYLES.size():
+		for view in [ChibiBody.View.FRONT, ChibiBody.View.BACK, ChibiBody.View.SIDE]:
+			for row: String in ChibiBody.hair_map(style, view):
+				assert_eq(row.length(), ChibiBody.BODY_SIZE.x, "hair %d view %d" % [style, view])
+				for symbol in row:
+					assert_true(symbol == "." or symbols.has(symbol), "hair symbol " + symbol)
 	# Back view has no eyes; side view hides the far ear.
 	assert_false(String(ChibiBody.body_map(ChibiBody.View.BACK)[9]).contains("w"))
 	assert_eq(String(ChibiBody.body_map(ChibiBody.View.SIDE)[9])[0], ".")
 
 
 func test_every_animation_composes_on_every_facing() -> void:
-	var look := HunterAppearance.new()
+	# Long hair (the widest lying silhouette) in the Guardian outfit.
+	var look := HunterAppearance.from_dict({"hair_style": 1})
 	for animation: StringName in ChibiAnimations.ANIMATIONS:
 		for facing in [Facing.Direction.DOWN, Facing.Direction.UP, Facing.Direction.LEFT, Facing.Direction.RIGHT]:
-			var frames := ChibiBody.get_frames(look, facing, animation)
+			var frames := ChibiBody.get_frames(look, facing, animation, &"guardian")
 			assert_eq(frames.size(), ChibiAnimations.get_frames(animation).size(), "%s %d" % [animation, facing])
 			for texture in frames:
 				var image := texture.get_image()
@@ -66,8 +80,13 @@ func test_every_animation_composes_on_every_facing() -> void:
 func test_rest_pose_matches_reference_and_lying_is_wide() -> void:
 	var look := HunterAppearance.new()
 	var rest := ChibiBody.compose(look, ChibiBody.View.FRONT, {})
-	assert_eq(rest.get_used_rect(), Rect2i(ChibiBody.BODY_ORIGIN, ChibiBody.BODY_SIZE))
-	assert_true(rest.get_pixel(ChibiBody.BODY_ORIGIN.x + 7, ChibiBody.BODY_ORIGIN.y + 4).is_equal_approx(ChibiBody.SKINS[0][1]))
+	var rest_used := rest.get_used_rect()
+	# The body fills its box; hair adds a few rows above the head.
+	assert_eq(rest_used.end, ChibiBody.BODY_ORIGIN + ChibiBody.BODY_SIZE)
+	assert_eq(rest_used.position.x, ChibiBody.BODY_ORIGIN.x)
+	assert_true(rest_used.position.y <= ChibiBody.BODY_ORIGIN.y and rest_used.position.y >= ChibiBody.BODY_ORIGIN.y + ChibiBody.HAIR_TOP)
+	# Cheek below the fringe is skin.
+	assert_true(rest.get_pixel(ChibiBody.BODY_ORIGIN.x + 7, ChibiBody.BODY_ORIGIN.y + 11).is_equal_approx(ChibiBody.SKINS[0][1]))
 	var lying := ChibiBody.compose(look, ChibiBody.View.FRONT, {"lying": true})
 	var used := lying.get_used_rect()
 	assert_true(used.size.x > used.size.y, "lying body is horizontal")
@@ -90,13 +109,34 @@ func test_raised_body_never_tears_from_the_legs() -> void:
 func test_skin_and_dye_recolour() -> void:
 	var a := HunterAppearance.from_dict({"skin": 0, "dye": 0})
 	var b := HunterAppearance.from_dict({"skin": 3, "dye": 5})
-	var head := ChibiBody.BODY_ORIGIN + Vector2i(7, 4)
+	var head := ChibiBody.BODY_ORIGIN + Vector2i(7, 11)
 	var shorts := ChibiBody.BODY_ORIGIN + Vector2i(7, 23)
 	var image_a := ChibiBody.compose(a, ChibiBody.View.FRONT, {})
 	var image_b := ChibiBody.compose(b, ChibiBody.View.FRONT, {})
 	assert_false(image_a.get_pixel(head.x, head.y).is_equal_approx(image_b.get_pixel(head.x, head.y)))
 	assert_false(image_a.get_pixel(shorts.x, shorts.y).is_equal_approx(image_b.get_pixel(shorts.x, shorts.y)))
-	assert_eq(ChibiBody.get_portrait(a).get_size(), Vector2(ChibiBody.BODY_SIZE.x, 14))
+	assert_eq(ChibiBody.get_portrait(a).get_size(), Vector2(ChibiBody.PORTRAIT_RECT.size))
+
+
+func test_hair_and_outfit_layers() -> void:
+	var dark := HunterAppearance.from_dict({"hair_style": 0, "hair_color": 0})
+	var blonde := HunterAppearance.from_dict({"hair_style": 0, "hair_color": 4})
+	var top := ChibiBody.BODY_ORIGIN + Vector2i(7, 1)
+	var image_dark := ChibiBody.compose(dark, ChibiBody.View.FRONT, {})
+	var image_blonde := ChibiBody.compose(blonde, ChibiBody.View.FRONT, {})
+	assert_false(image_dark.get_pixel(top.x, top.y).is_equal_approx(image_blonde.get_pixel(top.x, top.y)), "hair colour")
+	var chest := ChibiBody.BODY_ORIGIN + Vector2i(7, 17)
+	var warrior := ChibiBody.compose(dark, ChibiBody.View.FRONT, {}, &"warrior")
+	var ranger := ChibiBody.compose(dark, ChibiBody.View.FRONT, {}, &"ranger")
+	assert_false(warrior.get_pixel(chest.x, chest.y).is_equal_approx(ranger.get_pixel(chest.x, chest.y)), "class outfit")
+	var promoted := HunterDefinition.new()
+	promoted.class_id = &"templar"
+	promoted.promotion_of = &"guardian"
+	assert_eq(ChibiBody.outfit_for(promoted), &"guardian")
+	var unknown := HunterDefinition.new()
+	unknown.class_id = &"bard"
+	assert_eq(ChibiBody.outfit_for(unknown), &"")
+	assert_eq(ChibiBody.outfit_for(null), &"")
 
 
 func test_offsets_groups_and_side_override() -> void:

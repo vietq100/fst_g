@@ -1,6 +1,6 @@
 extends TestCase
 ## WorldService geometry, BuildingService placement and HousingService beds
-## (WORLD_DESIGN.md, BUILD_SYSTEM.md, DECISIONS.md D27, D32, D33).
+## (WORLD_DESIGN.md, BUILD_SYSTEM.md, DECISIONS.md D52, D32, D33).
 
 const DataRegistryScript := preload("res://core/data_registry.gd")
 
@@ -39,8 +39,9 @@ func after_each() -> void:
 func test_tile_world_round_trip() -> void:
 	for tile in [Vector2i(0, 0), Vector2i(5, 9), Vector2i(30, 2), Vector2i(17, 37)]:
 		assert_eq(WorldService.tile_at(WorldService.tile_center(tile)), tile, str(tile))
-	assert_eq(WorldService.tile_to_world(Vector2(1, 0)), Vector2(32, 16))
-	assert_eq(WorldService.tile_to_world(Vector2(0, 1)), Vector2(-32, 16))
+	assert_eq(WorldService.tile_to_world(Vector2(1, 0)), Vector2(32, 0))
+	assert_eq(WorldService.tile_to_world(Vector2(0, 1)), Vector2(0, 32))
+	assert_eq(WorldService.rect_to_world(Rect2i(1, 2, 3, 4)), Rect2(32, 64, 96, 128))
 
 
 func test_four_regions_and_four_gates() -> void:
@@ -93,9 +94,10 @@ func test_can_place_reasons() -> void:
 	# The tiles in front of the Town → Ruins gate (x 34..35, y 17..18) stay free.
 	assert_eq(_buildings.can_place(BuildingService.HOUSE, Vector2i(34, 17)), "Keep the gate road free")
 	assert_eq(_buildings.can_place(BuildingService.HOUSE, Vector2i(14, 6)), "")
-	# The Hospital at (6, 24) has its door at (8, 25): nothing may stand there.
-	assert_eq(BuildingService.get_door_tile(Rect2i(6, 24, 2, 2)), Vector2i(8, 25))
-	assert_eq(_buildings.can_place(BuildingService.HOUSE, Vector2i(8, 24)), "Blocks a door")
+	# The Hospital at (6, 24) has its door at (7, 26), in front of its bottom face: nothing may
+	# stand there.
+	assert_eq(BuildingService.get_door_tile(Rect2i(6, 24, 2, 2)), Vector2i(7, 26))
+	assert_eq(_buildings.can_place(BuildingService.HOUSE, Vector2i(6, 26)), "Blocks a door")
 
 
 func test_build_costs_gold_and_unique_buildings_are_limited() -> void:

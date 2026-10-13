@@ -272,15 +272,20 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 	_difficulty_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var resources := GridContainer.new()
 	resources.columns = 2
-	resources.add_theme_constant_override(&"h_separation", 10)
-	resources.add_theme_constant_override(&"v_separation", 1)
+	resources.add_theme_constant_override(&"h_separation", 4)
+	resources.add_theme_constant_override(&"v_separation", 3)
 	for entry in [[&"gold", &"coin"], [&"food", &"food"], [&"slots", &"bag"], [&"chest", &"chest"]]:
 		var line := UIKit.hbox([PixelIcons.rect(entry[1], 2)], 4)
 		var label := UIKit.label("", &"HudLabel", false)
 		label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		line.add_child(label)
 		_chips[entry[0]] = label
-		resources.add_child(line)
+		# Each resource sits in a dark pill so the numbers read over any part of the map.
+		var chip := PanelContainer.new()
+		chip.theme_type_variation = &"Chip"
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.add_child(line)
+		resources.add_child(chip)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -400,7 +405,7 @@ func _build_overlays() -> void:
 	_waiting_button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_waiting_button.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	_waiting_button.add_theme_color_override(&"font_color", Color("7fe0d0"))
-	_waiting_button.add_theme_color_override(&"font_outline_color", Color("14100d"))
+	_waiting_button.add_theme_color_override(&"font_outline_color", GameTheme.INK)
 	_waiting_button.add_theme_constant_override(&"outline_size", 3)
 	_waiting_button.custom_minimum_size = Vector2(52, 50)
 	_waiting_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
@@ -430,8 +435,9 @@ func _build_overlays() -> void:
 				recenter_requested.emit()
 			else:
 				focus_region_requested.emit(entry[1]), &"RoundButton")
-		button.custom_minimum_size = Vector2(32, 32)
+		button.custom_minimum_size = Vector2(38, 38)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
+		button.add_theme_font_size_override(&"font_size", 13)
 		button.tooltip_text = "Town" if entry[1] == &"" else GameManager.regions.get_duty_name(entry[1])
 		if entry[1] == &"":
 			button.text = ""
@@ -490,12 +496,14 @@ func _build_nav(layout: VBoxContainer) -> void:
 	for entry in [["Construct", open_build, &"build"], ["Dungeon", open_expedition.bind(&"dark_forest"), &"arch"],
 			["Hunters", open_hunters, &"hunters"], ["Storage", open_inventory, &"chest"], ["Shop", open_shop, &"shop"]]:
 		var button := UIKit.button(entry[0], entry[1], &"NavButton")
-		button.icon = PixelIcons.texture(entry[2], 2)
+		button.icon = PixelIcons.texture(entry[2], 3)
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 		button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		button.add_theme_font_size_override(&"font_size", 10)
-		button.custom_minimum_size.y = 48
+		button.add_theme_color_override(&"font_outline_color", GameTheme.INK)
+		button.add_theme_constant_override(&"outline_size", 3)
+		button.custom_minimum_size.y = 58
 		_nav_buttons[StringName(entry[0].to_lower())] = button
 		buttons.add_child(button)
 	_nav.add_child(buttons)

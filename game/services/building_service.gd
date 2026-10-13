@@ -201,9 +201,10 @@ func can_place(building_id: StringName, tile: Vector2i, ignore: StringName = &""
 	return ""
 
 
-## The tile in front of a footprint's door (front-right face, IsoBuilding.get_door_point).
+## The tile in front of a footprint's door (middle of the front / bottom face,
+## TownBuilding.get_door_point).
 static func get_door_tile(rect: Rect2i) -> Vector2i:
-	return Vector2i(rect.end.x, rect.position.y + rect.size.y / 2)
+	return Vector2i(rect.position.x + rect.size.x / 2, rect.end.y)
 
 
 ## Places a free copy of a missing building (save migrations): at its default tile, or the free

@@ -1,6 +1,6 @@
 class_name RegionDefinition
 extends GameDefinition
-## A diamond region of the isometric world (WORLD_DESIGN.md, DECISIONS.md D27, D29).
+## A square region of the top-down world (WORLD_DESIGN.md, DECISIONS.md D52, D29).
 ## The Town is a region too (`is_town`, no monsters).
 
 enum Props { NONE, TREES, ROCKS, COLUMNS }

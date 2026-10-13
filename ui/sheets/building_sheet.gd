@@ -176,29 +176,18 @@ func _build_town_hall(content: VBoxContainer) -> void:
 
 func _build_tavern(content: VBoxContainer) -> void:
 	var recruitment := GameManager.recruitment
-	var hunters := GameManager.hunters
-	content.add_child(UIKit.label("Candidates", &"AccentLabel"))
+	content.add_child(UIKit.label("Hunters waiting", &"AccentLabel"))
 	if recruitment.candidates.is_empty():
 		content.add_child(UIKit.label("Nobody is looking for work right now.", &"MutedLabel"))
+	# Two columns of candidate cards (like the reference game's "Hunters Waiting" board).
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", 4)
+	grid.add_theme_constant_override(&"v_separation", 4)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for i in recruitment.candidates.size():
-		var candidate := recruitment.candidates[i]
-		var traits := PackedStringArray()
-		for definition in GameManager.traits.get_traits(candidate):
-			traits.append(definition.display_name)
-		var info := UIKit.vbox([
-			UIKit.label("%s — %s" % [candidate.display_name, hunters.get_definition(candidate).display_name]),
-			UIKit.label("Traits: %s%s" % [", ".join(traits), "  ·  Talent: %s" % GameManager.talents.get_talent(candidate).display_name if GameManager.talents.get_talent(candidate) != null else ""], &"AccentLabel"),
-			UIKit.label("HP %d · ATK %.1f · DEF %.1f" % [hunters.get_stat(candidate, HunterService.MAX_HP),
-				hunters.get_stat(candidate, HunterService.ATTACK), hunters.get_stat(candidate, HunterService.DEFENSE)], &"MutedLabel"),
-		], 2)
-		var portrait := HunterPortrait.new().setup(candidate, null)
-		var recruit := UIKit.button("Hire\n%d g" % recruitment.get_recruit_cost(i), func() -> void:
-			var hunter := recruitment.recruit(i)
-			run_action("" if hunter != null else recruitment.can_recruit(i),
-				"%s joined the roster" % hunter.display_name if hunter != null else ""), &"PrimaryButton", recruitment.can_recruit(i))
-		recruit.size_flags_horizontal = Control.SIZE_SHRINK_END
-		recruit.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([portrait, info, recruit])))
+		grid.add_child(_candidate_card(i))
+	content.add_child(grid)
 	var blocked := recruitment.can_recruit(0) if not recruitment.candidates.is_empty() else ""
 	if blocked.begins_with("Roster full"):
 		content.add_child(UIKit.label(blocked, &"WarningLabel"))
@@ -207,6 +196,47 @@ func _build_tavern(content: VBoxContainer) -> void:
 		run_action("" if recruitment.paid_refresh() else "Needs %d gold" % cost),
 		&"", "" if GameManager.wallet.can_spend(cost) else "Needs %d gold" % cost))
 	content.add_child(UIKit.label("Candidates also change after every expedition.", &"MutedLabel"))
+
+
+## One candidate: portrait, name and class, talent star, traits, stats and the Hire button.
+func _candidate_card(index: int) -> Control:
+	var recruitment := GameManager.recruitment
+	var hunters := GameManager.hunters
+	var candidate := recruitment.candidates[index]
+	var talent := GameManager.talents.get_talent(candidate)
+	var traits := PackedStringArray()
+	for definition in GameManager.traits.get_traits(candidate):
+		traits.append(definition.display_name)
+	var panel := PanelContainer.new()
+	panel.theme_type_variation = &"HunterCard"
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var star := PixelIcons.rect(&"star", 1)
+	star.modulate = Color.WHITE if talent != null else Color(1, 1, 1, 0.25)
+	star.tooltip_text = talent.display_name if talent != null else "No talent"
+	var name_label := UIKit.label(candidate.display_name, &"HudSmallLabel", false)
+	name_label.clip_text = true
+	var top := UIKit.hbox([star, name_label], 2)
+	var portrait := HunterPortrait.new().setup(candidate, null)
+	portrait.custom_minimum_size = Vector2(56, 56)
+	var class_label := UIKit.label("Lv.%d %s" % [candidate.level, hunters.get_definition(candidate).display_name], &"MutedLabel", false)
+	class_label.clip_text = true
+	var stats := UIKit.label("HP %d · ATK %.0f · DEF %.0f" % [hunters.get_stat(candidate, HunterService.MAX_HP),
+		hunters.get_stat(candidate, HunterService.ATTACK), hunters.get_stat(candidate, HunterService.DEFENSE)], &"MutedLabel", false)
+	stats.add_theme_font_size_override(&"font_size", 9)
+	stats.clip_text = true
+	var side := UIKit.vbox([class_label, stats], 1)
+	var trait_text := ", ".join(traits) + ("  ·  %s" % talent.display_name if talent != null else "")
+	var trait_label := UIKit.label(trait_text, &"HudAccentLabel")
+	trait_label.add_theme_font_size_override(&"font_size", 9)
+	var reason := recruitment.can_recruit(index)
+	var recruit := UIKit.button("Hire  %d g" % recruitment.get_recruit_cost(index), func() -> void:
+		var hunter := recruitment.recruit(index)
+		run_action("" if hunter != null else recruitment.can_recruit(index),
+			"%s joined the roster" % hunter.display_name if hunter != null else ""), &"PrimaryButton", reason)
+	recruit.custom_minimum_size.y = 32
+	recruit.add_theme_font_size_override(&"font_size", 11)
+	panel.add_child(UIKit.vbox([top, UIKit.hbox([portrait, side], 4), trait_label, recruit], 3))
+	return panel
 
 
 func _build_temple(content: VBoxContainer) -> void:
@@ -261,7 +291,7 @@ func _build_recipes(content: VBoxContainer, heading: String, note: String) -> vo
 				"Made %s" % title), &"PrimaryButton", reason)
 		craft.size_flags_horizontal = Control.SIZE_SHRINK_END
 		craft.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([UIKit.swatch(RarityColors.of(item.rarity), 14), info, craft])))
+		content.add_child(UIKit.card(UIKit.hbox([ItemIcon.new().setup(item, 32), info, craft])))
 
 
 static func _describe_consumable(item: ItemDefinition) -> String:
@@ -438,7 +468,7 @@ func _build_forge(content: VBoxContainer) -> void:
 			&"PrimaryButton", reason)
 		enhance.size_flags_horizontal = Control.SIZE_SHRINK_END
 		enhance.custom_minimum_size.x = 72
-		content.add_child(UIKit.card(UIKit.hbox([UIKit.swatch(RarityColors.of(item.rarity), 14), info, enhance])))
+		content.add_child(UIKit.card(UIKit.hbox([ItemIcon.new().setup(item, 32, "+%d" % level if level > 0 else ""), info, enhance])))
 
 
 func _build_portal(content: VBoxContainer) -> void:

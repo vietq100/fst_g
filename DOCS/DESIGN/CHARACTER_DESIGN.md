@@ -35,7 +35,7 @@ Every playable Hunter should support:
 
 MVP may use simplified animations.
 
-Implemented for Hunters: the chibi core (D49, `actors/hunter/chibi/`). A 15×29 px body (bald, white tank top, shorts in the Hunter's dye) on a 32×48 canvas, split into head, torso, two arms and two legs that frames move by whole pixels. Views: front, back, side (left = mirrored).
+Implemented for Hunters: the chibi core (D49, `actors/hunter/chibi/`). A 15×29 px body on a 32×48 canvas, split into head, torso, two arms and two legs that frames move by whole pixels. Views: front, back, side (left = mirrored). Layers (D51): hair (10 styles, 10 colours), class outfit (Warrior, Ranger, Rogue, Guardian; trousers in the Hunter's dye), class weapon (sword, bow, dagger, mace + shield).
 
 ```
 Hunter

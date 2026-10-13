@@ -132,3 +132,8 @@ Do not overwhelm the screen.
 ## Hunter dialog (2026-10-12)
 
 Tapping Info on a Hunter card opens `HunterDialog` (full-screen dialog, HUD hidden): name, reincarnation stars and purse, paper doll (weapon / accessory left, armor right, enhancement "+N" on worn items), rebirth points, tabs Info (grade, Lv + class, DPS, HP / satiety / mood / stamina / XP bars, ATK / DEF / CRIT / ATK SPD / MOVE), Skill&Trait, Gear (equip / remove) and Life (needs, purse transfers, duty, activity, bonds, history), and a red Close button.
+
+## Palette and map (2026-10-13, D52)
+
+- Theme colours follow the reference game: deep navy panels (`GameTheme.PANEL`), gold rims, green Primary (confirm) and red Danger (cancel / close) buttons, white numbers with a dark outline over the map, resource pills in the header, 36 px nav icons with a gold bar over the selected tab, round gold-rimmed Town / I / II / III buttons.
+- The map is top-down (square tiles, front-facing buildings, bridges over water) so the HUD reads like the reference screenshots.

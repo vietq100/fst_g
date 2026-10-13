@@ -19,6 +19,9 @@ func setup(hunter: HunterRuntime, service: HunterService, combat_service: Combat
 	name = String(hunter.unique_id)
 	add_to_group(GROUP)
 	_refresh_equipment_look()
+	var plate := ActorNameplate.new()
+	add_child(plate)
+	plate.setup(self, hunter.display_name, 42.0)
 	health.setup(_service.get_stat(hunter, HunterService.MAX_HP), hunter.current_hp)
 	health.health_changed.connect(_on_health_changed)
 	_service.hunter_changed.connect(_on_hunter_changed)
@@ -82,8 +85,8 @@ func _on_hunter_leveled_up(hunter: HunterRuntime, _new_level: int, healed: float
 	visual.play_level_up()
 
 
-## Skin and dye from the Hunter's look; the weapon tints the blade line (D49).
-## Outfits are not drawn yet (the chibi body has no outfit layer).
+## Skin, hair and dye from the Hunter's look, outfit from its base class, the weapon sprite from
+## the equipped item (or the class default) tinted by the item (D49, D53).
 func _refresh_equipment_look() -> void:
 	var look := visual as ChibiVisual
 	if look == null:
@@ -93,6 +96,10 @@ func _refresh_equipment_look() -> void:
 	look.dead = not runtime.alive
 	look.weapon_color = weapon.tint if weapon != null else DEFAULT_WEAPON_TINT
 	var definition := _service.get_definition(runtime)
-	var base_length := definition.weapon_length if definition != null else 12.0
+	look.set_class_style(ChibiBody.outfit_for(definition))
+	look.weapon_sprite = WeaponSprites.kind_for_item(weapon, look.get_default_weapon_sprite())
 	look.weapon_width = definition.weapon_width if definition != null else look.weapon_width
+	# Reach of the slash arc: the sprite's length, a little more for better gear.
+	var base_length := WeaponSprites.length_of(look.weapon_sprite) if WeaponSprites.has_kind(look.weapon_sprite) \
+		else (definition.weapon_length if definition != null else 12.0)
 	look.weapon_length = base_length + (2.0 if weapon != null and weapon.rarity >= ItemDefinition.Rarity.UNCOMMON else 0.0)

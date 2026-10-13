@@ -25,6 +25,10 @@ func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, ret
 	combat.setup(Hunter.GROUP, definition.attack_range, retarget_interval, combat_service)
 	auto_combat = true
 	repositions_in_range = not definition.is_boss
+	# HP bar while hurt; bosses also show their name.
+	var plate := ActorNameplate.new()
+	add_child(plate)
+	plate.setup(self, definition.display_name if definition.is_boss else "", 56.0 if definition.is_boss else 28.0)
 
 
 func get_team_group() -> StringName:

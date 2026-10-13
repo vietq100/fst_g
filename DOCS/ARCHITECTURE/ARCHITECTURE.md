@@ -34,14 +34,14 @@ Main
 ├── WorldContainer
 └── UI
 
-WorldMap (main map: Town + regions, D27)
+WorldMap (main map: Town + regions, D52)
 ├── Ground
 ├── NavigationRegion2D (baked from WorldService outlines; rebaked on layout change)
 ├── Entities (y-sorted)
-│   ├── Buildings (IsoBuilding ← BuildingService instances)
+│   ├── Buildings (TownBuilding ← BuildingService instances)
 │   ├── Props (trees / rocks / columns)
 │   ├── Actors
-│   └── gates, dungeon entrances
+│   └── bridges (GateVisual), dungeon entrances
 └── WorldCamera (drag, pinch / wheel zoom, follow)
 
 Expedition
@@ -118,11 +118,12 @@ Plain classes or nodes owned by `GameManager` (not autoloads):
 - `game/definitions/` — Resource classes for static data
 - `game/services/` — gameplay services
 - `game/runtime/` — runtime state objects (`HunterRuntime`, …): ids and plain values, serializable
-- `actors/common/` — reusable actor components (`HealthController`, `StateController`, `CombatController`, `Facing`, `PlaceholderVisual`)
+- `actors/common/` — reusable actor components (`HealthController`, `StateController`, `CombatController`, `Facing`, `PlaceholderVisual`, `ActorNameplate`)
+- `actors/enemies/` — enemy scenes; `MonsterBodies` + `MonsterVisual` (pixel goblin / skeleton), per-enemy visuals (slime, wolf, Forest Guardian)
 - `actors/hunter/` — Hunter actor scene
 - `actors/hunter/chibi/` — the chibi Hunter (D49): `ChibiBody` (32×48 body map, parts, facings, skin/dye recolour, cached frames and portraits), `ChibiAnimations` (frame tables), `ChibiVisual` (animation state machine, weapon, action effects)
-- `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `IsoBuilding` + `IsoBuildingVisual`, `WorldProp`, `GateVisual`, `DungeonEntrance`, ground, `WorldCamera`
-- `game/services/world_service.gd` — isometric geometry: tile ↔ world, regions, gates, navigation outlines
+- `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `TownBuilding` + `BuildingVisual`, `WorldProp`, `GateVisual`, `DungeonEntrance`, ground, `WaterShimmer`, `WorldCamera`
+- `game/services/world_service.gd` — top-down grid geometry (32 px tiles): tile ↔ world, regions, gates (bridges), navigation outlines
 - `world/test_arena/` — combat sandbox, reachable from the Town debug panel (debug builds only)
 - `world/vfx/` — world-space feedback (`CombatFeedback`, `DamageNumber`, `LevelUpBurst`, `LootPopup`)
 - `save/` — `SaveCodec` (snapshot ↔ services, migrations); `core/save_manager.gd` handles files, autosave and offline catch-up

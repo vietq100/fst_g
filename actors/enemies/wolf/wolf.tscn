@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy.gd" id="1_enemy"]
-[ext_resource type="Script" path="res://actors/enemies/wolf/wolf_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://actors/enemies/monster_visual.gd" id="2_visual"]
 [ext_resource type="Script" path="res://actors/common/health_controller.gd" id="3_health"]
 [ext_resource type="Script" path="res://actors/common/combat_controller.gd" id="4_combat"]
 [ext_resource type="Script" path="res://actors/common/state_controller.gd" id="5_state"]
@@ -17,6 +17,8 @@ script = ExtResource("1_enemy")
 
 [node name="Visual" type="Node2D" parent="."]
 script = ExtResource("2_visual")
+body_id = &"wolf"
+weapon_length = 0.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -4)

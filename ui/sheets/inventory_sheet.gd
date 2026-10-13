@@ -27,7 +27,7 @@ func _build(content: VBoxContainer) -> void:
 			run_action("" if inventory.sell_item(item_id, 1) > 0 else "Nothing to sell"), &"DangerButton")
 		sell.size_flags_horizontal = Control.SIZE_SHRINK_END
 		sell.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([UIKit.swatch(RarityColors.of(item.rarity), 14), name_label, sell])))
+		content.add_child(UIKit.card(UIKit.hbox([ItemIcon.new().setup(item, 32, "×%d" % stacks[item_id]), name_label, sell])))
 	content.add_child(UIKit.label("Spare equipment", &"AccentLabel"))
 	var instances := inventory.get_instances()
 	if instances.is_empty():
@@ -41,5 +41,5 @@ func _build(content: VBoxContainer) -> void:
 			run_action("" if inventory.sell_instance(instance_id) > 0 else "Cannot sell"), &"DangerButton")
 		sell.size_flags_horizontal = Control.SIZE_SHRINK_END
 		sell.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([UIKit.swatch(RarityColors.of(item.rarity), 14), info, sell])))
+		content.add_child(UIKit.card(UIKit.hbox([ItemIcon.new().setup(item, 32), info, sell])))
 	content.add_child(UIKit.label("Equip items from a Hunter's panel.", &"MutedLabel"))

@@ -1,9 +1,9 @@
 class_name HunterAppearance
 extends RefCounted
 ## Look of one Hunter (CHARACTER_DESIGN.md §12, DECISIONS.md D47). Plain values only.
-## The chibi body (D49) uses skin and dye; gender, hair style and hair colour are kept in saves
-## for the future hair / body-type layers. The outfit is not stored here, it follows the
-## equipped armor (ItemDefinition.outfit_id).
+## The chibi body (D49, D51) draws skin, dye, hair style and hair colour; gender is kept in saves
+## for a future body-type layer. The outfit is not stored here: the sprite follows the Hunter's
+## base class (ChibiBody.outfit_for).
 
 const MALE := &"male"
 const FEMALE := &"female"

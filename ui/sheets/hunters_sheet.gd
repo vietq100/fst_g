@@ -92,13 +92,14 @@ func _card(runtime: HunterRuntime) -> Control:
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var grade_label := UIKit.label(grade[0], &"HudSmallLabel", false)
 	grade_label.add_theme_color_override(&"font_color", grade[1])
+	grade_label.add_theme_font_size_override(&"font_size", 13)
 	grade_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 	var top := UIKit.hbox([star, name_label, grade_label], 2)
 	var level_label := UIKit.label("Lv.%d %s" % [runtime.level, definition.display_name], &"MutedLabel", false)
 	level_label.clip_text = true
 	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var portrait := HunterPortrait.new().setup(runtime, gm.equipment)
-	portrait.custom_minimum_size = Vector2(52, 52)
+	portrait.custom_minimum_size = Vector2(56, 56)
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var status := UIKit.label(_status(runtime), &"HudAccentLabel", false)
 	status.add_theme_font_size_override(&"font_size", 9)

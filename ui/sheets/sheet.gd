@@ -33,6 +33,7 @@ func _ready() -> void:
 	close.custom_minimum_size = Vector2(36, 36)
 	_header = UIKit.hbox([_title_label, close])
 	layout.add_child(_header)
+	layout.add_child(UIKit.separator())
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL

@@ -100,19 +100,14 @@ func _slot(slot: StringName) -> Control:
 		panel.add_child(hint)
 		return panel
 	var enhance := gm.inventory.get_enhance(instance_id)
-	var swatch := UIKit.swatch(item.tint, 20)
-	swatch.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var icon := ItemIcon.new().setup(item, 28, "+%d" % enhance if enhance > 0 else "")
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var name_label := UIKit.label(item.display_name, &"MutedLabel", false)
 	name_label.add_theme_font_size_override(&"font_size", 8)
 	name_label.clip_text = true
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
-	var column := UIKit.vbox([swatch, name_label], 1)
-	if enhance > 0:
-		var plus := UIKit.label("+%d" % enhance, &"HudAccentLabel", false)
-		plus.add_theme_font_size_override(&"font_size", 9)
-		plus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		column.add_child(plus)
+	var column := UIKit.vbox([icon, name_label], 1)
 	panel.add_child(column)
 	panel.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed:

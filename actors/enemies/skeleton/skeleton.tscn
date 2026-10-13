@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy.gd" id="1_enemy"]
-[ext_resource type="Script" path="res://actors/common/placeholder_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://actors/enemies/monster_visual.gd" id="2_visual"]
 [ext_resource type="Script" path="res://actors/common/health_controller.gd" id="3_health"]
 [ext_resource type="Script" path="res://actors/common/combat_controller.gd" id="4_combat"]
 [ext_resource type="Script" path="res://actors/common/state_controller.gd" id="5_state"]
@@ -17,14 +17,11 @@ script = ExtResource("1_enemy")
 
 [node name="Visual" type="Node2D" parent="."]
 script = ExtResource("2_visual")
-body_color = Color(0.82, 0.8, 0.72, 1)
-accent_color = Color(0.35, 0.33, 0.3, 1)
-skin_color = Color(0.9, 0.88, 0.8, 1)
-body_size = Vector2(11, 17)
-ear_length = 0.0
+body_id = &"skeleton"
+weapon_sprite = &"bone"
 weapon_color = Color(0.6, 0.62, 0.66, 1)
 weapon_length = 12.0
-weapon_width = 2.0
+weapon_width = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -3)

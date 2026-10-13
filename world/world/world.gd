@@ -1,7 +1,8 @@
 class_name WorldMap
 extends Node2D
-## The main map (WORLD_DESIGN.md, DECISIONS.md D27–D28, D33): Town on top, Ancient Ruins (right),
-## Dark Forest (left), Goblin Cave (bottom), joined by gates; dungeon entrances on the outer edges.
+## The main map (WORLD_DESIGN.md, DECISIONS.md D52, D28, D33): top-down grid with the Town
+## (top-left), Ancient Ruins (top-right), Dark Forest (bottom-left) and Goblin Cave (bottom-right),
+## joined by bridges; dungeon entrances on rock ledges off the outer edges.
 ## The screen is a camera over it: drag to pan, pinch / wheel to zoom, tap a Hunter to follow.
 ## Buildings mirror BuildingService; placement mode previews a ghost and asks UIRoot to confirm.
 
@@ -45,7 +46,7 @@ var _buildings_root: Node2D
 var _actors: Node2D
 var _camera: WorldCamera
 var _panel: DebugPanel
-var _building_nodes: Dictionary[StringName, IsoBuilding] = {}
+var _building_nodes: Dictionary[StringName, TownBuilding] = {}
 var _entrances: Array[DungeonEntrance] = []
 var _spawners: Dictionary[StringName, RegionSpawner] = {}
 var _staff: Dictionary[StringName, StaffWorker] = {}
@@ -72,7 +73,7 @@ var _placing: StringName = &""
 var _placing_building: StringName = &""
 var _placing_instance: StringName = &""
 var _placing_tile := Vector2i.ZERO
-var _ghost: IsoBuildingVisual
+var _ghost: BuildingVisual
 
 
 func _ready() -> void:
@@ -108,7 +109,16 @@ func _build_scene() -> void:
 	_ground.set_script(preload("res://world/world/world_ground.gd"))
 	add_child(_ground)
 	var plaza := _town_plaza()
-	_ground.setup(world, _town_roads(plaza), plaza, world.get_town_pond())
+	var ledges: Array[Vector2i] = []
+	for definition in DataRegistry.get_all(&"expedition"):
+		var expedition := definition as ExpeditionDefinition
+		if expedition.region_id != &"":
+			ledges.append(expedition.entrance_tile)
+	_ground.setup(world, _town_roads(plaza), plaza, world.get_town_pond(), ledges)
+	var shimmer := WaterShimmer.new()
+	shimmer.name = "WaterShimmer"
+	shimmer.setup(world)
+	add_child(shimmer)
 	RenderingServer.set_default_clear_color(Color("1b3d4a"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"
@@ -152,7 +162,7 @@ func _build_scene() -> void:
 	_camera.zoom = Vector2(START_ZOOM, START_ZOOM)
 	_camera.position = world.region_center(world.get_town())
 	add_child(_camera)
-	_ghost = IsoBuildingVisual.new()
+	_ghost = BuildingVisual.new()
 	_ghost.ghost = true
 	_ghost.visible = false
 	_ghost.z_index = 10
@@ -327,7 +337,7 @@ func get_hunter_actor(unique_id: StringName) -> Hunter:
 	return _hunter_actors.get(unique_id)
 
 
-func get_building_node(instance_id: StringName) -> IsoBuilding:
+func get_building_node(instance_id: StringName) -> TownBuilding:
 	return _building_nodes.get(instance_id)
 
 
@@ -357,8 +367,8 @@ func _hunter_at(world_position: Vector2) -> Hunter:
 ## Front-most building under the point (largest y first, matching the draw order).
 func _building_at(world_position: Vector2) -> StringName:
 	var nodes := _building_nodes.values()
-	nodes.sort_custom(func(a: IsoBuilding, b: IsoBuilding) -> bool: return a.position.y > b.position.y)
-	for node: IsoBuilding in nodes:
+	nodes.sort_custom(func(a: TownBuilding, b: TownBuilding) -> bool: return a.position.y > b.position.y)
+	for node: TownBuilding in nodes:
 		if node.hit_test(world_position):
 			return node.instance_id
 	return &""
@@ -367,20 +377,20 @@ func _building_at(world_position: Vector2) -> StringName:
 # --- Buildings (BuildingService mirror) --------------------------------------------------------
 
 func _spawn_building(placed: BuildingService.Placed) -> void:
-	var node := IsoBuilding.new()
+	var node := TownBuilding.new()
 	node.setup(placed, GameManager.buildings.get_definition(placed.building_id))
 	_buildings_root.add_child(node)
 	_building_nodes[placed.instance_id] = node
 
 
 func _on_building_moved(placed: BuildingService.Placed) -> void:
-	var node: IsoBuilding = _building_nodes.get(placed.instance_id)
+	var node: TownBuilding = _building_nodes.get(placed.instance_id)
 	if node != null:
 		node.refresh(placed)
 
 
 func _on_building_removed(placed: BuildingService.Placed) -> void:
-	var node: IsoBuilding = _building_nodes.get(placed.instance_id)
+	var node: TownBuilding = _building_nodes.get(placed.instance_id)
 	_building_nodes.erase(placed.instance_id)
 	if node != null:
 		node.queue_free()
@@ -408,7 +418,7 @@ func _rebake() -> void:
 		_send_home(hunter)
 
 
-func _building_node(building_id: StringName) -> IsoBuilding:
+func _building_node(building_id: StringName) -> TownBuilding:
 	var placed := GameManager.buildings.find_first(building_id)
 	return _building_nodes.get(placed.instance_id) if placed != null else null
 
@@ -434,7 +444,7 @@ func begin_move(instance_id: StringName) -> void:
 	if placed == null:
 		return
 	var definition := GameManager.buildings.get_definition(placed.building_id)
-	var node: IsoBuilding = _building_nodes.get(instance_id)
+	var node: TownBuilding = _building_nodes.get(instance_id)
 	if node != null:
 		node.visual.modulate.a = 0.35
 	_start_placement(&"move", placed.building_id, instance_id, definition, placed.tile)
@@ -455,7 +465,7 @@ func _start_placement(mode: StringName, building_id: StringName, instance_id: St
 
 func _set_ghost_tile(tile: Vector2i) -> void:
 	_placing_tile = tile
-	_ghost.position = WorldService.tile_to_world(Vector2(tile + _ghost.footprint))
+	_ghost.position = TownBuilding.origin_for(tile, _ghost.footprint)
 	var reason := get_placement_reason()
 	_ghost.ghost_valid = reason.is_empty()
 	var definition := GameManager.buildings.get_definition(_placing_building)
@@ -493,7 +503,7 @@ func confirm_placement() -> String:
 func cancel_placement() -> void:
 	if _placing == &"":
 		return
-	var node: IsoBuilding = _building_nodes.get(_placing_instance)
+	var node: TownBuilding = _building_nodes.get(_placing_instance)
 	if node != null:
 		node.visual.modulate.a = 1.0
 	_placing = &""
@@ -564,8 +574,8 @@ func _spawn_props() -> void:
 				prop.size = scale
 				match region.props:
 					RegionDefinition.Props.TREES:
-						prop.kind = WorldProp.Kind.TREE
-						prop.tint = Color("23452b").lerp(Color("2f5a33"), rng.randf())
+						prop.kind = WorldProp.Kind.PINE
+						prop.tint = Color("1f4a3a").lerp(Color("2d5e40"), rng.randf())
 					RegionDefinition.Props.ROCKS:
 						prop.kind = WorldProp.Kind.ROCK
 						prop.tint = Color("6b5f52").lerp(Color("7d7062"), rng.randf())
@@ -590,7 +600,7 @@ func _spawn_pond_obstacle(props: Node2D) -> void:
 	props.add_child(body)
 
 
-## Trees along the Town's back edges (the screen's top corner) so it feels enclosed.
+## Trees along the Town's back (top) edge, behind the fence, so it feels enclosed.
 func _spawn_town_border(props: Node2D, rng: RandomNumberGenerator, placed: Array[Vector2]) -> void:
 	var town := world.get_town()
 	if town == null:
@@ -599,7 +609,7 @@ func _spawn_town_border(props: Node2D, rng: RandomNumberGenerator, placed: Array
 	var pond := world.get_town_pond().grow(1)
 	for gx in range(rect.position.x, rect.end.x):
 		for gy in range(rect.position.y, rect.end.y):
-			if gx - rect.position.x > 1 and gy - rect.position.y > 1:
+			if gy - rect.position.y > 1:
 				continue
 			var tile := Vector2i(gx, gy)
 			if pond.has_point(tile) or rng.randf() > 0.55:
@@ -868,7 +878,7 @@ func get_home_position(runtime: HunterRuntime) -> Vector2:
 	match activity:
 		ActivityService.SLEEPING:
 			var home := GameManager.housing.get_home(runtime)
-			var house: IsoBuilding = _building_nodes.get(home.instance_id) if home != null else null
+			var house: TownBuilding = _building_nodes.get(home.instance_id) if home != null else null
 			if house != null:
 				return house.get_door_point()
 			return plaza + Vector2(70.0 + (index % 3) * 16.0, 24.0 + (index / 3) * 12.0)

@@ -64,7 +64,7 @@ static func bar(value: float, maximum: float, variation: StringName, text: Strin
 		caption.text = text
 		caption.theme_type_variation = &"MutedLabel"
 		caption.add_theme_color_override(&"font_color", GameTheme.TEXT)
-		caption.add_theme_color_override(&"font_outline_color", Color("14100d"))
+		caption.add_theme_color_override(&"font_outline_color", GameTheme.INK)
 		caption.add_theme_constant_override(&"outline_size", 3)
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

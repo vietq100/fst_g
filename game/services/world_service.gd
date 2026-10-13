@@ -1,12 +1,12 @@
 class_name WorldService
 extends RefCounted
-## Isometric world geometry (DECISIONS.md D27): tile ↔ world, regions, gates between
-## neighbouring regions, region lookup. Pure geometry: no Nodes, no gameplay rules.
-## Tile (gx, gy) → world ((gx − gy) × 32, (gx + gy) × 16); a tile's diamond has its top corner there.
+## Top-down world geometry (DECISIONS.md D52, replacing the isometric D27): tile ↔ world, regions,
+## gates (bridges) between neighbouring regions, region lookup. Pure geometry: no Nodes, no
+## gameplay rules. Tile (gx, gy) → world (gx × 32, gy × 32); a tile's square has its top-left
+## corner there. Buildings and props are drawn front-facing (3/4 view) on this grid.
 
-const TILE_W := 64.0
-const TILE_H := 32.0
-## Gates are this many tiles wide (the corridor between two regions).
+const TILE := 32.0
+## Gates are this many tiles wide (the bridge between two regions).
 const GATE_WIDTH := 2
 
 ## A passage between two regions across the 2-tile gap.
@@ -30,14 +30,12 @@ func _init(registry: Node) -> void:
 
 
 static func tile_to_world(tile: Vector2) -> Vector2:
-	return Vector2((tile.x - tile.y) * TILE_W * 0.5, (tile.x + tile.y) * TILE_H * 0.5)
+	return tile * TILE
 
 
 ## Fractional tile coordinates of a world point.
 static func world_to_tile(point: Vector2) -> Vector2:
-	var a := point.x / (TILE_W * 0.5)
-	var b := point.y / (TILE_H * 0.5)
-	return Vector2((a + b) * 0.5, (b - a) * 0.5)
+	return point / TILE
 
 
 static func tile_at(point: Vector2) -> Vector2i:
@@ -50,7 +48,7 @@ static func tile_center(tile: Vector2i) -> Vector2:
 	return tile_to_world(Vector2(tile) + Vector2(0.5, 0.5))
 
 
-## World-space diamond (top, right, bottom, left) covering a tile rectangle.
+## World-space square (top-left, top-right, bottom-right, bottom-left) covering a tile rectangle.
 static func rect_polygon(rect: Rect2i, grow: float = 0.0) -> PackedVector2Array:
 	var top := Vector2(rect.position) - Vector2(grow, grow)
 	var size := Vector2(rect.size) + Vector2(grow, grow) * 2.0
@@ -62,7 +60,12 @@ static func rect_polygon(rect: Rect2i, grow: float = 0.0) -> PackedVector2Array:
 	])
 
 
-## The Town's decorative pond (north corner): blocks building placement and walking.
+## World-space rectangle covering a tile rectangle.
+static func rect_to_world(rect: Rect2i) -> Rect2:
+	return Rect2(tile_to_world(Vector2(rect.position)), Vector2(rect.size) * TILE)
+
+
+## The Town's decorative pond (top-left corner): blocks building placement and walking.
 func get_town_pond() -> Rect2i:
 	var town := get_town()
 	if town == null:
@@ -134,7 +137,7 @@ func get_bounds(margin: float = 64.0) -> Rect2:
 	return bounds.grow(margin)
 
 
-## Walkable outlines: every region diamond plus every gate corridor (overlapping the regions
+## Walkable outlines: every region square plus every gate corridor (overlapping the regions
 ## by one tile so the baked mesh connects).
 func navigation_outlines() -> Array[PackedVector2Array]:
 	var outlines: Array[PackedVector2Array] = []

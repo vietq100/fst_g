@@ -4,8 +4,11 @@ extends ActorVisual
 ## Hunter drawn as the 32×48 chibi body (D49). Origin is at the feet.
 ## Picks a looping animation from the actor's state (idle / walk / run / death) and plays
 ## one-shot actions on top (attack, skill, hit, pickup, loot, interact), higher priority first
-## (ChibiAnimations.PRIORITY). Frames come from ChibiBody; the weapon is a tinted line held in
-## the right hand until weapon art exists. Presentation only: gameplay never reads it.
+## (ChibiAnimations.PRIORITY). Frames come from ChibiBody (outfit = the base class). The weapon
+## is a WeaponSprites pixel sprite (`weapon_sprite`, picked from the equipped item or the class
+## default) rotated in the right hand to the frame's weapon angle and tinted by the item; without
+## a sprite a line is drawn by kind (sword, bow, dagger, mace). Guardians also carry a shield on
+## the left arm. Presentation only: gameplay never reads it.
 
 ## Injured but alive / dead body tints (modulate; self_modulate is the hit flash + status tint).
 const DOWNED_TINT := Color(0.72, 0.7, 0.76)
@@ -19,12 +22,51 @@ const SPARKLE_COLOR := Color("fff2a8")
 const ITEM_COLOR := Color("e0b04a")
 const DUST_COLOR := Color(0.85, 0.8, 0.7, 0.8)
 const SOUL_COLOR := Color(0.85, 0.95, 1.0, 0.8)
+const SWORD := &"sword"
+const BOW := &"bow"
+const DAGGER := &"dagger"
+const MACE := &"mace"
+## Base class -> [weapon kind, shield, default weapon sprite].
+const CLASS_STYLES := {
+	&"warrior": [SWORD, false, &"sword"],
+	&"ranger": [BOW, false, &"bow"],
+	&"rogue": [DAGGER, false, &"dagger"],
+	&"guardian": [MACE, true, &"mace"],
+}
+const GRIP_COLOR := Color("5a3a26")
+const GUARD_COLOR := Color("d9b356")
+const STRING_COLOR := Color(0.92, 0.9, 0.82, 0.85)
+const SHIELD_FACE := Color("41629e")
+const SHIELD_RIM := Color("c9d0d8")
+const SHIELD_EMBLEM := Color("e8c35a")
 const FX_DURATION := {"step": 0.3, "slash": 0.18, "charge": 0.25, "burst": 0.45, "sparkle": 0.5, "tap": 0.25, "dust": 0.4, "soul": 1.4}
 
 var appearance: HunterAppearance = HunterAppearance.new():
 	set(value):
 		appearance = value if value != null else HunterAppearance.new()
 		_frames_cache.clear()
+		queue_redraw()
+## ChibiBody outfit (base class id, &"" = reference tank top).
+var outfit: StringName = &"":
+	set(value):
+		if outfit == value:
+			return
+		outfit = value
+		_frames_cache.clear()
+		queue_redraw()
+## How the weapon is drawn: SWORD, BOW, DAGGER or MACE.
+var weapon_kind: StringName = SWORD:
+	set(value):
+		weapon_kind = value
+		queue_redraw()
+var shield := false:
+	set(value):
+		shield = value
+		queue_redraw()
+## WeaponSprites kind drawn in the hand; &"" falls back to the line weapon.
+var weapon_sprite: StringName = &"":
+	set(value):
+		weapon_sprite = value
 		queue_redraw()
 var weapon_color := Color("d8dde3"):
 	set(value):
@@ -60,6 +102,21 @@ var _frames_cache: Dictionary = {}
 
 func _ready() -> void:
 	queue_redraw()
+
+
+## Outfit, weapon kind and shield for a base class (ChibiBody.outfit_for).
+func set_class_style(base_class: StringName) -> void:
+	outfit = base_class
+	var style: Array = CLASS_STYLES.get(base_class, [SWORD, false, &"sword"])
+	weapon_kind = style[0]
+	shield = style[1]
+	weapon_sprite = style[2]
+
+
+## Default sprite kind of the current class (for the equipped item lookup).
+func get_default_weapon_sprite() -> StringName:
+	var style: Array = CLASS_STYLES.get(outfit, [SWORD, false, &"sword"])
+	return style[2]
 
 
 ## Plays a one-shot animation (ChibiAnimations names). Ignored while a higher-priority one plays,
@@ -206,12 +263,18 @@ func _draw() -> void:
 	var textures := _textures(_animation)
 	var show_weapon: bool = not frame.get("lying", false) and not frame.get("item", false)
 	var behind := facing == Facing.Direction.UP
+	# The shield arm is the far arm in the side view.
+	var shield_behind := ChibiBody.view_of(facing) == ChibiBody.View.SIDE
+	if shield and show_weapon and shield_behind:
+		_draw_shield(frame)
 	if show_weapon and behind:
 		_draw_weapon(frame)
 	if not textures.is_empty():
 		draw_texture(textures[clampi(_frame, 0, textures.size() - 1)], -Vector2(ChibiBody.FEET))
 	if show_weapon and not behind:
 		_draw_weapon(frame)
+	if shield and show_weapon and not shield_behind:
+		_draw_shield(frame)
 	if frame.get("item", false):
 		var hand := _hand_position(frame)
 		draw_rect(Rect2(hand + Vector2(-2, -5), Vector2(4, 4)), OUTLINE_COLOR)
@@ -223,7 +286,7 @@ func _draw() -> void:
 func _textures(animation: StringName) -> Array[ImageTexture]:
 	var key := "%d|%s" % [facing, animation]
 	if not _frames_cache.has(key):
-		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation)
+		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation, outfit)
 	return _frames_cache[key]
 
 
@@ -237,15 +300,107 @@ func _hand_position(frame: Dictionary) -> Vector2:
 	return hand
 
 
+## Shield hand (left arm) relative to the feet, mirrored when facing left.
+func _off_hand_position(frame: Dictionary) -> Vector2:
+	var view := ChibiBody.view_of(facing)
+	var offsets := ChibiAnimations.resolve_offsets(frame, view == ChibiBody.View.SIDE)
+	var hand := ChibiBody.off_hand_position(view, offsets[&"arm_l"])
+	if facing == Facing.Direction.LEFT:
+		hand.x = -hand.x
+	return hand
+
+
 func _draw_weapon(frame: Dictionary) -> void:
 	var hand := _hand_position(frame)
 	var angle: float = frame.get("weapon", ChibiAnimations.WEAPON_REST)
+	if weapon_kind == BOW:
+		# A bow is held upright, not swung.
+		angle = clampf(angle, -20.0, 30.0)
 	var direction := Vector2.UP.rotated(deg_to_rad(angle))
-	if facing == Facing.Direction.LEFT or facing == Facing.Direction.UP:
+	var mirrored := facing == Facing.Direction.LEFT or facing == Facing.Direction.UP
+	if mirrored:
 		direction.x = -direction.x
+	if WeaponSprites.has_kind(weapon_sprite):
+		_draw_weapon_sprite(hand, angle, mirrored)
+		return
+	# Perpendicular to the weapon, pointing to the side the Hunter faces.
+	var across := Vector2(-direction.y, direction.x) * (-1.0 if mirrored else 1.0)
+	match weapon_kind:
+		BOW:
+			_draw_bow(hand, direction, across)
+		MACE:
+			_draw_mace(hand, direction)
+		_:
+			_draw_blade(hand, direction, across)
+
+
+## Pixel weapon rotated about the hand; mirrored facings flip the sprite and the swing.
+func _draw_weapon_sprite(hand: Vector2, angle: float, mirrored: bool) -> void:
+	var texture := WeaponSprites.texture(weapon_sprite, weapon_color)
+	var grip := Vector2(WeaponSprites.grip_of(weapon_sprite)) + Vector2(0.5, 0.5)
+	var rotation := deg_to_rad(angle) * (-1.0 if mirrored else 1.0)
+	draw_set_transform(hand, rotation, Vector2(-1.0 if mirrored else 1.0, 1.0))
+	draw_texture(texture, -grip)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Sword or dagger: grip, crossguard, blade with a bright edge.
+func _draw_blade(hand: Vector2, direction: Vector2, across: Vector2) -> void:
+	var dagger := weapon_kind == DAGGER
+	var guard := 2.0 if dagger else 3.0
+	var blade_width := weapon_width if dagger else weapon_width + 1.0
+	var base := hand + direction * 2.0
 	var tip := hand + direction * weapon_length
-	draw_line(hand, tip, OUTLINE_COLOR, weapon_width + 2.0)
-	draw_line(hand, tip, weapon_color, weapon_width)
+	var pommel := hand - direction * 2.0
+	draw_line(pommel, base, OUTLINE_COLOR, 3.0)
+	draw_line(pommel, base, GRIP_COLOR, 1.0)
+	draw_line(base, tip + direction, OUTLINE_COLOR, blade_width + 2.0)
+	draw_line(base, tip, weapon_color, blade_width)
+	if blade_width >= 2.0:
+		draw_line(base + direction, tip - direction, weapon_color.lightened(0.45), 1.0)
+	draw_line(base + across * guard, base - across * guard, OUTLINE_COLOR, 3.0)
+	draw_line(base + across * (guard - 1.0), base - across * (guard - 1.0), GUARD_COLOR, 1.0)
+
+
+## Short bow: curved limb gripped at its middle, string behind the hand.
+func _draw_bow(hand: Vector2, direction: Vector2, across: Vector2) -> void:
+	var half := weapon_length * 0.5
+	var limb := PackedVector2Array()
+	for i in 9:
+		var t := lerpf(-1.0, 1.0, i / 8.0)
+		limb.append(hand + direction * t * half + across * (1.0 - t * t) * 3.5 - across * 1.5)
+	draw_line(limb[0], limb[8], STRING_COLOR, 1.0)
+	draw_polyline(limb, OUTLINE_COLOR, 3.0)
+	draw_polyline(limb, weapon_color, 1.0)
+	draw_line(hand - direction * 1.5, hand + direction * 1.5, GRIP_COLOR, 2.0)
+
+
+## Mace: handle and a spiked round head.
+func _draw_mace(hand: Vector2, direction: Vector2) -> void:
+	var head := hand + direction * (weapon_length - 2.0)
+	var pommel := hand - direction * 2.0
+	draw_line(pommel, head, OUTLINE_COLOR, 3.0)
+	draw_line(pommel, head, GRIP_COLOR, 1.0)
+	for i in 4:
+		var spike := direction.rotated(PI * 0.25 + i * PI * 0.5)
+		draw_line(head + spike * 2.0, head + spike * 4.5, OUTLINE_COLOR, 1.5)
+	draw_circle(head, 3.5, OUTLINE_COLOR)
+	draw_circle(head, 2.5, weapon_color)
+	draw_circle(head + Vector2(-0.8, -0.8), 1.0, weapon_color.lightened(0.45))
+
+
+## Kite shield on the left arm; seen from behind it shows its plain back.
+func _draw_shield(frame: Dictionary) -> void:
+	var at := _off_hand_position(frame) + Vector2(0, -2)
+	var points := PackedVector2Array([at + Vector2(-3, -4), at + Vector2(3, -4), at + Vector2(3, 1),
+		at + Vector2(0, 4), at + Vector2(-3, 1)])
+	draw_colored_polygon(BuildingVisual._grow(points, 1.0), OUTLINE_COLOR)
+	if facing == Facing.Direction.UP:
+		draw_colored_polygon(points, SHIELD_RIM.darkened(0.35))
+		return
+	draw_colored_polygon(points, SHIELD_FACE)
+	draw_line(at + Vector2(-3, -3.5), at + Vector2(3, -3.5), SHIELD_RIM, 1.0)
+	draw_rect(Rect2(at + Vector2(-1, -2), Vector2(2, 3)), SHIELD_EMBLEM)
 
 
 func _draw_fx(effect: Dictionary) -> void:
