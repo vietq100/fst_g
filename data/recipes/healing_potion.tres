@@ -16,7 +16,7 @@ quantity = 1
 [resource]
 script = ExtResource("1_recipe")
 id = &"healing_potion"
-display_name = "Healing Potion"
+display_name = "recipe.healing_potion.name"
 result_item_id = &"healing_potion"
 result_quantity = 1
 gold_cost = 0

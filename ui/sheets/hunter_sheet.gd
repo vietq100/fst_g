@@ -33,7 +33,7 @@ func _watch() -> Array:
 		[gm.inventory, &"inventory_changed"], [gm.bonds, &"bond_changed"], [gm.purses, &"purse_changed"],
 		[gm.wallet, &"gold_changed"], [gm.regions, &"loot_bag_changed"],
 		[gm.corpses, &"carrier_assigned"], [gm.corpses, &"staff_dispatched"], [gm.corpses, &"body_picked_up"],
-		[gm.corpses, &"body_delivered"]]
+		[gm.corpses, &"body_delivered"], [gm.class_skills, &"skills_changed"]]
 
 
 func _build(content: VBoxContainer) -> void:
@@ -45,13 +45,12 @@ func _build(content: VBoxContainer) -> void:
 	var required := gm.stats.required_xp(runtime.level)
 	var cap := gm.stats.level_cap(gm.progress.town_level)
 	var header := UIKit.vbox([
-		UIKit.label("%s · Lv %d%s%s" % [definition.display_name, runtime.level, " (cap)" if runtime.level >= cap else "",
-			" · reborn %d×" % runtime.reincarnations if runtime.reincarnations > 0 else ""]),
-		UIKit.bar(runtime.current_hp, max_hp, &"HpBar", "HP %d / %d" % [roundi(runtime.current_hp), roundi(max_hp)]),
-		UIKit.bar(runtime.xp, required, &"XpBar", "XP %d / %d" % [runtime.xp, required]),
-		UIKit.label("ATK %.1f · DEF %.1f · SPD %d · Crit %d%%" % [
-			hunters.get_stat(runtime, HunterService.ATTACK), hunters.get_stat(runtime, HunterService.DEFENSE),
-			roundi(hunters.get_stat(runtime, HunterService.MOVE_SPEED)), roundi(hunters.get_stat(runtime, HunterService.CRITICAL_CHANCE) * 100.0)],
+		UIKit.label(_header_text(definition.display_name, cap)),
+		UIKit.bar(runtime.current_hp, max_hp, &"HpBar", Loc.t("ui.hunter.hp_bar", {"current": roundi(runtime.current_hp), "max": roundi(max_hp)})),
+		UIKit.bar(runtime.xp, required, &"XpBar", Loc.t("ui.hunter.xp_bar", {"current": runtime.xp, "max": required})),
+		UIKit.label(Loc.t("ui.hunter.stats_line", {
+			"atk": "%.1f" % hunters.get_stat(runtime, HunterService.ATTACK), "def": "%.1f" % hunters.get_stat(runtime, HunterService.DEFENSE),
+			"spd": roundi(hunters.get_stat(runtime, HunterService.MOVE_SPEED)), "crit": roundi(hunters.get_stat(runtime, HunterService.CRITICAL_CHANCE) * 100.0)}),
 			&"MutedLabel"),
 		UIKit.label(_status_text(), &"AccentLabel"),
 		UIKit.label(_talent_text(), &"MutedLabel"),
@@ -60,13 +59,36 @@ func _build(content: VBoxContainer) -> void:
 	var portrait := HunterPortrait.new().setup(runtime, gm.equipment)
 	portrait.custom_minimum_size = Vector2(64, 64)
 	content.add_child(UIKit.hbox([portrait, header], 8))
-	content.add_child(UIKit.button("Follow on the map", func() -> void: follow_requested.emit(runtime.unique_id), &"",
-		"" if runtime.expedition_id == &"" or GameManager.expeditions.is_running() else "Not on the map"))
+	content.add_child(UIKit.button(Loc.t("ui.hunter.follow"), func() -> void: follow_requested.emit(runtime.unique_id), &"",
+		"" if runtime.expedition_id == &"" or GameManager.expeditions.is_running() else Loc.t("ui.hunter.not_on_map")))
 	_build_needs_and_purse(content)
 	_build_equipment(content)
 	_build_traits_and_mood(content)
 	_build_activity(content)
 	_build_bonds_and_history(content)
+
+
+## "Warrior · Lv 5 (cap) · reborn 2×": class, level, level-cap mark and rebirth count.
+func _header_text(class_name_text: String, cap: int) -> String:
+	var key := "ui.hunter.header_cap" if runtime.level >= cap else "ui.hunter.header"
+	var text := Loc.t(key, {"class": class_name_text, "level": runtime.level})
+	if runtime.reincarnations > 0:
+		text = Loc.t("ui.hunter.header_reborn", {"header": text, "count": runtime.reincarnations})
+	return text
+
+
+## Name of an activity id: its definition's name, else a key per id (sleeping, eating); "" for none.
+static func activity_label(activity_id: StringName) -> String:
+	var definition := GameManager.activities.get_definition(activity_id)
+	if definition != null:
+		return definition.display_name
+	if activity_id == &"":
+		return ""
+	var key := "ui.hunter.activity.%s" % activity_id
+	if Loc.has_key(key):
+		return Loc.t(key)
+	var task_key := "ui.hunter.task.%s" % activity_id
+	return Loc.t(task_key) if Loc.has_key(task_key) else ""
 
 
 func _skills_text() -> String:
@@ -76,71 +98,84 @@ func _skills_text() -> String:
 		if skill != null and runtime.skills[skill_id] > 0:
 			parts.append("%s %d" % [skill.display_name, runtime.skills[skill_id]])
 	if runtime.rebirth_points > 0:
-		parts.append("%d rebirth pt" % runtime.rebirth_points)
-	return "Skills: %s" % (", ".join(parts) if not parts.is_empty() else "none")
+		parts.append(Loc.t("ui.hunter.rebirth_pt", {"points": runtime.rebirth_points}))
+	return Loc.t("ui.hunter.skills", {"skills": ", ".join(parts) if not parts.is_empty() else Loc.t("ui.hunter.skills_none")})
 
 
 func _talent_text() -> String:
 	var talent := GameManager.talents.get_talent(runtime)
 	if talent == null:
-		return "No talent"
-	return "Talent: %s — %s" % [talent.display_name, talent.description]
+		return Loc.t("ui.hunter.no_talent")
+	return Loc.t("ui.hunter.talent", {"name": talent.display_name, "desc": talent.description})
 
 
 func _status_text() -> String:
 	var corpses: CorpseService = GameManager.corpses
 	if corpses.is_body(runtime):
 		if not corpses.has_carrier(runtime):
-			return "Fallen — waiting for someone to carry them home"
+			return Loc.t("ui.hunter.status.fallen_waiting")
 		var carrier := corpses.get_carrier(runtime)
-		var who := carrier.display_name if carrier != null else "Village staff"
-		return "Fallen — %s %s" % [who, "is carrying them to the Temple" if corpses.is_carried(runtime) else "is on the way"]
+		var who := carrier.display_name if carrier != null else Loc.t("ui.hunter.status.village_staff")
+		var key := "ui.hunter.status.fallen_carrying" if corpses.is_carried(runtime) else "ui.hunter.status.fallen_on_way"
+		return Loc.t(key, {"who": who})
 	if not runtime.alive and runtime.injured:
-		return "Fallen — revived at the Temple in %s" % UIKit.format_duration(GameManager.temple.get_remaining(runtime))
+		return Loc.t("ui.hunter.status.fallen_reviving", {"time": UIKit.format_duration(GameManager.temple.get_remaining(runtime))})
 	var body := corpses.get_body_of(runtime)
 	if body != null:
-		return "%s %s" % ["Carrying" if corpses.is_carried(body) else "Fetching", body.display_name]
+		var body_key := "ui.hunter.status.carrying" if corpses.is_carried(body) else "ui.hunter.status.fetching"
+		return Loc.t(body_key, {"name": body.display_name})
 	if runtime.injured:
-		return "Injured — %s at the Temple" % UIKit.format_duration(GameManager.temple.get_remaining(runtime))
+		return Loc.t("ui.hunter.status.injured", {"time": UIKit.format_duration(GameManager.temple.get_remaining(runtime))})
 	if runtime.expedition_id != &"":
-		return "On an expedition"
+		return Loc.t("ui.hunter.status.on_expedition")
 	if runtime.task == HunterRuntime.HUNTING:
 		var region := GameManager.world.region_at(runtime.world_position)
-		return "Hunting%s" % (" in %s" % region.display_name if region != null and not region.is_town else "")
+		if region != null and not region.is_town:
+			return Loc.t("ui.hunter.status.hunting_in", {"region": region.display_name})
+		return Loc.t("ui.hunter.status.hunting")
 	if runtime.task != &"":
-		return String(runtime.task).capitalize()
-	return "In town"
+		return Loc.t("ui.hunter.task.%s" % runtime.task)
+	return Loc.t("ui.hunter.status.in_town")
 
 
 ## Stamina / energy (D31) and the purse with treasury transfers (D34, 10% fee).
 func _build_needs_and_purse(content: VBoxContainer) -> void:
 	var gm := GameManager
 	var top: float = DataRegistry.config.needs_max
-	var stamina_text := "Stamina %d" % roundi(runtime.stamina) + (" — exhausted" if gm.needs.is_exhausted(runtime) else "")
-	var energy_text := "Energy %d" % roundi(runtime.energy) + (" — starving" if gm.needs.is_starving(runtime) else (" — hungry" if gm.needs.is_hungry(runtime) else ""))
+	var stamina_key := "ui.hunter.stamina_exhausted" if gm.needs.is_exhausted(runtime) else "ui.hunter.stamina"
+	var stamina_text := Loc.t(stamina_key, {"value": roundi(runtime.stamina)})
+	var energy_key := "ui.hunter.energy"
+	if gm.needs.is_starving(runtime):
+		energy_key = "ui.hunter.energy_starving"
+	elif gm.needs.is_hungry(runtime):
+		energy_key = "ui.hunter.energy_hungry"
+	var energy_text := Loc.t(energy_key, {"value": roundi(runtime.energy)})
 	var food_problem := gm.supply.food_reason(runtime) if gm.needs.is_hungry(runtime) else ""
 	if not food_problem.is_empty():
-		energy_text += " (%s)" % food_problem.to_lower()
-	content.add_child(UIKit.hbox([
+		energy_text = Loc.t("ui.hunter.energy_reason", {"text": energy_text, "reason": food_problem.to_lower()})
+	# Stacked: the texts get long (hungry / no food reasons, Vietnamese).
+	content.add_child(UIKit.vbox([
 		UIKit.bar(runtime.stamina, top, &"StaminaBar", stamina_text),
 		UIKit.bar(runtime.energy, top, &"EnergyBar", energy_text),
-	], 6))
+	], 4))
 	var purses := gm.purses
 	var take_amount := runtime.purse
-	var give := UIKit.button("Give %d\n(+%d)" % [GIVE_STEP, purses.get_received(GIVE_STEP)], func() -> void:
-		run_action(purses.give(runtime, GIVE_STEP), "Gave %d gold to %s" % [purses.get_received(GIVE_STEP), runtime.display_name]),
+	var give := UIKit.button(Loc.t("ui.hunter.give", {"amount": GIVE_STEP, "received": purses.get_received(GIVE_STEP)}), func() -> void:
+		run_action(purses.give(runtime, GIVE_STEP), Loc.t("ui.hunter.gave", {"gold": purses.get_received(GIVE_STEP), "name": runtime.display_name})),
 		&"", purses.can_give(runtime, GIVE_STEP))
-	var take := UIKit.button("Take all\n(+%d)" % purses.get_received(take_amount), func() -> void:
-		run_action(purses.take(runtime, take_amount), "Treasury +%d gold" % purses.get_received(take_amount)),
+	var take := UIKit.button(Loc.t("ui.hunter.take_all", {"received": purses.get_received(take_amount)}), func() -> void:
+		run_action(purses.take(runtime, take_amount), Loc.t("ui.hunter.treasury_gain", {"gold": purses.get_received(take_amount)})),
 		&"", purses.can_take(runtime, take_amount))
 	for button: Button in [give, take]:
-		button.size_flags_horizontal = Control.SIZE_SHRINK_END
-		button.custom_minimum_size.x = 76
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size.x = 0
+	# Text on top, the two buttons sharing the row under it (fits a phone width).
 	var purse := UIKit.vbox([
-		UIKit.label("Purse %d gold" % runtime.purse),
-		UIKit.label("Earns by selling materials; buys food and medicine. Transfers lose %d%%." % roundi(DataRegistry.config.transfer_fee * 100.0), &"MutedLabel"),
-	], 2)
-	content.add_child(UIKit.card(UIKit.hbox([purse, give, take])))
+		UIKit.label(Loc.t("ui.hunter.purse", {"gold": runtime.purse})),
+		UIKit.label(Loc.t("ui.hunter.purse_note", {"fee": roundi(DataRegistry.config.transfer_fee * 100.0)}), &"MutedLabel"),
+		UIKit.hbox([give, take], 4),
+	], 4)
+	content.add_child(UIKit.card(purse))
 	_build_duty(content)
 
 
@@ -148,39 +183,42 @@ func _build_needs_and_purse(content: VBoxContainer) -> void:
 func _build_duty(content: VBoxContainer) -> void:
 	var regions: RegionService = GameManager.regions
 	var target := regions.get_duty_region(runtime)
-	content.add_child(UIKit.label("Duty: %s%s" % [regions.get_duty_name(runtime.duty),
-		" → %s" % target.display_name if runtime.duty == &"" and target != null else ""], &"AccentLabel"))
-	var row := UIKit.hbox([], 4)
+	var duty_text := Loc.t("ui.hunter.duty", {"duty": regions.get_duty_name(runtime.duty)})
+	if runtime.duty == &"" and target != null:
+		duty_text = Loc.t("ui.hunter.duty_target", {"duty": regions.get_duty_name(runtime.duty), "region": target.display_name})
+	content.add_child(UIKit.label(duty_text, &"AccentLabel"))
+	# Three per row: six choices never fit side by side on a phone.
+	var row := _button_grid(3)
 	for duty in regions.get_duty_options():
 		var region := GameManager.world.get_region(duty)
 		var text := regions.get_duty_name(duty)
 		if region != null:
-			text = "%s\nLv %d+" % [text.replace("Ancient ", "").replace("Goblin ", "").replace("Dark ", ""), region.min_hunter_level]
+			text = Loc.t("ui.hunter.duty_button", {"name": Loc.t("ui.hunter.duty_short.%s" % duty), "level": region.min_hunter_level})
 		elif duty == HunterRuntime.STAY_IN_TOWN:
-			text = "Stay"
+			text = Loc.t("ui.hunter.duty_stay")
 		var button := UIKit.button(text, func() -> void: run_action(regions.set_duty(runtime, duty)),
 			&"PrimaryButton" if runtime.duty == duty else &"")
-		button.custom_minimum_size.x = 0
+		_fit_button(button)
 		row.add_child(button)
 	content.add_child(row)
 	var bag := PackedStringArray()
 	for item_id in runtime.loot_bag:
 		bag.append("%d %s" % [runtime.loot_bag[item_id], DataRegistry.get_item(item_id).display_name])
-	content.add_child(UIKit.label("Loot bag %d / %d%s" % [regions.get_bag_count(runtime), DataRegistry.config.loot_bag_capacity,
-		": " + ", ".join(bag) if not bag.is_empty() else ""], &"MutedLabel"))
+	var bag_args := {"count": regions.get_bag_count(runtime), "max": DataRegistry.config.loot_bag_capacity, "items": ", ".join(bag)}
+	content.add_child(UIKit.label(Loc.t("ui.hunter.loot_bag" if bag.is_empty() else "ui.hunter.loot_bag_items", bag_args), &"MutedLabel"))
 
 
 func _build_equipment(content: VBoxContainer) -> void:
 	var equipment := GameManager.equipment
-	content.add_child(UIKit.label("Equipment", &"AccentLabel"))
-	for slot in [&"weapon", &"armor"]:
+	content.add_child(UIKit.label(Loc.t("ui.hunter.equipment"), &"AccentLabel"))
+	for slot in EquipmentService.SLOT_ORDER:
 		var item := equipment.get_equipped_item(runtime, slot)
-		var text := "%s: %s" % [String(slot).capitalize(), "—" if item == null else "%s (%s)" % [item.display_name, UIKit.describe_modifiers(item)]]
+		var text := "%s: %s" % [EquipmentService.slot_label(slot), "—" if item == null else "%s (%s)" % [item.display_name, UIKit.describe_modifiers(item)]]
 		var label := UIKit.label(text)
 		if item != null:
 			label.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
-		var unequip := UIKit.button("Remove", func() -> void:
-			run_action(equipment.unequip(runtime, slot)), &"", "" if item != null else "Nothing equipped")
+		var unequip := UIKit.button(Loc.t("ui.common.remove"), func() -> void:
+			run_action(equipment.unequip(runtime, slot)), &"", "" if item != null else Loc.t("ui.hunter.nothing_equipped"))
 		unequip.size_flags_horizontal = Control.SIZE_SHRINK_END
 		unequip.custom_minimum_size.x = 72
 		content.add_child(UIKit.hbox([label, unequip]))
@@ -191,60 +229,87 @@ func _build_equipment(content: VBoxContainer) -> void:
 		if item == null or not EquipmentService.SLOT_NAMES.has(item.equipment_slot):
 			continue
 		options += 1
-		var button := UIKit.button("Equip %s (%s)" % [item.display_name, UIKit.describe_modifiers(item)], func() -> void:
-			run_action(equipment.equip(runtime, instance_id), "Equipped %s" % item.display_name))
+		var slot_name: String = EquipmentService.slot_label(EquipmentService.SLOT_NAMES[item.equipment_slot])
+		var button := UIKit.button(Loc.t("ui.hunter.equip_option", {"slot": slot_name, "item": item.display_name, "mods": UIKit.describe_modifiers(item)}), func() -> void:
+			run_action(equipment.equip(runtime, instance_id), Loc.t("ui.hunter.equipped", {"item": item.display_name})))
 		button.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
 		content.add_child(button)
 	if options == 0:
-		content.add_child(UIKit.label("No spare equipment in the Warehouse. Craft some at the Blacksmith.", &"MutedLabel"))
+		content.add_child(UIKit.label(Loc.t("ui.hunter.no_spare"), &"MutedLabel"))
 
 
 func _build_traits_and_mood(content: VBoxContainer) -> void:
 	var gm := GameManager
-	content.add_child(UIKit.label("Personality", &"AccentLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.hunter.personality"), &"AccentLabel"))
 	for definition in gm.traits.get_traits(runtime):
 		content.add_child(UIKit.label("%s — %s" % [definition.display_name, definition.description], &"MutedLabel"))
-	var state: String = MoodService.State.keys()[gm.mood.get_state(runtime)]
-	var effect := ""
+	var mood_key := "ui.hunter.mood_bar"
 	match gm.mood.get_state(runtime):
 		MoodService.State.HIGH:
-			effect = " · fights and learns better"
+			mood_key = "ui.hunter.mood_bar_high"
 		MoodService.State.LOW:
-			effect = " · weaker until rested"
-	content.add_child(UIKit.bar(runtime.mood, DataRegistry.config.mood_max, &"MoodBar", "Mood %d — %s%s" % [roundi(runtime.mood), state.capitalize(), effect]))
+			mood_key = "ui.hunter.mood_bar_low"
+	content.add_child(UIKit.bar(runtime.mood, DataRegistry.config.mood_max, &"MoodBar", Loc.t(mood_key, {
+		"mood": roundi(runtime.mood), "state": mood_state_name(gm.mood.get_state(runtime))})))
+
+
+## "Low" / "Normal" / "High" for a MoodService.State.
+static func mood_state_name(state: int) -> String:
+	return Loc.t("ui.hunter.mood_state.%s" % String(MoodService.State.keys()[state]).to_lower())
 
 
 func _build_activity(content: VBoxContainer) -> void:
 	if runtime.injured or not runtime.alive or runtime.expedition_id != &"":
 		return
 	var activities := GameManager.activities
-	var current := activities.get_definition(runtime.activity)
-	content.add_child(UIKit.label("Doing: %s%s" % [current.display_name if current != null else String(runtime.activity).capitalize(),
-		" (automatic)" if runtime.assigned_activity == &"" else ""], &"AccentLabel"))
-	var row := UIKit.hbox([], 4)
-	for option in [[&"", "Auto"], [ActivityService.RESTING, "Rest"], [ActivityService.TRAINING, "Train"], [ActivityService.SOCIALIZING, "Social"]]:
+	var doing_key := "ui.hunter.doing_auto" if runtime.assigned_activity == &"" else "ui.hunter.doing"
+	content.add_child(UIKit.label(Loc.t(doing_key, {"activity": activity_label(runtime.activity)}), &"AccentLabel"))
+	var row := _button_grid(2)
+	for option in [[&"", "ui.hunter.assign.auto"], [ActivityService.RESTING, "ui.hunter.assign.rest"],
+			[ActivityService.TRAINING, "ui.hunter.assign.train"], [ActivityService.SOCIALIZING, "ui.hunter.assign.social"]]:
 		var selected: bool = runtime.assigned_activity == option[0]
-		row.add_child(UIKit.button(option[1], func() -> void: run_action(activities.set_assignment(runtime, option[0])),
-			&"SelectedButton" if selected else &""))
+		var button := UIKit.button(Loc.t(option[1]), func() -> void: run_action(activities.set_assignment(runtime, option[0])),
+			&"SelectedButton" if selected else &"")
+		_fit_button(button)
+		row.add_child(button)
 	content.add_child(row)
+
+
+## A grid of equal buttons that wraps instead of growing wider than the screen.
+static func _button_grid(columns: int) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = columns
+	grid.add_theme_constant_override(&"h_separation", 4)
+	grid.add_theme_constant_override(&"v_separation", 4)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return grid
+
+
+## Shares the row width; long labels shrink with an ellipsis instead of widening the sheet.
+static func _fit_button(button: Button) -> void:
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.custom_minimum_size.x = 0
+	button.clip_text = true
+	button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	button.add_theme_font_size_override(&"font_size", 12)
 
 
 func _build_bonds_and_history(content: VBoxContainer) -> void:
 	var gm := GameManager
-	content.add_child(UIKit.label("Bonds", &"AccentLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.hunter.bonds"), &"AccentLabel"))
 	var bonds := gm.bonds.get_bonds(runtime.unique_id)
 	if bonds.is_empty():
-		content.add_child(UIKit.label("No bonds yet — share expeditions or socialize at the Tavern.", &"MutedLabel"))
+		content.add_child(UIKit.label(Loc.t("ui.hunter.no_bonds"), &"MutedLabel"))
 	for partner_id in bonds:
 		var partner := gm.hunters.get_hunter(partner_id)
 		if partner == null:
 			continue
 		var bonded := gm.bonds.is_bonded(runtime.unique_id, partner_id)
 		content.add_child(UIKit.bar(bonds[partner_id], DataRegistry.config.bond_max, &"MoodBar",
-			"%s%s" % [partner.display_name, " — bonded (+5% ATK together)" if bonded else ""]))
+			Loc.t("ui.hunter.bond_bonded", {"name": partner.display_name}) if bonded else partner.display_name))
 	var history := runtime.history
-	content.add_child(UIKit.label("History", &"AccentLabel"))
-	content.add_child(UIKit.label("Joined on day %d · %d expeditions won · %d lost · %d bosses defeated · injured %d times" % [
-		history.get(HunterRuntime.RECRUIT_DAY, 1), history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0),
-		history.get(HunterRuntime.EXPEDITIONS_FAILED, 0), history.get(HunterRuntime.BOSSES_DEFEATED, 0),
-		history.get(HunterRuntime.TIMES_INJURED, 0)], &"MutedLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.hunter.history"), &"AccentLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.hunter.history_line", {
+		"day": int(history.get(HunterRuntime.RECRUIT_DAY, 1)), "won": int(history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0)),
+		"lost": int(history.get(HunterRuntime.EXPEDITIONS_FAILED, 0)), "bosses": int(history.get(HunterRuntime.BOSSES_DEFEATED, 0)),
+		"injured": int(history.get(HunterRuntime.TIMES_INJURED, 0))}), &"MutedLabel"))

@@ -12,8 +12,8 @@ value = 0.02
 [resource]
 script = ExtResource("1_skill")
 id = &"keen_eye"
-display_name = "Keen Eye"
-description = "+2% critical chance per level."
+display_name = "skill.keen_eye.name"
+description = "skill.keen_eye.desc"
 max_level = 4
 gold_per_level = 250
 required_academy_level = 2

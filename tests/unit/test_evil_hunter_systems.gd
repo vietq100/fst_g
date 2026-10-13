@@ -138,7 +138,7 @@ func test_forge_enhances_equipment_up_to_its_level() -> void:
 func test_reincarnation_resets_level_and_unlocks_difficulty() -> void:
 	_unlock(3)
 	var hunter: HunterRuntime = _game.hunters.get_all()[0]
-	_game.hunters.set_level(hunter, 20)
+	_game.hunters.set_level(hunter, 100)
 	assert_eq(_game.reincarnation.can_reincarnate(hunter), "Needs a Reincarnation Portal")
 	_build(&"portal")
 	var attack: float = _game.hunters.get_stat(hunter, HunterService.ATTACK)
@@ -266,5 +266,5 @@ func test_higher_item_tiers_exist() -> void:
 	for item_id in [&"steel_sword", &"shadow_blade", &"steel_armor", &"shadow_armor"]:
 		var item := _registry.find_def(&"item", item_id) as ItemDefinition
 		assert_not_null(item, String(item_id))
-		assert_true(item.rarity >= ItemDefinition.Rarity.SUPERIOR)
+		assert_true(item.rarity >= Tier.Level.SR)
 		assert_not_null(_registry.find_def(&"recipe", item_id), String(item_id))

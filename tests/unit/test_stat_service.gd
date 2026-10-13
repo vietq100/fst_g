@@ -68,6 +68,7 @@ func test_level_cap() -> void:
 	assert_eq(_stats.level_cap(1), 10)
 	assert_eq(_stats.level_cap(2), 20)
 	assert_eq(_stats.level_cap(0), 10)
+	assert_eq(_stats.level_cap(20), 100, "never above 100 (D62)")
 
 
 func _modifier(stat: StringName, type: StatModifier.Type, value: float) -> StatModifier:

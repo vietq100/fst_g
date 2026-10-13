@@ -7,8 +7,9 @@ extends RefCounted
 ##   Utility:  pickup, loot, interact
 ##
 ## A frame is a Dictionary:
-## - part offsets in whole pixels: "all", "body" (head + torso + arms), "arms", "legs", or one part
-##   ("head", "torso", "arm_l", "arm_r", "leg_l", "leg_r"). Groups and parts add up.
+## - part offsets in whole pixels of the original 15×29 body (scaled by PIXEL_SCALE): "all",
+##   "body" (head + torso + arms), "arms", "legs", or one part ("head", "torso", "arm_l", "arm_r",
+##   "leg_l", "leg_r"). Groups and parts add up.
 ## - "side": keys that replace the frame's own keys in the side view (+x = forward).
 ## - "weapon": weapon angle in degrees (0 = straight up, + = forward). Default WEAPON_REST.
 ## - "fx": effect started when the frame begins (ChibiVisual): step, slash, charge, burst,
@@ -17,6 +18,8 @@ extends RefCounted
 ## - "item": show a picked-up item in the weapon hand.
 
 const WEAPON_REST := 30.0
+## Offsets in the tables are in 15×29-body pixels (D49); the 23×44 body (D67) scales them.
+const PIXEL_SCALE := 1.5
 
 const IDLE := &"idle"
 const WALK := &"walk"
@@ -163,4 +166,4 @@ static func resolve_offsets(frame: Dictionary, side: bool) -> Dictionary:
 
 
 static func _vector(value: Array) -> Vector2i:
-	return Vector2i(int(value[0]), int(value[1]))
+	return Vector2i(roundi(float(value[0]) * PIXEL_SCALE), roundi(float(value[1]) * PIXEL_SCALE))

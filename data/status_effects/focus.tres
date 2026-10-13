@@ -18,7 +18,7 @@ value = 0.5
 [resource]
 script = ExtResource("1_effect")
 id = &"focus"
-display_name = "Focus"
+display_name = "status.focus.name"
 kind = 0
 duration = 8.0
 stacking = 0

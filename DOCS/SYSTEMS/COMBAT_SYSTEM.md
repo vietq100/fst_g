@@ -91,6 +91,10 @@ Timed buffs/debuffs on any actor, defined in `data/status_effects/`:
 - Cleanse removes dispellable debuffs, purge dispellable buffs.
 - Test arena: one debug button per effect (selected Hunter, or every enemy when none is selected).
 
+## Class skills (D70)
+
+Hunters cast class skills with mana (`CLASS_SKILL_SYSTEM.md`). `CombatService.resolve_skill_hit` resolves one skill hit (defense once per hit, critical with skill bonuses), `heal` restores HP. Hunters can dodge hits (`dodge`, cap 40%) and shorten crowd control (`tenacity`, cap 70%). On bosses, stun / freeze / root / disarm from skills become Stagger (+10% damage taken).
+
 ## MVP
 
 - melee attack

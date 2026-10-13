@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_region")
 id = &"dark_forest"
-display_name = "Dark Forest"
+display_name = "region.dark_forest.name"
 tile_rect = Rect2i(0, 38, 36, 36)
 is_town = false
 min_hunter_level = 1

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RegionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/region_definition.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"hunter_gate"
+display_name = "region.hunter_gate.name"
+tile_rect = Rect2i(-10, 6, 8, 8)
+is_town = false
+kind = 2
+min_hunter_level = 1
+monster_ids = Array[StringName]([])
+monster_level_min = 1
+monster_level_max = 1
+population_cap = 0
+respawn_seconds = 15.0
+ground_color = Color(0.56, 0.54, 0.5, 1)
+ground_alt_color = Color(0.6, 0.58, 0.53, 1)
+props = 0
+prop_density = 0.0

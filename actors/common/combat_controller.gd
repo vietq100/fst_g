@@ -93,6 +93,12 @@ func is_valid_target(candidate: Actor) -> bool:
 		and (not keep_filter.is_valid() or keep_filter.call(candidate))
 
 
+## Makes `attacker` this actor's target now (taunt, D70). Ignored if it is not a valid target.
+func force_target(attacker: Actor) -> void:
+	if _active and is_valid_target(attacker):
+		_set_target(attacker)
+
+
 ## Drops the current target if it is no longer valid and looks for a new one now.
 func recheck() -> void:
 	if target != null and not is_valid_target(target):

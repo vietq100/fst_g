@@ -37,10 +37,11 @@ func after_each() -> void:
 
 
 func test_buildings_start_at_level_one_with_effects() -> void:
-	assert_eq(_buildings.get_ids().size(), 13, "six core buildings + House + six Town Hall unlocks")
+	assert_eq(_buildings.get_ids().size(), 14, "six core buildings + House + Market + six Town Hall unlocks")
 	for building_id in _buildings.get_ids():
-		var unlocked_later: bool = _buildings.get_definition(building_id).required_town_level > 1
-		assert_eq(_buildings.get_level(building_id), 0 if unlocked_later else 1, String(building_id))
+		# The starting layout: every building with a default tile; the rest (Town Hall unlocks, the Market, D63) are built later.
+		var starts_built := not _buildings.get_definition(building_id).default_tiles.is_empty()
+		assert_eq(_buildings.get_level(building_id), 1 if starts_built else 0, String(building_id))
 	assert_eq(_inventory.capacity, 40, "warehouse Lv1")
 	assert_eq(_progress.town_level, 1)
 	assert_eq(_recruitment.get_capacity(), 3)
@@ -89,14 +90,14 @@ func test_candidates_are_not_in_roster_until_recruited() -> void:
 	assert_eq(_hunters.count(), 0)
 	var cost := _recruitment.get_recruit_cost(0)
 	assert_eq(_recruitment.can_recruit(0), "Needs %d gold" % cost)
-	_wallet.add(150)
+	_wallet.add(cost)
 	var name := _recruitment.candidates[0].display_name
 	var hunter := _recruitment.recruit(0)
 	assert_not_null(hunter)
 	assert_eq(hunter.display_name, name)
 	assert_eq(_hunters.count(), 1)
 	assert_true(hunter.unique_id != &"")
-	assert_eq(_wallet.gold, 150 - cost)
+	assert_eq(_wallet.gold, 0)
 	assert_eq(_recruitment.candidates.size(), 2)
 
 

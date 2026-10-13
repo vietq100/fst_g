@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_def")
 id = &"sunken_crypt"
-display_name = "Sunken Crypt"
+display_name = "expedition.sunken_crypt.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"ancient_ruins"

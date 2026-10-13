@@ -28,7 +28,7 @@ visual_variant = &"lv2"
 [resource]
 script = ExtResource("1_building")
 id = &"warehouse"
-display_name = "Warehouse"
+display_name = "building.warehouse.name"
 levels = Array[ExtResource("2_level")]([SubResource("BuildingLevel_0"), SubResource("BuildingLevel_1")])
 build_cost = 150
 footprint = Vector2i(2, 2)

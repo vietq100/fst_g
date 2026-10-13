@@ -28,7 +28,7 @@ Camera should be readable and stable.
 
 Initial target:
 - environment tile: 32x32 px
-- standard character: approximately 32x48 px (Hunters, D47: 34×50 canvas, body ≈ 23×44; portraits use a 2x version)
+- standard character: approximately 32x48 px (Hunters, D67: 23×44 px body on a 40×64 canvas) (Hunters, D47: 34×50 canvas, body ≈ 23×44; portraits use a 2x version)
 - larger bosses may use 64x64 or larger
 
 These values are targets, not absolute constraints.

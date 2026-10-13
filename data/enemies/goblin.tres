@@ -6,7 +6,8 @@
 [resource]
 script = ExtResource("1_enemy")
 id = &"goblin"
-display_name = "Goblin"
+tags = Array[StringName]([&"humanoid"])
+display_name = "enemy.goblin.name"
 hp = 50.0
 attack = 10.0
 defense = 3.0

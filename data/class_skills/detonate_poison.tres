@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"detonate_poison"
+display_name = "class_skill.detonate_poison.name"
+class_id = &"rogue"
+order = 17
+kind = 0
+description = "class_skill.detonate_poison.desc"
+scale_stat = &"attack"
+ratings = Vector3i(2, 2, 3)
+cooldown = 12.0
+mana_cost = 26.0
+target = 0
+attack_ratio = 0.2
+ratio_per_stack = 0.35
+consume_stacks = true
+stack_effect = &"poison"

@@ -10,6 +10,8 @@ extends Node2D
 signal building_tapped(instance_id: StringName)
 signal hunter_tapped(hunter: HunterRuntime)
 signal entrance_tapped(expedition_id: StringName)
+## The Hunter Gate or the Boss Arena altar was tapped (D58): the region's id.
+signal structure_tapped(region_id: StringName)
 ## The departure walk failed (e.g. validation changed meanwhile).
 signal depart_failed(reason: String)
 ## Placement preview moved / started / ended. `active` false = placement mode closed.
@@ -48,6 +50,8 @@ var _camera: WorldCamera
 var _panel: DebugPanel
 var _building_nodes: Dictionary[StringName, TownBuilding] = {}
 var _entrances: Array[DungeonEntrance] = []
+## Hunter Gate and Boss Arena altar (D58): region id → node with `hit_test`.
+var _structures: Dictionary[StringName, Node2D] = {}
 var _spawners: Dictionary[StringName, RegionSpawner] = {}
 var _staff: Dictionary[StringName, StaffWorker] = {}
 ## Gate centres and dungeon entrances: monsters do not spawn next to them.
@@ -98,6 +102,7 @@ func _ready() -> void:
 	buildings.building_upgraded.connect(_on_building_upgraded)
 	buildings.layout_changed.connect(_on_layout_changed)
 	GameManager.hunters.hunter_added.connect(_on_hunter_added)
+	GameManager.hunters.hunter_removed.connect(_on_hunter_removed)
 	GameManager.hunters.hunter_changed.connect(_on_hunter_changed)
 	GameManager.activities.activity_changed.connect(_on_activity_changed)
 	GameManager.corpses.body_delivered.connect(_on_body_delivered)
@@ -141,10 +146,7 @@ func _build_scene() -> void:
 	_actors = _y_sorted("Actors", _entities)
 	for gate in world.get_gates():
 		var arch := GateVisual.new()
-		arch.position = gate.center
-		var a := world.region_center(world.get_region(gate.region_a))
-		var b := world.region_center(world.get_region(gate.region_b))
-		arch.axis = (b - a).normalized()
+		arch.setup(gate)
 		_entities.add_child(arch)
 		_keep_clear_points.append(gate.center)
 	for definition in DataRegistry.get_all(&"expedition"):
@@ -156,6 +158,18 @@ func _build_scene() -> void:
 		_entities.add_child(entrance)
 		_entrances.append(entrance)
 		_keep_clear_points.append(entrance.position)
+	for region in world.get_regions():
+		var structure: Node2D = null
+		if region.kind == RegionDefinition.Kind.GATE:
+			structure = HunterGateVisual.new()
+		elif region.kind == RegionDefinition.Kind.BOSS:
+			structure = BossAltarVisual.new()
+		if structure == null:
+			continue
+		structure.position = world.region_center(region)
+		_entities.add_child(structure)
+		_structures[region.id] = structure
+		_keep_clear_points.append(structure.position)
 	_camera = WorldCamera.new()
 	_camera.name = "Camera"
 	_camera.bounds = world.get_bounds(96.0)
@@ -280,6 +294,11 @@ func _on_tap(world_position: Vector2) -> void:
 		if entrance.hit_test(world_position):
 			select_building(&"")
 			entrance_tapped.emit(entrance.expedition_id)
+			return
+	for region_id in _structures:
+		if _structures[region_id].hit_test(world_position):
+			select_building(&"")
+			structure_tapped.emit(region_id)
 			return
 	var instance_id := _building_at(world_position)
 	select_building(instance_id)
@@ -469,8 +488,9 @@ func _set_ghost_tile(tile: Vector2i) -> void:
 	var reason := get_placement_reason()
 	_ghost.ghost_valid = reason.is_empty()
 	var definition := GameManager.buildings.get_definition(_placing_building)
-	var verb := "Build" if _placing == &"build" else "Move"
-	placement_changed.emit(true, "%s %s" % [verb, definition.display_name], reason)
+	var title := Loc.t("world.placement.build", {"name": definition.display_name}) if _placing == &"build" \
+			else Loc.t("world.placement.move", {"name": definition.display_name})
+	placement_changed.emit(true, title, reason)
 
 
 ## Empty when the ghost can be placed at its current tile.
@@ -486,13 +506,13 @@ func get_placement_reason() -> String:
 ## Builds / moves at the ghost tile. Returns the error ("" = done, placement mode closed).
 func confirm_placement() -> String:
 	if _placing == &"":
-		return "Nothing to place"
+		return Loc.t("world.placement.nothing")
 	var buildings := GameManager.buildings
 	var error := ""
 	if _placing == &"build":
 		error = get_placement_reason()
 		if error.is_empty() and buildings.build(_placing_building, _placing_tile) == null:
-			error = "Cannot build here"
+			error = Loc.t("world.placement.cannot_build")
 	else:
 		error = buildings.move(_placing_instance, _placing_tile)
 	if error.is_empty():
@@ -544,6 +564,10 @@ func _spawn_props() -> void:
 	var keep_clear: Array[Rect2i] = []
 	for gate in world.get_gates():
 		keep_clear.append(gate.tiles.grow(PROP_CLEARANCE))
+	for region in world.get_regions():
+		if region.kind == RegionDefinition.Kind.GATE or region.kind == RegionDefinition.Kind.BOSS:
+			var centre := WorldService.tile_at(world.region_center(region))
+			keep_clear.append(Rect2i(centre, Vector2i.ONE).grow(PROP_CLEARANCE + 1))
 	for definition in DataRegistry.get_all(&"expedition"):
 		var expedition := definition as ExpeditionDefinition
 		if expedition.region_id != &"":
@@ -555,6 +579,7 @@ func _spawn_props() -> void:
 		if region.props == RegionDefinition.Props.NONE or region.prop_density <= 0.0:
 			continue
 		var rect := region.tile_rect
+		var ground := world.region_tiles(region.id)
 		for gx in range(rect.position.x, rect.end.x):
 			for gy in range(rect.position.y, rect.end.y):
 				var roll := rng.randf()
@@ -563,6 +588,8 @@ func _spawn_props() -> void:
 				if roll >= region.prop_density:
 					continue
 				var tile := Vector2i(gx, gy)
+				if not ground.has(tile):
+					continue
 				if keep_clear.any(func(r: Rect2i) -> bool: return r.has_point(tile)):
 					continue
 				var at := WorldService.tile_to_world(Vector2(tile) + offset)
@@ -607,11 +634,13 @@ func _spawn_town_border(props: Node2D, rng: RandomNumberGenerator, placed: Array
 		return
 	var rect := town.tile_rect
 	var pond := world.get_town_pond().grow(1)
+	var ground := world.region_tiles(town.id)
 	for gx in range(rect.position.x, rect.end.x):
 		for gy in range(rect.position.y, rect.end.y):
-			if gy - rect.position.y > 1:
-				continue
 			var tile := Vector2i(gx, gy)
+			# The two rows along the back (north-east) edge of the shape.
+			if not ground.has(tile) or (ground.has(tile + Vector2i(0, -1)) and ground.has(tile + Vector2i(0, -2))):
+				continue
 			if pond.has_point(tile) or rng.randf() > 0.55:
 				continue
 			var at := WorldService.tile_to_world(Vector2(tile) + Vector2(rng.randf_range(0.3, 0.7), rng.randf_range(0.3, 0.7)))
@@ -643,6 +672,11 @@ func _town_roads(plaza: Dictionary[Vector2i, bool] = {}) -> Dictionary[Vector2i,
 		elif g.position.y >= town.tile_rect.end.y:
 			for y in range(hall_rect.end.y, g.position.y):
 				for x in range(g.position.x, g.end.x):
+					roads[Vector2i(x, y)] = true
+		elif g.end.x <= town.tile_rect.position.x:
+			# Road to the Hunter Gate bridge (D58).
+			for x in range(g.end.x, hall_rect.position.x):
+				for y in range(g.position.y, g.end.y):
 					roads[Vector2i(x, y)] = true
 	# A path from the Town Hall up to the pond and to the west edge, so the map has a "main street".
 	for x in range(hall_rect.position.x - 1, 8, -1):
@@ -679,7 +713,11 @@ func _navigation_synced() -> void:
 
 func _spawn_regions() -> void:
 	var index := 0
-	for region in GameManager.regions.get_hunting_regions():
+	var spawning: Array[RegionDefinition] = GameManager.regions.get_hunting_regions()
+	for region in world.get_regions():
+		if region.kind == RegionDefinition.Kind.BOSS:
+			spawning.append(region)
+	for region in spawning:
 		var spawner := RegionSpawner.new()
 		add_child(spawner)
 		spawner.setup(self, _actors, region, PROP_SEED + index)
@@ -721,8 +759,8 @@ func get_keep_clear_points() -> Array[Vector2]:
 
 ## A random walkable point inside `region`.
 func random_point_in(region: RegionDefinition, rng: RandomNumberGenerator) -> Vector2:
-	var rect := region.tile_rect.grow(-1)
-	var tile := Vector2(rng.randf_range(rect.position.x, rect.end.x), rng.randf_range(rect.position.y, rect.end.y))
+	var tiles := world.region_tile_list(region.id)
+	var tile := Vector2(tiles[rng.randi() % tiles.size()]) + Vector2(rng.randf(), rng.randf())
 	return NavigationServer2D.map_get_closest_point(get_world_2d().navigation_map, WorldService.tile_to_world(tile))
 
 
@@ -738,12 +776,12 @@ func _on_monster_killed(enemy: Enemy, killer: Hunter, reward: KillReward) -> voi
 	var at := enemy.global_position + Vector2(0, -30)
 	var line := 0
 	if reward.gold > 0:
-		_popup("+%d gold" % reward.gold, RarityColors.GOLD, at, 0.0)
+		_popup(Loc.t("world.popup.gold", {"gold": reward.gold}), RarityColors.GOLD, at, 0.0)
 		line += 1
 	for item_id in reward.items:
 		var item := DataRegistry.get_item(item_id)
 		if item != null:
-			_popup("+%d %s" % [reward.items[item_id], item.display_name], RarityColors.of(item.rarity), at + Vector2(0, -12.0 * line), 0.15 * line)
+			_popup(Loc.t("world.popup.item", {"count": reward.items[item_id], "name": item.display_name}), RarityColors.of(item.rarity), at + Vector2(0, -12.0 * line), 0.15 * line)
 			line += 1
 
 
@@ -760,7 +798,7 @@ func _spawn_actor(runtime: HunterRuntime, at: Vector2) -> Hunter:
 	var hunter := HUNTER_SCENE.instantiate() as Hunter
 	_actors.add_child(hunter)
 	hunter.global_position = at
-	hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment)
+	hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment, GameManager.class_skills)
 	_hunter_actors[runtime.unique_id] = hunter
 	var brain := HunterBrain.new()
 	hunter.add_child(brain)
@@ -935,8 +973,29 @@ func _replan_all() -> void:
 
 
 func _on_hunter_added(runtime: HunterRuntime) -> void:
-	# New recruits walk out of the Tavern.
-	_spawn_actor(runtime, _door_of(BuildingService.TAVERN, _plaza()))
+	# New recruits walk in through the Hunter Gate (D58), or out of the Tavern without one.
+	var gate := _gate_region()
+	_spawn_actor(runtime, world.region_center(gate) if gate != null else _door_of(BuildingService.TAVERN, _plaza()))
+
+
+## An expelled Hunter's actor leaves the world at once (D58).
+func _on_hunter_removed(runtime: HunterRuntime) -> void:
+	var hunter: Hunter = _hunter_actors.get(runtime.unique_id)
+	_hunter_actors.erase(runtime.unique_id)
+	if hunter == null:
+		return
+	if _selected_hunter == hunter:
+		_set_selected_hunter(null)
+	if _camera.follow_target == hunter:
+		_camera.stop_following()
+	hunter.queue_free()
+
+
+func _gate_region() -> RegionDefinition:
+	for region in world.get_regions():
+		if region.kind == RegionDefinition.Kind.GATE:
+			return region
+	return null
 
 
 func _on_hunter_changed(runtime: HunterRuntime) -> void:
@@ -955,13 +1014,13 @@ func _on_hunter_changed(runtime: HunterRuntime) -> void:
 ## the world keeps living. Returns the reason if it cannot start.
 func depart(expedition_id: StringName, party: Array[StringName] = []) -> String:
 	if _departing or _dungeon != null:
-		return "A party is already out"
+		return Loc.t("world.depart.party_out")
 	if party.is_empty():
 		party = pick_party()
 	var error := GameManager.expeditions.validate(expedition_id, party)
 	var definition := DataRegistry.get_expedition(expedition_id)
 	if error.is_empty() and (definition == null or definition.locked):
-		error = "This dungeon is sealed"
+		error = Loc.t("world.depart.sealed")
 	if not error.is_empty():
 		depart_failed.emit(error)
 		return error
@@ -997,7 +1056,7 @@ func depart(expedition_id: StringName, party: Array[StringName] = []) -> String:
 			_send_home(hunter)
 		_camera.stop_following()
 		var reason := GameManager.expeditions.validate(expedition_id, party)
-		depart_failed.emit(reason if not reason.is_empty() else "The party could not reach the entrance")
+		depart_failed.emit(reason if not reason.is_empty() else Loc.t("world.depart.unreachable"))
 		return reason
 	return ""
 
@@ -1096,15 +1155,15 @@ func _rebuild_panel() -> void:
 		return
 	_panel.clear()
 	_panel.add_button_row([
-		["Save", func() -> void:
-			_panel.add_label("Saved" if SaveManager.save_game(&"manual") else "Save failed")],
-		["New game", _new_game],
-		["Sandbox", func() -> void: GameManager.request_world(&"sandbox")],
+		[Loc.t("world.dev.save"), func() -> void:
+			_panel.add_label(Loc.t("world.dev.saved") if SaveManager.save_game(&"manual") else Loc.t("world.dev.save_failed"))],
+		[Loc.t("world.dev.new_game"), _new_game],
+		[Loc.t("world.dev.sandbox"), func() -> void: GameManager.request_world(&"sandbox")],
 	])
 	_panel.add_button_row([
-		["+500 gold", func() -> void: GameManager.wallet.add(500)],
-		["+1 h", func() -> void: SaveManager.apply_offline_progress(3600.0)],
-		["Tire all", func() -> void:
+		[Loc.t("world.dev.add_gold"), func() -> void: GameManager.wallet.add(500)],
+		[Loc.t("world.dev.add_hour"), func() -> void: SaveManager.apply_offline_progress(3600.0)],
+		[Loc.t("world.dev.tire_all"), func() -> void:
 			for runtime in GameManager.hunters.get_all():
 				runtime.stamina = 10.0
 				runtime.energy = 20.0

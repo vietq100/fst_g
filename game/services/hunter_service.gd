@@ -5,6 +5,8 @@ extends RefCounted
 ## so every stat goes through one pipeline (DECISIONS.md D18).
 
 signal hunter_added(hunter: HunterRuntime)
+## The Hunter left the roster for good (expelled at the Hunter Gate, D58).
+signal hunter_removed(hunter: HunterRuntime)
 signal hunter_changed(hunter: HunterRuntime)
 ## Emitted after level and HP were updated; `healed` is the HP restored by the level-up.
 signal hunter_leveled_up(hunter: HunterRuntime, new_level: int, healed: float)
@@ -21,8 +23,19 @@ const DAMAGE_DEALT := &"damage_dealt"
 const DAMAGE_TAKEN := &"damage_taken"
 const GOLD_FIND := &"gold_find"
 const XP_GAIN := &"xp_gain"
+## Healing done (class skills, D70). Multiplier stat.
+const HEALING := &"healing"
+## Mana for active class skills (D70).
+const MAX_MANA := &"max_mana"
+const MANA_REGEN := &"mana_regen"
+## Additive fractions from 0 (D70): chance to dodge a hit, share of crowd control shrugged off.
+const DODGE := &"dodge"
+const TENACITY := &"tenacity"
+## Extra attack range as a fraction (D70). Additive from 0.
+const RANGE_BONUS := &"range_bonus"
 
-const MULTIPLIER_STATS: Array[StringName] = [DAMAGE_DEALT, DAMAGE_TAKEN, GOLD_FIND, XP_GAIN]
+const MULTIPLIER_STATS: Array[StringName] = [DAMAGE_DEALT, DAMAGE_TAKEN, GOLD_FIND, XP_GAIN, HEALING]
+const ADDITIVE_STATS: Array[StringName] = [DODGE, TENACITY, RANGE_BONUS]
 ## Stats that receive a random roll at recruitment.
 const ROLLED_STATS: Array[StringName] = [MAX_HP, ATTACK, DEFENSE]
 const ACCENT_COUNT := 8
@@ -65,6 +78,10 @@ func generate_candidate(definition_id: StringName, rng: RandomNumberGenerator) -
 	var variance := definition.stat_roll_variance
 	for stat in ROLLED_STATS:
 		hunter.stat_rolls[stat] = rng.randf_range(-variance, variance)
+	# Tier from its own seed so the shared RNG sequence is not changed (D60).
+	var tier_rng := RandomNumberGenerator.new()
+	tier_rng.seed = hash("tier|%s|%s|%s" % [hunter.display_name, definition_id, hunter.stat_rolls])
+	hunter.tier = Tier.roll(tier_rng, Tier.HUNTER_WEIGHTS)
 	hunter.mood = _config.mood_start
 	hunter.current_hp = get_stat(hunter, MAX_HP)
 	hunter.stamina = _config.needs_max
@@ -81,6 +98,16 @@ func add_hunter(hunter: HunterRuntime) -> HunterRuntime:
 	_next_id += 1
 	_hunters[hunter.unique_id] = hunter
 	hunter_added.emit(hunter)
+	return hunter
+
+
+## Takes a Hunter off the roster (D58). Returns it, or null if unknown.
+func remove_hunter(unique_id: StringName) -> HunterRuntime:
+	var hunter: HunterRuntime = _hunters.get(unique_id)
+	if hunter == null:
+		return null
+	_hunters.erase(unique_id)
+	hunter_removed.emit(hunter)
 	return hunter
 
 
@@ -133,12 +160,24 @@ func get_stat(hunter: HunterRuntime, stat: StringName, conditions: Array[StringN
 			base = definition.critical_chance
 		CRITICAL_DAMAGE:
 			base = definition.critical_damage
+		MAX_MANA:
+			base = definition.base_mana
+			growth = definition.mana_per_level
+		MANA_REGEN:
+			base = definition.mana_regen
 		_:
+			if ADDITIVE_STATS.has(stat):
+				return _stats.compute_stat(stat, 0.0, 0.0, hunter.level, get_modifiers(hunter), conditions)
 			if not MULTIPLIER_STATS.has(stat):
 				push_error("HunterService: unknown stat '%s'" % stat)
 				return 0.0
 			base = 1.0
 	base *= 1.0 + hunter.stat_rolls.get(stat, 0.0)
+	if stat == MAX_HP or stat == ATTACK or stat == DEFENSE:
+		# Tier (D60) scales base and growth alike.
+		var scale := Tier.stat_scale(hunter.tier)
+		base *= scale
+		growth *= scale
 	return _stats.compute_stat(stat, base, growth, hunter.level, get_modifiers(hunter), conditions)
 
 

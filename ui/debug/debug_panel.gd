@@ -37,7 +37,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func toggle() -> void:
 	_body.visible = not _body.visible
-	_header.text = "Dev %s" % ("-" if _body.visible else "+")
+	_header.text = Loc.t("ui.debug.header_open") if _body.visible else Loc.t("ui.debug.header_closed")
 	custom_minimum_size.x = WIDTH if _body.visible else COLLAPSED_WIDTH
 	reset_size()
 	# Anchored top-right: keep the right edge fixed while the size changes.

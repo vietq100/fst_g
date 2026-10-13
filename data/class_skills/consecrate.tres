@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/regeneration.tres" id="e_regeneration"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_regeneration")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"consecrate"
+display_name = "class_skill.consecrate.name"
+class_id = &"guardian"
+order = 12
+kind = 0
+description = "class_skill.consecrate.desc"
+scale_stat = &"max_hp"
+ratings = Vector3i(2, 2, 3)
+cooldown = 22.0
+mana_cost = 41.0
+target = 4
+radius = 60.0
+ally_effects = Array[ExtResource("3_chance")]([SubResource("C0")])

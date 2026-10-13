@@ -80,6 +80,10 @@ const BITMAPS := {
 		".....kk.....", "....kyyk....", "....kyyk....", "kkkkkyykkkkk", "kyyyyyyyyyyk", ".kyyyyyyyyk.",
 		"..kyyyyyyk..", "..kyyyyyyk..", ".kyyykkyyyk.", ".kyykk.kyyk.", "kyk......kyk", "kk........kk",
 	],
+	&"locate": [
+		".....ww.....", "....kwwk....", "..kkwwwwkk..", ".kwwk..kwwk.", ".kwk....kwk.", "wwwk.ww.kwww",
+		"wwwk.ww.kwww", ".kwk....kwk.", ".kwwk..kwwk.", "..kkwwwwkk..", "....kwwk....", ".....ww.....",
+	],
 	&"target": [
 		"....kkkk....", "..kkwwwwkk..", ".kwwwkkwwwk.", ".kwwwkkwwwk.", "kwwwwkkwwwwk", "kkkkkwwkkkkk",
 		"kkkkkwwkkkkk", "kwwwwkkwwwwk", ".kwwwkkwwwk.", ".kwwwkkwwwk.", "..kkwwwwkk..", "....kkkk....",
@@ -87,6 +91,10 @@ const BITMAPS := {
 	&"dungeon": [
 		".........kk.", "........ksk.", ".......ksk..", "......ksk...", ".k...ksk....", ".kk.ksk.....",
 		"..kksk......", "...kyk......", "..kykyk.....", ".kbk.kyk....", "kbk.........", "kk..........",
+	],
+	&"gear": [
+		"....kkkk....", ".kk.kssk.kk.", ".kskggggksk.", "..kggggggk..", "kkggkkkkggkk", "ksggk..kgggk",
+		"ksggk..kgggk", "kkggkkkkggkk", "..kggggggk..", ".kgkggggkgk.", ".kk.kggk.kk.", "....kkkk....",
 	],
 }
 

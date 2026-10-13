@@ -25,7 +25,7 @@ func setup(world: WorldService) -> void:
 			continue
 		var on_bridge := false
 		for gate in world.get_gates():
-			if WorldService.rect_to_world(gate.tiles.grow(1)).has_point(point):
+			if WorldService.rect_has_point(gate.tiles.grow(1), point):
 				on_bridge = true
 				break
 		if not on_bridge:

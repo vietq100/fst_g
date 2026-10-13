@@ -24,7 +24,7 @@ theme_override_constants/separation = 4
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-text = "Debug -"
+text = "ui.debug.header_open"
 
 [node name="Body" type="VBoxContainer" parent="Margin/Layout"]
 unique_name_in_owner = true

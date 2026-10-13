@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/thorns.tres" id="e_thorns"]
+[ext_resource type="Resource" path="res://data/status_effects/haste.tres" id="e_haste"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_thorns")
+chance = 1.0
+stacks = 1
+
+[sub_resource type="Resource" id="C1"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_haste")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"reflex"
+display_name = "class_skill.reflex.name"
+class_id = &"rogue"
+order = 18
+kind = 0
+description = "class_skill.reflex.desc"
+scale_stat = &"move_speed"
+ratings = Vector3i(2, 3, 2)
+cooldown = 16.0
+mana_cost = 32.0
+target = 3
+self_effects = Array[ExtResource("3_chance")]([SubResource("C0"), SubResource("C1")])

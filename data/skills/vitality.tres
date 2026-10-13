@@ -12,8 +12,8 @@ value = 12.0
 [resource]
 script = ExtResource("1_skill")
 id = &"vitality"
-display_name = "Vitality"
-description = "+12 max HP per level."
+display_name = "skill.vitality.name"
+description = "skill.vitality.desc"
 max_level = 5
 gold_per_level = 100
 required_academy_level = 1

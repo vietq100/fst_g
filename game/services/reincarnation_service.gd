@@ -46,15 +46,15 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 ## Empty string when the Hunter can reincarnate now, otherwise the reason.
 func can_reincarnate(hunter: HunterRuntime) -> String:
 	if hunter == null:
-		return "Unknown Hunter"
+		return Loc.t("err.reincarnation.unknown_hunter")
 	if not _buildings.has_building(BuildingService.PORTAL):
-		return "Needs a Reincarnation Portal"
+		return Loc.t("err.reincarnation.no_portal")
 	if hunter.level < _config.reincarnate_level:
-		return "Needs level %d" % _config.reincarnate_level
+		return Loc.t("err.reincarnation.needs_level", {"level": _config.reincarnate_level})
 	if not hunter.alive or hunter.injured:
-		return "%s is hurt" % hunter.display_name
+		return Loc.t("err.reincarnation.hurt", {"name": hunter.display_name})
 	if hunter.expedition_id != &"":
-		return "%s is on an expedition" % hunter.display_name
+		return Loc.t("err.reincarnation.on_expedition", {"name": hunter.display_name})
 	return ""
 
 
@@ -87,7 +87,7 @@ func get_difficulty_count() -> int:
 
 
 func get_difficulty_name(difficulty: int) -> String:
-	return _config.difficulty_names[clampi(difficulty, 0, get_difficulty_count() - 1)]
+	return Loc.t(_config.difficulty_names[clampi(difficulty, 0, get_difficulty_count() - 1)])
 
 
 func get_unlock_requirement(difficulty: int) -> int:
@@ -106,9 +106,9 @@ func get_difficulty() -> int:
 ## Empty string on success.
 func set_difficulty(difficulty: int) -> String:
 	if difficulty < 0 or difficulty >= get_difficulty_count():
-		return "Unknown difficulty"
+		return Loc.t("err.reincarnation.unknown_difficulty")
 	if not is_unlocked(difficulty):
-		return "Needs %d reincarnations (have %d)" % [get_unlock_requirement(difficulty), _progress.total_reincarnations]
+		return Loc.t("err.reincarnation.difficulty_locked", {"count": get_unlock_requirement(difficulty), "have": _progress.total_reincarnations})
 	_progress.difficulty = difficulty
 	difficulty_changed.emit(difficulty)
 	autosave_requested.emit(&"difficulty")

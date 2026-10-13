@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"build_house"
-display_name = "A Roof Overhead"
-description = "Build a second House for your Hunters."
+display_name = "quest.build_house.name"
+description = "quest.build_house.desc"
 order = 1
 kind = 0
 target_id = &"house"

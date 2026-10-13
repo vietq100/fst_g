@@ -30,8 +30,21 @@ func apply(definition: StatusEffectDefinition, source: Actor = null, stacks: int
 				effect.stacks = mini(effect.stacks + maxi(stacks, 1), maxi(definition.max_stacks, 1))
 		effect.source = source
 		effect.restart()
+	if definition.kind == StatusEffectDefinition.Kind.DEBUFF and actor != null and _is_crowd_control(definition):
+		# Tenacity (D70) shortens crowd control.
+		effect.remaining *= 1.0 - clampf(actor.get_tenacity(), 0.0, 1.0)
 	effect_applied.emit(effect)
 	return effect
+
+
+## Stun, freeze, root, disarm and slows count as crowd control.
+static func _is_crowd_control(definition: StatusEffectDefinition) -> bool:
+	if definition.stuns or definition.roots or definition.disarms:
+		return true
+	for modifier in definition.modifiers:
+		if modifier != null and modifier.stat == HunterService.MOVE_SPEED and modifier.value < 0.0:
+			return true
+	return false
 
 
 func remove(id: StringName) -> bool:
@@ -195,6 +208,9 @@ func _tick(effect: StatusEffect) -> void:
 		actor.health.heal(definition.heal_per_tick * scale)
 	if definition.damage_per_tick > 0.0:
 		var amount: float = definition.damage_per_tick * scale
+		if definition.tick_is_ratio:
+			# Damage in % of max HP is scaled down on bosses (D70), e.g. Bleed on a 4200 HP boss.
+			amount *= actor.get_ratio_damage_scale()
 		var service: CombatService = actor.combat.get_service()
 		if service != null:
 			service.resolve_effect_damage(effect.get_source(), actor, amount, definition)

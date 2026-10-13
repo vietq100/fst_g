@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"snipe"
+display_name = "class_skill.snipe.name"
+class_id = &"ranger"
+order = 9
+kind = 0
+description = "class_skill.snipe.desc"
+scale_stat = &"critical_chance"
+ratings = Vector3i(1, 3, 3)
+cooldown = 16.0
+mana_cost = 32.0
+target = 0
+cast_range = 220.0
+attack_ratio = 2.6
+bonus_crit = 0.4

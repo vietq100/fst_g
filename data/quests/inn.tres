@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"inn"
-display_name = "Rest for the Weary"
-description = "Build an Inn."
+display_name = "quest.inn.name"
+description = "quest.inn.desc"
 order = 5
 kind = 0
 target_id = &"inn"

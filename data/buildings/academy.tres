@@ -41,7 +41,7 @@ visual_variant = &"lv3"
 [resource]
 script = ExtResource("1_building")
 id = &"academy"
-display_name = "Academy"
+display_name = "building.academy.name"
 levels = Array[ExtResource("2_level")]([SubResource("Lvl_0"), SubResource("Lvl_1"), SubResource("Lvl_2")])
 required_town_level = 3
 build_cost = 600

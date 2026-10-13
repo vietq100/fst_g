@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/recipe_definition.gd" id="1_recipe"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amount"]
+
+[sub_resource type="Resource" id="ItemAmount_0"]
+script = ExtResource("2_amount")
+item_id = &"slime_gel"
+quantity = 5
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"pet_slime"
+display_name = "recipe.pet_slime.name"
+result_item_id = &"pet_slime"
+gold_cost = 450
+material_costs = Array[ExtResource("2_amount")]([SubResource("ItemAmount_0")])
+building_id = &"trading_post"
+required_level = 1

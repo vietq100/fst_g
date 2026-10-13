@@ -15,6 +15,8 @@ extends Resource
 @export var xp_exponent: float = 2.2
 ## Hunter max level = Town Hall level × this (DECISIONS.md D12).
 @export var level_cap_per_town_level: int = 10
+## Highest level any Hunter can reach, whatever the Town Hall level (D62).
+@export var max_hunter_level: int = 100
 ## Fraction of max HP restored on level-up.
 @export_range(0.0, 1.0) var level_up_heal_ratio: float = 0.2
 
@@ -137,15 +139,47 @@ extends Resource
 
 @export_group("Reincarnation")
 ## Hunter level needed to reincarnate at the Portal.
-@export var reincarnate_level: int = 20
+@export var reincarnate_level: int = 100
 ## Permanent bonus per reincarnation to max HP / attack / defense.
 @export var reincarnation_stat_bonus: float = 0.06
 ## Total reincarnations needed to unlock each difficulty (index = difficulty).
 @export var difficulty_unlocks: Array[int] = [0, 1, 3, 6]
-@export var difficulty_names: PackedStringArray = ["Easy", "Normal", "Hard", "Nightmare"]
+## Translation keys of the difficulty names (shown through `Loc.t`).
+@export var difficulty_names: PackedStringArray = ["game.difficulty.easy", "game.difficulty.normal", "game.difficulty.hard", "game.difficulty.nightmare"]
 ## Monster stat and reward multipliers per difficulty.
 @export var difficulty_stat_scale: Array[float] = [1.0, 1.4, 2.0, 3.0]
 @export var difficulty_reward_scale: Array[float] = [1.0, 1.5, 2.2, 3.5]
+
+@export_group("Class skills")
+## Class skills (D70): pool of the base class, up to this many per Hunter, each up to max level.
+@export var class_skill_max_count: int = 7
+@export var class_skill_max_level: int = 6
+## One skill point every this many Hunter levels (10, 20 … 100).
+@export var class_skill_point_every: int = 10
+## Random skills a new recruit starts with.
+@export var class_skill_start_count: int = 0
+## Skill power at level L = 1 + power_per_level × (L − 1) (damage, heals, passive bonuses).
+@export var class_skill_power_per_level: float = 0.15
+## Mana cost at level L = cost × (1 + mana_per_level × (L − 1)).
+@export var class_skill_mana_per_level: float = 0.06
+## Effects from skills last longer with the skill level: buffs × power, debuffs × (1 + share ×
+## (power − 1)).
+@export_range(0.0, 1.0) var class_skill_debuff_duration_share: float = 0.5
+## Swap points granted by each reincarnation (replace one skill with another random one).
+@export var class_skill_swap_per_reincarnation: int = 1
+## Minimum seconds between two skill casts of one Hunter.
+@export var class_skill_cast_gap: float = 0.8
+## Mana regeneration multiplier while the Hunter has no target.
+@export var mana_regen_idle_multiplier: float = 3.0
+## Execute thresholds and %HP effects against bosses (D69).
+@export var boss_execute_threshold: float = 0.15
+## Bosses: duration of soft debuffs from skills (slow, weaken, armor break…) and the share of
+## %-max-HP damage over time (Bleed) they take.
+@export_range(0.0, 1.0) var boss_soft_debuff_scale: float = 0.5
+@export_range(0.0, 1.0) var boss_ratio_dot_scale: float = 0.25
+## Caps on combat stats from skills (D69).
+@export_range(0.0, 1.0) var dodge_cap: float = 0.4
+@export_range(0.0, 1.0) var tenacity_cap: float = 0.7
 
 @export_group("Enhancement")
 ## Gold = enhance_gold_base × (level + 1) ^ 1.5; stat modifiers grow by this much per level.

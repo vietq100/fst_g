@@ -1,29 +1,49 @@
 class_name ItemIcon
 extends Control
 ## Square item slot: dark rounded plate rimmed in the rarity colour, the item's pixel icon in the
-## middle, an optional count or enhancement badge in the corner.
+## middle, an optional count or enhancement badge in the corner. Tapping it opens the item's
+## details over the current screen (ItemInfoModal, D64); a worn-out weapon shows a red crack.
 
 const PLATE := Color("141824")
 
 var _texture: Texture2D
 var _rim := Color.WHITE
 var _badge := ""
+var _item: ItemDefinition
+var _instance: StringName = &""
+var _broken := false
 
 
 func _init() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
 
-func setup(item: ItemDefinition, side: float = 28.0, badge: String = "") -> ItemIcon:
+## `instance` (optional) is the item instance shown, for its enhancement and durability.
+func setup(item: ItemDefinition, side: float = 28.0, badge: String = "", instance: StringName = &"") -> ItemIcon:
 	custom_minimum_size = Vector2(side, side)
+	_item = item
+	_instance = instance
+	_broken = instance != &"" and Engine.get_main_loop() != null and _is_broken(instance)
 	_rim = RarityColors.of(item.rarity) if item != null else RarityColors.COMMON
 	var scale := maxi(1, int((side - 8.0) / ItemIcons.SIZE))
 	_texture = ItemIcons.texture(item, scale)
 	_badge = badge
 	queue_redraw()
 	return self
+
+
+func _gui_input(event: InputEvent) -> void:
+	if _item != null and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		accept_event()
+		get_tree().call_group(&"ui_root", &"open_item_info", _item, _instance)
+
+
+static func _is_broken(instance: StringName) -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	var gm := tree.root.get_node_or_null(^"GameManager") if tree != null else null
+	return gm != null and gm.equipment != null and gm.equipment.is_broken(instance)
 
 
 func _draw() -> void:
@@ -38,6 +58,8 @@ func _draw() -> void:
 	if _texture != null:
 		var shown := _texture.get_size()
 		draw_texture_rect(_texture, Rect2(((size - shown) * 0.5).floor(), shown), false)
+	if _broken:
+		draw_line(Vector2(3, 3), size - Vector2(3, 3), GameTheme.DANGER, 2.0)
 	if not _badge.is_empty():
 		var font := ThemeDB.fallback_font
 		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x

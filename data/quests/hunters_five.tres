@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"hunters_five"
-display_name = "A Proper Guild"
-description = "Have 5 Hunters in the village."
+display_name = "quest.hunters_five.name"
+description = "quest.hunters_five.desc"
 order = 6
 kind = 2
 target_id = &""

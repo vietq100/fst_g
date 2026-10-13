@@ -47,15 +47,16 @@ func can_enhance(instance_id: StringName) -> String:
 	var item_id := _inventory.get_instance_item(instance_id)
 	var item := _registry.find_def(&"item", item_id) as ItemDefinition
 	if item == null or item.equipment_slot == ItemDefinition.EquipmentSlot.NONE:
-		return "Not equipment"
+		return Loc.t("err.forge.not_equipment")
 	if not _buildings.has_building(BuildingService.FORGE):
-		return "Needs an Enhancement Forge"
+		return Loc.t("err.forge.no_forge")
 	if get_level(instance_id) >= get_max_level():
-		return "Forge limit reached (+%d) — upgrade the Forge" % get_max_level()
+		return Loc.t("err.forge.limit", {"max": get_max_level()})
 	if not _wallet.can_spend(get_gold_cost(instance_id)):
-		return "Needs %d gold" % get_gold_cost(instance_id)
+		return Loc.t("ui.common.needs_gold", {"gold": get_gold_cost(instance_id)})
 	if not _inventory.has(ORE, get_ore_cost(instance_id)):
-		return "Needs %d Iron Ore" % get_ore_cost(instance_id)
+		var ore := _registry.find_def(&"item", ORE) as ItemDefinition
+		return Loc.t("err.forge.needs_items", {"count": get_ore_cost(instance_id), "item": ore.display_name if ore != null else String(ORE)})
 	return ""
 
 

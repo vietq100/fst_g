@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_hunter")
 id = &"duelist"
-display_name = "Duelist"
+display_name = "class.duelist.name"
 class_id = &"duelist"
 base_hp = 120.0
 base_attack = 16.8

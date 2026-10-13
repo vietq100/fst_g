@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/weekly_boss/weekly_boss.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"weekly_boss"
+tags = Array[StringName]([&"undead"])
+display_name = "enemy.weekly_boss.name"
+is_boss = true
+tier = 5
+hp = 4200.0
+attack = 62.0
+defense = 24.0
+attack_speed = 0.55
+move_speed = 42.0
+critical_chance = 0.1
+critical_damage = 1.6
+attack_range = 34.0
+hit_radius = 16.0
+xp_reward = 900
+gold_min = 1200
+gold_max = 1200
+loot_table_id = &"weekly_boss"
+actor_scene = ExtResource("2_scene")

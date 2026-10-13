@@ -12,6 +12,9 @@ func _ready() -> void:
 	z_index = 100
 	GameManager.combat.damage_dealt.connect(_on_damage_dealt)
 	GameManager.combat.effect_damage_dealt.connect(_on_effect_damage_dealt)
+	GameManager.combat.skill_cast.connect(_on_skill_cast)
+	GameManager.combat.attack_dodged.connect(_on_attack_dodged)
+	GameManager.combat.actor_healed.connect(_on_actor_healed)
 
 
 ## Attackers with a longer reach than this shoot (arrow streak).
@@ -29,7 +32,7 @@ func _on_damage_dealt(attacker: Actor, target: Actor, amount: float, is_critical
 		streak.setup(attacker.global_position + Vector2(0, -14), target.global_position + Vector2(0, -12))
 	var number := _spawn_number(target)
 	if amount <= 0.0 and target.effects.is_invulnerable():
-		number.show_text("Immune", IMMUNE_COLOR)
+		number.show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR)
 	else:
 		number.setup(amount, is_critical, target is Hunter)
 
@@ -41,7 +44,7 @@ func _on_effect_damage_dealt(_source: Actor, target: Actor, amount: float, effec
 	var color := effect.color if effect != null else DamageNumber.COLOR
 	if amount <= 0.0:
 		if target.effects.is_invulnerable():
-			_spawn_number(target).show_text("Immune", IMMUNE_COLOR, EFFECT_FONT_SIZE)
+			_spawn_number(target).show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR, EFFECT_FONT_SIZE)
 		return
 	_spawn_number(target).show_text(str(roundi(amount)), color, EFFECT_FONT_SIZE)
 
@@ -51,3 +54,24 @@ func _spawn_number(target: Actor) -> DamageNumber:
 	add_child(number)
 	number.global_position = target.global_position + NUMBER_OFFSET + Vector2(randf_range(-NUMBER_JITTER, NUMBER_JITTER), 0)
 	return number
+
+
+const SKILL_COLOR := Color("9fb4ff")
+const HEAL_COLOR := Color("7fe08a")
+const MISS_COLOR := Color("d8dde3")
+
+
+## Class skill name over the caster (D70).
+func _on_skill_cast(caster: Actor, skill: ClassSkillDefinition) -> void:
+	if is_instance_valid(caster) and skill != null:
+		_spawn_number(caster).show_text(skill.display_name, SKILL_COLOR, EFFECT_FONT_SIZE)
+
+
+func _on_attack_dodged(_attacker: Actor, target: Actor) -> void:
+	if is_instance_valid(target):
+		_spawn_number(target).show_text(Loc.t("world.popup.miss"), MISS_COLOR, EFFECT_FONT_SIZE)
+
+
+func _on_actor_healed(_source: Actor, target: Actor, amount: float) -> void:
+	if is_instance_valid(target) and amount >= 1.0:
+		_spawn_number(target).show_text("+%d" % roundi(amount), HEAL_COLOR, EFFECT_FONT_SIZE)

@@ -62,14 +62,15 @@ func _refresh() -> void:
 		return
 	var definition := service.get_current_definition()
 	var sections := definition.enemy_groups.size()
-	var where := "Boss" if run.boss_reached else "Area %d / %d" % [clampi(run.section_index + 1, 1, sections), sections]
+	var where := Loc.t("ui.expedition_hud.boss") if run.boss_reached \
+		else Loc.t("ui.expedition_hud.area", {"area": clampi(run.section_index + 1, 1, sections), "total": sections})
 	if run.phase == ExpeditionRun.Phase.RETURNING:
-		where = "Returning"
-	_header.text = "%s — %s" % [definition.display_name, where]
+		where = Loc.t("ui.expedition_hud.returning")
+	_header.text = Loc.t("ui.expedition_hud.header", {"dungeon": definition.display_name, "where": where})
 	var items := 0
 	for quantity in run.stash_items.values():
 		items += quantity
-	_stash.text = "Found: %d gold · %d items · %d defeated" % [run.stash_gold, items, run.kills]
+	_stash.text = Loc.t("ui.expedition_hud.stash", {"gold": run.stash_gold, "items": items, "kills": run.kills})
 	for hunter_id in _bars:
 		var runtime := GameManager.hunters.get_hunter(hunter_id)
 		var bar := _bars[hunter_id]

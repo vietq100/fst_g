@@ -4,7 +4,7 @@ The Town is built and arranged by the player (D32, D33). Costs and footprints: `
 
 ## Grid
 
-- Town tiles: gx 0–35, gy 0–35 (top-down, 32 × 32 px squares, D52). A building occupies a rectangle of tiles (its footprint) anchored at its top-left tile; its door is the tile below the middle of its bottom edge.
+- Town tiles: gx 0–35, gy 0–35 (2:1 isometric, 44 × 22 px diamonds, D55/D56). A building occupies a rectangle of tiles (its footprint) anchored at its top (lowest gx, gy) tile; its door is the tile in front of the middle of its +y (south-west) edge.
 - A placement is valid when every footprint tile is inside the Town, not occupied by another building and not on a reserved tile (gate approaches).
 
 ## Build mode (UI)

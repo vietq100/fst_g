@@ -16,7 +16,7 @@ value = 30.0
 [resource]
 script = ExtResource("1_item")
 id = &"steel_armor"
-display_name = "Steel Armor"
+display_name = "item.steel_armor.name"
 item_type = 1
 rarity = 3
 stackable = false

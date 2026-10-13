@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_activity")
 id = &"resting"
-display_name = "Resting"
+display_name = "activity.resting.name"
 location_id = &"tavern"
 player_assignable = true
 tick_seconds = 10.0

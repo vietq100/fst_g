@@ -13,9 +13,9 @@ func _watch() -> Array:
 
 
 func _build(content: VBoxContainer) -> void:
-	set_title("Shop & Services")
+	set_title(Loc.t("ui.shop.title"))
 	var buildings := GameManager.buildings
-	var quests := UIKit.button("Quests (%d ready)" % GameManager.quests.get_claimable_count(),
+	var quests := UIKit.button(Loc.t("ui.shop.quests", {"count": GameManager.quests.get_claimable_count()}),
 		func() -> void: open_requested.emit(QuestSheet.new()), &"PrimaryButton" if GameManager.quests.get_claimable_count() > 0 else &"")
 	content.add_child(quests)
 	for building_id in SERVICES:
@@ -24,16 +24,16 @@ func _build(content: VBoxContainer) -> void:
 			continue
 		var level := buildings.get_level(building_id)
 		var info := UIKit.vbox([
-			UIKit.label("%s%s" % [definition.display_name, "  Lv %d" % level if level > 0 else ""]),
-			UIKit.label(BuildingSheet.DESCRIPTIONS.get(building_id, ""), &"MutedLabel"),
+			UIKit.label(Loc.t("ui.shop.name_level", {"name": definition.display_name, "level": level}) if level > 0 else definition.display_name),
+			UIKit.label(BuildingSheet.describe(building_id), &"MutedLabel"),
 		], 2)
 		var action: Button
 		if level > 0:
-			action = UIKit.button("Open", func() -> void: open_requested.emit(BuildingSheet.new(building_id)), &"PrimaryButton")
+			action = UIKit.button(Loc.t("ui.shop.open"), func() -> void: open_requested.emit(BuildingSheet.new(building_id)), &"PrimaryButton")
 		else:
 			var reason := buildings.can_build(building_id)
-			info.add_child(UIKit.label(reason if not reason.is_empty() else "Not built — use Construct", &"WarningLabel"))
-			action = UIKit.button("Locked", func() -> void: pass, &"", "Not built")
+			info.add_child(UIKit.label(reason if not reason.is_empty() else Loc.t("ui.shop.not_built_hint"), &"WarningLabel"))
+			action = UIKit.button(Loc.t("ui.shop.locked"), func() -> void: pass, &"", Loc.t("ui.shop.not_built"))
 		action.size_flags_horizontal = Control.SIZE_SHRINK_END
 		action.custom_minimum_size.x = 64
 		content.add_child(UIKit.card(UIKit.hbox([info, action])))

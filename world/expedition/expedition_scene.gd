@@ -72,7 +72,7 @@ func start(service: ExpeditionService, party: Array[Hunter] = []) -> void:
 		if hunter == null:
 			hunter = HUNTER_SCENE.instantiate() as Hunter
 			_actors.add_child(hunter)
-			hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment)
+			hunter.setup(runtime, GameManager.hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment, GameManager.class_skills)
 		hunter.global_position = _hunter_spawn.global_position + FORMATION[index % FORMATION.size()]
 		hunter.travel_target = Vector2.INF
 		var on_downed := _on_hunter_downed.bind(hunter)
@@ -103,9 +103,9 @@ func release_party() -> void:
 func setup_debug(panel: DebugPanel) -> void:
 	panel.add_separator()
 	panel.add_button_row([
-		["Kill wave", _debug_kill_wave],
-		["Party Lv 10", _debug_party_level],
-		["Wipe party", _debug_wipe],
+		[Loc.t("world.expedition.dev_kill_wave"), _debug_kill_wave],
+		[Loc.t("world.expedition.dev_party_level"), _debug_party_level],
+		[Loc.t("world.expedition.dev_wipe"), _debug_wipe],
 	])
 	_status_label = panel.add_label("")
 	_refresh_status()
@@ -190,13 +190,13 @@ func _on_enemy_died(enemy: Enemy) -> void:
 func _show_loot(reward: KillReward, at: Vector2) -> void:
 	var line := 0
 	if reward.gold > 0:
-		_spawn_popup("+%d gold" % reward.gold, RarityColors.GOLD, at, 0.0)
+		_spawn_popup(Loc.t("world.popup.gold", {"gold": reward.gold}), RarityColors.GOLD, at, 0.0)
 		line += 1
 	for item_id in reward.items:
 		var item := DataRegistry.get_item(item_id)
 		if item != null:
 			var offset := Vector2(0, -LOOT_LINE_HEIGHT * line)
-			_spawn_popup("+%d %s" % [reward.items[item_id], item.display_name], RarityColors.of(item.rarity), at + offset, LOOT_POPUP_STAGGER * line)
+			_spawn_popup(Loc.t("world.popup.item", {"count": reward.items[item_id], "name": item.display_name}), RarityColors.of(item.rarity), at + offset, LOOT_POPUP_STAGGER * line)
 			line += 1
 
 
@@ -248,13 +248,14 @@ func _refresh_status() -> void:
 	if _status_label == null or _service == null or _service.current_run == null:
 		return
 	var run := _service.current_run
-	var where := "Boss" if _service.is_boss_section(_section) else "Section %d/%d" % [_section + 1, _definition.enemy_groups.size()]
-	_status_label.text = "%s  %s  %s\nKills %d  Stash %d gold  XP %d each\nDowned %d/%d\nStash: %s" % [
-		_definition.display_name, where, Stage.keys()[_stage],
-		run.kills, run.stash_gold, run.xp_per_hunter,
-		run.downed_ids.size(), run.party_ids.size(),
-		ItemText.describe(run.stash_items, DataRegistry),
-	]
+	var where := Loc.t("world.expedition.boss") if _service.is_boss_section(_section) \
+			else Loc.t("world.expedition.section", {"index": _section + 1, "count": _definition.enemy_groups.size()})
+	_status_label.text = Loc.t("world.expedition.status", {
+		"name": _definition.display_name, "where": where, "stage": Stage.keys()[_stage],
+		"kills": run.kills, "gold": run.stash_gold, "xp": run.xp_per_hunter,
+		"downed": run.downed_ids.size(), "party": run.party_ids.size(),
+		"stash": ItemText.describe(run.stash_items, DataRegistry),
+	})
 
 
 func _debug_kill_wave() -> void:

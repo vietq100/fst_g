@@ -104,6 +104,10 @@ func think() -> void:
 		_set_task(runtime.task if runtime.task == HunterRuntime.HUNTING else &"")
 		_deposit()
 		return
+	if in_town and GameManager.equipment.wants_repair(runtime):
+		_set_task(&"")
+		_repair()
+		return
 	if go_home or duty_region == null or (in_town and runtime.task == &"" and _busy_in_town(runtime)):
 		_go_home(in_town)
 	else:
@@ -251,8 +255,21 @@ func _visit_hospital() -> void:
 	hunter.travel_target = door
 
 
+## A worn weapon goes to the Blacksmith; the Hunter pays from its purse (D64).
+func _repair() -> void:
+	var door := map.get_door(BuildingService.BLACKSMITH)
+	if door == Vector2.INF or _arrived(door):
+		GameManager.equipment.repair_by_hunter(hunter.runtime)
+		hunter.visual.play_action(ChibiAnimations.INTERACT)
+		return
+	hunter.travel_target = door
+
+
+## Loot goes to the Market when the Town has one, else to the Warehouse door (D63).
 func _deposit() -> void:
-	var door := map.get_door(BuildingService.WAREHOUSE)
+	var door := map.get_door(BuildingService.MARKET)
+	if door == Vector2.INF:
+		door = map.get_door(BuildingService.WAREHOUSE)
 	if door == Vector2.INF or _arrived(door):
 		GameManager.regions.deposit(hunter.runtime)
 		hunter.visual.play_action(ChibiAnimations.INTERACT)

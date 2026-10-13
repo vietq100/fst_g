@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hunter Skill Guide</title>
+<style>
+
+  :root{
+    --bg:#15110d; --card:#2a221a; --card2:#332a20; --line:#4a3b2c;
+    --text:#efe3cf; --muted:#a8977f; --gold:#e3b341; --red:#d6553f; --green:#7fb75a;
+    --active:#e08a3c; --passive:#5aa3d6; --mob:#7fb75a; --pvp:#d66b9c; --boss:#e3b341;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+  header{padding:28px 0 16px;background:linear-gradient(180deg,#2a2016,var(--bg));border-bottom:1px solid var(--line)}
+  h1{margin:0 0 6px;font-size:28px;color:var(--gold)}
+  h1 small{font-size:14px;color:var(--muted);font-weight:normal;margin-left:10px}
+  h2{color:var(--gold);font-size:20px;margin:0 0 8px}
+  h3{color:var(--gold);font-size:16px;margin:14px 0 6px}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .rule{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .rule b{color:var(--gold)}
+  .rule .big{font-size:26px;font-weight:700;line-height:1.1}
+  .stat{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid transparent;cursor:pointer;user-select:none;white-space:nowrap}
+  .stat.on{outline:2px solid var(--text)}
+  .s-ATK{background:#4a2a22;color:#f2a08f;border-color:#7a3f33}
+  .s-DEF{background:#2b3a4a;color:#9fc6ea;border-color:#3e5a75}
+  .s-HP{background:#3a2a3a;color:#e5a5c7;border-color:#5c3f5c}
+  .s-ASPD{background:#4a3d1e;color:#f0d27a;border-color:#7a6430}
+  .s-MSPD{background:#1f3f3a;color:#8fe0cf;border-color:#2f6a60}
+  .s-CRIT{background:#2f2446;color:#c9a8f2;border-color:#4e3b75}
+  .s-CRITDMG{background:#45203a;color:#f2a0d6;border-color:#73365f}
+  .s-RANGE{background:#223f2a;color:#a6e39a;border-color:#366a43}
+  .s-LV{background:#3a3a3a;color:#e6e6e6;border-color:#666}
+  .s-GOLD{background:#4a3a12;color:#ffd866;border-color:#8a6a1a}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+  .tab{padding:10px 18px;border-radius:10px 10px 0 0;background:var(--card);border:1px solid var(--line);border-bottom:none;cursor:pointer;font-weight:700;color:var(--muted)}
+  .tab.on{background:var(--card2);color:var(--gold)}
+  .classinfo{background:var(--card2);border:1px solid var(--line);border-radius:0 10px 10px 10px;padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+  .classinfo p{margin:4px 0;color:var(--muted)}
+  .promo{display:flex;gap:8px;flex-wrap:wrap}
+  .promo span{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px}
+  .promo b{color:var(--gold)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 14px}
+  .toolbar input,.toolbar select,.toolbar button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+  .toolbar input{min-width:200px;flex:1 1 200px;max-width:320px}
+  .toolbar button{cursor:pointer}
+  .toolbar button.primary{background:var(--gold);color:#1a1409;border-color:var(--gold);font-weight:700}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .count{color:var(--muted);font-size:13px;margin-left:auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;margin-bottom:30px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;position:relative}
+  .card.active{border-left:4px solid var(--active)}
+  .card.passive{border-left:4px solid var(--passive)}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-right:26px}
+  .card .name{font-weight:700;font-size:16px}
+  .card .name small{display:block;color:var(--muted);font-weight:normal;font-size:12px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;white-space:nowrap}
+  .badge.active{background:#4a3012;color:#f3b06b}
+  .badge.passive{background:#1f3140;color:#8fc4ec}
+  .badge.new{background:#1f3a22;color:#9be08a}
+  .badge.chg{background:#3a2f12;color:#f0cf6a}
+  .card .formula{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold);background:#1a140e;border-radius:6px;padding:5px 8px}
+  .card .was{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8f7d66;text-decoration:line-through}
+  .card .note{font-size:12px;color:#d9c7a8;background:#221b14;border-left:3px solid var(--line);padding:4px 8px;border-radius:4px}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
+  .fx{font-size:11px;padding:1px 7px;border-radius:6px;background:#3b2d22;color:#d9b38c;border:1px solid #5a4430}
+  .num{font-size:11px;color:var(--muted);position:absolute;top:10px;right:12px}
+  .ctx{display:flex;gap:10px;font-size:12px;flex-wrap:wrap}
+  .ctx span{white-space:nowrap}
+  .stars{letter-spacing:1px}
+  .c-mob{color:var(--mob)} .c-pvp{color:var(--pvp)} .c-boss{color:var(--boss)}
+  .dim{color:#5a4a3a}
+  .panel{background:linear-gradient(135deg,#2c2117,#1b1510);border:1px solid var(--gold);border-radius:12px;padding:16px;margin:10px 0 24px}
+  .panel p{margin:0 0 10px;color:var(--muted)}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:12px}
+  .slot{background:var(--card);border:1px dashed var(--line);border-radius:10px;min-height:92px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+  .slot.empty{justify-content:center;align-items:center;color:var(--muted);font-size:13px}
+  .slot .name{font-weight:700}
+  .slot .d{font-size:12px;color:var(--muted)}
+  .bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px}
+  .bar{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px}
+  .bar .track{height:8px;background:#1a140e;border-radius:4px;margin-top:6px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:4px}
+  .summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
+  .summary b{color:var(--text)}
+  details{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+  summary{cursor:pointer;color:var(--gold);font-weight:700}
+  .tablewrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:var(--card2);color:var(--gold)}
+  code{background:#1a140e;padding:1px 5px;border-radius:4px;font-size:12px}
+  ul{margin:6px 0;padding-left:20px}
+  li{margin:3px 0}
+  footer{color:var(--muted);font-size:12px;padding:20px 0 40px;border-top:1px solid var(--line)}
+  @media (max-width:700px){.classinfo{grid-template-columns:1fr} h1 small{display:block;margin:4px 0 0}}
+
+  .warn{background:#3a2412;border:1px solid var(--active);border-radius:10px;padding:10px 14px;margin:0 0 14px;color:#f3c99b}
+  .lv{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:start}
+  .lv b{font-size:11px;color:var(--muted);padding-top:5px;white-space:nowrap}
+  .lv .formula{margin:0}
+  .badge.auto{background:#1f3a35;color:#8fe0cf}
+  .badge.approx{background:#3a2f12;color:#f0cf6a}
+  .note.approx{border-left-color:var(--active)}
+  .simgrid{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .simgrid label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+  .simgrid input[type=number]{width:70px}
+  .lvpips{letter-spacing:2px;color:var(--gold)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>⚔️ Hunter Skill Guide <small>v3 · mana · cấp skill · điểm skill · chuyển sinh</small></h1>
+    <div style="color:var(--muted)">4 class × 30 skill. Hunter nhận <b>1 điểm skill mỗi 10 cấp</b>, dùng điểm để <b>mở 1 skill ngẫu nhiên</b> (tối đa 7) hoặc <b>nâng 1 skill</b> (tối đa cấp 6). <b style="color:var(--active)">Thi triển</b> tốn mana, <b style="color:var(--passive)">Nội tại</b> luôn có tác dụng. Số liệu khớp với dữ liệu trong game. Bản markdown: <code>skills_guide.md</code>.</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="rules">
+    <div class="rule"><div class="big">30</div>skill / class: 18 thi triển + 12 nội tại. Class thăng cấp dùng pool của class gốc.</div>
+    <div class="rule"><div class="big">7</div>skill tối đa / Hunter. Mỗi lần mở là ngẫu nhiên, không trùng.</div>
+    <div class="rule"><div class="big">1 / 10</div>1 điểm skill mỗi 10 cấp Hunter (10, 20 … 100). Điểm chưa dùng được giữ lại.</div>
+    <div class="rule"><div class="big">Lv 6</div>cấp skill tối đa. Sức mạnh <code>1 + 0.15 × (cấp − 1)</code>, cấp 6 = ×1.75. Buff kéo dài ×1.75, debuff ×1.375.</div>
+    <div class="rule"><div class="big">Mana</div>tối đa 100 + 2/cấp, hồi 5/giây (×3 khi không đánh). Skill thi triển tốn <code>8 + 1.5 × hồi chiêu</code>, +6% mỗi cấp skill.</div>
+    <div class="rule"><div class="big">Lv 100</div>chuyển sinh: về cấp 1, giữ nguyên skill và cấp skill, <b>+1 điểm đổi skill</b> lưu theo từng Hunter.</div>
+  </div>
+  <div class="warn">⚠️ Town Hall hiện tối đa cấp 5 nên Hunter chỉ lên tới cấp 50. Cần thêm Town Hall cấp 6–10 để có thể chuyển sinh ở cấp 100.</div>
+
+  <details open>
+    <summary>📘 Luật hệ thống (đã cài đặt)</summary>
+    <div class="tablewrap"><table>
+      <tr><th>Luật</th><th>Chi tiết</th></tr>
+      <tr><td>Dùng 1 điểm skill</td><td>Mở 1 skill ngẫu nhiên chưa có, cấp 1. Hoặc nâng 1 skill đã có lên 1 cấp.</td></tr>
+      <tr><td>Đổi skill</td><td>1 điểm đổi thay 1 skill bằng 1 skill ngẫu nhiên chưa có, giữ nguyên ô và cấp.</td></tr>
+      <tr><td>Thi triển trong trận</td><td>Hunter tự dùng skill đầu tiên (theo thứ tự mở) đã hồi chiêu, đủ mana và đủ điều kiện. Cách nhau tối thiểu 0.8 giây.</td></tr>
+      <tr><td>Điều kiện</td><td>Skill đánh cần kẻ địch trong tầm. Hồi máu và thanh tẩy chờ đồng đội dưới 70% HP hoặc dính debuff. Skill có ngưỡng HP chờ máu thấp.</td></tr>
+      <tr><td>Nội tại tự kích</td><td>Có hồi chiêu, không tốn mana: Bất Khuất, Thoát Hiểm, Kiên Trì, Hào Quang Bảo Hộ, Người Che Chắn, Tâm Kiên.</td></tr>
+      <tr><td>Sát thương mỗi hit</td><td><code>(hệ số × ATK + hệ số × chỉ số) × sức mạnh</code>, rồi trừ <code>DEF × 0.5</code> mỗi hit, chí mạng, kết liễu, bonus loại quái.</td></tr>
+      <tr><td>Chỉ số mới</td><td>Né tránh (trần 40%), Kháng khống chế (trần 70%), Tầm đánh %, Hồi máu %.</td></tr>
+      <tr><td>Điều kiện nội tại</td><td>với boss · với người (Goblin, Skeleton) · với thú (Wolf) · khi không bị nhắm · với mục tiêu trên 90% HP · khi HP dưới 50% · khi HP trên 70%.</td></tr>
+      <tr><td>👑 Boss</td><td>Choáng, Đóng Băng, Trói, Tước Vũ Khí thành <b>Loạng Choạng</b> (+10% sát thương nhận, 2 giây). Debuff mềm còn nửa thời gian. Chảy Máu ×0.25. Ngưỡng kết liễu 15%, không hồi chiêu khi hạ boss.</td></tr>
+      <tr><td>⚔️ Người</td><td>Đấu Trường 1vs1, 4vs4, 6vs6 mới ở mức thiết kế (<code>ARENA_SYSTEM.md</code>). Ghi chú "Đấu Trường (thiết kế)" là luật dự kiến.</td></tr>
+    </table></div>
+  </details>
+
+  <details>
+    <summary>📐 Ghi chú cân bằng</summary>
+    <ul>
+      <li><b>Mốc tham chiếu:</b> Hunter Lv10 đồ Iron. Warrior 258 HP, 39 ATK. Ranger 191 HP, 36 ATK, tầm 110. Rogue 210 HP, 36 ATK, 25% chí mạng. Guardian 324 HP, 30 ATK, 28 DEF.</li>
+      <li><b>Ngân sách skill đơn mục tiêu:</b> hệ số ≈ 25% ATK × hồi chiêu. Diện rộng ≈ 40% của đơn mục tiêu cho mỗi mục tiêu.</li>
+      <li><b>Mỗi hit trừ DEF riêng:</b> skill nhiều hit nhỏ mạnh với bầy quái, yếu với boss DEF cao. Hiệu ứng theo thời gian bỏ qua DEF.</li>
+      <li><b>Mana là giới hạn:</b> với 4 skill thi triển hồi chiêu khoảng 12 giây, Hunter dùng được khoảng 60% số lần có thể.</li>
+      <li><b>Chỉ số phụ luôn có trần:</b> skill theo Tốc chạy, Tốc đánh, Tầm đánh nhân theo tỉ lệ với giá trị gốc của class, không cộng phẳng.</li>
+    </ul>
+  </details>
+
+  <div class="panel">
+    <h2>🎲 Mô phỏng tiến trình skill</h2>
+    <p>Chọn class, số lần chuyển sinh và cấp hiện tại. Mỗi điểm skill được dùng theo chiến lược đã chọn, skill mở ra luôn ngẫu nhiên. Thanh bên dưới cộng sao của bộ skill theo bối cảnh.</p>
+    <div class="simgrid">
+      <select id="simClass"></select>
+      <label>Chuyển sinh <input type="number" id="simLives" min="0" max="20" value="0"></label>
+      <label>Cấp hiện tại <input type="number" id="simLevel" min="1" max="100" value="50"></label>
+      <select id="simStrategy">
+        <option value="fill">Mở đủ 7 skill rồi mới nâng</option>
+        <option value="deep">Nâng tối đa từng skill rồi mới mở tiếp</option>
+      </select>
+      <button class="primary" id="simBtn">Mô phỏng</button>
+      <button id="simStats">Thống kê 10.000 lần</button>
+    </div>
+    <div class="summary" id="simSummary"></div>
+    <div class="slots" id="simSlots"></div>
+    <div class="bars" id="simBars"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="classinfo" id="classinfo"></div>
+
+  <div class="toolbar">
+    <input id="search" placeholder="Tìm tên, mô tả, hiệu ứng…">
+    <select id="typeFilter">
+      <option value="">Mọi loại</option>
+      <option value="active">Thi triển</option>
+      <option value="passive">Nội tại</option>
+      <option value="auto">Nội tại tự kích</option>
+    </select>
+    <select id="ctxFilter">
+      <option value="">Mọi bối cảnh</option>
+      <option value="0">3 sao vs 🐺 Quái</option>
+      <option value="1">3 sao vs ⚔️ Người</option>
+      <option value="2">3 sao vs 👑 Boss</option>
+    </select>
+    <select id="approxFilter">
+      <option value="">Mọi skill</option>
+      <option value="1">Chỉ skill có cài đặt đơn giản hoá</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="chips" id="statFilter" style="margin:-4px 0 14px"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Dữ liệu: <code>data/class_skills/*.tres</code> · luật: <code>DOCS/SYSTEMS/CLASS_SKILL_SYSTEM.md</code> · quyết định D69, D70.</footer>
+</div>
+
+<script>
+const ROWS = [{"id": "heavy_slash", "cls": "warrior", "vi": "Chém Mạnh", "en": "Heavy Slash", "type": "active", "stat": "ATK", "cd": 6, "m1": 17, "m6": 22, "desc": "Một nhát chém nặng vào mục tiêu.", "f1": "ST 160% ATK", "f6": "ST 280% ATK", "ctx": [2, 2, 3], "note": "Một hit lớn nên ít bị DEF boss ăn mòn.", "approx": "", "auto": false}, {"id": "whirlwind", "cls": "warrior", "vi": "Xoáy Kiếm", "en": "Whirlwind", "type": "active", "stat": "ATK", "cd": 10, "m1": 23, "m6": 30, "desc": "Xoay kiếm đánh mọi kẻ địch xung quanh.", "f1": "ST 110% ATK; AoE quanh mình 40px", "f6": "ST 192.5% ATK; AoE quanh mình 40px", "ctx": [3, 1, 1], "note": "Công cụ dọn bầy quái chính của Warrior.", "approx": "", "auto": false}, {"id": "battle_cry", "cls": "warrior", "vi": "Tiếng Gầm Chiến Trận", "en": "Battle Cry", "type": "active", "stat": "LV", "cd": 20, "m1": 38, "m6": 49, "desc": "Bản thân và đồng đội gần đó nhận Cường Lực.", "f1": "đồng đội quanh mình: Cường Lực 8s", "f6": "đồng đội quanh mình: Cường Lực 14s", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "pierce", "cls": "warrior", "vi": "Đâm Xuyên", "en": "Pierce", "type": "active", "stat": "ATK", "cd": 10, "m1": 23, "m6": 30, "desc": "Đâm xuyên, phá giáp các mục tiêu trúng đòn.", "f1": "ST 140% ATK; AoE quanh mục tiêu 24px; gây Phá Giáp 6s", "f6": "ST 245% ATK; AoE quanh mục tiêu 24px; gây Phá Giáp 8.2s", "ctx": [2, 2, 3], "note": "Boss: Phá Giáp còn nửa thời gian. Skill mở boss tốt nhất của Warrior.", "approx": "", "auto": false}, {"id": "shoulder_bash", "cls": "warrior", "vi": "Vai Húc", "en": "Shoulder Bash", "type": "active", "stat": "HP", "cd": 12, "m1": 26, "m6": 34, "desc": "Húc vai làm choáng mục tiêu, mạnh theo thể lực.", "f1": "ST 50% ATK + 6% HP tối đa; gây Choáng 1.5s", "f6": "ST 87.5% ATK + 10.5% HP tối đa; gây Choáng 2.1s", "ctx": [2, 3, 1], "note": "Boss: Stagger thay choáng. Đấu Trường (thiết kế): choáng 0.6s.", "approx": "", "auto": false}, {"id": "riposte", "cls": "warrior", "vi": "Phản Đòn", "en": "Riposte", "type": "active", "stat": "ATK", "cd": 14, "m1": 29, "m6": 38, "desc": "Vào thế thủ, phản lại sát thương nhận vào.", "f1": "bản thân: Phản Đòn 8s", "f6": "bản thân: Phản Đòn 14s", "ctx": [2, 2, 2], "note": "", "approx": "Phản đòn = hiệu ứng Phản Đòn.", "auto": false}, {"id": "rend", "cls": "warrior", "vi": "Vết Chém Chảy Máu", "en": "Rend", "type": "active", "stat": "ATK", "cd": 8, "m1": 20, "m6": 26, "desc": "Chém gây chảy máu.", "f1": "ST 80% ATK; gây Chảy Máu ×2 5s", "f6": "ST 140% ATK; gây Chảy Máu ×2 6.9s", "ctx": [2, 2, 2], "note": "Boss: Chảy Máu chỉ gây 25% sát thương.", "approx": "", "auto": false}, {"id": "leap_strike", "cls": "warrior", "vi": "Nhảy Chém", "en": "Leap Strike", "type": "active", "stat": "MSPD", "cd": 11, "m1": 24, "m6": 31, "desc": "Nhảy tới mục tiêu ở xa, càng nhanh càng đau.", "f1": "ST (140% ATK) × Tốc chạy/gốc; tầm thi triển 80px", "f6": "ST (245% ATK) × Tốc chạy/gốc; tầm thi triển 80px", "ctx": [2, 3, 1], "note": "Áp sát Ranger hoặc pháp sư ở Đấu Trường.", "approx": "Không di chuyển Hunter, chỉ giữ sát thương.", "auto": false}, {"id": "berserk", "cls": "warrior", "vi": "Cuồng Nộ", "en": "Berserk", "type": "active", "stat": "ASPD", "cd": 25, "m1": 46, "m6": 60, "desc": "Đánh nhanh và mạnh hơn trong một lúc.", "f1": "bản thân: Tăng Tốc 6s, Cường Lực 8s", "f6": "bản thân: Tăng Tốc 10.5s, Cường Lực 14s", "ctx": [3, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "sword_wave", "cls": "warrior", "vi": "Kiếm Khí", "en": "Sword Wave", "type": "active", "stat": "RANGE", "cd": 7, "m1": 18, "m6": 23, "desc": "Phóng sóng kiếm bay xa, trúng cả nhóm quanh mục tiêu.", "f1": "ST 120% ATK; AoE quanh mục tiêu 20px; tầm thi triển 60px", "f6": "ST 210% ATK; AoE quanh mục tiêu 20px; tầm thi triển 60px", "ctx": [2, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "last_stand", "cls": "warrior", "vi": "Tử Chiến", "en": "Last Stand", "type": "active", "stat": "HP", "cd": 60, "m1": 98, "m6": 127, "desc": "Khi máu dưới 30%: hồi máu và cứng cáp lại.", "f1": "hồi 20% HP tối đa (bản thân); bản thân: Kiên Cố 8s; kích hoạt khi HP dưới 30%", "f6": "hồi 35% HP tối đa (bản thân); bản thân: Kiên Cố 14s; kích hoạt khi HP dưới 30%", "ctx": [2, 3, 3], "note": "Đấu Trường (thiết kế): hồi ×0.7.", "approx": "", "auto": false}, {"id": "triple_slash", "cls": "warrior", "vi": "Chém Liên Hoàn", "en": "Triple Slash", "type": "active", "stat": "CRIT", "cd": 8, "m1": 20, "m6": 26, "desc": "Ba nhát chém liên tiếp, mỗi nhát chí mạng riêng.", "f1": "ST 3 × 65% ATK; +15% chí mạng", "f6": "ST 3 × 113.8% ATK; +15% chí mạng", "ctx": [2, 2, 1], "note": "3 hit nhỏ, yếu khi gặp DEF cao.", "approx": "", "auto": false}, {"id": "execute", "cls": "warrior", "vi": "Đòn Kết Liễu", "en": "Execute", "type": "active", "stat": "CRITDMG", "cd": 15, "m1": 30, "m6": 39, "desc": "Đòn kết liễu, cực mạnh với mục tiêu yếu máu.", "f1": "ST 180% ATK; +30% ST chí mạng; mục tiêu dưới 25% HP: ×1.5 (boss 15%)", "f6": "ST 315% ATK; +30% ST chí mạng; mục tiêu dưới 25% HP: ×1.5 (boss 15%)", "ctx": [3, 3, 2], "note": "Boss: ngưỡng 15% HP.", "approx": "", "auto": false}, {"id": "iron_stance", "cls": "warrior", "vi": "Thế Thép", "en": "Iron Stance", "type": "active", "stat": "DEF", "cd": 18, "m1": 35, "m6": 46, "desc": "Trụ vững, tăng mạnh phòng thủ.", "f1": "bản thân: Kiên Cố 8s", "f6": "bản thân: Kiên Cố 14s", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "ground_slam", "cls": "warrior", "vi": "Đập Đất", "en": "Ground Slam", "type": "active", "stat": "DEF", "cd": 12, "m1": 26, "m6": 34, "desc": "Đập kiếm xuống đất, làm chậm kẻ địch xung quanh.", "f1": "ST 70% ATK + 60% DEF; AoE quanh mình 40px; gây Làm Chậm 4s", "f6": "ST 122.5% ATK + 105% DEF; AoE quanh mình 40px; gây Làm Chậm 5.5s", "ctx": [3, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "taunt", "cls": "warrior", "vi": "Khiêu Khích", "en": "Taunt", "type": "active", "stat": "HP", "cd": 16, "m1": 32, "m6": 42, "desc": "Ép kẻ địch gần đó đánh mình và cứng cáp lại.", "f1": "khiêu khích địch trong 80px; bản thân: Kiên Cố 8s", "f6": "khiêu khích địch trong 80px; bản thân: Kiên Cố 14s", "ctx": [3, 2, 2], "note": "Kẻ địch đổi mục tiêu sang Hunter và giữ đến khi tự đổi. Đấu Trường (thiết kế): ×0.5.", "approx": "Khiêu khích + Kiên Cố.", "auto": false}, {"id": "second_wind", "cls": "warrior", "vi": "Hồi Sức", "en": "Second Wind", "type": "active", "stat": "HP", "cd": 30, "m1": 53, "m6": 69, "desc": "Lấy lại hơi thở khi máu dưới 60%.", "f1": "hồi 5% HP tối đa (bản thân); bản thân: Hồi Máu 8s; kích hoạt khi HP dưới 60%", "f6": "hồi 8.8% HP tối đa (bản thân); bản thân: Hồi Máu 14s; kích hoạt khi HP dưới 60%", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "blade_storm", "cls": "warrior", "vi": "Bão Kiếm", "en": "Blade Storm", "type": "active", "stat": "ASPD", "cd": 20, "m1": 38, "m6": 49, "desc": "Múa kiếm đánh liên tục mọi kẻ địch quanh mình.", "f1": "ST 5 × 55% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 9); AoE quanh mình 40px", "f6": "ST 5 × 96.3% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 9); AoE quanh mình 40px", "ctx": [3, 1, 1], "note": "Nhiều hit nhỏ: rất mạnh với bầy, yếu với boss.", "approx": "", "auto": false}, {"id": "thick_skin", "cls": "warrior", "vi": "Da Thép", "en": "Thick Skin", "type": "passive", "stat": "DEF", "cd": 0, "m1": 0, "m6": 0, "desc": "Thân thể dày dạn.", "f1": "+8% DEF; +5% HP tối đa", "f6": "+14% DEF; +8.8% HP tối đa", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "bloodlust", "cls": "warrior", "vi": "Khát Máu", "en": "Bloodlust", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Hăng máu khi xông trận.", "f1": "+6% ATK", "f6": "+10.5% ATK", "ctx": [3, 1, 1], "note": "", "approx": "Cộng phẳng, không đếm số địch.", "auto": false}, {"id": "iron_will", "cls": "warrior", "vi": "Ý Chí Sắt", "en": "Iron Will", "type": "passive", "stat": "LV", "cd": 0, "m1": 0, "m6": 0, "desc": "Khó bị khống chế, càng già dặn càng vững.", "f1": "+30% kháng khống chế; +0.5% kháng khống chế mỗi 1 cấp Hunter (tối đa 40 lần)", "f6": "+52.5% kháng khống chế; +0.9% kháng khống chế mỗi 1 cấp Hunter (tối đa 40 lần)", "ctx": [1, 3, 2], "note": "", "approx": "", "auto": false}, {"id": "swordsmanship", "cls": "warrior", "vi": "Kiếm Thuật", "en": "Swordsmanship", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Thành thạo kiếm.", "f1": "+8% ATK", "f6": "+14% ATK", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "veteran", "cls": "warrior", "vi": "Dày Dạn", "en": "Veteran", "type": "passive", "stat": "LV", "cd": 0, "m1": 0, "m6": 0, "desc": "Kinh nghiệm chiến trường theo cấp.", "f1": "+1% sát thương mỗi 3 cấp Hunter (tối đa 15 lần)", "f6": "+1.8% sát thương mỗi 3 cấp Hunter (tối đa 15 lần)", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "battle_regen", "cls": "warrior", "vi": "Hồi Phục Chiến Trường", "en": "Battle Regen", "type": "passive", "stat": "HP", "cd": 0, "m1": 0, "m6": 0, "desc": "Hạ địch thì hồi máu.", "f1": "hồi 3% HP tối đa mỗi lần hạ địch", "f6": "hồi 5.2% HP tối đa mỗi lần hạ địch", "ctx": [3, 1, 1], "note": "Vô dụng khi chỉ có một boss.", "approx": "", "auto": false}, {"id": "retaliation", "cls": "warrior", "vi": "Phản Kích", "en": "Retaliation", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Bị dồn ép thì đánh mạnh hơn.", "f1": "+10% sát thương khi HP dưới 50%", "f6": "+17.5% sát thương khi HP dưới 50%", "ctx": [2, 2, 2], "note": "", "approx": "Mạnh hơn khi HP dưới 50%.", "auto": false}, {"id": "giant_slayer", "cls": "warrior", "vi": "Kẻ Diệt Khổng Lồ", "en": "Giant Slayer", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Càng to càng dễ trúng chỗ hiểm.", "f1": "+12% sát thương với boss", "f6": "+21% sát thương với boss", "ctx": [1, 2, 3], "note": "Thay Steadfast (trùng Iron Will). Trong PvP có tác dụng với Guardian.", "approx": "", "auto": false}, {"id": "heavy_crit", "cls": "warrior", "vi": "Đòn Nặng", "en": "Heavy Crit", "type": "passive", "stat": "CRITDMG", "cd": 0, "m1": 0, "m6": 0, "desc": "Chí mạng nặng tay.", "f1": "+3% Chí mạng; +30% ST chí mạng", "f6": "+5.2% Chí mạng; +52.5% ST chí mạng", "ctx": [2, 2, 2], "note": "Warrior chỉ có 5% CRIT gốc nên cần thêm tỷ lệ.", "approx": "", "auto": false}, {"id": "unyielding", "cls": "warrior", "vi": "Bất Khuất", "en": "Unyielding", "type": "passive", "stat": "HP", "cd": 90, "m1": 0, "m6": 0, "desc": "Khi sắp gục: bất tử chốc lát và hồi máu.", "f1": "hồi 10% HP tối đa (bản thân); bản thân: Bất Tử 2s; kích hoạt khi HP dưới 15%", "f6": "hồi 17.5% HP tối đa (bản thân); bản thân: Bất Tử 3.5s; kích hoạt khi HP dưới 15%", "ctx": [2, 3, 3], "note": "", "approx": "", "auto": true}, {"id": "hot_blood", "cls": "warrior", "vi": "Máu Nóng", "en": "Hot Blood", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Càng mất máu càng mạnh.", "f1": "+15% ATK khi HP dưới 50%", "f6": "+26.2% ATK khi HP dưới 50%", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "gladiator", "cls": "warrior", "vi": "Đấu Sĩ", "en": "Gladiator", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Sinh ra để đấu với người.", "f1": "+12% sát thương với người; -10% sát thương nhận với người", "f6": "+21% sát thương với người; -17.5% sát thương nhận với người", "ctx": [1, 3, 1], "note": "Thay Vanguard để Warrior có lựa chọn PvP.", "approx": "", "auto": false}, {"id": "piercing_arrow", "cls": "ranger", "vi": "Mũi Tên Xuyên", "en": "Piercing Arrow", "type": "active", "stat": "ATK", "cd": 8, "m1": 20, "m6": 26, "desc": "Mũi tên xuyên qua nhóm kẻ địch.", "f1": "ST 170% ATK; AoE quanh mục tiêu 24px", "f6": "ST 297.5% ATK; AoE quanh mục tiêu 24px", "ctx": [3, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "arrow_rain", "cls": "ranger", "vi": "Mưa Tên", "en": "Arrow Rain", "type": "active", "stat": "ASPD", "cd": 14, "m1": 29, "m6": 38, "desc": "Tên rơi như mưa xuống vùng mục tiêu.", "f1": "ST 6 × 45% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 10); AoE quanh mục tiêu 36px", "f6": "ST 6 × 78.8% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 10); AoE quanh mục tiêu 36px", "ctx": [3, 1, 1], "note": "Mỗi mũi trừ DEF riêng, yếu với boss tuần.", "approx": "", "auto": false}, {"id": "rapid_fire", "cls": "ranger", "vi": "Bắn Nhanh", "en": "Rapid Fire", "type": "active", "stat": "ASPD", "cd": 10, "m1": 23, "m6": 30, "desc": "Bắn liên tiếp nhiều mũi tên.", "f1": "ST 5 × 55% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 7)", "f6": "ST 5 × 96.3% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 7)", "ctx": [2, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "poison_arrow", "cls": "ranger", "vi": "Tên Độc", "en": "Poison Arrow", "type": "active", "stat": "ATK", "cd": 9, "m1": 22, "m6": 29, "desc": "Mũi tên tẩm độc.", "f1": "ST 100% ATK; gây Trúng Độc ×3 6s", "f6": "ST 175% ATK; gây Trúng Độc ×3 8.2s", "ctx": [2, 2, 3], "note": "Poison bỏ qua DEF nên hợp đánh boss.", "approx": "", "auto": false}, {"id": "fire_arrow", "cls": "ranger", "vi": "Tên Lửa", "en": "Fire Arrow", "type": "active", "stat": "ATK", "cd": 9, "m1": 22, "m6": 29, "desc": "Mũi tên thiêu đốt mục tiêu.", "f1": "ST 110% ATK; gây Bỏng 4s", "f6": "ST 192.5% ATK; gây Bỏng 5.5s", "ctx": [2, 2, 3], "note": "Bỏng giảm 10% DEF; với boss còn nửa thời gian.", "approx": "", "auto": false}, {"id": "frost_arrow", "cls": "ranger", "vi": "Tên Băng", "en": "Frost Arrow", "type": "active", "stat": "RANGE", "cd": 11, "m1": 24, "m6": 31, "desc": "Làm chậm, có thể đóng băng mục tiêu.", "f1": "ST 100% ATK; gây Làm Chậm 4s, Đóng Băng 2s (30%)", "f6": "ST 175% ATK; gây Làm Chậm 5.5s, Đóng Băng 2.8s (30%)", "ctx": [2, 3, 1], "note": "Boss: Frozen thành Stagger.", "approx": "Đóng băng là xác suất 30%.", "auto": false}, {"id": "disengage", "cls": "ranger", "vi": "Lùi Bước", "en": "Disengage", "type": "active", "stat": "MSPD", "cd": 12, "m1": 26, "m6": 34, "desc": "Lộn ra sau, tăng tốc chạy.", "f1": "bản thân: Tăng Tốc 6s", "f6": "bản thân: Tăng Tốc 10.5s", "ctx": [1, 3, 1], "note": "Skill thả diều cốt lõi ở Đấu Trường.", "approx": "Không lùi người, chỉ tăng tốc.", "auto": false}, {"id": "snare_trap", "cls": "ranger", "vi": "Bẫy Gấu", "en": "Snare Trap", "type": "active", "stat": "LV", "cd": 15, "m1": 30, "m6": 39, "desc": "Bẫy trói chân mục tiêu.", "f1": "ST 80% ATK; gây Trói Chân 3s", "f6": "ST 140% ATK; gây Trói Chân 4.1s", "ctx": [2, 3, 1], "note": "Boss: Stagger.", "approx": "", "auto": false}, {"id": "snipe", "cls": "ranger", "vi": "Bắn Tỉa", "en": "Snipe", "type": "active", "stat": "CRIT", "cd": 16, "m1": 32, "m6": 42, "desc": "Phát bắn tầm cực xa, rất dễ chí mạng.", "f1": "ST 260% ATK; tầm thi triển 220px; +40% chí mạng", "f6": "ST 455% ATK; tầm thi triển 220px; +40% chí mạng", "ctx": [1, 3, 3], "note": "Một hit rất lớn, xuyên DEF boss tốt.", "approx": "", "auto": false}, {"id": "split_shot", "cls": "ranger", "vi": "Tên Tách", "en": "Split Shot", "type": "active", "stat": "ATK", "cd": 8, "m1": 20, "m6": 26, "desc": "Mũi tên tách ra trúng cả nhóm.", "f1": "ST 85% ATK; AoE quanh mục tiêu 40px", "f6": "ST 148.8% ATK; AoE quanh mục tiêu 40px", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "hawk_eye", "cls": "ranger", "vi": "Mắt Diều Hâu", "en": "Hawk Eye", "type": "active", "stat": "CRIT", "cd": 20, "m1": 38, "m6": 49, "desc": "Tập trung cao độ.", "f1": "bản thân: Tập Trung 8s", "f6": "bản thân: Tập Trung 14s", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "explosive_arrow", "cls": "ranger", "vi": "Tên Nổ", "en": "Explosive Arrow", "type": "active", "stat": "RANGE", "cd": 13, "m1": 28, "m6": 36, "desc": "Mũi tên nổ tung, mạnh hơn khi tầm xa hơn.", "f1": "ST (120% ATK) × Tầm đánh/gốc; AoE quanh mục tiêu 30px", "f6": "ST (210% ATK) × Tầm đánh/gốc; AoE quanh mục tiêu 30px", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "homing_arrow", "cls": "ranger", "vi": "Tên Truy Đuổi", "en": "Homing Arrow", "type": "active", "stat": "RANGE", "cd": 10, "m1": 23, "m6": 30, "desc": "Không thể né.", "f1": "ST 130% ATK; không thể né", "f6": "ST 227.5% ATK; không thể né", "ctx": [2, 3, 2], "note": "Khắc chế Rogue né tránh ở Đấu Trường.", "approx": "", "auto": false}, {"id": "leeching_arrow", "cls": "ranger", "vi": "Tên Hút Máu", "en": "Leeching Arrow", "type": "active", "stat": "HP", "cd": 12, "m1": 26, "m6": 34, "desc": "Mũi tên rút sinh lực.", "f1": "ST 110% ATK; hồi 4% HP tối đa (bản thân)", "f6": "ST 192.5% ATK; hồi 7% HP tối đa (bản thân)", "ctx": [2, 2, 2], "note": "Đấu Trường (thiết kế): hồi ×0.7.", "approx": "", "auto": false}, {"id": "hunting_companion", "cls": "ranger", "vi": "Gọi Thú Săn", "en": "Hunting Companion", "type": "active", "stat": "HP", "cd": 30, "m1": 53, "m6": 69, "desc": "Sói săn cắn xé mục tiêu.", "f1": "ST 3 × 40% ATK + 2% HP tối đa; gây Chảy Máu ×2 5s", "f6": "ST 3 × 70% ATK + 3.5% HP tối đa; gây Chảy Máu ×2 6.9s", "ctx": [3, 2, 2], "note": "Chảy Máu giữ quái mất máu liên tục.", "approx": "Không triệu hồi sói: 3 vết cắn + Chảy Máu.", "auto": false}, {"id": "take_aim", "cls": "ranger", "vi": "Ngắm Kỹ", "en": "Take Aim", "type": "active", "stat": "CRITDMG", "cd": 14, "m1": 29, "m6": 38, "desc": "Phát bắn chắc chắn chí mạng.", "f1": "ST 150% ATK; +100% chí mạng; +40% ST chí mạng", "f6": "ST 262.5% ATK; +100% chí mạng; +40% ST chí mạng", "ctx": [1, 3, 3], "note": "", "approx": "", "auto": false}, {"id": "pinning_shot", "cls": "ranger", "vi": "Đóng Đinh", "en": "Pinning Shot", "type": "active", "stat": "ATK", "cd": 12, "m1": 26, "m6": 34, "desc": "Ghim tay kẻ địch, không thể tấn công.", "f1": "ST 100% ATK; gây Tước Vũ Khí 2.5s", "f6": "ST 175% ATK; gây Tước Vũ Khí 3.4s", "ctx": [2, 3, 1], "note": "Boss: Stagger. Đấu Trường (thiết kế): Disarmed 1.2s.", "approx": "", "auto": false}, {"id": "backflip_shot", "cls": "ranger", "vi": "Nhảy Lùi Bắn", "en": "Backflip Shot", "type": "active", "stat": "MSPD", "cd": 9, "m1": 22, "m6": 29, "desc": "Nhảy lùi rồi bắn, càng nhanh càng đau.", "f1": "ST (130% ATK) × Tốc chạy/gốc", "f6": "ST (227.5% ATK) × Tốc chạy/gốc", "ctx": [2, 3, 1], "note": "", "approx": "Không nhảy lùi, chỉ giữ sát thương.", "auto": false}, {"id": "keen_sight", "cls": "ranger", "vi": "Mắt Sắc", "en": "Keen Sight", "type": "passive", "stat": "RANGE", "cd": 0, "m1": 0, "m6": 0, "desc": "Nhìn xa, bắn xa.", "f1": "+15% tầm đánh", "f6": "+26.2% tầm đánh", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "quiver_mastery", "cls": "ranger", "vi": "Ống Tên Nhẹ", "en": "Quiver Mastery", "type": "passive", "stat": "ASPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Rút tên nhanh.", "f1": "+8% Tốc đánh", "f6": "+14% Tốc đánh", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "weak_spot", "cls": "ranger", "vi": "Điểm Yếu", "en": "Weak Spot", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Nhắm vào chỗ hiểm.", "f1": "+5% Chí mạng", "f6": "+8.8% Chí mạng", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "long_shot", "cls": "ranger", "vi": "Bắn Xa", "en": "Long Shot", "type": "passive", "stat": "RANGE", "cd": 0, "m1": 0, "m6": 0, "desc": "Khoảng cách là bạn.", "f1": "+8% sát thương", "f6": "+14% sát thương", "ctx": [2, 2, 2], "note": "", "approx": "Cộng phẳng, không tính khoảng cách.", "auto": false}, {"id": "light_feet", "cls": "ranger", "vi": "Chân Nhẹ", "en": "Light Feet", "type": "passive", "stat": "MSPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Chạy nhanh, bắn khi chạy.", "f1": "+10% Tốc chạy; +3% sát thương", "f6": "+17.5% Tốc chạy; +5.2% sát thương", "ctx": [2, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "double_nock", "cls": "ranger", "vi": "Hai Mũi Tên", "en": "Double Nock", "type": "passive", "stat": "ASPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Lắp hai mũi tên một lúc.", "f1": "+10% Tốc đánh", "f6": "+17.5% Tốc đánh", "ctx": [3, 2, 1], "note": "", "approx": "Thành tốc đánh, không bắn thêm mũi.", "auto": false}, {"id": "beast_tracker", "cls": "ranger", "vi": "Thợ Săn Thú", "en": "Beast Tracker", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Khắc tinh thú rừng.", "f1": "+15% sát thương với thú", "f6": "+26.2% sát thương với thú", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "composure", "cls": "ranger", "vi": "Bình Tĩnh", "en": "Composure", "type": "passive", "stat": "CRITDMG", "cd": 0, "m1": 0, "m6": 0, "desc": "Đầu lạnh khi còn khoẻ.", "f1": "+25% ST chí mạng khi HP trên 70%", "f6": "+43.8% ST chí mạng khi HP trên 70%", "ctx": [2, 1, 2], "note": "Đấu Trường (thiết kế): Ranger hay bị áp sát nên khó giữ trên 70%.", "approx": "", "auto": false}, {"id": "evasion", "cls": "ranger", "vi": "Né Tránh", "en": "Evasion", "type": "passive", "stat": "MSPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Né đòn.", "f1": "+6% né tránh", "f6": "+10.5% né tránh", "ctx": [2, 3, 2], "note": "", "approx": "", "auto": false}, {"id": "forager", "cls": "ranger", "vi": "Người Hái Lượm", "en": "Forager", "type": "passive", "stat": "GOLD", "cd": 0, "m1": 0, "m6": 0, "desc": "Nhặt được nhiều vàng hơn.", "f1": "+10% Tìm vàng", "f6": "+17.5% Tìm vàng", "ctx": [3, 1, 1], "note": "Đấu Trường (thiết kế): không tác dụng.", "approx": "", "auto": false}, {"id": "coated_arrows", "cls": "ranger", "vi": "Tên Tẩm", "en": "Coated Arrows", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Đòn thường đôi khi gây độc.", "f1": "đòn thường: Trúng Độc (12%)", "f6": "đòn thường: Trúng Độc (21%)", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "hunters_mark", "cls": "ranger", "vi": "Dấu Thợ Săn", "en": "Hunter's Mark", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Đánh dấu con mồi, cả đội đánh đau hơn.", "f1": "đòn thường: Dễ Tổn Thương (20%)", "f6": "đòn thường: Dễ Tổn Thương (35%)", "ctx": [1, 2, 3], "note": "Passive boss chính của Ranger, có lợi cho cả đội.", "approx": "", "auto": false}, {"id": "backstab", "cls": "rogue", "vi": "Đâm Lén", "en": "Backstab", "type": "active", "stat": "CRIT", "cd": 8, "m1": 20, "m6": 26, "desc": "Đâm vào chỗ hiểm, rất dễ chí mạng.", "f1": "ST 140% ATK; +50% chí mạng", "f6": "ST 245% ATK; +50% chí mạng", "ctx": [2, 3, 2], "note": "Boss thường nhắm tank nên Rogue gần như luôn đâm lén được.", "approx": "Không kiểm tra sau lưng; hợp với Kẻ Rình Rập.", "auto": false}, {"id": "vanish", "cls": "rogue", "vi": "Tàng Hình", "en": "Vanish", "type": "active", "stat": "CRITDMG", "cd": 22, "m1": 41, "m6": 53, "desc": "Biến mất trong chốc lát rồi ra đòn chí tử.", "f1": "bản thân: Bất Tử 2s, Tập Trung 8s", "f6": "bản thân: Bất Tử 3.5s, Tập Trung 14s", "ctx": [1, 3, 2], "note": "Đấu Trường (thiết kế): tàng hình 1.5s.", "approx": "Tàng hình = Bất Tử + Tập Trung.", "auto": false}, {"id": "fan_of_knives", "cls": "rogue", "vi": "Mưa Dao", "en": "Fan of Knives", "type": "active", "stat": "ASPD", "cd": 10, "m1": 23, "m6": 30, "desc": "Ném dao ra mọi hướng.", "f1": "ST 70% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 3); AoE quanh mình 45px; gây Chảy Máu 5s", "f6": "ST 122.5% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 3); AoE quanh mình 45px; gây Chảy Máu 6.9s", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "envenom", "cls": "rogue", "vi": "Lưỡi Độc", "en": "Envenom", "type": "active", "stat": "ATK", "cd": 18, "m1": 35, "m6": 46, "desc": "Dao tẩm độc nặng.", "f1": "ST 60% ATK; gây Trúng Độc ×3 6s", "f6": "ST 105% ATK; gây Trúng Độc ×3 8.2s", "ctx": [2, 2, 3], "note": "Bỏ qua DEF, rất bền khi đánh boss.", "approx": "Một phát độc 3 stack, không tẩm độc đòn thường.", "auto": false}, {"id": "shadow_step", "cls": "rogue", "vi": "Bước Bóng", "en": "Shadow Step", "type": "active", "stat": "MSPD", "cd": 9, "m1": 22, "m6": 29, "desc": "Lướt tới mục tiêu và đâm, càng nhanh càng đau.", "f1": "ST (120% ATK) × Tốc chạy/gốc; tầm thi triển 90px", "f6": "ST (210% ATK) × Tốc chạy/gốc; tầm thi triển 90px", "ctx": [2, 3, 1], "note": "", "approx": "Không dịch chuyển, chỉ giữ sát thương.", "auto": false}, {"id": "hamstring", "cls": "rogue", "vi": "Cắt Gân", "en": "Hamstring", "type": "active", "stat": "ATK", "cd": 10, "m1": 23, "m6": 30, "desc": "Chém gân làm chậm.", "f1": "ST 90% ATK; gây Làm Chậm 4s", "f6": "ST 157.5% ATK; gây Làm Chậm 5.5s", "ctx": [2, 3, 1], "note": "", "approx": "", "auto": false}, {"id": "eviscerate", "cls": "rogue", "vi": "Moi Ruột", "en": "Eviscerate", "type": "active", "stat": "CRITDMG", "cd": 12, "m1": 26, "m6": 34, "desc": "Đòn kết thúc, mạnh theo vết chảy máu.", "f1": "ST 120% ATK; +30% ST chí mạng; +30% ATK mỗi stack Chảy Máu", "f6": "ST 210% ATK; +30% ST chí mạng; +52.5% ATK mỗi stack Chảy Máu", "ctx": [2, 3, 3], "note": "", "approx": "", "auto": false}, {"id": "smoke_bomb", "cls": "rogue", "vi": "Bom Khói", "en": "Smoke Bomb", "type": "active", "stat": "LV", "cd": 20, "m1": 38, "m6": 49, "desc": "Khói làm kẻ địch xung quanh không thể tấn công.", "f1": "AoE quanh mình 60px; gây Tước Vũ Khí 2.5s", "f6": "AoE quanh mình 60px; gây Tước Vũ Khí 3.4s", "ctx": [2, 3, 1], "note": "Boss: Stagger.", "approx": "", "auto": false}, {"id": "shadow_execute", "cls": "rogue", "vi": "Kết Liễu Bóng Tối", "en": "Shadow Execute", "type": "active", "stat": "CRIT", "cd": 14, "m1": 29, "m6": 38, "desc": "Kết liễu mục tiêu yếu máu; hạ được thì hồi chiêu.", "f1": "ST 100% ATK; mục tiêu dưới 30% HP: ×2.2 (boss 15%); hạ được thì hồi chiêu (trừ boss)", "f6": "ST 175% ATK; mục tiêu dưới 30% HP: ×2.2 (boss 15%); hạ được thì hồi chiêu (trừ boss)", "ctx": [3, 3, 1], "note": "Boss: ngưỡng 15%, không hồi CD. Đấu Trường (thiết kế): hạ được chỉ giảm 50% CD.", "approx": "", "auto": false}, {"id": "blade_dance", "cls": "rogue", "vi": "Vũ Điệu Dao", "en": "Blade Dance", "type": "active", "stat": "ASPD", "cd": 11, "m1": 24, "m6": 31, "desc": "Chuỗi đâm liên tục.", "f1": "ST 4 × 55% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 7)", "f6": "ST 4 × 96.3% ATK (+1 hit mỗi 0.25 Tốc đánh trên 1.0, tối đa 7)", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "distract", "cls": "rogue", "vi": "Đánh Lạc Hướng", "en": "Distract", "type": "active", "stat": "LV", "cd": 15, "m1": 30, "m6": 39, "desc": "Làm mục tiêu suy yếu.", "f1": "gây Suy Yếu 6s", "f6": "gây Suy Yếu 8.2s", "ctx": [2, 2, 2], "note": "Boss: Suy Yếu còn nửa thời gian.", "approx": "", "auto": false}, {"id": "throwing_knife", "cls": "rogue", "vi": "Phi Dao", "en": "Throwing Knife", "type": "active", "stat": "RANGE", "cd": 6, "m1": 17, "m6": 22, "desc": "Ném dao tầm xa, làm chậm.", "f1": "ST 110% ATK; tầm thi triển 72px; gây Làm Chậm 4s", "f6": "ST 192.5% ATK; tầm thi triển 72px; gây Làm Chậm 5.5s", "ctx": [2, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "steal_vigor", "cls": "rogue", "vi": "Cướp Sức", "en": "Steal Vigor", "type": "active", "stat": "ATK", "cd": 13, "m1": 28, "m6": 36, "desc": "Đánh cắp sức mạnh kẻ địch.", "f1": "ST 100% ATK; gây Suy Yếu 6s; bản thân: Cường Lực 8s", "f6": "ST 175% ATK; gây Suy Yếu 8.2s; bản thân: Cường Lực 14s", "ctx": [2, 3, 2], "note": "", "approx": "", "auto": false}, {"id": "tempo", "cls": "rogue", "vi": "Nhịp Độ", "en": "Tempo", "type": "active", "stat": "ASPD", "cd": 18, "m1": 35, "m6": 46, "desc": "Tăng tốc toàn thân.", "f1": "bản thân: Tăng Tốc 6s", "f6": "bản thân: Tăng Tốc 10.5s", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "twin_strike", "cls": "rogue", "vi": "Song Đao", "en": "Twin Strike", "type": "active", "stat": "CRIT", "cd": 7, "m1": 18, "m6": 23, "desc": "Hai nhát liên tiếp.", "f1": "ST 2 × 80% ATK; +10% chí mạng", "f6": "ST 2 × 140% ATK; +10% chí mạng", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "night_leech", "cls": "rogue", "vi": "Hút Máu Bóng Đêm", "en": "Night Leech", "type": "active", "stat": "HP", "cd": 20, "m1": 38, "m6": 49, "desc": "Mỗi đòn hồi máu trong một lúc.", "f1": "bản thân: Hút Máu 8s", "f6": "bản thân: Hút Máu 14s", "ctx": [2, 2, 2], "note": "Đấu Trường (thiết kế): trần hút máu 20%.", "approx": "", "auto": false}, {"id": "detonate_poison", "cls": "rogue", "vi": "Kích Nổ Độc", "en": "Detonate Poison", "type": "active", "stat": "ATK", "cd": 12, "m1": 26, "m6": 34, "desc": "Kích nổ toàn bộ độc trên mục tiêu.", "f1": "ST 20% ATK; +35% ATK mỗi stack Trúng Độc, xoá stack", "f6": "ST 35% ATK; +61.2% ATK mỗi stack Trúng Độc, xoá stack", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "reflex", "cls": "rogue", "vi": "Phản Xạ", "en": "Reflex", "type": "active", "stat": "MSPD", "cd": 16, "m1": 32, "m6": 42, "desc": "Lách người và đâm trả.", "f1": "bản thân: Phản Đòn 8s, Tăng Tốc 6s", "f6": "bản thân: Phản Đòn 14s, Tăng Tốc 10.5s", "ctx": [2, 3, 2], "note": "", "approx": "Né mọi đòn = Phản Đòn + Tăng Tốc.", "auto": false}, {"id": "nimble", "cls": "rogue", "vi": "Nhanh Tay", "en": "Nimble", "type": "passive", "stat": "ASPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Tay nhanh hơn mắt.", "f1": "+8% Tốc đánh", "f6": "+14% Tốc đánh", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "assassinate", "cls": "rogue", "vi": "Mưu Sát", "en": "Assassinate", "type": "passive", "stat": "CRITDMG", "cd": 0, "m1": 0, "m6": 0, "desc": "Đòn đầu là đòn chí tử.", "f1": "+40% ST chí mạng với mục tiêu trên 90% HP", "f6": "+70% ST chí mạng với mục tiêu trên 90% HP", "ctx": [2, 3, 1], "note": "", "approx": "", "auto": false}, {"id": "honed_blades", "cls": "rogue", "vi": "Dao Sắc", "en": "Honed Blades", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Lưỡi dao luôn sắc.", "f1": "+4% Chí mạng", "f6": "+7% Chí mạng", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "catwalk", "cls": "rogue", "vi": "Bước Chân Mèo", "en": "Catwalk", "type": "passive", "stat": "MSPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Đi không tiếng động.", "f1": "+10% Tốc chạy", "f6": "+17.5% Tốc chạy", "ctx": [2, 2, 1], "note": "", "approx": "", "auto": false}, {"id": "opener", "cls": "rogue", "vi": "Đòn Mở Màn", "en": "Opener", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Rất dễ chí mạng lên mục tiêu còn đầy máu.", "f1": "+50% Chí mạng với mục tiêu trên 90% HP", "f6": "+87.5% Chí mạng với mục tiêu trên 90% HP", "ctx": [3, 3, 1], "note": "", "approx": "Chí mạng với mục tiêu trên 90% HP.", "auto": false}, {"id": "toxicologist", "cls": "rogue", "vi": "Chuyên Gia Độc", "en": "Toxicologist", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Đòn thường đôi khi gây độc.", "f1": "đòn thường: Trúng Độc (15%)", "f6": "đòn thường: Trúng Độc (26.2%)", "ctx": [2, 2, 3], "note": "", "approx": "Đòn thường gây độc thay vì tăng sát thương độc.", "auto": false}, {"id": "escape_artist", "cls": "rogue", "vi": "Thoát Hiểm", "en": "Escape Artist", "type": "passive", "stat": "HP", "cd": 90, "m1": 0, "m6": 0, "desc": "Nguy kịch thì tăng tốc và cứng cáp.", "f1": "bản thân: Tăng Tốc 6s, Kiên Cố 8s; kích hoạt khi HP dưới 25%", "f6": "bản thân: Tăng Tốc 10.5s, Kiên Cố 14s; kích hoạt khi HP dưới 25%", "ctx": [2, 3, 2], "note": "", "approx": "", "auto": true}, {"id": "pickpocket", "cls": "rogue", "vi": "Kẻ Móc Túi", "en": "Pickpocket", "type": "passive", "stat": "GOLD", "cd": 0, "m1": 0, "m6": 0, "desc": "Vàng rơi nhiều hơn.", "f1": "+15% Tìm vàng", "f6": "+26.2% Tìm vàng", "ctx": [3, 1, 1], "note": "Đấu Trường (thiết kế): không tác dụng.", "approx": "", "auto": false}, {"id": "advanced_evasion", "cls": "rogue", "vi": "Né Cao Cấp", "en": "Advanced Evasion", "type": "passive", "stat": "MSPD", "cd": 0, "m1": 0, "m6": 0, "desc": "Rất khó bị đánh trúng.", "f1": "+8% né tránh", "f6": "+14% né tránh", "ctx": [2, 3, 2], "note": "", "approx": "", "auto": false}, {"id": "serrated", "cls": "rogue", "vi": "Lưỡi Răng Cưa", "en": "Serrated", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Đòn thường đôi khi gây chảy máu.", "f1": "đòn thường: Chảy Máu (20%)", "f6": "đòn thường: Chảy Máu (35%)", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "lurker", "cls": "rogue", "vi": "Kẻ Rình Rập", "en": "Lurker", "type": "passive", "stat": "ATK", "cd": 0, "m1": 0, "m6": 0, "desc": "Đau hơn khi mục tiêu không để ý mình.", "f1": "+15% sát thương khi không bị nhắm", "f6": "+26.2% sát thương khi không bị nhắm", "ctx": [2, 2, 3], "note": "Boss nhắm tank nên Rogue gần như luôn hưởng.", "approx": "", "auto": false}, {"id": "manhunter", "cls": "rogue", "vi": "Săn Người", "en": "Manhunter", "type": "passive", "stat": "CRIT", "cd": 0, "m1": 0, "m6": 0, "desc": "Chuyên săn người.", "f1": "+8% Chí mạng với người; +20% ST chí mạng với người", "f6": "+14% Chí mạng với người; +35% ST chí mạng với người", "ctx": [1, 3, 1], "note": "Thay Golden Ratio (CRIT trên 100% gần như không đạt được).", "approx": "", "auto": false}, {"id": "shield_bash", "cls": "guardian", "vi": "Đập Khiên", "en": "Shield Bash", "type": "active", "stat": "DEF", "cd": 8, "m1": 20, "m6": 26, "desc": "Đập khiên làm choáng, mạnh theo phòng thủ.", "f1": "ST 50% ATK + 80% DEF; gây Choáng 1.5s", "f6": "ST 87.5% ATK + 140% DEF; gây Choáng 2.1s", "ctx": [2, 3, 1], "note": "Boss: Stagger. Đấu Trường (thiết kế): choáng 0.6s.", "approx": "", "auto": false}, {"id": "shield_wall", "cls": "guardian", "vi": "Tường Khiên", "en": "Shield Wall", "type": "active", "stat": "DEF", "cd": 20, "m1": 38, "m6": 49, "desc": "Che chắn cả đội.", "f1": "đồng đội quanh mình: Kiên Cố 8s", "f6": "đồng đội quanh mình: Kiên Cố 14s", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "mass_taunt", "cls": "guardian", "vi": "Khiêu Khích Toàn Thể", "en": "Mass Taunt", "type": "active", "stat": "HP", "cd": 16, "m1": 32, "m6": 42, "desc": "Mọi kẻ địch gần đó đánh mình, giáp mọc gai.", "f1": "khiêu khích địch trong 100px; bản thân: Phản Đòn 8s", "f6": "khiêu khích địch trong 100px; bản thân: Phản Đòn 14s", "ctx": [3, 2, 3], "note": "Kẻ địch đổi mục tiêu sang Guardian và giữ đến khi tự đổi.", "approx": "", "auto": false}, {"id": "holy_hammer", "cls": "guardian", "vi": "Búa Thánh", "en": "Holy Hammer", "type": "active", "stat": "ATK", "cd": 9, "m1": 22, "m6": 29, "desc": "Giáng chuỳ thần thánh, mạnh với Undead.", "f1": "ST 150% ATK; +50% với undead", "f6": "ST 262.5% ATK; +50% với undead", "ctx": [2, 2, 2], "note": "Rất mạnh ở Ancient Ruins.", "approx": "", "auto": false}, {"id": "healing_light", "cls": "guardian", "vi": "Ánh Sáng Chữa Lành", "en": "Healing Light", "type": "active", "stat": "HP", "cd": 12, "m1": 26, "m6": 34, "desc": "Hồi máu đồng đội thấp máu nhất.", "f1": "hồi 10% HP tối đa (đồng đội yếu máu nhất)", "f6": "hồi 17.5% HP tối đa (đồng đội yếu máu nhất)", "ctx": [2, 2, 3], "note": "Đấu Trường (thiết kế): ×0.7.", "approx": "", "auto": false}, {"id": "divine_shield", "cls": "guardian", "vi": "Thánh Hộ", "en": "Divine Shield", "type": "active", "stat": "LV", "cd": 45, "m1": 76, "m6": 99, "desc": "Bất tử chốc lát khi máu dưới 35%.", "f1": "bản thân: Bất Tử 2s; kích hoạt khi HP dưới 35%", "f6": "bản thân: Bất Tử 3.5s; kích hoạt khi HP dưới 35%", "ctx": [2, 2, 3], "note": "Đấu Trường (thiết kế): 1 lần mỗi trận.", "approx": "", "auto": false}, {"id": "spiked_armor", "cls": "guardian", "vi": "Giáp Gai", "en": "Spiked Armor", "type": "active", "stat": "DEF", "cd": 15, "m1": 30, "m6": 39, "desc": "Gai mọc trên giáp, phản sát thương.", "f1": "bản thân: Phản Đòn 8s", "f6": "bản thân: Phản Đòn 14s", "ctx": [3, 2, 2], "note": "Đấu Trường (thiết kế): trần phản 30%.", "approx": "", "auto": false}, {"id": "judgment", "cls": "guardian", "vi": "Phán Xét", "en": "Judgment", "type": "active", "stat": "ATK", "cd": 11, "m1": 24, "m6": 31, "desc": "Đánh mạnh hơn khi địch đã mất nửa máu.", "f1": "ST 100% ATK; mục tiêu dưới 50% HP: ×1.4 (boss 15%)", "f6": "ST 175% ATK; mục tiêu dưới 50% HP: ×1.4 (boss 15%)", "ctx": [2, 2, 3], "note": "", "approx": "Mạnh hơn khi mục tiêu dưới 50% HP.", "auto": false}, {"id": "intercept", "cls": "guardian", "vi": "Chắn Đòn", "en": "Intercept", "type": "active", "stat": "MSPD", "cd": 14, "m1": 29, "m6": 38, "desc": "Che khiên cho đồng đội yếu nhất.", "f1": "khiên 15% HP tối đa (đồng đội yếu máu nhất)", "f6": "khiên 26.2% HP tối đa (đồng đội yếu máu nhất)", "ctx": [2, 3, 2], "note": "", "approx": "Không lao tới, chỉ che khiên.", "auto": false}, {"id": "oath", "cls": "guardian", "vi": "Lời Thề Bảo Hộ", "en": "Oath", "type": "active", "stat": "HP", "cd": 20, "m1": 38, "m6": 49, "desc": "Thề bảo vệ đồng đội yếu nhất.", "f1": "đồng đội yếu máu nhất: Kiên Cố 8s", "f6": "đồng đội yếu máu nhất: Kiên Cố 14s", "ctx": [1, 3, 3], "note": "", "approx": "Không chia sát thương, cho Kiên Cố.", "auto": false}, {"id": "shockwave", "cls": "guardian", "vi": "Chấn Động", "en": "Shockwave", "type": "active", "stat": "DEF", "cd": 12, "m1": 26, "m6": 34, "desc": "Đập chuỳ làm rung chuyển mặt đất.", "f1": "ST 60% ATK + 50% DEF; AoE quanh mình 45px; gây Làm Chậm 4s", "f6": "ST 105% ATK + 87.5% DEF; AoE quanh mình 45px; gây Làm Chậm 5.5s", "ctx": [3, 1, 1], "note": "", "approx": "", "auto": false}, {"id": "consecrate", "cls": "guardian", "vi": "Thánh Địa", "en": "Consecrate", "type": "active", "stat": "HP", "cd": 22, "m1": 41, "m6": 53, "desc": "Thánh hoá mặt đất, đồng đội hồi máu.", "f1": "đồng đội quanh mình: Hồi Máu 8s", "f6": "đồng đội quanh mình: Hồi Máu 14s", "ctx": [2, 2, 3], "note": "Đấu Trường (thiết kế): hồi ×0.7.", "approx": "", "auto": false}, {"id": "crushing_blow", "cls": "guardian", "vi": "Đập Nát", "en": "Crushing Blow", "type": "active", "stat": "ATK", "cd": 10, "m1": 23, "m6": 30, "desc": "Đập vỡ giáp mục tiêu.", "f1": "ST 160% ATK; gây Phá Giáp 6s", "f6": "ST 280% ATK; gây Phá Giáp 8.2s", "ctx": [2, 2, 3], "note": "Boss: Phá Giáp còn nửa thời gian.", "approx": "", "auto": false}, {"id": "reflective_guard", "cls": "guardian", "vi": "Khiên Phản Xạ", "en": "Reflective Guard", "type": "active", "stat": "DEF", "cd": 20, "m1": 38, "m6": 49, "desc": "Chặn và phản đòn.", "f1": "bản thân: Phản Đòn 8s, Kiên Cố 8s", "f6": "bản thân: Phản Đòn 14s, Kiên Cố 14s", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "aura_of_might", "cls": "guardian", "vi": "Hào Quang Sức Mạnh", "en": "Aura of Might", "type": "active", "stat": "LV", "cd": 24, "m1": 44, "m6": 57, "desc": "Tăng sức mạnh đồng đội.", "f1": "đồng đội quanh mình: Cường Lực 8s", "f6": "đồng đội quanh mình: Cường Lực 14s", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "cleanse", "cls": "guardian", "vi": "Thanh Tẩy", "en": "Cleanse", "type": "active", "stat": "LV", "cd": 18, "m1": 35, "m6": 46, "desc": "Xoá hiệu ứng xấu khỏi đồng đội.", "f1": "xoá hiệu ứng xấu (đồng đội quanh mình)", "f6": "xoá hiệu ứng xấu (đồng đội quanh mình)", "ctx": [2, 3, 3], "note": "Khắc chế đội khống chế ở Đấu Trường.", "approx": "", "auto": false}, {"id": "smite", "cls": "guardian", "vi": "Trừng Phạt", "en": "Smite", "type": "active", "stat": "DEF", "cd": 9, "m1": 22, "m6": 29, "desc": "Đòn trừng phạt bằng sức nặng của giáp.", "f1": "ST 90% ATK + 70% DEF; gây Choáng 1.5s (40%)", "f6": "ST 157.5% ATK + 122.5% DEF; gây Choáng 2.1s (40%)", "ctx": [2, 2, 2], "note": "Boss: Loạng Choạng thay choáng.", "approx": "Choáng là xác suất 40%.", "auto": false}, {"id": "bulwark", "cls": "guardian", "vi": "Điểm Tựa", "en": "Bulwark", "type": "active", "stat": "HP", "cd": 16, "m1": 32, "m6": 42, "desc": "Tạo khiên hấp thụ sát thương.", "f1": "khiên 15% HP tối đa (bản thân)", "f6": "khiên 26.2% HP tối đa (bản thân)", "ctx": [2, 2, 3], "note": "Đấu Trường (thiết kế): ×0.7.", "approx": "", "auto": false}, {"id": "iron_constitution", "cls": "guardian", "vi": "Thể Chất Thép", "en": "Iron Constitution", "type": "passive", "stat": "HP", "cd": 0, "m1": 0, "m6": 0, "desc": "Thân thể bền bỉ.", "f1": "+10% HP tối đa", "f6": "+17.5% HP tối đa", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "shield_mastery", "cls": "guardian", "vi": "Thuẫn Thuật", "en": "Shield Mastery", "type": "passive", "stat": "DEF", "cd": 0, "m1": 0, "m6": 0, "desc": "Chặn đòn bằng khiên.", "f1": "-8% sát thương nhận", "f6": "-14% sát thương nhận", "ctx": [2, 2, 3], "note": "", "approx": "Giảm sát thương nhận thay vì chặn đòn.", "auto": false}, {"id": "unshakable", "cls": "guardian", "vi": "Bất Động", "en": "Unshakable", "type": "passive", "stat": "DEF", "cd": 0, "m1": 0, "m6": 0, "desc": "Chân như cắm rễ.", "f1": "+40% kháng khống chế", "f6": "+70% kháng khống chế", "ctx": [1, 3, 2], "note": "Gộp hai passive kháng khống chế của v1.", "approx": "", "auto": false}, {"id": "perseverance", "cls": "guardian", "vi": "Kiên Trì", "en": "Perseverance", "type": "passive", "stat": "HP", "cd": 20, "m1": 0, "m6": 0, "desc": "Máu dưới 50% thì tự hồi phục.", "f1": "bản thân: Hồi Máu 8s; kích hoạt khi HP dưới 50%", "f6": "bản thân: Hồi Máu 14s; kích hoạt khi HP dưới 50%", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": true}, {"id": "protective_aura", "cls": "guardian", "vi": "Hào Quang Bảo Hộ", "en": "Protective Aura", "type": "passive", "stat": "DEF", "cd": 20, "m1": 0, "m6": 0, "desc": "Định kỳ che chở đồng đội gần đó.", "f1": "đồng đội quanh mình: Kiên Cố 8s", "f6": "đồng đội quanh mình: Kiên Cố 14s", "ctx": [2, 2, 2], "note": "", "approx": "Hào quang = định kỳ cho Kiên Cố.", "auto": true}, {"id": "vengeance", "cls": "guardian", "vi": "Trả Đũa", "en": "Vengeance", "type": "passive", "stat": "DEF", "cd": 0, "m1": 0, "m6": 0, "desc": "Giáp cũng là vũ khí.", "f1": "+8% ATK", "f6": "+14% ATK", "ctx": [2, 2, 2], "note": "", "approx": "Cộng % ATK, không theo DEF.", "auto": false}, {"id": "gatekeeper", "cls": "guardian", "vi": "Người Gác Cửa", "en": "Gatekeeper", "type": "passive", "stat": "HP", "cd": 0, "m1": 0, "m6": 0, "desc": "Đứng vững trước đám đông.", "f1": "+6% DEF; +3% HP tối đa", "f6": "+10.5% DEF; +5.2% HP tối đa", "ctx": [3, 1, 1], "note": "", "approx": "Cộng phẳng, không cần bị vây.", "auto": false}, {"id": "faith", "cls": "guardian", "vi": "Tín Niệm", "en": "Faith", "type": "passive", "stat": "LV", "cd": 0, "m1": 0, "m6": 0, "desc": "Hồi máu mạnh hơn theo cấp.", "f1": "+15% hồi máu; +0.3% hồi máu mỗi 1 cấp Hunter (tối đa 66 lần)", "f6": "+26.2% hồi máu; +0.5% hồi máu mỗi 1 cấp Hunter (tối đa 66 lần)", "ctx": [2, 2, 3], "note": "", "approx": "", "auto": false}, {"id": "boss_challenger", "cls": "guardian", "vi": "Kẻ Thách Thức", "en": "Boss Challenger", "type": "passive", "stat": "HP", "cd": 0, "m1": 0, "m6": 0, "desc": "Đứng trước boss không lùi bước.", "f1": "-12% sát thương nhận với boss", "f6": "-21% sát thương nhận với boss", "ctx": [1, 1, 3], "note": "Thay Immovable (trùng Unshakable).", "approx": "", "auto": false}, {"id": "bodyguard", "cls": "guardian", "vi": "Người Che Chắn", "en": "Bodyguard", "type": "passive", "stat": "HP", "cd": 15, "m1": 0, "m6": 0, "desc": "Định kỳ che khiên cho đồng đội yếu nhất.", "f1": "khiên 6% HP tối đa (đồng đội yếu máu nhất)", "f6": "khiên 10.5% HP tối đa (đồng đội yếu máu nhất)", "ctx": [2, 3, 3], "note": "", "approx": "Không gánh đòn, định kỳ che khiên.", "auto": true}, {"id": "battle_hardened", "cls": "guardian", "vi": "Dày Dạn Trận Mạc", "en": "Battle-Hardened", "type": "passive", "stat": "LV", "cd": 0, "m1": 0, "m6": 0, "desc": "Giáp dày theo năm tháng.", "f1": "+1.0 DEF mỗi 3 cấp Hunter (tối đa 33 lần)", "f6": "+1.8 DEF mỗi 3 cấp Hunter (tối đa 33 lần)", "ctx": [2, 2, 2], "note": "", "approx": "", "auto": false}, {"id": "resolve", "cls": "guardian", "vi": "Tâm Kiên", "en": "Resolve", "type": "passive", "stat": "HP", "cd": 10, "m1": 0, "m6": 0, "desc": "Máu dưới 60% thì cứng cáp lại.", "f1": "bản thân: Kiên Cố 8s; kích hoạt khi HP dưới 60%", "f6": "bản thân: Kiên Cố 14s; kích hoạt khi HP dưới 60%", "ctx": [1, 2, 3], "note": "Boss đánh chậm và nặng nên kích hoạt liên tục.", "approx": "", "auto": true}];
+const STATS = {ATK:"Attack",DEF:"Defense",HP:"Max HP",ASPD:"Attack Speed",MSPD:"Move Speed",CRIT:"Crit Chance",CRITDMG:"Crit Damage",RANGE:"Attack Range",LV:"Level",GOLD:"Gold Find"};
+const CTX = [["mob","🐺 Quái"],["pvp","⚔️ Người"],["boss","👑 Boss"]];
+const CLASSES = [
+  {id:"warrior", icon:"🗡️", name:"Warrior", vi:"Chiến Binh", desc:"Cận chiến cân bằng ATK và HP. AoE dọn quái, đòn nặng phá giáp boss, mạnh khi máu thấp.", promos:[["Duelist","hợp skill tốc đánh, chí mạng"],["Slayer","hợp skill ATK, kết liễu, boss"]]},
+  {id:"ranger", icon:"🏹", name:"Ranger", vi:"Cung Thủ", desc:"Tầm xa 110px, máu thấp. Độc và lửa tốt với boss, xuyên và mưa tên dọn quái, khống chế đơn mục tiêu.", promos:[["Hawkeye","hợp skill chí mạng, tầm đánh"],["Sniper","hợp skill ATK, ST chí mạng, boss"]]},
+  {id:"rogue", icon:"🔪", name:"Rogue", vi:"Đạo Tặc", desc:"Dao găm, chí mạng và tốc độ cao nhất. Né tránh, độc và kết liễu.", promos:[["Assassin","hợp skill chí mạng, PvP"],["Nightblade","hợp skill độc, tốc chạy"]]},
+  {id:"guardian", icon:"🛡️", name:"Guardian", vi:"Hộ Vệ", desc:"HP và DEF cao nhất. Khiêu khích, che khiên, hồi máu và thanh tẩy cho đội.", promos:[["Crusader","hợp skill ATK, HP, boss"],["Templar","hợp skill DEF, hỗ trợ"]]},
+];
+CLASSES.forEach(c => c.skills = ROWS.filter(r => r.cls === c.id));
+
+let cur = CLASSES[0], typeF = "", ctxF = "", approxF = "", statF = new Set(), q = "";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[ch]));
+const chip = (s, cls = "") => `<span class="stat s-${s} ${cls}" data-stat="${s}">${s} · ${STATS[s]}</span>`;
+const stars = n => `<span class="stars">${"★".repeat(n)}<span class="dim">${"★".repeat(3 - n)}</span></span>`;
+const ctxLine = c => `<div class="ctx">${CTX.map(([k, l], i) => `<span class="c-${k}">${l} ${stars(c[i])}</span>`).join("")}</div>`;
+const kindBadge = s => s.type === "active" ? `<span class="badge active">Thi triển</span>` : (s.auto ? `<span class="badge auto">Nội tại · tự kích</span>` : `<span class="badge passive">Nội tại</span>`);
+const costLine = s => s.type === "active" ? `<span>⏱ ${s.cd}s</span><span>💧 ${s.m1}→${s.m6} mana</span>` : (s.cd ? `<span>⏱ ${s.cd}s · 0 mana</span>` : `<span>∞ luôn hoạt động</span>`);
+
+function renderTabs() {
+  $("#tabs").innerHTML = CLASSES.map(c => `<div class="tab ${c === cur ? "on" : ""}" data-id="${c.id}">${c.icon} ${c.name} <span style="font-weight:normal;opacity:.7">· ${c.vi}</span></div>`).join("");
+  $("#tabs").querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = CLASSES.find(c => c.id === t.dataset.id); renderTabs(); renderInfo(); renderGrid(); });
+}
+function renderInfo() {
+  const a = cur.skills.filter(s => s.type === "active").length;
+  const auto = cur.skills.filter(s => s.auto).length;
+  const dist = {}; cur.skills.forEach(s => dist[s.stat] = (dist[s.stat] || 0) + 1);
+  const best = CTX.map((_, i) => cur.skills.filter(s => s.ctx[i] === 3).length);
+  $("#classinfo").innerHTML = `<div>
+    <div style="font-size:18px;font-weight:700;color:var(--gold)">${cur.icon} ${cur.name} <span style="color:var(--muted);font-weight:normal">(${cur.vi})</span> · ${a} thi triển · ${30 - a} nội tại (${auto} tự kích)</div>
+    <p>${cur.desc}</p>
+    <p>Skill 3 sao: ${CTX.map(([k, l], i) => `<b class="c-${k}">${l} ${best[i]}</b>`).join(" · ")}</p>
+    <p class="chips" style="margin-top:8px">${Object.entries(dist).sort((x, y) => y[1] - x[1]).map(([k, v]) => `<span class="stat s-${k}" style="cursor:default">${k} ×${v}</span>`).join("")}</p>
+  </div><div class="promo">${cur.promos.map(([n, d]) => `<span><b>${n}</b><br><small>${d}</small></span>`).join("")}</div>`;
+}
+function renderStatFilter() {
+  $("#statFilter").innerHTML = Object.keys(STATS).map(s => chip(s, statF.has(s) ? "on" : "")).join("");
+  $("#statFilter").querySelectorAll(".stat").forEach(el => el.onclick = () => { const s = el.dataset.stat; statF.has(s) ? statF.delete(s) : statF.add(s); renderStatFilter(); renderGrid(); });
+}
+function card(s, i) {
+  return `<div class="card ${s.type}">
+    <span class="num">#${i + 1}</span>
+    <div class="top"><div class="name">${esc(s.vi)}<small>${esc(s.en)}</small></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${s.approx ? `<span class="badge approx">Đơn giản hoá</span>` : ""}${kindBadge(s)}</div></div>
+    <div>${esc(s.desc)}</div>
+    <div class="lv"><b>Cấp 1</b><div class="formula">${esc(s.f1)}</div><b>Cấp 6</b><div class="formula">${esc(s.f6)}</div></div>
+    ${ctxLine(s.ctx)}
+    ${s.note ? `<div class="note">${esc(s.note)}</div>` : ""}
+    ${s.approx ? `<div class="note approx">Cài đặt: ${esc(s.approx)}</div>` : ""}
+    <div class="meta">${chip(s.stat)} ${costLine(s)}</div>
+  </div>`;
+}
+function renderGrid() {
+  const list = cur.skills.map((s, i) => [s, i]).filter(([s]) => {
+    if (typeF === "auto" ? !s.auto : (typeF && s.type !== typeF)) return false;
+    if (ctxF !== "" && s.ctx[+ctxF] !== 3) return false;
+    if (approxF && !s.approx) return false;
+    if (statF.size && !statF.has(s.stat)) return false;
+    if (q) { const h = [s.vi, s.en, s.desc, s.f1, s.f6, s.note, s.approx].join(" ").toLowerCase(); if (!h.includes(q)) return false; }
+    return true;
+  });
+  $("#grid").innerHTML = list.map(([s, i]) => card(s, i)).join("") || `<div style="color:var(--muted)">Không có skill nào khớp bộ lọc.</div>`;
+  $("#count").textContent = `${list.length} / ${cur.skills.length} skill`;
+}
+
+// ---------- Progression simulator: same rules as ClassSkillService ----------
+const MAX_SKILLS = 7, MAX_LEVEL = 6, EVERY = 10;
+function points(lives, level) { return lives * Math.floor(100 / EVERY) + Math.floor(level / EVERY); }
+function simulate(c, total, strategy) {
+  const owned = []; // [{s, lv}]
+  const free = c.skills.slice();
+  const learn = () => { const i = Math.floor(Math.random() * free.length); owned.push({s: free[i], lv: 1}); free.splice(i, 1); };
+  const upgrade = () => { const can = owned.filter(o => o.lv < MAX_LEVEL); if (!can.length) return false; can.sort((a, b) => b.lv - a.lv)[0].lv++; return true; };
+  for (let p = 0; p < total; p++) {
+    const notMax = owned.filter(o => o.lv < MAX_LEVEL);
+    if (strategy === "fill") {
+      if (owned.length < MAX_SKILLS) learn();
+      else if (notMax.length) notMax.sort((a, b) => a.lv - b.lv)[0].lv++;
+      else break;
+    } else {
+      if (notMax.length) notMax[0].lv++;
+      else if (owned.length < MAX_SKILLS) learn();
+      else break;
+    }
+  }
+  return owned;
+}
+const COLORS = ["var(--mob)", "var(--pvp)", "var(--boss)"];
+function bars(vals, max, labels) {
+  return vals.map((v, i) => `<div class="bar"><span class="c-${CTX[i][0]}">${CTX[i][1]}</span> <b style="float:right">${labels[i]}</b><div class="track"><div class="fill" style="width:${Math.min(100, v / max * 100)}%;background:${COLORS[i]}"></div></div></div>`).join("");
+}
+function simInputs() {
+  const c = CLASSES.find(x => x.id === $("#simClass").value);
+  const lives = Math.max(0, Math.min(20, +$("#simLives").value || 0));
+  const level = Math.max(1, Math.min(100, +$("#simLevel").value || 1));
+  return {c, lives, level, total: points(lives, level), strategy: $("#simStrategy").value};
+}
+function runSim() {
+  const {c, lives, level, total, strategy} = simInputs();
+  const owned = simulate(c, total, strategy);
+  const used = owned.reduce((t, o) => t + o.lv, 0);
+  $("#simSummary").innerHTML = `<span><b>${c.icon} ${c.name}</b></span><span>Điểm skill: <b>${total}</b> (dùng ${used})</span><span>Điểm đổi skill: <b>${lives}</b></span><span>Skill: <b>${owned.length} / 7</b></span>`;
+  $("#simSlots").innerHTML = owned.map(({s, lv}) => `<div class="slot" style="border-style:solid;border-color:${s.type === "active" ? "var(--active)" : "var(--passive)"}">
+    <div class="name">${esc(s.vi)} ${kindBadge(s)}</div>
+    <div class="lvpips">${"◆".repeat(lv)}<span class="dim">${"◆".repeat(MAX_LEVEL - lv)}</span> Cấp ${lv}</div>
+    <div class="d">${lv >= 6 ? "Cấp 6: " + esc(s.f6) : `Sức mạnh ×${(1 + 0.15 * (lv - 1)).toFixed(2)} so với cấp 1: ` + esc(s.f1)}</div>${ctxLine(s.ctx)}</div>`).join("") || `<div class="slot empty">Chưa có điểm skill (cần cấp 10)</div>`;
+  const sum = CTX.map((_, i) => owned.reduce((t, o) => t + o.s.ctx[i] * (1 + 0.15 * (o.lv - 1)), 0));
+  $("#simBars").innerHTML = owned.length ? bars(sum, 7 * 3 * 1.75, sum.map(v => `${v.toFixed(1)} / 36.75`)) : "";
+}
+function simStats() {
+  const {c, total, strategy} = simInputs(), N = 10000;
+  const avg = [0, 0, 0]; let full = 0, maxed = 0;
+  for (let n = 0; n < N; n++) {
+    const owned = simulate(c, total, strategy);
+    owned.forEach(o => o.s.ctx.forEach((v, i) => avg[i] += v * (1 + 0.15 * (o.lv - 1))));
+    if (owned.length === 7) full++;
+    if (owned.length === 7 && owned.every(o => o.lv === 6)) maxed++;
+  }
+  const m = avg.map(v => v / N);
+  $("#simSlots").innerHTML = "";
+  $("#simSummary").innerHTML = `<span><b>${c.icon} ${c.name}</b> · ${N.toLocaleString("vi")} lần</span><span>Điểm skill: <b>${total}</b></span><span>Đủ 7 skill: <b>${(full / N * 100).toFixed(1)}%</b></span><span>7 skill cấp 6: <b>${(maxed / N * 100).toFixed(1)}%</b> (cần 42 điểm)</span>`;
+  $("#simBars").innerHTML = bars(m, 7 * 3 * 1.75, m.map(v => `TB ${v.toFixed(1)} / 36.75`));
+}
+
+$("#simClass").innerHTML = CLASSES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join("");
+$("#simBtn").onclick = runSim; $("#simStats").onclick = simStats;
+$("#typeFilter").onchange = e => { typeF = e.target.value; renderGrid(); };
+$("#ctxFilter").onchange = e => { ctxF = e.target.value; renderGrid(); };
+$("#approxFilter").onchange = e => { approxF = e.target.value; renderGrid(); };
+$("#search").oninput = e => { q = e.target.value.trim().toLowerCase(); renderGrid(); };
+renderTabs(); renderInfo(); renderStatFilter(); renderGrid(); runSim();
+</script>
+</body>
+</html>

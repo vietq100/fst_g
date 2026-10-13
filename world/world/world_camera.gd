@@ -3,7 +3,7 @@ extends Camera2D
 ## The screen as a window onto the world (D28): drag to pan, pinch / wheel to zoom, follow an
 ## actor until the player drags. Clamped to the world bounds.
 
-const MIN_ZOOM := 0.2
+const MIN_ZOOM := 0.22
 const MAX_ZOOM := 2.0
 const WHEEL_STEP := 1.12
 

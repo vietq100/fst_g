@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"split_shot"
+display_name = "class_skill.split_shot.name"
+class_id = &"ranger"
+order = 10
+kind = 0
+description = "class_skill.split_shot.desc"
+scale_stat = &"attack"
+ratings = Vector3i(3, 1, 1)
+cooldown = 8.0
+mana_cost = 20.0
+target = 2
+radius = 40.0
+attack_ratio = 0.85

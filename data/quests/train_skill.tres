@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"train_skill"
-display_name = "Study Hard"
-description = "Train 3 skill levels at the Academy."
+display_name = "quest.train_skill.name"
+description = "quest.train_skill.desc"
 order = 10
 kind = 7
 target_id = &""

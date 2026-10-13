@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"damage_dealt"
+type = 1
+value = 0.01
+
+[resource]
+script = ExtResource("1_skill")
+id = &"veteran"
+display_name = "class_skill.veteran.name"
+class_id = &"warrior"
+order = 23
+kind = 1
+description = "class_skill.veteran.desc"
+scale_stat = &"level"
+ratings = Vector3i(2, 2, 2)
+level_step = 3
+level_step_cap = 15
+level_modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

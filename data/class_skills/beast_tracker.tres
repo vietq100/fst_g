@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"damage_dealt"
+type = 1
+value = 0.15
+condition = &"vs_beast"
+
+[resource]
+script = ExtResource("1_skill")
+id = &"beast_tracker"
+display_name = "class_skill.beast_tracker.name"
+class_id = &"ranger"
+order = 25
+kind = 1
+description = "class_skill.beast_tracker.desc"
+scale_stat = &"attack"
+ratings = Vector3i(3, 1, 1)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

@@ -23,6 +23,7 @@ HunterRuntime:
 - injured (bool) and recovery_remaining
 - equipment (item instance ids per slot)
 - trait_ids
+- class_skills (skill id → level 1–6, opening order), skill_points, skill_swap_points, skill_point_level, current_mana (D70, `CLASS_SKILL_SYSTEM.md`)
 - mood
 - activity
 - history

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RegionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/region_definition.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"boss_arena"
+display_name = "region.boss_arena.name"
+tile_rect = Rect2i(46, -14, 12, 12)
+is_town = false
+kind = 3
+min_hunter_level = 12
+monster_ids = Array[StringName]([&"weekly_boss"])
+monster_level_min = 12
+monster_level_max = 12
+population_cap = 1
+respawn_seconds = 604800.0
+ground_color = Color(0.24, 0.18, 0.3, 1)
+ground_alt_color = Color(0.28, 0.21, 0.34, 1)
+props = 2
+prop_density = 0.05

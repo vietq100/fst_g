@@ -6,7 +6,10 @@ extends GameDefinition
 
 enum Kind { BUILDING, TOWN_LEVEL, HUNTERS, FLAG, REINCARNATIONS, DIFFICULTY, HUNTER_LEVEL, SKILLS_LEARNED, ENHANCED }
 
-@export_multiline var description: String
+## A translation key (D61); reading it returns the translated text.
+@export_multiline var description: String:
+	get:
+		return tr(description) if not description.is_empty() else description
 @export var order: int = 0
 @export var kind: Kind = Kind.BUILDING
 ## Building id / progress flag for BUILDING and FLAG.

@@ -48,24 +48,24 @@ func is_running() -> bool:
 ## Empty string when the expedition can start, otherwise the reason.
 func validate(expedition_id: StringName, hunter_ids: Array[StringName]) -> String:
 	if is_running():
-		return "An expedition is already running"
+		return Loc.t("err.expedition.running")
 	var definition := get_definition(expedition_id)
 	if definition == null:
-		return "Unknown expedition '%s'" % expedition_id
+		return Loc.t("err.expedition.unknown", {"expedition": expedition_id})
 	if not _progress.has_flag(definition.unlock_flag):
-		return "%s is locked" % definition.display_name
+		return Loc.t("err.expedition.locked", {"expedition": definition.display_name})
 	if hunter_ids.is_empty() or hunter_ids.size() > _config.max_party_size:
-		return "Party needs 1–%d Hunters" % _config.max_party_size
+		return Loc.t("err.expedition.party_size", {"max": _config.max_party_size})
 	var seen: Dictionary[StringName, bool] = {}
 	for hunter_id in hunter_ids:
 		if seen.has(hunter_id):
-			return "Hunter listed twice"
+			return Loc.t("err.expedition.duplicate_hunter")
 		seen[hunter_id] = true
 		var hunter := _hunters.get_hunter(hunter_id)
 		if hunter == null:
-			return "Unknown Hunter '%s'" % hunter_id
+			return Loc.t("err.expedition.unknown_hunter", {"hunter": hunter_id})
 		if hunter.injured or not hunter.alive or hunter.state != HunterRuntime.LifecycleState.AVAILABLE:
-			return "%s is not available" % hunter.display_name
+			return Loc.t("err.expedition.unavailable", {"name": hunter.display_name})
 	return ""
 
 

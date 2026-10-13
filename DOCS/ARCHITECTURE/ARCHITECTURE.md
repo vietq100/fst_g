@@ -34,7 +34,7 @@ Main
 ├── WorldContainer
 └── UI
 
-WorldMap (main map: Town + regions, D52)
+WorldMap (main map: Town + regions, isometric, D55)
 ├── Ground
 ├── NavigationRegion2D (baked from WorldService outlines; rebaked on layout change)
 ├── Entities (y-sorted)
@@ -123,7 +123,7 @@ Plain classes or nodes owned by `GameManager` (not autoloads):
 - `actors/hunter/` — Hunter actor scene
 - `actors/hunter/chibi/` — the chibi Hunter (D49): `ChibiBody` (32×48 body map, parts, facings, skin/dye recolour, cached frames and portraits), `ChibiAnimations` (frame tables), `ChibiVisual` (animation state machine, weapon, action effects)
 - `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `TownBuilding` + `BuildingVisual`, `WorldProp`, `GateVisual`, `DungeonEntrance`, ground, `WaterShimmer`, `WorldCamera`
-- `game/services/world_service.gd` — top-down grid geometry (32 px tiles): tile ↔ world, regions, gates (bridges), navigation outlines
+- `game/services/world_service.gd` — 2:1 isometric grid geometry (44 × 22 px tiles): tile ↔ world, regions, gates (bridges), navigation outlines
 - `world/test_arena/` — combat sandbox, reachable from the Town debug panel (debug builds only)
 - `world/vfx/` — world-space feedback (`CombatFeedback`, `DamageNumber`, `LevelUpBurst`, `LootPopup`)
 - `save/` — `SaveCodec` (snapshot ↔ services, migrations); `core/save_manager.gd` handles files, autosave and offline catch-up

@@ -12,7 +12,7 @@ var _progress := 0.0
 func _ready() -> void:
 	z_index = 50
 	var label := Label.new()
-	label.text = "LEVEL UP"
+	label.text = Loc.t("world.popup.level_up")
 	label.add_theme_font_size_override("font_size", 10)
 	label.add_theme_color_override("font_color", COLOR)
 	label.add_theme_color_override("font_outline_color", OUTLINE)

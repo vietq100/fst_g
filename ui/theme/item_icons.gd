@@ -14,10 +14,32 @@ const PALETTE := {
 ## Default tint for kinds whose item has none (white = untinted).
 const KIND_TINT := {
 	&"sword": Color("c8d0d8"), &"dagger": Color("c8d0d8"), &"bow": Color("8b5e3c"), &"mace": Color("b8bcc4"),
-	&"armor": Color("b8bcc4"), &"potion": Color("ff6b7a"),
+	&"armor": Color("b8bcc4"), &"potion": Color("ff6b7a"), &"helmet": Color("b8bcc4"), &"pants": Color("8b5e3c"),
+	&"boots": Color("8b5e3c"), &"necklace": Color("5fa8ff"), &"charm": Color("a78bfa"), &"skin": Color("c9503f"), &"pet": Color("c8925a"),
 }
 
 const BITMAPS := {
+	&"helmet": [
+		"............", "....kkkk....", "..kkTTLTkk..", ".kTTTTLTTtk.", ".kTTTTTTTtk.", "kTTTTTTTTTtk", "kTTTTTTTTTtk", "kyyyyyyyyyyk", "kTk......ktk", "kTk......ktk", ".k........k.", "............"
+	],
+	&"pants": [
+		"............", ".kkkkkkkkkk.", ".kyyyyyyyyk.", ".kTTTTTTTtk.", ".kTTTTTTTtk.", ".kTTTkkTTtk.", ".kTTk..kTtk.", ".kTTk..kTtk.", ".kTTk..kTtk.", ".kTtk..kTtk.", ".kkkk..kkkk.", "............"
+	],
+	&"boots": [
+		"............", "..kkk.......", "..kTLk......", "..kTTk......", "..kTTk.kkk..", "..kTTk.kTLk.", "..kTTk.kTTk.", ".kTTTkkkTTk.", "kTTTTkkTTTk.", "kttttkkTTTTk", "kkkkk.ktttt.", "......kkkkk."
+	],
+	&"necklace": [
+		"............", "..kk....kk..", ".kyk....kyk.", ".ky......yk.", "..ky....yk..", "..ky....yk..", "...ky..yk...", "....kyyk....", "...kkTTkk...", "...kTLTtk...", "...kTTTtk...", "....kkkk...."
+	],
+	&"charm": [
+		"....kkk.....", "...kyyyk....", "....kyk.....", "...kkTkk....", "..kTLTTtk...", ".kTLTTTTtk..", ".kTTTyTTtk..", ".kTTyyyTtk..", "..kTTyTtk...", "...kTTtk....", "....ktk.....", ".....k......"
+	],
+	&"skin": [
+		"............", "..kkk..kkk..", ".kTTTkkTTTk.", "kTLTTTTTTtTk", "kTkTTyyTTktk", ".kkTTyyTTkk.", "..kTTTTTTk..", "..kTTyyTtk..", "..kTTTTTTk..", "..kTTyyTtk..", "..kttttttk..", "..kkkkkkkk.."
+	],
+	&"pet": [
+		"............", "..kk....kk..", ".kTTk..kTTk.", ".kTTk..kTTk.", "..kk....kk..", ".kk..kk..kk.", "kTTkkTTkkTTk", "kTTkTTTTkTTk", ".kkkTTTTkkk.", "...kTTTTtk..", "...kTTTTtk..", "....kkkkk..."
+	],
 	&"sword": [
 		".........kk.", "........kTLk", ".......kTLk.", "......kTLk..", ".....kTLk...", "kk..kTLk....",
 		".kkkkLk.....", "..kyyk......", ".kykkyk.....", "kbk..kk.....", "kBk.........", ".k..........",
@@ -93,6 +115,23 @@ static func kind_of(item: ItemDefinition) -> StringName:
 	if item == null:
 		return &"ore"
 	var id := String(item.id)
+	match item.equipment_slot:
+		ItemDefinition.EquipmentSlot.HELMET:
+			return &"helmet"
+		ItemDefinition.EquipmentSlot.PANTS:
+			return &"pants"
+		ItemDefinition.EquipmentSlot.BOOTS:
+			return &"boots"
+		ItemDefinition.EquipmentSlot.NECKLACE:
+			return &"necklace"
+		ItemDefinition.EquipmentSlot.RING:
+			return &"ring"
+		ItemDefinition.EquipmentSlot.ACCESSORY:
+			return &"charm"
+		ItemDefinition.EquipmentSlot.SKIN:
+			return &"skin"
+		ItemDefinition.EquipmentSlot.PET:
+			return &"pet"
 	match item.item_type:
 		ItemDefinition.ItemType.WEAPON:
 			if id.contains("bow"):

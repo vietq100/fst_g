@@ -212,3 +212,43 @@ Events: success +10, failure −15, injured −10, trait like +5, trait dislike 
 | Disciplined | Training ×1.5 | training | party with Reckless |
 | Reckless | +15% damage dealt, +10% damage taken | boss fight | resting 3+ ticks |
 | Lazy | Training ×0.5, Resting ×1.5 | resting | 2 consecutive expeditions |
+
+## Colosseum (D68, design only)
+| Value | Number |
+|---|---|
+| PvP damage | × 0.8 |
+| PvP crowd control duration | × 0.6, then 2 s same-type immunity |
+| PvP healing and shields | × 0.7 |
+| Caps PvP / PvE | dodge 25 / 40 %, damage reduction 50 / 60 %, tenacity 50 / 70 %, lifesteal 20 / 30 %, thorns 30 / 60 %, crit 75 / 100 % |
+| Time limit | 1vs1 60 s, 4vs4 90 s, 6vs6 120 s |
+| Stamina per match | 10 (needs ≥ 25) |
+| Rank points | start 1000, K = 32 (win ≈ +20, loss ≈ −15) |
+| Tickets | 5 ranked matches per format per day |
+| Rival refresh | 20 gold |
+| Ranked win gold | 15 × (1 / 3 / 4 for 1vs1 / 4vs4 / 6vs6) + 1 Arena Token |
+| Mood | win +5, draw +1, loss −3 |
+
+## Boss rules for class skills (D69, design only)
+- Stunned, Frozen, Rooted, Disarmed on a boss become Stagger (+10 % damage taken) for half the duration.
+- Slowed, Weakened, Armor Break at 50 % effect; Taunt duration × 0.5.
+- % max-HP damage (Bleed, Judgment) capped at 150 % of the source's ATK per hit or per second.
+- Execute thresholds drop to 15 % HP; no cooldown reset on a boss kill.
+
+## Class skills and mana (D70)
+| Value | Number |
+|---|---|
+| Skills per class | 30 (18 active, 12 passive) |
+| Skills per Hunter | max 7, opened at random |
+| Skill level | 1–6, power `1 + 0.15 × (L − 1)` (Lv 6 ×1.75) |
+| Effect duration from skills | buffs × power, debuffs × (1 + 0.5 × (power − 1)) |
+| Skill points | 1 per 10 Hunter levels |
+| Max mana | 100 + 2 per level |
+| Mana regen | 5 / s (×3 with no target) |
+| Mana cost (Lv 1) | `8 + 1.5 × cooldown`, +6% per skill level |
+| Cast gap | 0.8 s |
+| Dodge cap / tenacity cap | 40% / 70% |
+| Boss execute threshold | 15% |
+| Stagger | +10% damage taken, 2 s |
+| Boss: soft debuffs from skills | half duration |
+| Boss: %-max-HP damage over time (Bleed) | ×0.25 |
+| Reincarnation | level 100, +1 swap point |

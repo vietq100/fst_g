@@ -12,8 +12,8 @@ value = 0.03
 [resource]
 script = ExtResource("1_skill")
 id = &"mastery"
-display_name = "Combat Mastery"
-description = "+3% damage dealt per level."
+display_name = "skill.mastery.name"
+description = "skill.mastery.desc"
 max_level = 3
 gold_per_level = 500
 required_academy_level = 3

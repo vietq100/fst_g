@@ -39,13 +39,39 @@ func after_each() -> void:
 func test_tile_world_round_trip() -> void:
 	for tile in [Vector2i(0, 0), Vector2i(5, 9), Vector2i(30, 2), Vector2i(17, 37)]:
 		assert_eq(WorldService.tile_at(WorldService.tile_center(tile)), tile, str(tile))
-	assert_eq(WorldService.tile_to_world(Vector2(1, 0)), Vector2(32, 0))
-	assert_eq(WorldService.tile_to_world(Vector2(0, 1)), Vector2(0, 32))
-	assert_eq(WorldService.rect_to_world(Rect2i(1, 2, 3, 4)), Rect2(32, 64, 96, 128))
+	assert_eq(WorldService.tile_to_world(Vector2(1, 0)), Vector2(22, 11))
+	assert_eq(WorldService.tile_to_world(Vector2(0, 1)), Vector2(-22, 11))
+	assert_eq(WorldService.world_to_tile(Vector2(0, 22)), Vector2(1, 1))
+	assert_eq(WorldService.rect_to_world(Rect2i(1, 2, 3, 4)), Rect2(-110, 33, 154, 77))
+	assert_true(WorldService.rect_has_point(Rect2i(1, 2, 3, 4), WorldService.tile_center(Vector2i(2, 3))))
+	assert_false(WorldService.rect_has_point(Rect2i(1, 2, 3, 4), WorldService.tile_center(Vector2i(0, 3))))
+
+
+func test_region_shapes_are_soft_but_keep_gates_entrances_and_pond() -> void:
+	var town := _world.get_town()
+	var tiles: Dictionary = _world.region_tiles(town.id)
+	assert_true(tiles.size() < town.tile_rect.get_area(), "corners and edges are cut")
+	assert_true(tiles.size() > town.tile_rect.get_area() * 0.8, "most of the rectangle remains")
+	assert_false(tiles.has(town.tile_rect.position), "the top corner is cut")
+	for gate in _world.gates_of(town.id):
+		for tile: Vector2i in [gate.tiles.position, gate.tiles.end - Vector2i.ONE]:
+			var inside := tile.clamp(town.tile_rect.position, town.tile_rect.end - Vector2i.ONE)
+			assert_true(tiles.has(inside), "ground next to the gate %s" % [inside])
+	var pond := _world.get_town_pond()
+	for gx in range(pond.position.x - 1, pond.end.x + 1):
+		for gy in range(pond.position.y - 1, pond.end.y + 1):
+			assert_true(tiles.has(Vector2i(gx, gy)), "shore around the pond")
+	for expedition in _registry.get_all(&"expedition"):
+		if expedition.region_id == &"":
+			continue
+		var region := _world.get_region(expedition.region_id)
+		var next_to := _world.region_tiles(region.id).keys().filter(func(t: Vector2i) -> bool: return (t - expedition.entrance_tile).length() <= 1.0)
+		assert_false(next_to.is_empty(), "ground beside the entrance %s" % [expedition.entrance_tile])
+	assert_true(_world.region_outline(town).size() > 4, "outline follows the shape")
 
 
 func test_four_regions_and_four_gates() -> void:
-	assert_eq(_world.get_regions().size(), 4)
+	assert_eq(_world.get_regions().size(), 6, "4 regions + the Hunter Gate island + the Boss Arena (D58)")
 	assert_eq(_world.get_town().id, &"town")
 	var pairs: Array[String] = []
 	for gate in _world.get_gates():
@@ -53,8 +79,11 @@ func test_four_regions_and_four_gates() -> void:
 		ids.sort()
 		pairs.append("-".join(ids))
 	pairs.sort()
-	assert_eq(pairs, ["ancient_ruins-goblin_cave", "ancient_ruins-town", "dark_forest-goblin_cave", "dark_forest-town"])
-	assert_eq(_world.gates_of(&"town").size(), 2)
+	assert_eq(pairs, ["ancient_ruins-boss_arena", "ancient_ruins-goblin_cave", "ancient_ruins-town", "dark_forest-goblin_cave",
+		"dark_forest-town", "hunter_gate-town"])
+	assert_eq(_world.gates_of(&"town").size(), 3)
+	assert_eq(_world.get_region(&"hunter_gate").kind, RegionDefinition.Kind.GATE)
+	assert_eq(_world.get_region(&"boss_arena").kind, RegionDefinition.Kind.BOSS)
 
 
 func test_region_lookup() -> void:
@@ -114,8 +143,8 @@ func test_build_costs_gold_and_unique_buildings_are_limited() -> void:
 
 func test_move_and_remove() -> void:
 	var warehouse := _buildings.find_first(BuildingService.WAREHOUSE)
-	assert_eq(_buildings.move(warehouse.instance_id, Vector2i(20, 1)), "")
-	assert_eq(warehouse.tile, Vector2i(20, 1))
+	assert_eq(_buildings.move(warehouse.instance_id, Vector2i(20, 5)), "")
+	assert_eq(warehouse.tile, Vector2i(20, 5))
 	assert_eq(_buildings.move(warehouse.instance_id, _buildings.find_first(BuildingService.TOWN_HALL).tile), "Space is taken")
 	assert_eq(_buildings.get_refund(warehouse.instance_id), 75)
 	assert_eq(_buildings.remove(warehouse.instance_id), "")

@@ -1,11 +1,11 @@
 extends Node2D
-## Top-down ground for every region and bridge (WORLD_DESIGN.md → Biome identity, D52).
-## Drawn once (static). The regions are plateaus over dark water (wave marks, foam at the cliff
-## foot): each shows a cliff face below its bottom edge (the Town a stone retaining wall and a
-## parapet around its other edges); bridges of planks cross the gaps; small rock ledges carry the
-## dungeon entrances. The Town has a cobbled plaza, dirt roads with pebbles and kerbs, grass
-## tufts, flowers, bushes, a pond and a back fence; the hunting regions have their own ground
-## patterns (moss and leaves, cracked rock, pale paving).
+## Isometric ground for every region and bridge (WORLD_DESIGN.md → Biome identity, D55, D57).
+## Drawn once (static). The regions are organically shaped plateaus over dark water (wave marks,
+## foam at the cliff foot): each shows cliff faces below its front edges (south-west and
+## south-east; the Town a stone retaining wall, with a parapet and a fence along its back edges); bridges of
+## planks cross the gaps; small rock ledges carry the dungeon entrances. The Town has a cobbled
+## plaza, dirt roads with pebbles and kerbs, grass tufts, flowers, bushes and a pond; the hunting
+## regions have their own ground patterns (moss and leaves, cracked rock, pale paving).
 
 const ROAD := Color("9c8566")
 const ROAD_EDGE := Color("6f5d45")
@@ -18,7 +18,7 @@ const WALL := Color("4b4b55")
 const WALL_LIGHT := Color("5e5e6a")
 const WALL_CAP := Color("7a7a84")
 const EDGE := Color(0, 0, 0, 0.35)
-const CLIFF_DEPTH := 28.0
+const CLIFF_DEPTH := 26.0
 const CLIFF := Color("5a4430")
 const CLIFF_GRASS := Color("3f6a36")
 const COBBLE := Color("bdb6a4")
@@ -31,7 +31,10 @@ const FENCE := Color("8a6a44")
 const FENCE_DARK := Color("5a4430")
 const LEDGE := Color("5f5a52")
 const FLOWERS: Array[Color] = [Color("f4f1ea"), Color("f2c94c"), Color("e8789a"), Color("a78bfa")]
-const TILE := WorldService.TILE
+## Width of the parapet band (tiles).
+const PARAPET := 0.18
+## Tiny overlap between neighbouring tile diamonds so no hairline gaps show.
+const SEAM := 0.015
 
 var world: WorldService
 ## Tiles drawn as road inside the Town.
@@ -59,21 +62,16 @@ func _draw() -> void:
 	_draw_water()
 	# Cliffs first: bridges and ledges are drawn over their overlaps.
 	for region in world.get_regions():
-		_cliff(region.tile_rect, region.is_town)
+		_cliffs(region)
 	for tile in ledges:
 		_ledge(tile)
 	for region in world.get_regions():
-		var rect := region.tile_rect
-		for gx in range(rect.position.x, rect.end.x):
-			for gy in range(rect.position.y, rect.end.y):
-				_ground_tile(region, Vector2i(gx, gy))
-		var area := WorldService.rect_to_world(rect)
-		draw_rect(area, EDGE, false, 2.0)
+		var ground := world.region_tiles(region.id)
+		for tile: Vector2i in world.region_tile_list(region.id):
+			_ground_tile(region, ground, tile)
+		_rims(region, ground)
 		if region.is_town:
-			_town_edges(region)
-		else:
-			# Lit rim along the top edge.
-			draw_line(area.position + Vector2(1, 1), Vector2(area.end.x - 1.0, area.position.y + 1.0), Color(1, 1, 0.85, 0.12), 2.0)
+			_town_edges(region, ground)
 	for gate in world.get_gates():
 		_bridge(gate)
 	if pond.size != Vector2i.ZERO:
@@ -97,73 +95,126 @@ func _draw_water() -> void:
 			draw_line(at + Vector2(width + 2.0, 3.0), at + Vector2(width * 2.0, 3.0), Color(WAVE, WAVE.a * 0.6), 1.0)
 
 
-## Face below a plateau's bottom edge: earth with strata and hanging grass, or (Town) a stone
-## retaining wall. Foam where it meets the water.
-func _cliff(rect: Rect2i, stone: bool = false) -> void:
-	var area := WorldService.rect_to_world(rect)
-	var left := Vector2(area.position.x, area.end.y)
-	var right := area.end
-	var face := Rect2(left, Vector2(area.size.x, CLIFF_DEPTH))
+## Faces below every front edge of a region's shape (a tile's south-west edge when the +y
+## neighbour is water, its south-east edge when the +x neighbour is): earth with strata and
+## hanging grass, or (Town) a stone retaining wall. Foam where they meet the water. Drawn back to
+## front so nearer faces cover farther ones.
+func _cliffs(region: RegionDefinition) -> void:
+	var ground := world.region_tiles(region.id)
+	var tiles: Array = world.region_tile_list(region.id).duplicate()
+	tiles.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y < b.x + b.y)
+	for tile: Vector2i in tiles:
+		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
+		if not ground.has(tile + Vector2i(0, 1)):
+			_cliff_face(corners[3], corners[2], false, region.is_town)
+		if not ground.has(tile + Vector2i(1, 0)):
+			_cliff_face(corners[2], corners[1], true, region.is_town)
+
+
+func _cliff_face(a: Vector2, b: Vector2, shaded: bool, stone: bool) -> void:
+	var face := _drop(a, b, CLIFF_DEPTH)
 	if stone:
-		_stone_wall(face)
+		_stone_wall(a, b, shaded)
 	else:
-		draw_rect(face, CLIFF)
+		var color := CLIFF.darkened(0.2) if shaded else CLIFF
+		draw_colored_polygon(face, color)
+		# Darker towards the water so the drop reads as depth.
+		draw_colored_polygon(_band(a, b, CLIFF_DEPTH * 0.55, CLIFF_DEPTH), color.darkened(0.18))
+		draw_colored_polygon(_band(a, b, CLIFF_DEPTH * 0.8, CLIFF_DEPTH), color.darkened(0.32))
 		for layer: float in [0.35, 0.68]:
-			var y := face.position.y + face.size.y * layer
-			draw_line(Vector2(face.position.x, y), Vector2(face.end.x, y), CLIFF.darkened(0.25), 1.0)
-		_cliff_details(face, CLIFF)
-		draw_line(left, right, CLIFF_GRASS, 4.0)
-		_hanging_grass(left, right, CLIFF_GRASS)
-	draw_line(Vector2(face.position.x, face.end.y), face.end, Color(0, 0, 0, 0.45), 2.0)
-	draw_line(face.position, Vector2(face.position.x, face.end.y), Color(0, 0, 0, 0.4), 1.0)
-	draw_line(Vector2(face.end.x, face.position.y), face.end, Color(0, 0, 0, 0.4), 1.0)
-	_foam(Vector2(face.position.x, face.end.y), face.end)
+			draw_line(a + Vector2(0, CLIFF_DEPTH * layer), b + Vector2(0, CLIFF_DEPTH * layer), color.darkened(0.25), 1.0)
+		_cliff_details(a, b, CLIFF_DEPTH, color)
+		draw_line(a, b, CLIFF_GRASS, 4.0)
+		_hanging_grass(a, b, CLIFF_GRASS)
+	draw_line(a + Vector2(0, CLIFF_DEPTH), b + Vector2(0, CLIFF_DEPTH), Color(0, 0, 0, 0.45), 2.0)
+	draw_line(b, b + Vector2(0, CLIFF_DEPTH), Color(0, 0, 0, 0.25), 1.0)
+	_foam(a + Vector2(0, CLIFF_DEPTH), b + Vector2(0, CLIFF_DEPTH))
 
 
-## The Town sits behind a stone retaining wall over the moat (Evil Hunter Tycoon's town edge).
-func _stone_wall(face: Rect2) -> void:
-	draw_rect(face, WALL)
-	var rows := 4
-	var columns := int(face.size.x / 22.0)
+## Dark line along every boundary edge of the shape, and a lit rim along the back edges of the
+## hunting regions.
+func _rims(region: RegionDefinition, ground: Dictionary) -> void:
+	for tile: Vector2i in world.region_tile_list(region.id):
+		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
+		var steps := [[Vector2i(0, -1), 0, 1], [Vector2i(1, 0), 1, 2], [Vector2i(0, 1), 2, 3], [Vector2i(-1, 0), 3, 0]]
+		for step: Array in steps:
+			if ground.has(tile + step[0]):
+				continue
+			draw_line(corners[step[1]], corners[step[2]], EDGE, 2.0)
+			if not region.is_town and (step[0] == Vector2i(0, -1) or step[0] == Vector2i(-1, 0)):
+				draw_line(corners[step[1]] + Vector2(0, 1.5), corners[step[2]] + Vector2(0, 1.5), Color(1, 1, 0.85, 0.12), 2.0)
+
+
+## Face hanging `depth` px below the edge a → b.
+static func _drop(a: Vector2, b: Vector2, depth: float) -> PackedVector2Array:
+	return PackedVector2Array([a, b, b + Vector2(0, depth), a + Vector2(0, depth)])
+
+
+## Part of a hanging face between two depths.
+static func _band(a: Vector2, b: Vector2, d0: float, d1: float) -> PackedVector2Array:
+	return PackedVector2Array([a + Vector2(0, d0), b + Vector2(0, d0), b + Vector2(0, d1), a + Vector2(0, d1)])
+
+
+## The Town sits behind a stone retaining wall over the moat (the reference game's town edge).
+func _stone_wall(a: Vector2, b: Vector2, shaded: bool) -> void:
+	var wall := WALL.darkened(0.2) if shaded else WALL
+	draw_colored_polygon(_drop(a, b, CLIFF_DEPTH), wall)
+	draw_colored_polygon(_band(a, b, CLIFF_DEPTH * 0.7, CLIFF_DEPTH), wall.darkened(0.25))
+	var rows := 5
+	var columns := maxi(int(a.distance_to(b) / 11.0), 1)
 	for row in rows:
-		var y := face.position.y + face.size.y * row / rows
-		draw_line(Vector2(face.position.x, y), Vector2(face.end.x, y), WALL.darkened(0.35), 1.0)
+		var d0 := CLIFF_DEPTH * row / rows
+		var d1 := CLIFF_DEPTH * (row + 1) / rows
+		draw_line(a + Vector2(0, d0), b + Vector2(0, d0), wall.darkened(0.35), 1.0)
 		var shift := 0.5 if row % 2 == 1 else 0.0
 		for i in columns:
-			var x := face.position.x + face.size.x * (i + shift) / columns
-			if x > face.position.x and x < face.end.x:
-				draw_line(Vector2(x, y), Vector2(x, y + face.size.y / rows), WALL.darkened(0.35), 1.0)
+			var t := (i + shift) / columns
+			if t > 0.0 and t < 1.0:
+				var at := a.lerp(b, t)
+				draw_line(at + Vector2(0, d0), at + Vector2(0, d1), wall.darkened(0.35), 1.0)
 				# A lit block now and then.
 				if _hash(i, row, 17) % 5 == 0:
-					draw_rect(Rect2(Vector2(x + 1.0, y + 1.0), Vector2(face.size.x / columns - 2.0, face.size.y / rows - 2.0)), WALL_LIGHT)
-	draw_line(face.position, Vector2(face.end.x, face.position.y), WALL_CAP, 5.0)
-	draw_line(face.position + Vector2(0, -2), Vector2(face.end.x, face.position.y - 2.0), WALL_CAP.lightened(0.15), 1.0)
+					var next := a.lerp(b, (i + shift + 1.0) / columns)
+					draw_colored_polygon(PackedVector2Array([at + Vector2(1, d0 + 1), next + Vector2(-1, d0 + 1), next + Vector2(-1, d1 - 1), at + Vector2(1, d1 - 1)]),
+						WALL_LIGHT.darkened(0.2) if shaded else WALL_LIGHT)
+	draw_line(a, b, WALL_CAP, 5.0)
+	draw_line(a + Vector2(0, -2), b + Vector2(0, -2), WALL_CAP.lightened(0.15), 1.0)
 
 
-## Stone parapet just inside the Town's top, left and right edges.
-func _town_edges(region: RegionDefinition) -> void:
-	var area := WorldService.rect_to_world(region.tile_rect)
-	var thickness := 6.0
-	var bands := [
-		Rect2(area.position, Vector2(area.size.x, thickness)),
-		Rect2(area.position, Vector2(thickness, area.size.y)),
-		Rect2(Vector2(area.end.x - thickness, area.position.y), Vector2(thickness, area.size.y)),
-	]
-	for band: Rect2 in bands:
-		draw_rect(band, WALL_CAP)
-		draw_rect(band, WALL.darkened(0.3), false, 1.0)
-		var horizontal := band.size.x > band.size.y
-		var length := band.size.x if horizontal else band.size.y
-		for i in range(1, int(length / 14.0)):
-			var at := band.position + (Vector2(i * 14.0, 0) if horizontal else Vector2(0, i * 14.0))
-			var to := at + (Vector2(0, thickness) if horizontal else Vector2(thickness, 0))
-			draw_line(at, to, WALL.darkened(0.3), 1.0)
-	# Wooden fence a tile inside the back (top) edge.
-	var fence_y := area.position.y + TILE * 0.5
-	for i in range(0, region.tile_rect.size.x + 1):
-		_fence_post(Vector2(area.position.x + i * TILE, fence_y))
-	draw_line(Vector2(area.position.x, fence_y - 5.0), Vector2(area.end.x, fence_y - 5.0), FENCE, 2.0)
-	draw_line(Vector2(area.position.x, fence_y - 9.0), Vector2(area.end.x, fence_y - 9.0), FENCE, 2.0)
+## Stone parapet (a low wall with a cap and a short front face) just inside the Town's back
+## edges (every tile edge whose −x or −y neighbour is water), and a wooden fence a little
+## further in. Drawn tile by tile so it follows the shape.
+func _town_edges(region: RegionDefinition, ground: Dictionary) -> void:
+	var tiles: Array = world.region_tile_list(region.id).duplicate()
+	tiles.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y < b.x + b.y)
+	var fences: Array[PackedVector2Array] = []
+	for tile: Vector2i in tiles:
+		var origin := Vector2(tile)
+		if not ground.has(tile + Vector2i(0, -1)):
+			_parapet(WorldService.quad(origin, Vector2(1, PARAPET)), 3, 2)
+			fences.append(PackedVector2Array([WorldService.tile_to_world(origin + Vector2(0, 0.6)), WorldService.tile_to_world(origin + Vector2(1, 0.6))]))
+		if not ground.has(tile + Vector2i(-1, 0)):
+			_parapet(WorldService.quad(origin, Vector2(PARAPET, 1)), 1, 2)
+			fences.append(PackedVector2Array([WorldService.tile_to_world(origin + Vector2(0.6, 0)), WorldService.tile_to_world(origin + Vector2(0.6, 1))]))
+	for segment in fences:
+		draw_line(segment[0] + Vector2(0, -5), segment[1] + Vector2(0, -5), FENCE, 2.0)
+		draw_line(segment[0] + Vector2(0, -9), segment[1] + Vector2(0, -9), FENCE, 2.0)
+	for segment in fences:
+		_fence_post(segment[0])
+		_fence_post(segment[1])
+
+
+## One tile's length of parapet: cap band, short face under its inner edge, a joint.
+func _parapet(polygon: PackedVector2Array, inner_a: int, inner_b: int) -> void:
+	var face := _drop(polygon[inner_a], polygon[inner_b], 5.0)
+	draw_colored_polygon(face, WALL)
+	draw_polyline(face + PackedVector2Array([face[0]]), WALL.darkened(0.3), 1.0)
+	draw_colored_polygon(polygon, WALL_CAP)
+	draw_polyline(polygon + PackedVector2Array([polygon[0]]), WALL.darkened(0.3), 1.0)
+	if inner_a == 3:
+		draw_line(polygon[0].lerp(polygon[1], 0.5), polygon[3].lerp(polygon[2], 0.5), WALL.darkened(0.3), 1.0)
+	else:
+		draw_line(polygon[0].lerp(polygon[3], 0.5), polygon[1].lerp(polygon[2], 0.5), WALL.darkened(0.3), 1.0)
 
 
 func _fence_post(base: Vector2) -> void:
@@ -172,15 +223,15 @@ func _fence_post(base: Vector2) -> void:
 
 
 ## Light streaks and darker cracks on a rock face (deterministic per position).
-func _cliff_details(face: Rect2, color: Color) -> void:
-	var steps := int(face.size.x / 9.0)
+func _cliff_details(a: Vector2, b: Vector2, depth: float, color: Color) -> void:
+	var steps := int(a.distance_to(b) / 9.0)
 	for i in steps:
-		var roll := _hash(int(face.position.x) + i, int(face.position.y), 21) % 100
-		var top := Vector2(face.position.x + face.size.x * (i + 0.5) / steps, face.position.y + face.size.y * (0.15 + (roll % 30) / 100.0))
+		var roll := _hash(int(a.x) + i, int(a.y), 21) % 100
+		var top := a.lerp(b, (i + 0.5) / steps) + Vector2(0, depth * (0.15 + (roll % 30) / 100.0))
 		if roll < 35:
-			draw_line(top, top + Vector2(0, face.size.y * 0.25), color.lightened(0.15), 1.0)
+			draw_line(top, top + Vector2(0, depth * 0.25), color.lightened(0.15), 1.0)
 		elif roll < 55:
-			draw_line(top, top + Vector2(2, face.size.y * 0.2), color.darkened(0.35), 1.0)
+			draw_line(top, top + Vector2(2, depth * 0.2), color.darkened(0.35), 1.0)
 
 
 ## Grass tufts hanging over a cliff lip.
@@ -204,52 +255,60 @@ func _foam(a: Vector2, b: Vector2) -> void:
 
 ## Plank deck across a gate corridor, reaching a little onto both banks (GateVisual adds rails).
 func _bridge(gate: WorldService.Gate) -> void:
-	var a := world.region_center(world.get_region(gate.region_a))
-	var b := world.region_center(world.get_region(gate.region_b))
-	var horizontal := absf(b.x - a.x) > absf(b.y - a.y)
-	var deck := WorldService.rect_to_world(gate.tiles)
-	deck = deck.grow_individual(10.0, 0.0, 10.0, 0.0) if horizontal else deck.grow_individual(0.0, 10.0, 0.0, 10.0)
+	var along_x := gate.axis.x != 0
+	var origin := Vector2(gate.tiles.position)
+	var size := Vector2(gate.tiles.size)
+	if along_x:
+		origin.x -= 0.35
+		size.x += 0.7
+	else:
+		origin.y -= 0.35
+		size.y += 0.7
+	var deck := WorldService.quad(origin, size)
 	# Shadow on the water under the deck.
-	draw_rect(Rect2(deck.position + Vector2(0, 6), deck.size), Color(0, 0, 0, 0.3))
-	draw_rect(deck, DECK)
-	var planks := int((deck.size.x if horizontal else deck.size.y) / 6.0)
+	var shadow := PackedVector2Array()
+	for corner in deck:
+		shadow.append(corner + Vector2(0, 6))
+	draw_colored_polygon(shadow, Color(0, 0, 0, 0.3))
+	draw_colored_polygon(deck, DECK)
+	var planks := int((size.x if along_x else size.y) * WorldService.TILE_WIDTH / 7.0)
 	for i in range(1, planks):
 		var t := float(i) / planks
-		if horizontal:
-			var x := deck.position.x + deck.size.x * t
-			draw_line(Vector2(x, deck.position.y), Vector2(x, deck.end.y), DECK_DARK, 1.0)
+		if along_x:
+			var u := origin.x + size.x * t
+			draw_line(WorldService.tile_to_world(Vector2(u, origin.y)), WorldService.tile_to_world(Vector2(u, origin.y + size.y)), DECK_DARK, 1.0)
 		else:
-			var y := deck.position.y + deck.size.y * t
-			draw_line(Vector2(deck.position.x, y), Vector2(deck.end.x, y), DECK_DARK, 1.0)
-	# Beams along the edges.
-	if horizontal:
-		draw_line(deck.position, Vector2(deck.end.x, deck.position.y), DECK_DARK, 3.0)
-		draw_line(Vector2(deck.position.x, deck.end.y), deck.end, DECK_DARK, 3.0)
+			var v := origin.y + size.y * t
+			draw_line(WorldService.tile_to_world(Vector2(origin.x, v)), WorldService.tile_to_world(Vector2(origin.x + size.x, v)), DECK_DARK, 1.0)
+	# Beams along the long edges.
+	if along_x:
+		draw_line(deck[0], deck[1], DECK_DARK, 3.0)
+		draw_line(deck[3], deck[2], DECK_DARK, 3.0)
 	else:
-		draw_line(deck.position, Vector2(deck.position.x, deck.end.y), DECK_DARK, 3.0)
-		draw_line(Vector2(deck.end.x, deck.position.y), deck.end, DECK_DARK, 3.0)
-	draw_rect(deck, EDGE, false, 1.0)
+		draw_line(deck[0], deck[3], DECK_DARK, 3.0)
+		draw_line(deck[1], deck[2], DECK_DARK, 3.0)
+	draw_polyline(deck + PackedVector2Array([deck[0]]), EDGE, 1.0)
 
 
 ## Rock ledge in the water under a dungeon entrance.
 func _ledge(tile: Vector2i) -> void:
-	var centre := WorldService.tile_center(tile)
-	var slab := Rect2(centre - Vector2(TILE * 0.95, TILE * 0.75), Vector2(TILE * 1.9, TILE * 1.5))
-	var face := Rect2(Vector2(slab.position.x, slab.end.y), Vector2(slab.size.x, 14.0))
-	draw_rect(face, LEDGE.darkened(0.3))
-	_cliff_details(face, LEDGE.darkened(0.3))
-	_foam(Vector2(face.position.x, face.end.y), face.end)
-	draw_rect(slab, LEDGE)
-	draw_rect(Rect2(slab.position, Vector2(slab.size.x, 2.0)), LEDGE.lightened(0.2))
-	draw_rect(slab, EDGE, false, 1.0)
+	var slab := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE), 0.45)
+	for pair: Array in [[slab[3], slab[2]], [slab[2], slab[1]]]:
+		var face := _drop(pair[0], pair[1], 14.0)
+		draw_colored_polygon(face, LEDGE.darkened(0.3))
+		_cliff_details(pair[0], pair[1], 14.0, LEDGE.darkened(0.3))
+		_foam(pair[0] + Vector2(0, 14), pair[1] + Vector2(0, 14))
+	draw_colored_polygon(slab, LEDGE)
+	draw_polyline(PackedVector2Array([slab[3], slab[0], slab[1]]), LEDGE.lightened(0.2), 2.0)
+	draw_polyline(slab + PackedVector2Array([slab[0]]), EDGE, 1.0)
 	for i in 3:
-		var at := slab.position + Vector2(_unit(tile, 40 + i) * slab.size.x, _unit(tile, 50 + i) * slab.size.y)
+		var at := _at(tile, 0.2 + _unit(tile, 40 + i) * 0.6, 0.2 + _unit(tile, 50 + i) * 0.6)
 		draw_circle(at, 1.5, LEDGE.lightened(0.15))
 
 
 # --- Ground ----------------------------------------------------------------------------------------
 
-func _ground_tile(region: RegionDefinition, tile: Vector2i) -> void:
+func _ground_tile(region: RegionDefinition, ground: Dictionary, tile: Vector2i) -> void:
 	var variation := _hash(tile.x, tile.y, 1) % 100
 	var color := region.ground_color
 	if variation < 26:
@@ -257,7 +316,7 @@ func _ground_tile(region: RegionDefinition, tile: Vector2i) -> void:
 	elif variation > 88:
 		color = region.ground_color.darkened(0.06)
 	if region.is_town:
-		_town_tile(region, tile, color)
+		_town_tile(ground, tile, color)
 		return
 	_tile(tile, color)
 	match region.props:
@@ -277,7 +336,7 @@ func _ground_tile(region: RegionDefinition, tile: Vector2i) -> void:
 				_blob(tile, Color("5f7a4a", 0.55), 0.35)
 
 
-func _town_tile(region: RegionDefinition, tile: Vector2i, color: Color) -> void:
+func _town_tile(ground: Dictionary, tile: Vector2i, color: Color) -> void:
 	if pond.has_point(tile):
 		_tile(tile, SHORE)
 		return
@@ -289,7 +348,7 @@ func _town_tile(region: RegionDefinition, tile: Vector2i, color: Color) -> void:
 		_pebbles(tile)
 		# Kerb towards grass neighbours.
 		for step in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
-			if not road_tiles.has(tile + step) and not plaza_tiles.has(tile + step) and region.tile_rect.has_point(tile + step):
+			if not road_tiles.has(tile + step) and not plaza_tiles.has(tile + step) and ground.has(tile + step):
 				_edge(tile, step, ROAD_EDGE)
 		return
 	_tile(tile, color)
@@ -305,49 +364,46 @@ func _town_tile(region: RegionDefinition, tile: Vector2i, color: Color) -> void:
 		_blob(tile, color.darkened(0.12), 0.5)
 
 
-## Rounded pond with ripple rings, lily pads and reeds.
+## Pond: a sandy shore diamond, the water inside it with ripple rings, lily pads and reeds.
 func _draw_pond() -> void:
-	var shore := _rounded(WorldService.rect_to_world(pond).grow(TILE * 0.2), 12.0)
+	var shore := _rounded(WorldService.rect_polygon(pond, 0.2))
 	draw_colored_polygon(shore, SHORE)
-	var water_rect := WorldService.rect_to_world(pond).grow(-TILE * 0.35)
-	var water := _rounded(water_rect, 14.0)
+	var water := _rounded(WorldService.rect_polygon(pond, -0.35))
 	draw_colored_polygon(water, WATER)
-	var centre := water_rect.get_center()
+	var centre := WorldService.tile_to_world(Vector2(pond.position) + Vector2(pond.size) * 0.5)
 	for ring: float in [0.55, 0.3]:
 		var points := PackedVector2Array()
 		for corner in water:
 			points.append(centre + (corner - centre) * ring)
 		draw_polyline(points + PackedVector2Array([points[0]]), WATER_LIGHT, 1.0)
 	draw_polyline(water + PackedVector2Array([water[0]]), WATER.darkened(0.3), 2.0)
-	for pad: Vector2 in [Vector2(-14, 4), Vector2(10, -4), Vector2(2, 10)]:
+	for pad: Vector2 in [Vector2(-18, 4), Vector2(12, -4), Vector2(2, 10)]:
 		draw_circle(centre + pad, 3.5, Color("4f9a4a"))
 		draw_circle(centre + pad + Vector2(1, -1), 1.2, Color("e8789a"))
-	for reed: Vector2 in [Vector2(water_rect.position.x + 10.0, water_rect.end.y - 2.0), Vector2(water_rect.end.x - 12.0, water_rect.end.y - 3.0),
-			Vector2(water_rect.end.x - 10.0, water_rect.position.y + 6.0)]:
+	for reed: Vector2 in [water[3] + Vector2(8, -2), water[2] + Vector2(-6, -6), water[1] + Vector2(-10, 2)]:
 		draw_line(reed, reed + Vector2(0, -9), Color("5f7a3a"), 1.5)
 		draw_line(reed + Vector2(2, 0), reed + Vector2(3, -7), Color("5f7a3a"), 1.5)
 
 
-## Rectangle with rounded corners as a polygon.
-static func _rounded(rect: Rect2, radius: float) -> PackedVector2Array:
+## Diamond with its four corners cut (rounded look).
+static func _rounded(diamond: PackedVector2Array) -> PackedVector2Array:
 	var points := PackedVector2Array()
-	var r := minf(radius, minf(rect.size.x, rect.size.y) * 0.5)
-	var centres: Array[Vector2] = [rect.position + Vector2(r, r), Vector2(rect.end.x - r, rect.position.y + r),
-		rect.end - Vector2(r, r), Vector2(rect.position.x + r, rect.end.y - r)]
 	for i in 4:
-		var start := PI + i * PI * 0.5
-		for j in 5:
-			points.append(centres[i] + Vector2.RIGHT.rotated(start + j * PI * 0.125) * r)
+		var prev := diamond[(i + 3) % 4]
+		var corner := diamond[i]
+		var next := diamond[(i + 1) % 4]
+		points.append(corner.lerp(prev, 0.18))
+		points.append(corner.lerp(next, 0.18))
 	return points
 
 
 # --- Small decorations -----------------------------------------------------------------------------
 
 func _tile(tile: Vector2i, color: Color) -> void:
-	draw_rect(Rect2(Vector2(tile) * TILE, Vector2(TILE, TILE)), color)
+	draw_colored_polygon(WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE), SEAM), color)
 
 
-## Tile-local point (0..1) in world space.
+## Tile-local point (0..1 along each tile axis) in world space.
 func _at(tile: Vector2i, u: float, v: float) -> Vector2:
 	return WorldService.tile_to_world(Vector2(tile) + Vector2(u, v))
 
@@ -371,7 +427,7 @@ func _tufts(tile: Vector2i, color: Color, count: int) -> void:
 
 ## Small round bush (decoration only; buildings may cover it).
 func _bush(tile: Vector2i, color: Color) -> void:
-	var centre := _at(tile, 0.5, 0.6)
+	var centre := _at(tile, 0.5, 0.5)
 	draw_ellipse(centre + Vector2(1, 1), 8.0, 3.0, Color(0, 0, 0, 0.25))
 	for blob: Array in [[Vector2(-4, -3), 4.0], [Vector2(3, -3), 4.0], [Vector2(0, -6), 4.5]]:
 		draw_circle(centre + blob[0], blob[1] + 1.0, Color("10140f"))
@@ -383,14 +439,14 @@ func _bush(tile: Vector2i, color: Color) -> void:
 ## Plaza tile split into 3×3 cobblestones with mortar gaps and varied shades.
 func _cobbles(tile: Vector2i) -> void:
 	_tile(tile, COBBLE_GAP)
-	var size := TILE / 3.0
 	for i in 3:
 		for j in 3:
 			var roll := _hash(tile.x * 3 + i, tile.y * 3 + j, 13) % 3
 			var color := COBBLE if roll == 0 else (COBBLE_DARK if roll == 1 else COBBLE.lerp(COBBLE_DARK, 0.5))
-			var stone := Rect2(Vector2(tile) * TILE + Vector2(i, j) * size + Vector2(1, 1), Vector2(size - 2.0, size - 2.0))
-			draw_rect(stone, color)
-			draw_rect(Rect2(stone.position, Vector2(stone.size.x, 1.0)), color.lightened(0.15))
+			var stone := WorldService.quad(Vector2(tile) + Vector2(i + 0.08, j + 0.08) / 3.0, Vector2(0.84, 0.84) / 3.0)
+			draw_colored_polygon(stone, color)
+			draw_line(stone[3], stone[0], color.lightened(0.15), 1.0)
+			draw_line(stone[0], stone[1], color.lightened(0.15), 1.0)
 
 
 ## Pebbles and a rut on a dirt road tile.
@@ -413,38 +469,36 @@ func _flowers(tile: Vector2i) -> void:
 
 func _blob(tile: Vector2i, color: Color, size: float) -> void:
 	var centre := _at(tile, 0.3 + _unit(tile, 40) * 0.4, 0.3 + _unit(tile, 41) * 0.4)
-	draw_ellipse(centre, 11.0 * size, 7.0 * size, color)
+	draw_ellipse(centre, 11.0 * size, 5.5 * size, color)
 
 
 func _cracks(tile: Vector2i, color: Color) -> void:
 	var start := _at(tile, 0.2 + _unit(tile, 50) * 0.3, 0.2 + _unit(tile, 51) * 0.3)
-	var mid := start + Vector2(_unit(tile, 52) * 12.0 - 4.0, 7)
-	draw_polyline(PackedVector2Array([start, mid, mid + Vector2(6, 6)]), color, 1.0)
+	var mid := start + Vector2(_unit(tile, 52) * 12.0 - 4.0, 5)
+	draw_polyline(PackedVector2Array([start, mid, mid + Vector2(6, 4)]), color, 1.0)
 
 
+## Paving joints along both tile axes.
 func _paving(tile: Vector2i, color: Color) -> void:
-	var origin := Vector2(tile) * TILE
-	draw_line(origin + Vector2(0, TILE * 0.5), origin + Vector2(TILE, TILE * 0.5), Color(color, 0.5), 1.0)
-	draw_line(origin + Vector2(TILE * 0.5, 0), origin + Vector2(TILE * 0.5, TILE), Color(color, 0.5), 1.0)
+	draw_line(_at(tile, 0.5, 0.0), _at(tile, 0.5, 1.0), Color(color, 0.5), 1.0)
+	draw_line(_at(tile, 0.0, 0.5), _at(tile, 1.0, 0.5), Color(color, 0.5), 1.0)
 
 
 ## Dark line along one side of a tile (`step` points to the neighbour).
 func _edge(tile: Vector2i, step: Vector2i, color: Color) -> void:
-	var rect := Rect2(Vector2(tile) * TILE, Vector2(TILE, TILE))
-	var a: Vector2
-	var b: Vector2
+	var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
+	var centre := _at(tile, 0.5, 0.5)
+	var pair: Array[int]
 	if step == Vector2i(1, 0):
-		a = Vector2(rect.end.x - 1.0, rect.position.y)
-		b = Vector2(rect.end.x - 1.0, rect.end.y)
+		pair = [1, 2]
 	elif step == Vector2i(0, 1):
-		a = Vector2(rect.position.x, rect.end.y - 1.0)
-		b = Vector2(rect.end.x, rect.end.y - 1.0)
+		pair = [2, 3]
 	elif step == Vector2i(-1, 0):
-		a = Vector2(rect.position.x + 1.0, rect.position.y)
-		b = Vector2(rect.position.x + 1.0, rect.end.y)
+		pair = [3, 0]
 	else:
-		a = Vector2(rect.position.x, rect.position.y + 1.0)
-		b = Vector2(rect.end.x, rect.position.y + 1.0)
+		pair = [0, 1]
+	var a := corners[pair[0]] + (centre - corners[pair[0]]).normalized() * 1.5
+	var b := corners[pair[1]] + (centre - corners[pair[1]]).normalized() * 1.5
 	draw_line(a, b, color, 2.0)
 
 

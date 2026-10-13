@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/stun.tres" id="e_stun"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_stun")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"shield_bash"
+display_name = "class_skill.shield_bash.name"
+class_id = &"guardian"
+order = 1
+kind = 0
+description = "class_skill.shield_bash.desc"
+scale_stat = &"defense"
+ratings = Vector3i(2, 3, 1)
+cooldown = 8.0
+mana_cost = 20.0
+target = 0
+attack_ratio = 0.5
+stat_ratio = 0.8
+target_effects = Array[ExtResource("3_chance")]([SubResource("C0")])

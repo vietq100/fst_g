@@ -5,8 +5,9 @@ extends RefCounted
 
 signal item_sold(hunter: HunterRuntime, item: ItemDefinition)
 
-const NO_FOOD := "No food in the Tavern"
-const NO_MONEY_FOR_FOOD := "Cannot afford food"
+## Translation keys of the reasons `food_reason` returns (translated).
+const NO_FOOD := "err.supply.no_food"
+const NO_MONEY_FOR_FOOD := "err.supply.no_money_for_food"
 
 var _registry: Node
 var _inventory: InventoryService
@@ -58,7 +59,7 @@ func best_food(hunter: HunterRuntime) -> ItemDefinition:
 func food_reason(hunter: HunterRuntime) -> String:
 	if best_food(hunter) != null:
 		return ""
-	return NO_FOOD if get_food_stock() <= 0 or not _buildings.has_building(BuildingService.TAVERN) else NO_MONEY_FOR_FOOD
+	return Loc.t(NO_FOOD if get_food_stock() <= 0 or not _buildings.has_building(BuildingService.TAVERN) else NO_MONEY_FOR_FOOD)
 
 
 ## Sells the best food; returns it (the caller applies the energy) or null.

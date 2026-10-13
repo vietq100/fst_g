@@ -6,8 +6,10 @@
 [resource]
 script = ExtResource("1_enemy")
 id = &"forest_guardian"
-display_name = "Forest Guardian"
+tags = Array[StringName]([&"beast"])
+display_name = "enemy.forest_guardian.name"
 is_boss = true
+tier = 3
 hp = 900.0
 attack = 28.0
 defense = 10.0

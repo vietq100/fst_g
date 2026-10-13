@@ -28,11 +28,11 @@ func get_fee(amount: int) -> int:
 ## Empty string when `amount` treasury gold can go to the Hunter.
 func can_give(hunter: HunterRuntime, amount: int) -> String:
 	if hunter == null:
-		return "Unknown Hunter"
+		return Loc.t("err.purse.unknown_hunter")
 	if amount <= 0:
-		return "Nothing to give"
+		return Loc.t("err.purse.nothing_to_give")
 	if not _wallet.can_spend(amount):
-		return "Needs %d gold in the treasury" % amount
+		return Loc.t("err.purse.treasury_short", {"gold": amount})
 	return ""
 
 
@@ -49,11 +49,11 @@ func give(hunter: HunterRuntime, amount: int) -> String:
 
 func can_take(hunter: HunterRuntime, amount: int) -> String:
 	if hunter == null:
-		return "Unknown Hunter"
+		return Loc.t("err.purse.unknown_hunter")
 	if amount <= 0:
-		return "Nothing to take"
+		return Loc.t("err.purse.nothing_to_take")
 	if hunter.purse < amount:
-		return "%s only has %d gold" % [hunter.display_name, hunter.purse]
+		return Loc.t("err.purse.only_has", {"name": hunter.display_name, "gold": hunter.purse})
 	return ""
 
 

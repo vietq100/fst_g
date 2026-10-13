@@ -12,8 +12,8 @@ value = 1.5
 [resource]
 script = ExtResource("1_skill")
 id = &"iron_skin"
-display_name = "Iron Skin"
-description = "+1.5 defense per level."
+display_name = "skill.iron_skin.name"
+description = "skill.iron_skin.desc"
 max_level = 5
 gold_per_level = 120
 required_academy_level = 1

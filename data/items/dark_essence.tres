@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_item")
 id = &"dark_essence"
-display_name = "Dark Essence"
+display_name = "item.dark_essence.name"
 item_type = 3
 rarity = 2
 stackable = true

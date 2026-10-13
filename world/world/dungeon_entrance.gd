@@ -12,11 +12,21 @@ const PLAQUE := Color(0.06, 0.07, 0.1, 0.75)
 const FLICKER_FPS := 8.0
 
 var expedition_id: StringName
+## The expedition name key (translated when drawn, so a language change shows on redraw).
 var title := ""
 var locked := false
 
 var _flicker_time := 0.0
 var _flicker := 0
+
+
+func _ready() -> void:
+	# The name plate is translated in _draw; redraw when the language changes.
+	Loc.locale_changed.connect(_on_locale_changed)
+
+
+func _on_locale_changed(_locale: String) -> void:
+	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -31,7 +41,7 @@ func _process(delta: float) -> void:
 
 func setup(definition: ExpeditionDefinition) -> void:
 	expedition_id = definition.id
-	title = definition.display_name
+	title = definition.get_name_key()
 	locked = definition.locked
 	position = WorldService.tile_center(definition.entrance_tile)
 	queue_redraw()
@@ -41,12 +51,16 @@ func hit_test(world_point: Vector2) -> bool:
 	return Rect2(global_position + Vector2(-28, -52), Vector2(56, 60)).has_point(world_point)
 
 
-## Where a party stands before entering (one tile towards the region).
-func get_approach_pofunc _draw() -> void:
+func _draw() -> void:
 	draw_ellipse(Vector2(2, 0), 30, 11, Color(0, 0, 0, 0.35))
 	var stone := STONE.darkened(0.3) if locked else STONE
 	var frame := PackedVector2Array([Vector2(-24, 0), Vector2(-24, -28), Vector2(-17, -40), Vector2(-6, -46), Vector2(6, -46),
 		Vector2(17, -40), Vector2(24, -28), Vector2(24, 0)])
+	# Right side of the arch receding up and to the right (oblique view, D54).
+	var flank := PackedVector2Array([Vector2(24, 0), Vector2(24, -28), Vector2(17, -40), Vector2(6, -46), Vector2(13, -53), Vector2(24, -47),
+		Vector2(31, -35), Vector2(31, -7)])
+	draw_colored_polygon(BuildingVisual._grow(flank, 1.5), OUTLINE)
+	draw_colored_polygon(flank, stone.darkened(0.35))
 	draw_colored_polygon(BuildingVisual._grow(frame, 1.5), OUTLINE)
 	draw_colored_polygon(frame, stone)
 	# Arch blocks: lit left half, shaded right half, joints.
@@ -77,7 +91,8 @@ func get_approach_pofunc _draw() -> void:
 		draw_rect(Rect2(Vector2(-4, -17), Vector2(8, 7)), OUTLINE)
 		draw_rect(Rect2(Vector2(-3, -16), Vector2(6, 5)), Color("b8892a"))
 	var font := ThemeDB.fallback_font
-	var text := title + (" (locked)" if locked else "")
+	var name_text := tr(title)
+	var text := Loc.t("world.entrance.locked", {"name": name_text}) if locked else name_text
 	var size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10)
 	var plaque := Rect2(Vector2(-size.x * 0.5 - 4.0, -50.0 - size.y - 4.0), Vector2(size.x + 8.0, size.y + 2.0))
 	draw_rect(plaque, PLAQUE)

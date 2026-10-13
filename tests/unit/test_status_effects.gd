@@ -27,10 +27,10 @@ func after_each() -> void:
 
 func test_every_effect_loads() -> void:
 	var ids: Array[StringName] = _registry.get_ids(DataRegistryScript.STATUS_EFFECT)
-	assert_eq(ids.size(), 20)
+	assert_eq(ids.size(), 21)
 	for id in [&"poison", &"burn", &"bleed", &"regeneration", &"stun", &"freeze", &"root", &"disarm",
 			&"slow", &"haste", &"weaken", &"strength", &"armor_break", &"fortify", &"focus",
-			&"vulnerable", &"shield", &"invulnerable", &"thorns", &"lifesteal"]:
+			&"vulnerable", &"shield", &"invulnerable", &"thorns", &"lifesteal", &"stagger"]:
 		assert_true(ids.has(id), String(id))
 	assert_eq(_registry.load_errors.size(), 0)
 

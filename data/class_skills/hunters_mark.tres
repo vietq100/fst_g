@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/vulnerable.tres" id="e_vulnerable"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_vulnerable")
+chance = 0.2
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"hunters_mark"
+display_name = "class_skill.hunters_mark.name"
+class_id = &"ranger"
+order = 30
+kind = 1
+description = "class_skill.hunters_mark.desc"
+scale_stat = &"critical_chance"
+ratings = Vector3i(1, 2, 3)
+on_hit_effects = Array[ExtResource("3_chance")]([SubResource("C0")])

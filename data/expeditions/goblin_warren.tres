@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_def")
 id = &"goblin_warren"
-display_name = "Goblin Warren"
+display_name = "expedition.goblin_warren.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"goblin_cave"

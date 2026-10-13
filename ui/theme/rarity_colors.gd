@@ -1,23 +1,10 @@
 class_name RarityColors
 extends RefCounted
-## Consistent rarity colour language for items (ITEM_DESIGN.md → Rarity).
+## Colour of a tier (D60) for items, Hunters and monsters; see Tier.COLORS.
 
 const COMMON := Color("e6e2d8")
-const UNCOMMON := Color("7fd36b")
-const RARE := Color("5fa8ff")
-const SUPERIOR := Color("c58bff")
-const EPIC := Color("ff9a3d")
 const GOLD := Color("ffd23f")
 
 
-static func of(rarity: ItemDefinition.Rarity) -> Color:
-	match rarity:
-		ItemDefinition.Rarity.UNCOMMON:
-			return UNCOMMON
-		ItemDefinition.Rarity.RARE:
-			return RARE
-		ItemDefinition.Rarity.SUPERIOR:
-			return SUPERIOR
-		ItemDefinition.Rarity.EPIC:
-			return EPIC
-	return COMMON
+static func of(rarity: int) -> Color:
+	return Tier.color(rarity)

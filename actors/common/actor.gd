@@ -71,6 +71,16 @@ func get_on_hit_effects() -> Array[StatusEffectChance]:
 	return []
 
 
+## Share of crowd control duration shrugged off (D70). Overridden by Hunters.
+func get_tenacity() -> float:
+	return 0.0
+
+
+## Multiplier for damage over time in % of max HP (D70). Bosses override it.
+func get_ratio_damage_scale() -> float:
+	return 1.0
+
+
 ## Move speed after status effects (slow, haste).
 func get_final_move_speed() -> float:
 	return effects.modify_stat(HunterService.MOVE_SPEED, get_move_speed())

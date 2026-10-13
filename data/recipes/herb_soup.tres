@@ -16,7 +16,7 @@ quantity = 1
 [resource]
 script = ExtResource("1_recipe")
 id = &"herb_soup"
-display_name = "Herb Soup"
+display_name = "recipe.herb_soup.name"
 result_item_id = &"herb_soup"
 result_quantity = 2
 gold_cost = 0

@@ -36,6 +36,8 @@ func _process(_delta: float) -> bool:
 	if _started:
 		return false
 	_started = true
+	# Tests compare English texts (D61): run in English whatever the saved / OS language is.
+	root.get_node("/root/Loc").set_locale("en", false)
 	var collector := ErrorCollector.new()
 	OS.add_logger(collector)
 	var result := _run_all(collector)

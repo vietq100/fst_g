@@ -136,4 +136,4 @@ Tapping Info on a Hunter card opens `HunterDialog` (full-screen dialog, HUD hidd
 ## Palette and map (2026-10-13, D52)
 
 - Theme colours follow the reference game: deep navy panels (`GameTheme.PANEL`), gold rims, green Primary (confirm) and red Danger (cancel / close) buttons, white numbers with a dark outline over the map, resource pills in the header, 36 px nav icons with a gold bar over the selected tab, round gold-rimmed Town / I / II / III buttons.
-- The map is top-down (square tiles, front-facing buildings, bridges over water) so the HUD reads like the reference screenshots.
+- The map is 2:1 isometric (diamond tiles, bridges over water, buildings as isometric boxes with roof emblems, D55) so the HUD reads like the reference screenshots.

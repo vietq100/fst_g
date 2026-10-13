@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/recipe_definition.gd" id="1_recipe"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amount"]
+
+[sub_resource type="Resource" id="ItemAmount_0"]
+script = ExtResource("2_amount")
+item_id = &"dark_essence"
+quantity = 4
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"shadow_pendant"
+display_name = "recipe.shadow_pendant.name"
+result_item_id = &"shadow_pendant"
+gold_cost = 320
+material_costs = Array[ExtResource("2_amount")]([SubResource("ItemAmount_0")])
+building_id = &"blacksmith"
+required_level = 3

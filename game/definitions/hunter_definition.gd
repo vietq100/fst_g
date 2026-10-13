@@ -14,6 +14,13 @@ extends GameDefinition
 @export var attack_per_level: float = 0.0
 @export var defense_per_level: float = 0.0
 
+@export_group("Mana")
+## Mana pool for active class skills (D70).
+@export var base_mana: float = 100.0
+@export var mana_per_level: float = 2.0
+## Mana per second.
+@export var mana_regen: float = 5.0
+
 @export_group("Combat")
 ## Attacks per second. Cooldown = 1 / attack_speed.
 @export var attack_speed: float = 1.0

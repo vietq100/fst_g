@@ -12,8 +12,8 @@ value = 0.1
 [resource]
 script = ExtResource("1_trait")
 id = &"ferocious"
-display_name = "Ferocious"
-description = "Hits harder: +10% damage dealt."
+display_name = "trait.ferocious.name"
+description = "trait.ferocious.desc"
 modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])
 activity_rate_modifiers = Dictionary[StringName, float]({})
 mood_likes = Array[StringName]([])

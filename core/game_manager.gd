@@ -42,6 +42,8 @@ var academy: AcademyService
 var forge: ForgeService
 var trading: TradingService
 var quests: QuestService
+var weekly_boss: WeeklyBossService
+var class_skills: ClassSkillService
 
 
 func _ready() -> void:
@@ -88,12 +90,20 @@ func build(data_registry: Node) -> void:
 	forge = ForgeService.new(registry, buildings, wallet, inventory, hunters, config)
 	trading = TradingService.new(registry, buildings, wallet, purses, config)
 	quests = QuestService.new(registry, buildings, hunters, progress, wallet, inventory)
+	weekly_boss = WeeklyBossService.new(registry, world, hunters, wallet, inventory)
+	class_skills = ClassSkillService.new(registry, hunters, config, rng)
+	recruitment.corpses = corpses
+	equipment.buildings = buildings
+	equipment.purses = purses
+	equipment.wallet = wallet
 	_connect_services()
 
 
 func _connect_services() -> void:
 	recruitment.add_candidate_decorator(traits.assign_random_traits)
 	recruitment.add_candidate_decorator(talents.assign_random_talent)
+	recruitment.add_candidate_decorator(class_skills.grant_starting_skills)
+	reincarnation.reincarnated.connect(class_skills.on_reincarnated)
 	recruitment.hunter_recruited.connect(equipment.give_starting_gear)
 	hunters.hunter_added.connect(func(hunter: HunterRuntime) -> void:
 		hunter.history[HunterRuntime.RECRUIT_DAY] = progress.day)
@@ -111,17 +121,23 @@ func _connect_services() -> void:
 			hunters.mark_injured(hunter)
 	regions.bag_deposited.connect(trading.on_bag_deposited)
 	regions.wanted_items = trading.get_wanted_item_ids
+	regions.weapon_wear = func(hunter: HunterRuntime) -> void: equipment.wear_weapon(hunter)
+	regions.buy_ratio = func() -> float:
+		return buildings.get_effect(BuildingService.MARKET, BuildingService.BUY_PRICE, 1.0) \
+			if buildings.has_building(BuildingService.MARKET) else 1.0
 	forge.enhanced.connect(func(_id: StringName, _level: int) -> void: quests.note_enhanced())
 	var refresh_quests := func(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void: quests.refresh()
 	buildings.layout_changed.connect(refresh_quests)
 	buildings.building_upgraded.connect(refresh_quests)
 	hunters.hunter_added.connect(refresh_quests)
+	hunters.hunter_removed.connect(refresh_quests)
+	hunters.hunter_removed.connect(func(_hunter: HunterRuntime) -> void: housing.assign_beds())
 	hunters.hunter_leveled_up.connect(refresh_quests)
 	progress.flag_set.connect(refresh_quests)
 	academy.skill_learned.connect(refresh_quests)
 	reincarnation.reincarnated.connect(refresh_quests)
 	reincarnation.difficulty_changed.connect(refresh_quests)
-	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests]:
+	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests, class_skills]:
 		service.autosave_requested.connect(autosave_requested.emit)
 
 
@@ -133,6 +149,7 @@ func start_new_game() -> void:
 		var candidate := hunters.generate_candidate(config.starting_hunter_class, rng)
 		traits.assign_random_traits(candidate)
 		talents.assign_random_talent(candidate)
+		class_skills.grant_starting_skills(candidate)
 		equipment.give_starting_gear(hunters.add_hunter(candidate))
 	for item_id in config.starting_food:
 		inventory.add_item(item_id, config.starting_food[item_id])
@@ -150,6 +167,7 @@ func reset_to_new_game() -> void:
 	progress.from_dict({})
 	trading.from_dict([])
 	quests.from_dict({})
+	weekly_boss.from_dict({})
 	buildings.reset()
 	start_new_game()
 

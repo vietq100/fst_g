@@ -54,6 +54,16 @@ var outfit: StringName = &"":
 		outfit = value
 		_frames_cache.clear()
 		queue_redraw()
+## Gear worn over the outfit (D59): top / skin colours, pants, boots, hat and pet. Null = the
+## plain class outfit.
+var dress: ChibiDress = null:
+	set(value):
+		if dress != null and value != null and dress.key() == value.key() and dress.pet == value.pet \
+				and dress.pet_tint == value.pet_tint:
+			return
+		dress = value
+		_frames_cache.clear()
+		queue_redraw()
 ## How the weapon is drawn: SWORD, BOW, DAGGER or MACE.
 var weapon_kind: StringName = SWORD:
 	set(value):
@@ -244,7 +254,7 @@ func _add_fx(kind: String) -> void:
 		"slash", "sparkle", "tap", "charge":
 			at = _hand_position(frame)
 		"soul":
-			at = Vector2(0, -14)
+			at = Vector2(0, -22)
 	_fx.append({"kind": kind, "at": at, "age": 0.0, "side": _side_sign()})
 
 
@@ -256,15 +266,16 @@ func _side_sign() -> float:
 
 
 func _draw() -> void:
-	fill_ellipse(Vector2.ZERO, Vector2(8.0, 3.0), SHADOW_COLOR)
+	fill_ellipse(Vector2.ZERO, Vector2(11.0, 4.0), SHADOW_COLOR)
 	if selected:
-		outline_ellipse(Vector2.ZERO, Vector2(10.0, 4.5), SELECTION_COLOR)
+		outline_ellipse(Vector2.ZERO, Vector2(13.0, 6.0), SELECTION_COLOR)
 	var frame := ChibiAnimations.get_frame(_animation, _frame)
 	var textures := _textures(_animation)
 	var show_weapon: bool = not frame.get("lying", false) and not frame.get("item", false)
 	var behind := facing == Facing.Direction.UP
 	# The shield arm is the far arm in the side view.
 	var shield_behind := ChibiBody.view_of(facing) == ChibiBody.View.SIDE
+	_draw_pet(frame)
 	if shield and show_weapon and shield_behind:
 		_draw_shield(frame)
 	if show_weapon and behind:
@@ -277,16 +288,37 @@ func _draw() -> void:
 		_draw_shield(frame)
 	if frame.get("item", false):
 		var hand := _hand_position(frame)
-		draw_rect(Rect2(hand + Vector2(-2, -5), Vector2(4, 4)), OUTLINE_COLOR)
-		draw_rect(Rect2(hand + Vector2(-1, -4), Vector2(2, 2)), ITEM_COLOR)
+		draw_rect(Rect2(hand + Vector2(-3, -7), Vector2(6, 6)), OUTLINE_COLOR)
+		draw_rect(Rect2(hand + Vector2(-2, -6), Vector2(4, 4)), ITEM_COLOR)
 	for effect in _fx:
 		_draw_fx(effect)
+
+
+## The pet trots a step behind the Hunter's heels and hops while it walks (D59).
+func _draw_pet(frame: Dictionary) -> void:
+	if dress == null or dress.pet == &"" or frame.get("lying", false):
+		return
+	var moving := _animation == ChibiAnimations.WALK or _animation == ChibiAnimations.RUN
+	var texture := PetSprites.texture(dress.pet, dress.pet_tint, _frame % 2 if moving else 0)
+	if texture == null:
+		return
+	var side := _side_sign()
+	var x := -18.0 * side if facing == Facing.Direction.LEFT or facing == Facing.Direction.RIGHT else -16.0
+	var size := Vector2(PetSprites.SIZE)
+	fill_ellipse(Vector2(x, 0.5), Vector2(5.0, 1.8), SHADOW_COLOR)
+	var at := Vector2(x - size.x * 0.5, -size.y + 1.0)
+	if side < 0.0:
+		draw_set_transform(Vector2(x * 2.0, 0.0), 0.0, Vector2(-1, 1))
+		draw_texture(texture, at)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	else:
+		draw_texture(texture, at)
 
 
 func _textures(animation: StringName) -> Array[ImageTexture]:
 	var key := "%d|%s" % [facing, animation]
 	if not _frames_cache.has(key):
-		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation, outfit)
+		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation, outfit, dress)
 	return _frames_cache[key]
 
 
@@ -391,16 +423,16 @@ func _draw_mace(hand: Vector2, direction: Vector2) -> void:
 
 ## Kite shield on the left arm; seen from behind it shows its plain back.
 func _draw_shield(frame: Dictionary) -> void:
-	var at := _off_hand_position(frame) + Vector2(0, -2)
-	var points := PackedVector2Array([at + Vector2(-3, -4), at + Vector2(3, -4), at + Vector2(3, 1),
-		at + Vector2(0, 4), at + Vector2(-3, 1)])
+	var at := _off_hand_position(frame) + Vector2(0, -3)
+	var points := PackedVector2Array([at + Vector2(-4, -6), at + Vector2(4, -6), at + Vector2(4, 2),
+		at + Vector2(0, 6), at + Vector2(-4, 2)])
 	draw_colored_polygon(BuildingVisual._grow(points, 1.0), OUTLINE_COLOR)
 	if facing == Facing.Direction.UP:
 		draw_colored_polygon(points, SHIELD_RIM.darkened(0.35))
 		return
 	draw_colored_polygon(points, SHIELD_FACE)
-	draw_line(at + Vector2(-3, -3.5), at + Vector2(3, -3.5), SHIELD_RIM, 1.0)
-	draw_rect(Rect2(at + Vector2(-1, -2), Vector2(2, 3)), SHIELD_EMBLEM)
+	draw_line(at + Vector2(-4, -5.5), at + Vector2(4, -5.5), SHIELD_RIM, 1.0)
+	draw_rect(Rect2(at + Vector2(-1, -3), Vector2(2, 5)), SHIELD_EMBLEM)
 
 
 func _draw_fx(effect: Dictionary) -> void:
@@ -423,8 +455,8 @@ func _draw_fx(effect: Dictionary) -> void:
 				arc.append(at + Vector2(cos(angle) * side, sin(angle)) * radius)
 			draw_polyline(arc, Color(SLASH_COLOR, SLASH_COLOR.a * (1.0 - t)), 2.0)
 		"charge":
-			draw_circle(Vector2(0, -14), 4.0 + t * 12.0, Color(CHARGE_COLOR, 0.35 * (1.0 - t)))
-			draw_arc(Vector2(0, -14), 16.0 - t * 12.0, 0.0, TAU, 20, Color(CHARGE_COLOR, 0.9 * t), 1.0)
+			draw_circle(Vector2(0, -22), 5.0 + t * 14.0, Color(CHARGE_COLOR, 0.35 * (1.0 - t)))
+			draw_arc(Vector2(0, -22), 20.0 - t * 14.0, 0.0, TAU, 20, Color(CHARGE_COLOR, 0.9 * t), 1.0)
 		"burst":
 			var radius := 6.0 + t * 18.0
 			draw_ellipse(Vector2(0, -1), radius, radius * 0.4, Color(BURST_COLOR, 1.0 - t), false, 2.0)

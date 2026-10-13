@@ -1,7 +1,8 @@
 class_name GateVisual
 extends Node2D
-## Bridge over the water between two regions (WORLD_DESIGN.md, D52): the deck is drawn by the
-## ground; this adds the railings, posts and lanterns at both ends. Origin = corridor centre.
+## Bridge over the water between two regions (WORLD_DESIGN.md, D55): the deck is drawn by the
+## ground; this adds the railings, posts and lanterns along the corridor's two long edges
+## (following the tile grid), reaching one tile onto both banks. Origin = corridor centre.
 ## No collision: the corridor must stay walkable.
 
 const WOOD := Color("8a6a44")
@@ -9,20 +10,37 @@ const WOOD_DARK := Color("5a4430")
 const OUTLINE := Color("16161c")
 const FLAME := Color("ffb347")
 const FLAME_CORE := Color("fff2a8")
-## Half the corridor length along its axis (the gap plus the overlap onto both banks).
-const HALF_LENGTH := 44.0
-## Railings sit this far from the corridor centre line.
-const HALF_WIDTH := 29.0
 const POST_SPACING := 16.0
+## How far (tiles) the rails reach onto each bank.
+const REACH := 1.0
 
 ## Lantern flames flicker at this rate.
 const FLICKER_FPS := 8.0
 
-## Direction along the corridor in world space (from one region to the other).
-var axis := Vector2(1, 0)
+## Rail segments [start, end] relative to the origin.
+var _rails: Array[PackedVector2Array] = []
 
 var _flicker_time := 0.0
 var _flicker := 0
+
+
+func setup(gate: WorldService.Gate) -> void:
+	position = gate.center
+	_rails.clear()
+	var rect := gate.tiles
+	if gate.axis.x != 0:
+		for y: float in [float(rect.position.y), float(rect.end.y)]:
+			_rails.append(PackedVector2Array([
+				WorldService.tile_to_world(Vector2(rect.position.x - REACH, y)) - position,
+				WorldService.tile_to_world(Vector2(rect.end.x + REACH, y)) - position,
+			]))
+	else:
+		for x: float in [float(rect.position.x), float(rect.end.x)]:
+			_rails.append(PackedVector2Array([
+				WorldService.tile_to_world(Vector2(x, rect.position.y - REACH)) - position,
+				WorldService.tile_to_world(Vector2(x, rect.end.y + REACH)) - position,
+			]))
+	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -34,17 +52,14 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var along := axis.normalized()
-	var across := Vector2(-along.y, along.x)
-	for side: float in [-1.0, 1.0]:
-		var offset := across * HALF_WIDTH * side
-		var a := offset - along * HALF_LENGTH
-		var b := offset + along * HALF_LENGTH
+	for rail in _rails:
+		var a := rail[0]
+		var b := rail[1]
 		# Rail: outline, wood, highlight.
 		draw_line(a + Vector2(0, -10), b + Vector2(0, -10), OUTLINE, 4.0)
 		draw_line(a + Vector2(0, -10), b + Vector2(0, -10), WOOD, 2.0)
 		draw_line(a + Vector2(0, -11), b + Vector2(0, -11), WOOD.lightened(0.2), 1.0)
-		var posts := int(HALF_LENGTH * 2.0 / POST_SPACING)
+		var posts := maxi(int(a.distance_to(b) / POST_SPACING), 1)
 		for i in posts + 1:
 			var at := a.lerp(b, float(i) / posts)
 			draw_line(at, at + Vector2(0, -12), OUTLINE, 4.0)
