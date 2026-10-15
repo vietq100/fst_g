@@ -1,9 +1,18 @@
 class_name ItemIcon
 extends Control
 ## Square item slot: dark rounded plate rimmed in the rarity colour, the item's pixel icon in the
-## middle, an optional count or enhancement badge in the corner.
+## middle, an optional count or enhancement badge in the corner. `tappable()` turns it into a
+## button (`pressed`); `selected` draws a gold frame (Storage grid, D63).
+
+signal pressed
 
 const PLATE := Color("141824")
+const SELECTED := Color("f2c94c")
+
+var selected := false:
+	set(value):
+		selected = value
+		queue_redraw()
 
 var _texture: Texture2D
 var _rim := Color.WHITE
@@ -19,11 +28,28 @@ func _init() -> void:
 func setup(item: ItemDefinition, side: float = 28.0, badge: String = "") -> ItemIcon:
 	custom_minimum_size = Vector2(side, side)
 	_rim = RarityColors.of(item.rarity) if item != null else RarityColors.COMMON
-	var scale := maxi(1, int((side - 8.0) / ItemIcons.SIZE))
-	_texture = ItemIcons.texture(item, scale)
+	var icon_scale := maxi(1, int((side - 8.0) / ItemIcons.SIZE))
+	_texture = ItemIcons.texture(item, icon_scale)
 	_badge = badge
 	queue_redraw()
 	return self
+
+
+## Makes the slot react to taps (emits `pressed`).
+func tappable() -> ItemIcon:
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	return self
+
+
+func _gui_input(event: InputEvent) -> void:
+	if mouse_filter != Control.MOUSE_FILTER_STOP:
+		return
+	var tapped := (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) \
+		or (event is InputEventScreenTouch and event.pressed)
+	if tapped:
+		accept_event()
+		pressed.emit()
 
 
 func _draw() -> void:
@@ -44,3 +70,12 @@ func _draw() -> void:
 		var at := Vector2(size.x - width - 2.0, size.y - 3.0)
 		draw_string_outline(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, 2, Color("0b0d12"))
 		draw_string(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("fff3c4"))
+	if selected:
+		var frame := StyleBoxFlat.new()
+		frame.draw_center = false
+		frame.border_color = SELECTED
+		frame.set_border_width_all(2)
+		frame.set_corner_radius_all(4)
+		frame.shadow_color = Color(SELECTED, 0.35)
+		frame.shadow_size = 3
+		draw_style_box(frame, rect)

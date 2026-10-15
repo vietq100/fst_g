@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"earthen_grip"
+display_name = "Earthen Grip"
+description = "Stone hands hold them fast. 130% damage, up to 5 foes within 48 px, applies Root. Cooldown 13s."
+owner_class = &"guardian"
+required_level = 23
+cooldown = 13.0
+damage = 1.30
+radius = 48.0
+targets = 5
+effect_id = &"root"
+effect_stacks = 1
+self_effect_id = &""
+self_effect_stacks = 1
+heal_ratio = 0.00
+animation = &"skill_slam"
+vfx = &"earth"

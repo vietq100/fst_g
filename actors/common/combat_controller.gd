@@ -30,6 +30,9 @@ var attacks_enabled := true
 ## targets (aggro range), `keep_filter` also drops the current one (leash, left the region).
 var acquire_filter: Callable
 var keep_filter: Callable
+## Optional `func(target: Actor) -> void` resolving the attack instead of the service's plain
+## attack (Hunters use it for their class skill, D54).
+var attack_override: Callable
 
 var _service: CombatService
 var _timer: Timer
@@ -185,7 +188,10 @@ func _physics_process(delta: float) -> void:
 		return
 	_cooldown = _service.attack_cooldown(_owner_actor())
 	attacked.emit(target)
-	_service.resolve_attack(_owner_actor(), target)
+	if attack_override.is_valid():
+		attack_override.call(target)
+	else:
+		_service.resolve_attack(_owner_actor(), target)
 
 
 ## Nearest candidate for which `is_valid` returns true, or null.

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"second_wind"
+display_name = "Second Wind"
+description = "Catches breath and mends. Gains Regeneration, heals 15% HP. Cooldown 22s."
+owner_class = &"warrior"
+required_level = 11
+cooldown = 22.0
+damage = 0.00
+radius = 0.0
+targets = 1
+effect_id = &""
+effect_stacks = 1
+self_effect_id = &"regeneration"
+self_effect_stacks = 1
+heal_ratio = 0.15
+animation = &"skill_cast"
+vfx = &"heal"

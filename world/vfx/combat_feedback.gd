@@ -12,6 +12,7 @@ func _ready() -> void:
 	z_index = 100
 	GameManager.combat.damage_dealt.connect(_on_damage_dealt)
 	GameManager.combat.effect_damage_dealt.connect(_on_effect_damage_dealt)
+	GameManager.combat.skill_used.connect(_on_skill_used)
 
 
 ## Attackers with a longer reach than this shoot (arrow streak).
@@ -51,3 +52,28 @@ func _spawn_number(target: Actor) -> DamageNumber:
 	add_child(number)
 	number.global_position = target.global_position + NUMBER_OFFSET + Vector2(randf_range(-NUMBER_JITTER, NUMBER_JITTER), 0)
 	return number
+
+
+## Active skill (D55): a SkillVfx at the attacker (ground / self skills) or the main target, plus
+## one arrow streak per target for arrow skills, each a little later than the last.
+func _on_skill_used(attacker: Actor, targets: Array[Actor], skill: ActiveSkillDefinition) -> void:
+	if not is_instance_valid(attacker) or skill == null:
+		return
+	if skill.vfx == &"arrows":
+		for i in targets.size():
+			var target := targets[i]
+			if not is_instance_valid(target):
+				continue
+			var streak := ArrowStreak.new()
+			add_child(streak)
+			streak.setup(attacker.global_position + Vector2(0, -14), target.global_position + Vector2(0, -12))
+			if i > 0:
+				streak.set_process(false)
+				get_tree().create_timer(0.06 * i).timeout.connect(func() -> void:
+					if is_instance_valid(streak):
+						streak.set_process(true))
+	var on_self := skill.damage <= 0.0 or skill.vfx == &"shockwave" or skill.vfx == &"earth" or targets.is_empty()
+	var centre := attacker.global_position if on_self or not is_instance_valid(targets[0]) else targets[0].global_position
+	var vfx := SkillVfx.new()
+	add_child(vfx)
+	vfx.setup(skill.vfx, centre, skill.radius)

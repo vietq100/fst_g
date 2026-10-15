@@ -20,8 +20,18 @@ extends GameDefinition
 ## Status effects this enemy's hits may apply (D48), e.g. a venomous bite.
 @export var on_hit_effects: Array[StatusEffectChance] = []
 
+@export_group("Character")
+## Active skills (D55), used when off cooldown instead of a plain attack (two per monster).
+@export var skill_ids: Array[StringName] = []
+## Weapon and armor items (data/items) the monster fights with: their stat modifiers apply, the
+## weapon is shown in its hand, and either may drop (`gear_drop_chance`) into the killer's bag.
+@export var weapon_id: StringName
+@export var armor_id: StringName
+@export_range(0.0, 1.0) var gear_drop_chance: float = 0.0
+
 @export_group("Rewards")
 @export var xp_reward: int = 0
+## Coins the monster carries, taken by the killer (scaled by region level and difficulty).
 @export var gold_min: int = 0
 @export var gold_max: int = 0
 @export var loot_table_id: StringName

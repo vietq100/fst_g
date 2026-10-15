@@ -1,84 +1,127 @@
 class_name ChibiBody
 extends RefCounted
-## The chibi Hunter body (D49): a 15×29 px base figure (bald, white tank top, shorts) traced from
-## the owner's reference, placed on a 32×48 canvas with room above for hair, hats, jumps and
-## weapons. The body is split into six parts (head, torso, two arms, two legs) that animation
-## frames move by whole pixels (ChibiAnimations), so the art stays crisp.
+## The chibi Hunter body (D49, D56): a 30×58 texel figure (the owner's 15×29 reference at twice
+## the density, D56) placed on a 64×96 canvas with room above for hair, hats, jumps and weapons.
+## Textures are drawn at 1 / SCALE in the world, so the character keeps its 32×48 world size and
+## the extra texels are detail. The body is split into six parts (head, torso, two arms, two legs)
+## that animation frames move by whole world pixels (ChibiAnimations offsets × SCALE), so the art
+## stays crisp.
 ## Facings: front (down), back (up) and side (right; left is the mirrored image).
 ## Layers: skin tone, dye (trousers), hair style and hair colour come from HunterAppearance; the
 ## outfit (torso, arms, legs rows) follows the Hunter's base class (OUTFITS, `outfit_for`).
 ## Hair is drawn over the head part and moves with it; back and side views are derived from the
 ## front hair map (`hair_map`).
 
-const CANVAS := Vector2i(32, 48)
+## Texels per world pixel (D56). Every map below is in texels.
+const SCALE := 2
+const CANVAS := Vector2i(64, 96)
 ## Top-left of the body map on the canvas in the rest pose.
-const BODY_ORIGIN := Vector2i(8, 19)
+const BODY_ORIGIN := Vector2i(16, 38)
 ## The actor's feet (node origin) on the canvas.
-const FEET := Vector2i(16, 48)
-const BODY_SIZE := Vector2i(15, 29)
+const FEET := Vector2i(32, 96)
+const BODY_SIZE := Vector2i(30, 58)
 
 enum View { FRONT, BACK, SIDE }
 
 ## Traced reference, front view. Symbols:
-## o outline · h s m d n skin (light → dark) · r eye lid · w eye white · i iris (hair colour)
+## o outline · h s m d n skin (light → dark) · r eye lid · w eye white · i iris (hair colour) ·
+## l blush
 ## W c g b p tank top (white → dark) · k K shorts (dye, dye dark) · . transparent
 ## Outfits add: y Y gold trim · e E leather · t T u metal (base, dark, shine) · f F boots
 const BODY := [
-	"....ooooooo....",
-	"...ossssssso...",
-	"..ossssssssso..",
-	".ossssssssssso.",
-	".ossssssssssho.",
-	".omsssssssssmo.",
-	".ommsssssssmmo.",
-	".odmsssssssmdo.",
-	"ossmoosssoomsso",
-	"ossswosssowmsso",
-	".omsirsssrismo.",
-	"..nssssssshsn..",
-	"...omsssssmn...",
-	"...onnnnnnno...",
-	"..omgcssscgmo..",
-	"..nscWWWWWcsn..",
-	".nsmWWWWWWWmsn.",
-	".nsgWWWWWWWgsn.",
-	"omsbWWWWWWWbsmo",
-	"osbccWWWWWccbso",
-	".opggcccccggpo.",
-	"..pcccccccccp..",
-	"..oopWWWWWpoo..",
-	"..omKkkkkkKmo..",
-	"..omsso.ossmo..",
-	"...ommo.ommo...",
-	"...ommo.ommo...",
-	"...osso.osso...",
-	"...oooo.oooo...",
+	".........oooooooooooo.........",
+	".......ooohhssssssssoo........",
+	".......ohhhhsssssssssssso.....",
+	".....oohhhhssssssssssssssoo...",
+	".....ohhhssssssssssssssssso...",
+	"...oohhsssssssssssssssssssoo..",
+	"...ohhhsssssssssssssssssssso..",
+	"..oohhssssssssssssssssssssooo.",
+	"..ohhhssssssssssssssssssssmmo.",
+	"..ohhhsssssssssssssssssssmmmoo",
+	"..ohhhsssssssssssssssssssmmmmo",
+	"..ohhsssssssssssssssssssmmmmmo",
+	"..osssssssssssssssssssssmmmmmo",
+	".oossssssssssssssssssssssmmmmo",
+	".osssssorrrssssssssrrrosssssso",
+	"oossssoorrrrssssssrrrroossssso",
+	"ossssswwwwiisswwsswwiiwwssssso",
+	"ossssswwwiwisswwssswiwiwssssso",
+	"oossssooiiiissssmmssiiiissssoo",
+	".osssssoiiisssssmmsssiissssso.",
+	".ooolsssssssssssssssssssslooo.",
+	"...ollssssssssssssssssssllo...",
+	"....nnssssssssddsssssssmnn....",
+	".....nssssssssddsssssmmnnn....",
+	"......onnnmmmmmmmmmmmmmnno....",
+	"......onnnnmmmmmmmmmmnnoo.....",
+	"......onnnnnnnnnnnnnnnno......",
+	".....ooonnnnnnnnnnnnnnno......",
+	".....ommggccssssssccggmoo.....",
+	"....oommgcccsssssscccgmmoo....",
+	"....nnsscccWWWWWWWWcccssnn....",
+	"...nnssscWWWWWWWWWWWWcsssnn...",
+	"...nnssmWWWWWWWWWWWWWWmssnn...",
+	"..nnssmmWWWWWWWWWWWWWWmmssnn..",
+	"..nnssggWWWWWWWWWWWWWWggssnn..",
+	"..nnssggWWWWWWWWWWWWWWggssnn..",
+	".ommssbbWWWWWWWWWWWWWWbbssmmo.",
+	"oomssbbbWWWWWWWWWWWWWWbbbssmoo",
+	"oosssbbccWWWWWWWWWWWWccbbsssoo",
+	".ossbbcccccWWWWWWWWcccccbbsso.",
+	".oooppggggccccccccccggggppooo.",
+	"...oppggggccccccccccggggppo...",
+	"....ppccccccccccccccccccpp....",
+	"....ppccccccccccccccccccpp....",
+	"....opooppWWWWWWWWWWppoopo....",
+	"....ooooppWWWWWWWWWWppoooo....",
+	"....ooomKKkkkkkkkkkkKKmooo....",
+	"....ommmKKkkkkkkkkkkKKmmmo....",
+	"....oommssssso..osssssmmoo....",
+	".....ommmsssso..ossssmmmo.....",
+	".....oommmmmmo..ommmmmmoo.....",
+	"......ommmmmmo..ommmmmmo......",
+	"......ommmmmmo..ommmmmmo......",
+	"......ommmmmmo..ommmmmmo......",
+	"......osssssso..osssssso......",
+	"......ooossooo..ooossooo......",
+	"......ooossooo..ooossooo......",
+	".......oooooo....oooooo.......",
 ]
 
 ## Part rectangles in the body map. Draw order (back to front) is PART_ORDER.
 const PARTS := {
-	&"head": Rect2i(0, 0, 15, 13),
-	&"torso": Rect2i(3, 13, 9, 11),
-	&"arm_l": Rect2i(0, 13, 3, 10),
-	&"arm_r": Rect2i(12, 13, 3, 10),
-	&"leg_l": Rect2i(0, 24, 8, 5),
-	&"leg_r": Rect2i(8, 24, 7, 5),
+	&"head": Rect2i(0, 0, 30, 26),
+	&"torso": Rect2i(6, 26, 18, 22),
+	&"arm_l": Rect2i(0, 26, 6, 20),
+	&"arm_r": Rect2i(24, 26, 6, 20),
+	&"leg_l": Rect2i(0, 48, 16, 10),
+	&"leg_r": Rect2i(16, 48, 14, 10),
 }
 const PART_ORDER: Array[StringName] = [&"arm_l", &"leg_l", &"leg_r", &"torso", &"arm_r", &"head"]
 ## Weapon hand (bottom of the right arm) in the body map.
-const HAND := Vector2i(13, 20)
-## Eye blocks (front view): left eye, right eye, rows 8–10, 2 px wide.
-const EYE_ROWS := Vector2i(8, 10)
-const EYE_LEFT_COL := 4
-const EYE_RIGHT_COL := 9
+const HAND := Vector2i(26, 40)
+## Eye blocks (front view): left eye, right eye, rows 14–19, 4 texels wide (lid, white + iris,
+## iris).
+const EYE_ROWS := Vector2i(14, 19)
+const EYE_LEFT_COL := 8
+const EYE_RIGHT_COL := 18
+const EYE_WIDTH := 4
 ## Side view: eyes slide toward the facing side by these amounts.
-const SIDE_EYE_SHIFT := Vector2i(2, 1)
-## First body-map row replaced by an outfit (neck); outfits cover rows 13–28.
-const TORSO_ROW := 13
+const SIDE_EYE_SHIFT := Vector2i(4, 2)
+## First body-map row replaced by an outfit (neck); outfits cover rows 26–57.
+const TORSO_ROW := 26
 ## Hair maps start this many rows above the head's top row.
-const HAIR_TOP := -3
+const HAIR_TOP := -6
+## Side hair (D51 rules at D56 density): rows from this head row on are below the fringe, rows
+## below LONG_HAIR_ROW are strands over the shoulders; back-of-head columns end at these.
+const FRINGE_END_ROW := 13
+const LONG_HAIR_ROW := 25
+const SIDE_BACK_COL := 15
+const SIDE_NAPE_COL := 9
+const HAIR_SHADE_COL := 22
 ## Portrait crop relative to BODY_ORIGIN: hair, face and shoulders.
-const PORTRAIT_RECT := Rect2i(-1, -4, 17, 19)
+const PORTRAIT_RECT := Rect2i(-2, -8, 34, 38)
 
 const OUTLINE := Color("3d1505")
 const EYE_LID := Color("a64c40")
@@ -106,236 +149,435 @@ const SKINS := [
 ## dyed scarf, Guardian plate + blue tabard.
 const OUTFITS := {
 	&"warrior": [
-		"...onnnnnnno...",
-		".ouutcssscutto.",
-		".otTTWWWWWTTTo.",
-		".pcgWWWWWWWgcp.",
-		".pcgWWWWWWWgcp.",
-		"omsbWWWWWWWbsmo",
-		"osbccWWWWWccbso",
-		".opggcccccggpo.",
-		"..pcccccccccp..",
-		"..oEeeeyeeeEo..",
-		"..oKkkkkkkkKo..",
-		"..oKkko.okkKo..",
-		"...oFFo.oFFo...",
-		"...offo.offo...",
-		"...offo.offo...",
-		"...oooo.oooo...",
+		".......onnnnnnnnnnnnnno.......",
+		"......oonnnnnnnnnnnnnnoo......",
+		"...ouuuuttccssssssccuutttto...",
+		"..oouuuuttccssssssccuuttttoo..",
+		"..otttTTTTWWWWWWWWWWTTTTTTTo..",
+		"..otttTTTWWWWWWWWWWWWTTTTTTo..",
+		"..ppccggWWWWWWWWWWWWWWggccpp..",
+		"..ppccggWWWWWWWWWWWWWWggccpp..",
+		"..ppccggWWWWWWWWWWWWWWggccpp..",
+		"..ppccggWWWWWWWWWWWWWWggccpp..",
+		".ommssbbWWWWWWWWWWWWWWbbssmmo.",
+		"oomssbbbWWWWWWWWWWWWWWbbbssmoo",
+		"oosssbbccWWWWWWWWWWWWccbbsssoo",
+		".ossbbcccccWWWWWWWWcccccbbsso.",
+		".oooppggggccccccccccggggppooo.",
+		"...oppggggccccccccccggggppo...",
+		"....ppccccccccccccccccccpp....",
+		"....ppccccccccccccccccccpp....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....ooKKkkkkko..okkkkkKKoo....",
+		".....oKKkkkkko..okkkkkKKo.....",
+		".....oooFFFFFo..oFFFFFooo.....",
+		"......oFFFFFFo..oFFFFFFo......",
+		"......offffffo..offffffo......",
+		"......offffffo..offffffo......",
+		"......offffffo..offffffo......",
+		"......oooffooo..oooffooo......",
+		"......oooffooo..oooffooo......",
+		".......oooooo....oooooo.......",
 	],
 	&"ranger": [
-		"...onnnnnnno...",
-		"..oEgcssscgEo..",
-		".oeEcWWWWWcEeo.",
-		".peEWWWeWWWEep.",
-		".pcgWWWWeWWgcp.",
-		"omEbWWWWWeWbEmo",
-		"osEccWWWWWecEso",
-		".opggcccccggpo.",
-		"..pcccccccccp..",
-		"..oEeeeyeeeEo..",
-		"..oKkkkkkkkKo..",
-		"..oKkko.okkKo..",
-		"...oeeo.oeeo...",
-		"...oEEo.oEEo...",
-		"...ofFo.ofFo...",
-		"...oooo.oooo...",
+		".......onnnnnnnnnnnnnno.......",
+		".....ooonnnnnnnnnnnnnnooo.....",
+		".....oEEggccssssssccggEEo.....",
+		"...oooEEgcccsssssscccgEEooo...",
+		"...oeeEEcccWWWWWWWWcccEEeeo...",
+		"..ooeeEEcWWWWWWWWWWWWcEEeeoo..",
+		"..ppeeEEWWWWWWeeWWWWWWEEeepp..",
+		"..ppeeEEWWWWWWeeeWWWWWEEeepp..",
+		"..ppccggWWWWWWWeeeWWWWggccpp..",
+		"..ppccggWWWWWWWWeeeWWWggccpp..",
+		".ommEEbbWWWWWWWWWeeeWWbbEEmmo.",
+		"oommEEbbWWWWWWWWWWeeeWbbEEmmoo",
+		"oossEEcccWWWWWWWWWWeWeccEEssoo",
+		".ossEEcccccWWWWWWWWWeeccEEsso.",
+		".oooppggggccccccccccggggppooo.",
+		"...oppggggcccccccccccgggppo...",
+		"....ppccccccccccccccccccpp....",
+		"....ppccccccccccccccccccpp....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....ooKKkkkkko..okkkkkKKoo....",
+		".....oKKkkkkko..okkkkkKKo.....",
+		".....oooeeeeeo..oeeeeeooo.....",
+		"......oeeeeeeo..oeeeeeeo......",
+		"......oEEEEEEo..oEEEEEEo......",
+		"......oEEEEEEo..oEEEEEEo......",
+		"......offfFFFo..offfFFFo......",
+		"......ooofFooo..ooofFooo......",
+		"......ooofFooo..ooofFooo......",
+		".......oooooo....oooooo.......",
 	],
 	&"rogue": [
-		"...okkkkkkko...",
-		"..okKkkkkkKko..",
-		".obgKcWWWcKgbo.",
-		".pbgWWWWWWWgbp.",
-		".pbgWWWWWWWgbp.",
-		"omsbWWWWWWWbsmo",
-		"osbccWWWWWccbso",
-		".opggcgcgcggpo.",
-		"..pcgcccccgcp..",
-		"..oEeeeyeeeEo..",
-		"..obggggggbo...",
-		"..obggo.oggbo..",
-		"...offo.offo...",
-		"...offo.offo...",
-		"...oFFo.oFFo...",
-		"...oooo.oooo...",
+		".......okkkkkkkkkkkkkko.......",
+		".....ookkkkkkkkkkkkkkkkoo.....",
+		".....okkKKkkkkkkkkkkKKkko.....",
+		"...oookkKKkkkkkkkkkkKKkkooo...",
+		"...obbggKKccWWWWWWccKKggbbo...",
+		"..oobbggKKcWWWWWWWWcKKggbboo..",
+		"..ppbbggWWWWWWWWWWWWWWggbbpp..",
+		"..ppbbggWWWWWWWWWWWWWWggbbpp..",
+		"..ppbbggWWWWWWWWWWWWWWggbbpp..",
+		"..ppbbbgWWWWWWWWWWWWWWgbbbpp..",
+		".ommssbbWWWWWWWWWWWWWWbbssmmo.",
+		"oomsssbbWWWWWWWWWWWWWWbbsssmoo",
+		"oosssbbccWWWWWWWWWWWWccbbsssoo",
+		".ossbbcccccWWWWWWWWcccccbbsso.",
+		".oooppgggcccggccggcccgggppooo.",
+		"...oppggggccggccggccggggppo...",
+		"....ppcgggccccccccccgggcpp....",
+		"....ppccggccccccccccggccpp....",
+		"....oEEEeeeeeeyyeeeeeeEEoo....",
+		"....oEEEeeeeeeyyeeeeeeEoo.....",
+		"....obbbggggggggggggbbbo......",
+		"....obbbgggggggggggggbbo......",
+		"....oobbgggggo..oggggbbboo....",
+		".....obbgggggo..ogggggbboo....",
+		".....ooofffffo..offfffooo.....",
+		"......offffffo..offffffo......",
+		"......offffffo..offffffo......",
+		"......offffffo..offffffo......",
+		"......oFFFFFFo..oFFFFFFo......",
+		"......oooFFooo..oooFFooo......",
+		"......oooFFooo..oooFFooo......",
+		".......oooooo....oooooo.......",
 	],
 	&"guardian": [
-		"...onnnnnnno...",
-		".outtTsssTttuo.",
-		"otTTTWWcWWTTTTo",
-		".oTTtWWcWWtTTo.",
-		".pTtTWWcWWTtTp.",
-		"omsoTWWcWWTosmo",
-		"osbotWWcWWtobso",
-		".opTTtWcWtTTpo.",
-		"..pTTTWcWTTTp..",
-		"..oEeeeyeeeEo..",
-		"..oKkkkkkkkKo..",
-		"..oKkko.okkKo..",
-		"...outo.outo...",
-		"...otTo.otTo...",
-		"...oTTo.oTTo...",
-		"...oooo.oooo...",
+		".......onnnnnnnnnnnnnno.......",
+		"......oonnnnnnnnnnnnnnoo......",
+		"...ouuttttTTssssssTTttttuuo...",
+		".ooouutttTTTssssssTTTtttuuooo.",
+		"oottTTTTTTTWWWccWWWTTTTTTTTToo",
+		"oottTTTTTTWWWWccWWWWTTTTTTTToo",
+		".oooTTTTttWWWWccWWWWttTTTTToo.",
+		"..oTTTTtttWWWWccWWWWtttTTTTo..",
+		"..ppTTtttTWWWWccWWWWTtttTTpp..",
+		"..ppTTttTTWWWWccWWWWTTttTTpp..",
+		".ommssooTTWWWWccWWWWTToossmmo.",
+		"oomsssooTTWWWWccWWWWTToosssmoo",
+		"oosssboottWWWWccWWWWttoobsssoo",
+		".ossbbootttWWWccWWWtttoobbsso.",
+		".oooppTTTttWWWccWWWttTTTppooo.",
+		"...oppTTTTTtWWccWWtTTTTTppo...",
+		"....ppTTTTTTWWccWWTTTTTTpp....",
+		"....ppTTTTTTWWccWWTTTTTTpp....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oEEEeeeeeeyyeeeeeeEEEo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....oKKKkkkkkkkkkkkkkkKKKo....",
+		"....ooKKkkkkko..okkkkkKKoo....",
+		".....oKKkkkkko..okkkkkKKo.....",
+		".....ooouuttto..ouuuttooo.....",
+		"......ouutttto..ouutttto......",
+		"......ottttTTo..ottttTTo......",
+		"......ottTTTTo..ottTTTTo......",
+		"......oTTTTTTo..oTTTTTTo......",
+		"......oooTTooo..oooTTooo......",
+		"......oooTTooo..oooTTooo......",
+		".......oooooo....oooooo.......",
 	],
 }
 ## Hair styles (HunterAppearance.hair_style): front rows from HAIR_TOP; "back" = last head row
-## covered at the back. Short messy, long, ponytail, bob, spiky, bun, side swept, twin tails,
+## covered at the back (texel rows). Short messy, long, ponytail, bob, spiky, bun, side swept, twin tails,
 ## buzz cut, curly. Symbols: o outline, L H D hair (light → dark).
 const HAIR_STYLES := [
-	{"back": 9, "rows": [
-		"...............",
-		".....o..o.o....",
-		"...ooLooLoLo...",
-		"..oLLLLLLLLLo..",
-		".oLLHHHHHHHHHo.",
-		".oLHHHHHHHHHHDo",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHDHHDHHHDHHDo",
-		"oHDoHDoDHoDHoDo",
-		"oDo.o..o..o.oDo",
-		".o...........o.",
+	{"back": 19, "rows": [
+		"..............................",
+		"..............................",
+		"..........oo....oo..oo........",
+		".........oooo..ooo..ooo.......",
+		".......oooLLooooLLooLLo.......",
+		".....oooLLLLLLLLLLLLLLLoo.....",
+		".....oLLLLLLLLLLLLLLLLLLo.....",
+		"...ooLLLLLLLLLLLLLLLLLLLooo...",
+		"...oLLLLLHHHHHHHHHHHHHHHHHo...",
+		"..ooLLLHHHHHHHHHHHHHHHHHHHooo.",
+		"..oLLLLHHHLLLHLLLHLLHHHHHHDDo.",
+		".ooLLHHHLLHLLLHLLLHLHHHHHHDDoo",
+		".oLLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"ooLHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHDDHHHHDDHHHHHHDDHHHHDDDo",
+		"oHHHHDDDHHHDDDDHHHHHDDHHHHDDDo",
+		"oHHHHDDDHHHDDoDHHHHoDDHHHoDDDo",
+		"oHHDDooooHDDoooDHHoooDHHooDDDo",
+		"ooDDDo..oo...ooo...ooo..ooDDoo",
+		".oDDo...oo....oo....oo...oDDo.",
+		".oooo....................oooo.",
+		"..oo......................oo..",
 	]},
-	{"back": 12, "rows": [
-		"...............",
-		"...............",
-		"....ooooooo....",
-		"...oLLLLHHHHo..",
-		"..oLLLHHHHHHDo.",
-		".oLLHHHHHHHHHDo",
-		".oLHHHHHHHHHHDo",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHDDHHHHHDDHDo",
-		"oHDo.......oDDo",
-		"oHD.........DHo",
-		"oHD.........DHo",
-		"oHD.........DHo",
-		"oHHD.......DHHo",
-		"oHHDo.....oDHHo",
-		"oHDDo.....oDDHo",
-		"oDDo.......oDDo",
-		".oo.........oo.",
+	{"back": 25, "rows": [
+		"..............................",
+		"..............................",
+		"..............................",
+		"..............................",
+		".........oooooooooooo.........",
+		".......oooLLLLLLHHHHoo........",
+		".......oLLLLLLLLHHHHHHHHo.....",
+		".....ooLLLLLLLLHHHHHHHHHooo...",
+		".....oLLLLLLLHHHHHHHHHHHDDo...",
+		"...ooLLLLLLHHHHHHHHHHHHHHDDoo.",
+		"...oLLLLLHHHHHHHHHHHHHHHHDDDo.",
+		"..ooLLLHHHHHHHHHHHHHHHHHHHDDoo",
+		"..oLLLLHHHLLLHLLLHLLHHHHHHDDDo",
+		".ooLLHHHLLHLLLHLLLHLHHHHHHDDDo",
+		".oLLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"ooLHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHDDHHHHHHHHHHHHDDHHHDDDo",
+		"oHHHHDDDDDHHHHHHHHHHDDDDHHDDDo",
+		"oHHHHDDo..............oDDDDDDo",
+		"oHHHDDo................oDDDDDo",
+		"oHHHDD..................DDDHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHHDD................DDHHHHo",
+		"oHHHHDD................DDHHHHo",
+		"oHHHHHDD..............DDHHHHHo",
+		"oHHHHHDDo............oDDHHHHHo",
+		"oHHHHDDDoo..........ooDDDHHHHo",
+		"oHHHHDDDoo..........ooDDDHHHHo",
+		"oHHDDDDDo............oDDDDDHHo",
+		"ooDDDDDoo............ooDDDDDoo",
+		".oDDDDo................oDDDDo.",
+		".oooooo................oooooo.",
+		"...oo....................oo...",
 	]},
-	{"back": 10, "rows": [
-		"...........ooo.",
-		"..........oLHDo",
-		"....ooooooHHDo.",
-		"...oLLLLLLHDDo.",
-		"..oLLHHHHHHHDo.",
-		".oLHHHHHHHHHHDo",
-		".oLHHHHHHHHHHDo",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHDHHDHHHDHHDDo",
-		"oDo.oDo..o.oDDo",
-		".o..........oo.",
+	{"back": 21, "rows": [
+		".......................oooo...",
+		".....................oooHHooo.",
+		".....................oLLHHDDoo",
+		"...................oooLHHDDDoo",
+		".........oooooooooooHHHHHDDoo.",
+		".......oooLLLLLLLLLoHHHDDDDo..",
+		".......oLLLLLLLLLLLLHHDDDDDo..",
+		".....ooLLLLLLLLLLLLHHHDDDDDo..",
+		".....oLLLLLHHHHHHHHHHHHDDDDo..",
+		"...ooLLLLHHHHHHHHHHHHHHHHDDoo.",
+		"...oLLLHHHHHHHHHHHHHHHHHHDDDo.",
+		"..ooLLHHHHHHHHHHHHHHHHHHHHDDoo",
+		"..oLLLHHHHHHHHHHHHHHHHHHHHDDDo",
+		".ooLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		".oLLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"ooLHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHDDHHHHDDHHHHHHDDHHHHHDDDDo",
+		"oHHDDDHHHHDDHHHHHHDDHHHHDDDDDo",
+		"ooDDDo..ooDDoo....oo..ooDDDDoo",
+		".oDDo....oDDo.....oo...oDDDDo.",
+		".oooo..................oooooo.",
+		"..oo.....................oo...",
 	]},
-	{"back": 11, "rows": [
-		"...............",
-		"...............",
-		"....ooooooo....",
-		"...oLLLLLLLo...",
-		"..oLLHHHHHHHo..",
-		".oLHHHHHHHHHDo.",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHDDDDDDDDDDDDo",
-		"oHD.........DHo",
-		"oHD.........DHo",
-		"oHD.........DHo",
-		"oDD.........DDo",
-		".oo.........oo.",
+	{"back": 23, "rows": [
+		"..............................",
+		"..............................",
+		"..............................",
+		"..............................",
+		".........oooooooooooo.........",
+		".......oooLLLLLLLLLLooo.......",
+		".......oLLLLLLLLLLLLLLo.......",
+		".....ooLLLLLLLLLLLLLLLooo.....",
+		".....oLLLLLHHHHHHHHHHHHHo.....",
+		"...ooLLLLHHHHHHHHHHHHHHHooo...",
+		"...oLLLHHHHHHHHHHHHHHHHHDDo...",
+		".ooLLHHHHHHHHHHHHHHHHHHHHDDoo.",
+		".oLLLHHHLLLHLLLHLLLHHHHHHDDDo.",
+		"ooLHHHLLHLLLHLLLHLLLHHHHHHDDoo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHHDDDDDDDDDDDDDDDDDDDDDDDDo",
+		"oHHHDDDDDDDDDDDDDDDDDDDDDDDDDo",
+		"oHHHDDD................DDDDHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHHDD..................DDHHHo",
+		"oHHDDD..................DDDHHo",
+		"ooDDDD..................DDDDoo",
+		".oDDDD..................DDDDo.",
+		".ooooo..................ooooo.",
+		"...oo....................oo...",
 	]},
-	{"back": 9, "rows": [
-		"..o..o...o..o..",
-		"..oLooLoLLoLo..",
-		".oLLoLLLLLLLDo.",
-		"..oLLLLLLLHHo..",
-		".oLLHHHHHHHHHo.",
-		"oLLHHHHHHHHHHDo",
-		".oHHHHHHHHHHDo.",
-		"oHHHHHHHHHHHHDo",
-		"oHDHHHHDHHHHDDo",
-		".oDoHDooDHoDDo.",
-		"..o.oo..oo.oo..",
-		"...............",
+	{"back": 19, "rows": [
+		"....oo....oo......oo....oo....",
+		"....oo...ooo......ooo...oo....",
+		"....ooLLooooLLooLLLoooLLoo....",
+		"...ooLLLLooLLLLLLLLLoLLLooo...",
+		"..ooLLLLoooLLLLLLLLLLLLLDDoo..",
+		"..ooLLLLooLLLLLLLLLLLLLLDDoo..",
+		"....oLLLLLLLLLLLLLLLLHHHHo....",
+		"....oLLLLLLLLLLLLLLHHHHHHo....",
+		"...ooLLLLHHHHHHHHHHHHHHHHoo...",
+		".ooLLLLHHHLLLHLLLHLLHHHHHHooo.",
+		"ooLLLLLHHHLLHLLLHLLLHHHHHHDDoo",
+		"ooLLLHHHHHHHHHHHHHHHHHHHHDDDoo",
+		"..oHHHHHHHHHHHHHHHHHHHHHDDDo..",
+		"..oHHHHHHHHHHHHHHHHHHHHHDDDo..",
+		".ooHHHHHHHHHHHHHHHHHHHHHHHDoo.",
+		"ooHHHHHHHHHHHHHHHHHHHHHHHHDDoo",
+		"ooHHDDHHHHHHHHDDHHHHHHHHHDDDoo",
+		".oHHDDHHHHHHHHDDDHHHHHHDDDDDo.",
+		".oooDDHHHHHDoHDDDHHHHHDDDDDoo.",
+		"...oDDoooHDDooooDDHooooDDDo...",
+		"...ooo..ooooo..ooooo..ooooo...",
+		"....oo...oo......oo....oo.....",
+		"..............................",
+		"..............................",
 	]},
-	{"back": 10, "rows": [
-		".....ooooo.....",
-		"....oLLHHDo....",
-		"....oHHHHDo....",
-		"...ooooooooo...",
-		"..oLLLLLLHHHo..",
-		".oLHHHHHHHHHDo.",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHDDo",
-		"oHDDo.....oDDDo",
-		"oDo.........oDo",
-		".o...........o.",
+	{"back": 21, "rows": [
+		"...........oooooooo...........",
+		".........oooLLHHHHooo.........",
+		".........oLLLLHHHHDDo.........",
+		"........ooLLLHHHHHDDoo........",
+		"........oHHHHHHHHHDDDo........",
+		".......ooooHHHHHHHDoooo.......",
+		".......oooooooooooooooo.......",
+		".....oooooooooooooooooooo.....",
+		".....oLLLLLLLLLLLLHHHHHHo.....",
+		"...ooLLLLLLLLLLLLHHHHHHHooo...",
+		"...oLLLHHHHHHHHHHHHHHHHHDDo...",
+		".ooLLHHHHHHHHHHHHHHHHHHHHDDoo.",
+		".oLLLHHHHHHHHHHHHHHHHHHHHDDDo.",
+		"ooLHHHHHHHHHHHHHHHHHHHHHHHDDoo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHDDDDDDo",
+		"oHHHHDDDoo..........ooDDDDDDDo",
+		"oHHDDDDDo............oDDDDDDDo",
+		"ooDDDo..................oDDDoo",
+		".oDDo....................oDDo.",
+		".oooo....................oooo.",
+		"..oo......................oo..",
 	]},
-	{"back": 10, "rows": [
-		"...............",
-		"...............",
-		"....ooooooo....",
-		"...oLLLLLLLoo..",
-		"..oLLLLLHHHHHo.",
-		".oLHHHHHHHHHHDo",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHDDo",
-		"oHHHHHHDDDo.oDo",
-		"oHHDDDo.....oDo",
-		"oDDo.........o.",
-		".oo............",
+	{"back": 21, "rows": [
+		"..............................",
+		"..............................",
+		"..............................",
+		"..............................",
+		".........oooooooooooo.........",
+		".......oooLLLLLLLLLLooo.......",
+		".......oLLLLLLLLLLLLLLooo.....",
+		".....ooLLLLLLLLLLLLLLLoHooo...",
+		".....oLLLLLLLLLLLHHHHHHHHHo...",
+		"...ooLLLLLLLLLLHHHHHHHHHHHooo.",
+		"...oLLLHHHLLLHLLLHLLHHHHHHDDo.",
+		".ooLLHHHLLHLLLHLLLHLHHHHHHDDoo",
+		".oLLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"ooLHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHDDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHDDDDDo",
+		"oHHHHHHHHHHHHHHDDDDDoo..oDDDDo",
+		"oHHHHHHHHHHHHHDDDDDDo...oDDDDo",
+		"oHHHHHHDDDDDoo..........ooDDoo",
+		"oHHHHDDDDDDDo............oDDo.",
+		"ooDDDDDo.................oooo.",
+		".oDDDDo...................oo..",
+		".oooooo.......................",
+		"...oo.........................",
 	]},
-	{"back": 10, "rows": [
-		"...............",
-		"...............",
-		"....ooooooo....",
-		"...oLLLLLLLo...",
-		"..oLLHHHHHHHo..",
-		".oLHHHHHHHHHDo.",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHDHHHDHHHDHDo",
-		"oHDooHDoDHooDDo",
-		"ooo.........ooo",
-		"oLHo.......oHDo",
-		"oHHo.......oHDo",
-		"oHDo.......oHDo",
-		"oHDo.......oDDo",
-		".oHDo.....oDDo.",
-		"..oo.......oo..",
+	{"back": 21, "rows": [
+		"..............................",
+		"..............................",
+		"..............................",
+		"..............................",
+		".........oooooooooooo.........",
+		".......oooLLLLLLLLLLooo.......",
+		".......oLLLLLLLLLLLLLLo.......",
+		".....ooLLLLLLLLLLLLLLLooo.....",
+		".....oLLLLLHHHHHHHHHHHHHo.....",
+		"...ooLLLLHHHHHHHHHHHHHHHooo...",
+		"...oLLLHHHHHHHHHHHHHHHHHDDo...",
+		".ooLLHHHHHHHHHHHHHHHHHHHHDDoo.",
+		".oLLLHHHHHHHHHHHHHHHHHHHHDDDo.",
+		"ooLHHHLLLHLLLHLLLHLLHHHHHHDDoo",
+		"oHHHLLHLLLHLLLHLLLHLHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHDDHHHHHHDDHHHHHHDDHHDDDo",
+		"oHHHHDDDHHHHHDDDDHHHHHDDHHDDDo",
+		"oHHHHDDDHHHHHDDDDHHHHHDDDDDDDo",
+		"oooHDoooooHHDDooDDHHoooooDDooo",
+		"ooooDo..................oDoooo",
+		"ooooHo..................oHoooo",
+		"oooLHoo................ooHDooo",
+		"oLLHHHoo..............ooHHDDDo",
+		"oHHHHHHo..............oHHHDDDo",
+		"oHHHHHHo..............oHHHDDDo",
+		"oHHHHDDo..............oHHHDDDo",
+		"oHHHDDDo..............oHHDDDDo",
+		"ooHHDDDo..............oDDDDDoo",
+		".oHHHDDoo............ooDDDDDo.",
+		".ooHHDDDoo..........ooDDDDDoo.",
+		"...oHHDDoo..........ooDDDDo...",
+		"...oooooo............oooooo...",
+		".....oo................oo.....",
 	]},
-	{"back": 8, "rows": [
-		"...............",
-		"...............",
-		"....ooooooo....",
-		"...oLLLLHHHo...",
-		"..oLHHHHHHHDo..",
-		".oLHHHHHHHHHDo.",
-		".oHHHHHHHHHHDo.",
-		".oHHDHHHHDHHDo.",
-		".oDo.o...o.oDo.",
-		"..o.........o..",
+	{"back": 17, "rows": [
+		"..............................",
+		"..............................",
+		"..............................",
+		"..............................",
+		".........oooooooooooo.........",
+		".......oooLLLLLLHHHHooo.......",
+		".......oLLLLLLLLHHHHHHo.......",
+		".....ooLLLLLLLLHHHHHHHooo.....",
+		".....oLLLHHHLLHLHHHHHHDDo.....",
+		"...ooLLHHHHHHHHHHHHHHHHDDoo...",
+		"...oLLLHHHHHHHHHHHHHHHHDDDo...",
+		"..ooLHHHHHHHHHHHHHHHHHHHDDoo..",
+		"..oHHHHHHHHHHHHHHHHHHHHHDDDo..",
+		"..oHHHHHHHHHHHHHHHHHHHHHDDDo..",
+		"..oHHHHHDDHHHHHHHHDDHHHHDDDo..",
+		"..oHHHHHDDHHHHHHHHDDHHHHDDDo..",
+		"..ooDDoo..oo......oo..ooDDoo..",
+		"...oDDo...oo......oo...oDDo...",
+		"...oooo................oooo...",
+		"....oo..................oo....",
 	]},
-	{"back": 11, "rows": [
-		"....oo.oo.oo...",
-		"..ooLLoLLoHHoo.",
-		".oLLLLLLHHHHHDo",
-		"oLLLHHHHHHHHHDo",
-		"oLHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHHHHHHHHHHHDo",
-		"oHHDHHHHHHDHHDo",
-		"oHDoHDoHDoHDDDo",
-		"oHDo.o..o..oDDo",
-		"oHD.........DHo",
-		"oDDo.......oDDo",
-		".oo.........oo.",
+	{"back": 23, "rows": [
+		".........oo....oo....oo.......",
+		".......ooooo..oooo..ooooo.....",
+		".....oooLLLooooLLooooHHHooo...",
+		"...oooLLLLLLLLLLLLHHHHHHHHooo.",
+		"...oLLLLLLLLLLLLLHHHHHHHHHDDo.",
+		".ooLLLLLLLLLLLLHHHHHHHHHHHDDoo",
+		".oLLLLLLLHHHLLLHLLLHHHHHHHDDDo",
+		"ooLLLLLHHHLLHLLLHLLLHHHHHHDDDo",
+		"oLLLLHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oLLHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHHHHHHHHHHHHHHHHHHHHHDDDo",
+		"oHHHHHDDHHHHHHHHHHHHDDHHHHDDDo",
+		"oHHHHDDDHHHHHHHHHHHHDDDHHDDDDo",
+		"oHHHHDDoHHHDoHHHHDoHHDHDDDDDDo",
+		"oHHHDDooHHDoooHHDoooHHDDDDDDDo",
+		"oHHHDDoo..ooo...ooo...oDDDDDDo",
+		"oHHHDDo...oo....oo.....oDDDDDo",
+		"oHHHDD..................DDHHHo",
+		"oHHDDD..................DDHHHo",
+		"ooDDDDoo..............ooDDDDoo",
+		".oDDDDoo..............ooDDDDo.",
+		".oooooo................oooooo.",
+		"...oo....................oo...",
 	]},
 ]
 ## Hair ramps [light, base, dark] (HunterAppearance.hair_color): black, dark brown, chestnut,
@@ -380,7 +622,7 @@ static func get_frames(look: HunterAppearance, facing: Facing.Direction, animati
 	return _frames[key]
 
 
-## Hair, face and shoulders for UI portraits (PORTRAIT_RECT size, 17×19 px).
+## Hair, face and shoulders for UI portraits (PORTRAIT_RECT size, 34×38 texels).
 static func get_portrait(look: HunterAppearance, outfit: StringName = &"") -> ImageTexture:
 	var key := "%s|%s" % [look.key(), outfit]
 	if not _portraits.has(key):
@@ -410,16 +652,17 @@ static func view_of(facing: Facing.Direction) -> View:
 	return View.FRONT
 
 
-## One 32×48 frame: every part moved by the frame's offsets (ChibiAnimations.resolve_offsets).
-## Gaps opened between parts are filled by repeating the edge row (chin, top of the legs).
+## One 64×96 frame: every part moved by the frame's offsets (ChibiAnimations.resolve_offsets, in
+## world pixels, × SCALE). Gaps opened between parts are filled by repeating the edge row (chin,
+## top of the legs).
 static func compose(look: HunterAppearance, view: View, frame: Dictionary, outfit: StringName = &"") -> Image:
-	var offsets := ChibiAnimations.resolve_offsets(frame, view == View.SIDE)
+	var offsets := _scaled(ChibiAnimations.resolve_offsets(frame, view == View.SIDE))
 	var map := body_map(view, outfit)
 	var palette := palette_for(look, outfit)
 	var lying: bool = frame.get("lying", false)
 	var canvas := Image.create(CANVAS.x, CANVAS.y, false, Image.FORMAT_RGBA8) if not lying \
-		else Image.create(BODY_SIZE.x + 8, BODY_SIZE.y + 8, false, Image.FORMAT_RGBA8)
-	var origin := BODY_ORIGIN if not lying else Vector2i(4, 4)
+		else Image.create(BODY_SIZE.x + 16, BODY_SIZE.y + 16, false, Image.FORMAT_RGBA8)
+	var origin := BODY_ORIGIN if not lying else Vector2i(8, 8)
 	for part in PART_ORDER:
 		var rect: Rect2i = PARTS[part]
 		var offset: Vector2i = offsets[part]
@@ -442,7 +685,7 @@ static func compose(look: HunterAppearance, view: View, frame: Dictionary, outfi
 	canvas.rotate_90(CLOCKWISE)
 	var used := canvas.get_used_rect()
 	var result := Image.create(CANVAS.x, CANVAS.y, false, Image.FORMAT_RGBA8)
-	var lift: int = frame.get("lift", 0)
+	var lift: int = int(frame.get("lift", 0)) * SCALE
 	var at := Vector2i((CANVAS.x - used.size.x) / 2, CANVAS.y - used.size.y - 1 + lift)
 	result.blit_rect(canvas, used, at)
 	return result
@@ -466,17 +709,18 @@ static func body_map(view: View, outfit: StringName = &"") -> Array:
 		if view == View.BACK:
 			rows = face
 			# The shirt covers the back: no skin V-neck.
-			rows[14] = _replace_cols(rows[14], 6, String(rows[15]).substr(6, 3))
+			for y in [TORSO_ROW + 2, TORSO_ROW + 3]:
+				rows[y] = _replace_cols(rows[y], 12, String(rows[TORSO_ROW + 4]).substr(12, 6))
 		else:
 			for y in range(EYE_ROWS.x, EYE_ROWS.y + 1):
 				var front: String = BODY[y]
 				var row: String = face[y]
-				row = _replace_cols(row, EYE_LEFT_COL + SIDE_EYE_SHIFT.x, front.substr(EYE_LEFT_COL, 2))
-				row = _replace_cols(row, EYE_RIGHT_COL + SIDE_EYE_SHIFT.y, front.substr(EYE_RIGHT_COL, 2))
+				row = _replace_cols(row, EYE_LEFT_COL + SIDE_EYE_SHIFT.x, front.substr(EYE_LEFT_COL, EYE_WIDTH))
+				row = _replace_cols(row, EYE_RIGHT_COL + SIDE_EYE_SHIFT.y, front.substr(EYE_RIGHT_COL, EYE_WIDTH))
 				face[y] = row
 			# Far (left) ear hidden behind the head.
-			face[8] = _replace_cols(face[8], 0, ".o")
-			face[9] = _replace_cols(face[9], 0, ".o")
+			for y in range(EYE_ROWS.x, EYE_ROWS.y + 1):
+				face[y] = _replace_cols(face[y], 0, "..oo")
 			rows = face
 	_maps[key] = rows
 	return rows
@@ -507,15 +751,15 @@ static func hair_map(style: int, view: View) -> Array:
 				if first < 0:
 					first = x
 				last = x
-		if view == View.SIDE and head_row > 6:
-			row = row.substr(0, 8) + ".".repeat(row.length() - 8)
-		if first >= 0 and (head_row <= back_len or head_row > 12):
+		if view == View.SIDE and head_row > FRINGE_END_ROW:
+			row = row.substr(0, SIDE_BACK_COL + 1) + ".".repeat(row.length() - SIDE_BACK_COL - 1)
+		if first >= 0 and (head_row <= back_len or head_row > LONG_HAIR_ROW):
 			var right := last
 			if view == View.SIDE:
-				right = mini(last, 7 if head_row <= 6 else 4)
+				right = mini(last, SIDE_BACK_COL if head_row <= FRINGE_END_ROW else SIDE_NAPE_COL)
 			for x in range(first, right + 1):
 				if row[x] == ".":
-					row[x] = "D" if head_row == back_len or x >= 11 else "H"
+					row[x] = "D" if head_row == back_len or x >= HAIR_SHADE_COL else "H"
 				elif row[x] == "o" and x > first and x < right and head_row >= 0:
 					row[x] = "D" if head_row == back_len else "H"
 		rows.append(row)
@@ -530,8 +774,9 @@ static func palette_for(look: HunterAppearance, outfit: StringName = &"") -> Dic
 	var cloth: Array = CLOTH
 	if CLOTHS.has(outfit):
 		cloth = CLOTHS[outfit]
+	var blush: Color = skin[0].lerp(Color("ff8c96"), 0.3)
 	return {
-		"o": OUTLINE, "r": EYE_LID, "w": EYE_WHITE, "i": hair[1],
+		"o": OUTLINE, "r": EYE_LID, "w": EYE_WHITE, "i": hair[1], "l": blush,
 		"h": skin[0], "s": skin[1], "m": skin[2], "d": skin[3], "n": skin[4],
 		"W": cloth[0], "c": cloth[1], "g": cloth[2], "b": cloth[3], "p": cloth[4],
 		"k": dye, "K": dye.darkened(0.35),
@@ -541,29 +786,46 @@ static func palette_for(look: HunterAppearance, outfit: StringName = &"") -> Dic
 	}
 
 
-## Off hand (bottom of the left arm, shield) relative to the feet, unmirrored.
+## Off hand (bottom of the left arm, shield) relative to the feet in world pixels, unmirrored.
+## `arm` is the arm's frame offset in world pixels.
 static func off_hand_position(view: View, arm: Vector2i) -> Vector2:
-	var hand := Vector2i(BODY_SIZE.x - 1 - HAND.x, HAND.y)
+	var hand := Vector2i(BODY_SIZE.x - SCALE - HAND.x, HAND.y)
 	if view == View.BACK:
 		hand.x = HAND.x
-	return Vector2(BODY_ORIGIN + hand + arm - FEET) + Vector2(0.5, 0.5)
+	return _texel_to_world(hand, arm)
 
 
-## Hand position relative to the feet for arm offset `arm`, unmirrored (side view faces right).
+## Hand position relative to the feet in world pixels for arm offset `arm` (world pixels),
+## unmirrored (side view faces right).
 static func hand_position(view: View, arm: Vector2i) -> Vector2:
 	var hand := HAND
 	if view == View.BACK:
 		# Seen from behind, the weapon hand is on the screen-left side.
-		hand.x = BODY_SIZE.x - 1 - HAND.x
-	return Vector2(BODY_ORIGIN + hand + arm - FEET) + Vector2(0.5, 0.5)
+		hand.x = BODY_SIZE.x - SCALE - HAND.x
+	return _texel_to_world(hand, arm)
+
+
+## Centre of the SCALE×SCALE texel block at body-map `texel` moved by `offset` world pixels,
+## relative to the feet, in world pixels.
+static func _texel_to_world(texel: Vector2i, offset: Vector2i) -> Vector2:
+	return (Vector2(BODY_ORIGIN + texel + offset * SCALE - FEET) + Vector2.ONE * SCALE * 0.5) / SCALE
+
+
+## Frame offsets (world pixels) as texel offsets.
+static func _scaled(offsets: Dictionary) -> Dictionary:
+	var result := {}
+	for part in offsets:
+		var offset: Vector2i = offsets[part]
+		result[part] = offset * SCALE
+	return result
 
 
 static func _clear_face(rows: Array) -> Array:
 	var result := rows.duplicate()
 	for y in range(EYE_ROWS.x, EYE_ROWS.y + 1):
 		var row: String = result[y]
-		for x in range(3, 12):
-			if row[x] in ["o", "w", "W", "r", "i"]:
+		for x in range(6, 24):
+			if row[x] in ["o", "w", "W", "r", "i", "l"]:
 				row[x] = "s"
 		result[y] = row
 	return result

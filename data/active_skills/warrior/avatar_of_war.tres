@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"avatar_of_war"
+display_name = "Avatar of War"
+description = "War made flesh. 160% damage, up to 6 foes within 48 px, applies Vulnerable, gains Strength, heals 10% HP. Cooldown 30s."
+owner_class = &"warrior"
+required_level = 30
+cooldown = 30.0
+damage = 1.60
+radius = 48.0
+targets = 6
+effect_id = &"vulnerable"
+effect_stacks = 1
+self_effect_id = &"strength"
+self_effect_stacks = 1
+heal_ratio = 0.10
+animation = &"skill_spin"
+vfx = &"flame"

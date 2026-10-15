@@ -57,6 +57,11 @@ func get_combat_stats(against: Actor = null) -> CombatStats:
 	return stats
 
 
+## The two active skills the Hunter fights with (D55): its picks, or the highest unlocked.
+func get_active_skills() -> Array[ActiveSkillDefinition]:
+	return ActiveSkills.loadout(DataRegistry, runtime, _service.get_definition(runtime))
+
+
 func _on_health_changed(current: float, _maximum: float) -> void:
 	runtime.current_hp = current
 

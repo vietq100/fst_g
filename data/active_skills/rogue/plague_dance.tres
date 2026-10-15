@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"plague_dance"
+display_name = "Plague Dance"
+description = "Venom with every turn. 150% damage, up to 5 foes within 60 px, applies Poison ×2. Cooldown 15s."
+owner_class = &"rogue"
+required_level = 27
+cooldown = 15.0
+damage = 1.50
+radius = 60.0
+targets = 5
+effect_id = &"poison"
+effect_stacks = 2
+self_effect_id = &""
+self_effect_stacks = 1
+heal_ratio = 0.00
+animation = &"skill_spin"
+vfx = &"poison"

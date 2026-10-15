@@ -107,3 +107,54 @@ func test_talent_is_saved() -> void:
 	_hunter.talent_id = &"cook"
 	var copy := HunterRuntime.from_dict(_hunter.to_dict())
 	assert_eq(copy.talent_id, &"cook")
+
+
+func test_every_class_has_thirty_active_skills_and_monsters_two() -> void:
+	for owner_class in [&"warrior", &"ranger", &"rogue", &"guardian"]:
+		var skills := ActiveSkills.for_class(_registry, owner_class)
+		assert_eq(skills.size(), 30, "%s skills" % owner_class)
+		var last_level := 0
+		for skill in skills:
+			assert_true(skill.required_level >= last_level, "%s sorted by level" % skill.id)
+			last_level = skill.required_level
+			assert_true(ChibiAnimations.has_animation(skill.animation), "%s animation" % skill.id)
+			assert_true(skill.cooldown > 0.0 and skill.targets >= 1, String(skill.id))
+			assert_true(skill.damage > 0.0 or skill.self_effect_id != &"" or skill.heal_ratio > 0.0 or skill.effect_id != &"", "%s does something" % skill.id)
+			for effect_id in [skill.effect_id, skill.self_effect_id]:
+				if effect_id != &"":
+					assert_not_null(_registry.find_def(&"status_effect", effect_id), "%s effect %s" % [skill.id, effect_id])
+	for definition in _registry.get_all(&"enemy"):
+		var enemy := definition as EnemyDefinition
+		assert_eq(enemy.skill_ids.size(), 2, "%s has two skills" % enemy.id)
+		for skill_id in enemy.skill_ids:
+			var skill := ActiveSkills.get_skill(_registry, skill_id)
+			assert_not_null(skill, String(skill_id))
+			assert_eq(skill.owner_class, &"monster", String(skill_id))
+		for item_id in [enemy.weapon_id, enemy.armor_id]:
+			if item_id != &"":
+				assert_not_null(_registry.find_def(&"item", item_id), "%s gear %s" % [enemy.id, item_id])
+
+
+func test_loadout_picks_highest_unlocked_and_respects_choices() -> void:
+	var hunter := HunterRuntime.new()
+	hunter.definition_id = &"warrior"
+	var warrior := _registry.find_def(&"hunter", &"warrior") as HunterDefinition
+	hunter.level = 1
+	var picks := ActiveSkills.loadout(_registry, hunter, warrior)
+	assert_eq(picks.size(), 1, "one skill at level 1")
+	assert_eq(picks[0].id, &"power_slam")
+	hunter.level = 5
+	picks = ActiveSkills.loadout(_registry, hunter, warrior)
+	assert_eq(picks.size(), 2)
+	assert_eq(picks[0].required_level, 5, "highest unlocked first")
+	assert_eq(picks[1].required_level, 4)
+	assert_eq(ActiveSkills.set_slot(_registry, hunter, warrior, 0, &"cleave"), "")
+	assert_eq(ActiveSkills.loadout(_registry, hunter, warrior)[0].id, &"cleave")
+	assert_false(ActiveSkills.set_slot(_registry, hunter, warrior, 0, &"executioner").is_empty(), "locked")
+	assert_false(ActiveSkills.set_slot(_registry, hunter, warrior, 0, &"arrow_volley").is_empty(), "other class")
+	# A subclass uses its base class's skills; choices survive the save round trip.
+	var templar := _registry.find_def(&"hunter", &"templar") as HunterDefinition
+	hunter.active_skills.clear()
+	assert_eq(ActiveSkills.loadout(_registry, hunter, templar)[1].owner_class, &"guardian")
+	hunter.active_skills.assign([&"cleave"])
+	assert_eq(HunterRuntime.from_dict(hunter.to_dict()).active_skills, [&"cleave"] as Array[StringName])

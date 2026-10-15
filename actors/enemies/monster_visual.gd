@@ -5,7 +5,7 @@ extends ActorVisual
 ## bob), two-frame walk, hit flash (ActorVisual), lying when downed, an optional weapon held on
 ## the facing side: a WeaponSprites pixel sprite (`weapon_sprite`) or a line (weapon_length 0 =
 ## none). Side-on bodies keep their last horizontal facing.
-## Origin is at the feet. Presentation only.
+## Bodies are drawn at 1 / MonsterBodies.SCALE (D56). Origin is at the feet. Presentation only.
 
 const WALK_FPS := 8.0
 const DOWNED_TINT := Color(0.45, 0.45, 0.5)
@@ -35,6 +35,7 @@ const DOWNED_TINT := Color(0.45, 0.45, 0.5)
 
 var _frame := 0
 var _frame_time := 0.0
+var _action_tween: Tween
 ## Last horizontal facing (side-on bodies).
 var _mirrored := false
 
@@ -59,8 +60,20 @@ func _on_downed_changed() -> void:
 	modulate = DOWNED_TINT if downed else Color.WHITE
 
 
+## Skill flourish (D55): monsters have no skill frames, so the body puffs up and flashes.
+func play_action(_action: StringName) -> void:
+	if downed:
+		return
+	if _action_tween != null:
+		_action_tween.kill()
+	scale = Vector2(1.25, 0.85)
+	_action_tween = create_tween()
+	_action_tween.tween_property(self, ^"scale", Vector2(0.9, 1.15), 0.08)
+	_action_tween.tween_property(self, ^"scale", Vector2.ONE, 0.12)
+
+
 func _draw() -> void:
-	var half_width := MonsterBodies.get_width(body_id) * 0.5
+	var half_width := MonsterBodies.get_world_size(body_id).x * 0.5
 	fill_ellipse(Vector2.ZERO, Vector2(half_width + 1.0, 3.0), SHADOW_COLOR)
 	if selected:
 		outline_ellipse(Vector2.ZERO, Vector2(half_width + 3.0, 5.0), SELECTION_COLOR)
@@ -74,8 +87,12 @@ func _draw() -> void:
 	var behind := facing == Facing.Direction.UP
 	if not downed and behind:
 		_draw_weapon()
+	# Texture in texels, drawn at 1 / SCALE (D56); origin in texels relative to the feet.
 	var origin := Vector2(-floorf(size.x * 0.5), -size.y)
+	var texel := 1.0 / MonsterBodies.SCALE
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(texel, texel))
 	draw_texture(texture, origin)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if not downed and not behind:
 		_draw_weapon()
 	var config := MonsterBodies.get_config(body_id)
@@ -84,7 +101,7 @@ func _draw() -> void:
 		var glow: Vector2 = config["glow"]
 		var color: Color = config["glow_color"]
 		var strength := 0.8 if _frame == 1 else 0.5
-		var centre := origin + glow + Vector2(1.5, 1.5)
+		var centre := (origin + glow + Vector2.ONE * MonsterBodies.SCALE) * texel
 		draw_circle(centre, 9.0, Color(color, 0.18 * strength))
 		draw_circle(centre, 5.0, Color(color, 0.35 * strength))
 
@@ -94,14 +111,16 @@ func _draw_weapon() -> void:
 	if weapon_length <= 0.0:
 		return
 	var side := -1.0 if facing == Facing.Direction.LEFT else 1.0
-	var half_width := MonsterBodies.get_width(body_id) * 0.5
-	var height := MonsterBodies.get_height(body_id)
+	var world_size := MonsterBodies.get_world_size(body_id)
+	var half_width := world_size.x * 0.5
+	var height := world_size.y
 	var hand := Vector2(side * (half_width - 1.0), -height * 0.42)
 	if WeaponSprites.has_kind(weapon_sprite):
 		# Pixel weapon tilted outward, mirrored when facing left.
 		var texture := WeaponSprites.texture(weapon_sprite, weapon_color)
-		var grip := Vector2(WeaponSprites.grip_of(weapon_sprite)) + Vector2(0.5, 0.5)
-		draw_set_transform(hand, deg_to_rad(25.0) * side, Vector2(side, 1.0))
+		var grip := WeaponSprites.grip_center(weapon_sprite)
+		var weapon_texel := 1.0 / WeaponSprites.SCALE
+		draw_set_transform(hand, deg_to_rad(25.0) * side, Vector2(side * weapon_texel, weapon_texel))
 		draw_texture(texture, -grip)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		return

@@ -1,6 +1,6 @@
 class_name WorldMap
 extends Node2D
-## The main map (WORLD_DESIGN.md, DECISIONS.md D52, D28, D33): top-down grid with the Town
+## The main map (WORLD_DESIGN.md, DECISIONS.md D52, D57, D28, D33): top-down grid with the Town
 ## (top-left), Ancient Ruins (top-right), Dark Forest (bottom-left) and Goblin Cave (bottom-right),
 ## joined by bridges; dungeon entrances on rock ledges off the outer edges.
 ## The screen is a camera over it: drag to pan, pinch / wheel to zoom, tap a Hunter to follow.
@@ -48,6 +48,7 @@ var _camera: WorldCamera
 var _panel: DebugPanel
 var _building_nodes: Dictionary[StringName, TownBuilding] = {}
 var _entrances: Array[DungeonEntrance] = []
+var _decor: Array[WorldDecor] = []
 var _spawners: Dictionary[StringName, RegionSpawner] = {}
 var _staff: Dictionary[StringName, StaffWorker] = {}
 ## Gate centres and dungeon entrances: monsters do not spawn next to them.
@@ -82,6 +83,8 @@ func _ready() -> void:
 	for placed in GameManager.buildings.get_instances():
 		_spawn_building(placed)
 	_spawn_props()
+	_spawn_decor()
+	_refresh_town_layout()
 	_navigation.bake_navigation_polygon(false)
 	# Spawners need the synced navigation map to pick spawn points.
 	await _navigation_synced()
@@ -119,7 +122,11 @@ func _build_scene() -> void:
 	shimmer.name = "WaterShimmer"
 	shimmer.setup(world)
 	add_child(shimmer)
-	RenderingServer.set_default_clear_color(Color("1b3d4a"))
+	# Islets, rocks, the dock and the wreck around the map (D61).
+	var scenery := WorldScenery.new()
+	scenery.name = "Scenery"
+	add_child(scenery)
+	RenderingServer.set_default_clear_color(Color("163846"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"
 	var polygon := NavigationPolygon.new()
@@ -156,9 +163,12 @@ func _build_scene() -> void:
 		_entities.add_child(entrance)
 		_entrances.append(entrance)
 		_keep_clear_points.append(entrance.position)
+	var ambience := WorldAmbience.new()
+	ambience.name = "Ambience"
+	add_child(ambience)
 	_camera = WorldCamera.new()
 	_camera.name = "Camera"
-	_camera.bounds = world.get_bounds(96.0)
+	_camera.bounds = world.get_bounds(WorldScenery.MARGIN)
 	_camera.zoom = Vector2(START_ZOOM, START_ZOOM)
 	_camera.position = world.region_center(world.get_town())
 	add_child(_camera)
@@ -404,6 +414,7 @@ func _on_building_upgraded(building_id: StringName, _level: int) -> void:
 
 
 func _on_layout_changed() -> void:
+	_refresh_town_layout()
 	# Removed nodes leave the tree at the end of the frame; bake after that.
 	if not _bake_queued:
 		_bake_queued = true
@@ -551,6 +562,7 @@ func _spawn_props() -> void:
 	var placed: Array[Vector2] = []
 	_spawn_pond_obstacle(props)
 	_spawn_town_border(props, rng, placed)
+	_spawn_landmarks(props, keep_clear, placed)
 	for region in world.get_regions():
 		if region.props == RegionDefinition.Props.NONE or region.prop_density <= 0.0:
 			continue
@@ -564,6 +576,9 @@ func _spawn_props() -> void:
 					continue
 				var tile := Vector2i(gx, gy)
 				if keep_clear.any(func(r: Rect2i) -> bool: return r.has_point(tile)):
+					continue
+				# Trails stay clear (D57).
+				if _ground.is_trail_tile(tile):
 					continue
 				var at := WorldService.tile_to_world(Vector2(tile) + offset)
 				if placed.any(func(other: Vector2) -> bool: return other.distance_to(at) < PROP_SPACING):
@@ -583,6 +598,102 @@ func _spawn_props() -> void:
 						prop.kind = WorldProp.Kind.COLUMN
 						prop.tint = Color("b9b4a3").lerp(Color("cfcab8"), rng.randf())
 				props.add_child(prop)
+
+
+## Landmarks inside the hunting regions (D62), at tiles relative to each region's top-left corner,
+## by biome: [kind, tile, tint]. Skipped when the tile is on a trail or near a gate / entrance.
+const LANDMARKS := {
+	RegionDefinition.Props.TREES: [
+		[WorldLandmark.Kind.SHRINE, Vector2(8, 8)], [WorldLandmark.Kind.STUMP, Vector2(12, 26)], [WorldLandmark.Kind.STUMP, Vector2(27, 14)],
+		[WorldLandmark.Kind.STUMP, Vector2(6, 23)], [WorldLandmark.Kind.LOG, Vector2(22, 28)], [WorldLandmark.Kind.LOG, Vector2(10, 13)],
+	],
+	RegionDefinition.Props.ROCKS: [
+		[WorldLandmark.Kind.TENT, Vector2(25, 9)], [WorldLandmark.Kind.TENT, Vector2(28.5, 9.2)], [WorldLandmark.Kind.TENT, Vector2(24, 12.4)],
+		[WorldLandmark.Kind.CAMPFIRE, Vector2(26.8, 11.6)], [WorldLandmark.Kind.TOTEM, Vector2(29.6, 12.4)],
+		[WorldLandmark.Kind.TENT, Vector2(9, 27)], [WorldLandmark.Kind.CAMPFIRE, Vector2(11, 29)],
+	],
+	RegionDefinition.Props.COLUMNS: [
+		[WorldLandmark.Kind.STATUE, Vector2(9, 26)], [WorldLandmark.Kind.OBELISK, Vector2(27, 9)], [WorldLandmark.Kind.ARCH, Vector2(9, 9)],
+		[WorldLandmark.Kind.STATUE, Vector2(27, 27)],
+	],
+}
+const TENT_TINTS: Array[Color] = [Color("8a6a44"), Color("6a5a44"), Color("7a5a3a")]
+
+
+func _spawn_landmarks(props: Node2D, keep_clear: Array[Rect2i], placed: Array[Vector2]) -> void:
+	for region in world.get_regions():
+		var entries: Array = LANDMARKS.get(region.props, [])
+		for i in entries.size():
+			var entry: Array = entries[i]
+			var at := WorldService.tile_to_world(Vector2(region.tile_rect.position) + entry[1])
+			var tile := WorldService.tile_at(at)
+			if not region.tile_rect.grow(-1).has_point(tile) or _ground.is_trail_tile(tile):
+				continue
+			if keep_clear.any(func(rect: Rect2i) -> bool: return rect.has_point(tile)):
+				continue
+			var landmark := WorldLandmark.new().setup(entry[0], TENT_TINTS[i % TENT_TINTS.size()])
+			landmark.position = at
+			props.add_child(landmark)
+			placed.append(at)
+
+
+## Town decorations (D57): lamps at the plaza corners and every fifth road tile (on the grass
+## beside it), benches and flower planters on both sides of the plaza. No collision.
+func _spawn_decor() -> void:
+	var props := _entities.get_node(^"Props") as Node2D
+	var plaza := _town_plaza()
+	var roads := _town_roads(plaza)
+	if plaza.is_empty():
+		return
+	var taken: Dictionary[Vector2i, bool] = {}
+	for tile in plaza:
+		taken[tile] = true
+	for tile in roads:
+		taken[tile] = true
+	var low := Vector2i(1 << 30, 1 << 30)
+	var high := Vector2i(-(1 << 30), -(1 << 30))
+	for tile in plaza:
+		low = Vector2i(mini(low.x, tile.x), mini(low.y, tile.y))
+		high = Vector2i(maxi(high.x, tile.x) + 1, maxi(high.y, tile.y) + 1)
+	var tile_size := WorldService.TILE
+	for corner: Vector2i in [low, Vector2i(high.x, low.y), Vector2i(low.x, high.y), high]:
+		var at := Vector2(corner) * tile_size + Vector2(-6.0 if corner.x == low.x else 6.0, -2.0 if corner.y == low.y else 10.0)
+		_add_decor(props, WorldDecor.Kind.LAMP, at)
+	for side: float in [low.x - 0.5, high.x + 0.5]:
+		_add_decor(props, WorldDecor.Kind.BENCH, Vector2(side, low.y + 2.6) * tile_size)
+		_add_decor(props, WorldDecor.Kind.PLANTER, Vector2(side, low.y + 4.6) * tile_size)
+	var town := world.get_town().tile_rect.grow(-1)
+	var road_list: Array = roads.keys()
+	road_list.sort()
+	for tile: Vector2i in road_list:
+		if (tile.x + tile.y) % 5 != 0:
+			continue
+		for step: Vector2i in [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]:
+			var beside := tile + step
+			if taken.has(beside) or not town.has_point(beside):
+				continue
+			_add_decor(props, WorldDecor.Kind.LAMP, (Vector2(beside) + Vector2(0.5, 0.5) - Vector2(step) * 0.3) * tile_size + Vector2(0, 8))
+			break
+
+
+func _add_decor(parent: Node2D, kind: WorldDecor.Kind, at: Vector2) -> void:
+	var decor := WorldDecor.new()
+	decor.kind = kind
+	decor.position = at
+	decor.tile = WorldService.tile_at(at - Vector2(0, 2))
+	parent.add_child(decor)
+	_decor.append(decor)
+
+
+## Footpaths (ground) and decorations follow the placed buildings: decorations under a building
+## are hidden.
+func _refresh_town_layout() -> void:
+	var rects: Array[Rect2i] = []
+	for placed in GameManager.buildings.get_instances():
+		rects.append(GameManager.buildings.get_footprint_rect(placed))
+	_ground.set_footprints(rects)
+	for decor in _decor:
+		decor.visible = not rects.any(func(rect: Rect2i) -> bool: return rect.grow(1).has_point(decor.tile))
 
 
 ## The pond blocks walking (a navigation obstacle over its water).
@@ -1057,7 +1168,7 @@ func exit_dungeon(run: ExpeditionRun) -> void:
 		index += 1
 	_dungeon.queue_free()
 	_dungeon = null
-	_camera.bounds = world.get_bounds(96.0)
+	_camera.bounds = world.get_bounds(WorldScenery.MARGIN)
 	_camera.stop_following()
 	_camera.center_on(exit_point)
 	request_refresh()

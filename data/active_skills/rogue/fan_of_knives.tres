@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"fan_of_knives"
+display_name = "Fan of Knives"
+description = "Knives in every direction. 130% damage, up to 5 foes within 50 px. Cooldown 10s."
+owner_class = &"rogue"
+required_level = 5
+cooldown = 10.0
+damage = 1.30
+radius = 50.0
+targets = 5
+effect_id = &""
+effect_stacks = 1
+self_effect_id = &""
+self_effect_stacks = 1
+heal_ratio = 0.00
+animation = &"skill_spin"
+vfx = &"wind"

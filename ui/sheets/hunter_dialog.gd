@@ -160,9 +160,68 @@ func _build_info(body: VBoxContainer, definition: HunterDefinition) -> void:
 
 
 func _build_skills(body: VBoxContainer) -> void:
+	_build_active_skills(body)
+	body.add_child(UIKit.separator())
 	body.add_child(UIKit.label(_talent_text(), &"HudSmallLabel"))
 	body.add_child(UIKit.label(_skills_text(), &"HudSmallLabel"))
 	_build_traits_and_mood(body)
+
+
+## Active skills (D55): the two equipped slots, then every skill of the class with its unlock
+## level; tapping an unlocked one puts it in the first slot (long list → scrolls with the tab).
+func _build_active_skills(body: VBoxContainer) -> void:
+	var gm := GameManager
+	var definition := gm.hunters.get_definition(runtime)
+	var equipped := ActiveSkills.loadout(DataRegistry, runtime, definition)
+	body.add_child(UIKit.label("Active skills", &"HudAccentLabel", false))
+	var slots := UIKit.hbox([], 4)
+	for i in ActiveSkills.SLOTS:
+		var skill: ActiveSkillDefinition = equipped[i] if i < equipped.size() else null
+		var card := PanelContainer.new()
+		card.theme_type_variation = &"HunterCard"
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var title := UIKit.label(skill.display_name if skill != null else "Empty slot", &"HudSmallLabel", false)
+		title.clip_text = true
+		var detail := UIKit.label("CD %ds · %s" % [roundi(skill.cooldown), _skill_summary(skill)] if skill != null else "Unlocks with levels", &"MutedLabel")
+		detail.add_theme_font_size_override(&"font_size", 9)
+		card.add_child(UIKit.vbox([title, detail], 1))
+		slots.add_child(card)
+	body.add_child(slots)
+	var owned := ActiveSkills.for_class(DataRegistry, ActiveSkills.base_class_of(definition))
+	body.add_child(UIKit.label("%d / %d unlocked — tap a skill to equip it" % [
+		owned.filter(func(k: ActiveSkillDefinition) -> bool: return ActiveSkills.is_unlocked(k, runtime)).size(), owned.size()], &"MutedLabel"))
+	for skill in owned:
+		var unlocked := ActiveSkills.is_unlocked(skill, runtime)
+		var in_use := equipped.has(skill)
+		var row := UIKit.button("%s%s" % [skill.display_name, "  ✓" if in_use else ("  Lv %d" % skill.required_level if not unlocked else "")], func() -> void:
+			run_action(ActiveSkills.set_slot(DataRegistry, runtime, definition, 1 if equipped.size() > 0 and equipped[0] != skill and not in_use and equipped.size() >= ActiveSkills.SLOTS else 0, skill.id),
+				"%s equipped" % skill.display_name),
+			&"SelectedButton" if in_use else (&"RowButton" if unlocked else &""), "" if unlocked else "Unlocks at level %d" % skill.required_level)
+		row.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		row.custom_minimum_size.y = 34
+		row.add_theme_font_size_override(&"font_size", 11)
+		row.tooltip_text = skill.description
+		var summary := UIKit.label(_skill_summary(skill), &"MutedLabel", false)
+		summary.add_theme_font_size_override(&"font_size", 9)
+		summary.clip_text = true
+		summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		summary.custom_minimum_size.x = 90
+		body.add_child(UIKit.hbox([row, summary], 4))
+
+
+static func _skill_summary(skill: ActiveSkillDefinition) -> String:
+	if skill == null:
+		return ""
+	var parts := PackedStringArray()
+	if skill.damage > 0.0:
+		parts.append("×%.1f" % skill.damage + (" ×%d foes" % skill.targets if skill.targets > 1 else ""))
+	if skill.effect_id != &"":
+		parts.append(String(skill.effect_id).replace("_", " ").capitalize())
+	if skill.self_effect_id != &"":
+		parts.append("+" + String(skill.self_effect_id).replace("_", " ").capitalize())
+	if skill.heal_ratio > 0.0:
+		parts.append("heal %d%%" % roundi(skill.heal_ratio * 100.0))
+	return " · ".join(parts)
 	if GameManager.buildings.has_building(BuildingService.ACADEMY):
 		body.add_child(UIKit.button("Open the Academy", func() -> void:
 			open_requested.emit(BuildingSheet.new(BuildingService.ACADEMY)), &"PrimaryButton"))

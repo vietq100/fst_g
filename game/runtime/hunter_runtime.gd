@@ -72,6 +72,8 @@ var task: StringName
 var reincarnations: int = 0
 var rebirth_points: int = 0
 var skills: Dictionary[StringName, int] = {}
+## Active skills picked by the player (D55), up to ActiveSkills.SLOTS; empty = automatic.
+var active_skills: Array[StringName] = []
 ## Items carried back from hunting (item id -> quantity).
 var loot_bag: Dictionary[StringName, int] = {}
 
@@ -114,6 +116,7 @@ func to_dict() -> Dictionary:
 		"reincarnations": reincarnations,
 		"rebirth_points": rebirth_points,
 		"skills": skills.duplicate(),
+		"active_skills": active_skills.duplicate(),
 	}
 
 
@@ -178,4 +181,9 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 	if learned is Dictionary:
 		for skill_id in learned:
 			hunter.skills[StringName(str(skill_id))] = maxi(int(learned[skill_id]), 0)
+	var picks: Variant = data.get("active_skills", [])
+	if picks is Array:
+		for skill_id in picks:
+			if hunter.active_skills.size() < 2:
+				hunter.active_skills.append(StringName(str(skill_id)))
 	return hunter

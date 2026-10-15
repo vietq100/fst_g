@@ -1,9 +1,14 @@
 class_name PixelIcons
 extends RefCounted
-## Tiny 12×12 pixel-art icons drawn from text bitmaps (matches the game's pixel look, no asset
-## files). Each row is padded with '.' (transparent) to 12 pixels.
+## Tiny pixel-art icons drawn from text bitmaps (matches the game's pixel look, no asset files).
+## Bitmaps are 24×24 texels (D56: twice the density of the original 12×12 set); an icon of
+## `scale` still lays out at 12 × scale px, and the texture keeps its full resolution so the
+## extra detail shows on high-density screens (canvas_items stretch).
 
+## Layout size of an icon at scale 1, in px.
 const SIZE := 12
+## Bitmap size in texels.
+const TEXELS := 24
 
 const PALETTE := {
 	"k": Color("2a1c10"), "y": Color("f2c94c"), "Y": Color("b8892a"), "w": Color("f4f1ea"), "r": Color("c9503f"),
@@ -13,80 +18,156 @@ const PALETTE := {
 
 const BITMAPS := {
 	&"coin": [
-		"....kkkk....", "..kkyyyykk..", ".kyyyYYyyyk.", ".kyyYyyyyyk.", "kyyyYyyyyyyk", "kyyyYyyyyYyk",
-		"kyyyYyyyyYyk", "kyyyyYYYYyyk", ".kyyyyyyyyk.", ".kyyyyyyyyk.", "..kkyyyykk..", "....kkkk....",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".....kkkkyyyyyykkkk.....", "...kkkkyyyyyyyyyykkkk...",
+		"...kkyyyyyYYYYyyyyykk...", "..kkyyyyyYYYYYyyyyyykk..", "..kkyyyyYYYyyyyyyyyykk..", ".kkyyyyyYYyyyyyyyyyyykk.",
+		".kkyyyyyYYyyyyyyyyyyykk.", "kkyyyyyyYYyyyyyyyyyyyykk", "kkyyyyyyYYyyyyyyyyYYyykk", "kkyyyyyyYYyyyyyyyyYYyykk",
+		"kkyyyyyyYYyyyyyyyyYYyykk", "kkyyyyyyYYYyyyyyyYYYyykk", "kkyyyyyyyYYYYYYYYYYyyykk", ".kkyyyyyyyYYYYYYYYyyykk.",
+		".kkyyyyyyyyyyyyyyyyyykk.", "..kkyyyyyyyyyyyyyyyykk..", "..kkyyyyyyyyyyyyyyyykk..", "...kkyyyyyyyyyyyyyykk...",
+		"...kkkkyyyyyyyyyykkkk...", ".....kkkkyyyyyykkkk.....", ".......kkkkkkkkkk.......", ".........kkkkkk.........",
 	],
 	&"town": [
-		"....kkkk....", "...krrrrk...", "..krrrrrrk..", ".krrrrrrrrk.", "krrrrrrrrrrk", ".kwwwwwwwwk.",
-		".kwyywwyywk.", ".kwyywwyywk.", ".kwwwkkwwwk.", ".kwwwkkwwwk.", ".kwwwkkwwwk.", ".kkkkkkkkkk.",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".......kkrrrrrrkk.......", ".....kkrrrrrrrrrrkk.....",
+		".....kkrrrrrrrrrrkk.....", "...kkrrrrrrrrrrrrrrkk...", "...kkrrrrrrrrrrrrrrkk...", ".kkrrrrrrrrrrrrrrrrrrkk.",
+		"kkrrrrrrrrrrrrrrrrrrrrkk", "kkrrrrrrrrrrrrrrrrrrrrkk", ".kkkwwwwwwwwwwwwwwwwkkk.", "..kkwwwwwwwwwwwwwwwwkk..",
+		"..kkwwwyywwwwwwyywwwkk..", "..kkwwyyyywwwwyyyywwkk..", "..kkwwyyyywwwwyyyywwkk..", "..kkwwwyywwwwwwyywwwkk..",
+		"..kkwwwwwwwkkwwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..",
+		"..kkwwwwwwkkkkwwwwwwkk..", "..kkkwwwwkkkkkkwwwwkkk..", "..kkkkkkkkkkkkkkkkkkkk..", "...kkkkkkkkkkkkkkkkkk...",
 	],
 	&"food": [
-		"......kkk...", ".....kooook.", "....koooook.", "...kooooook.", "...kooooook.", "..kooooook..",
-		".kooooook...", "kwwkook.....", "kwwwkk......", ".kwwk.......", "..kk........", "............",
+		".............kkkk.......", "...........kkkkkkk......", "...........kkoooooook...", ".........kkoooooooookk..",
+		".........kkoooooooookk..", ".......kkoooooooooookk..", ".......kkoooooooooookk..", "......kkooooooooooookk..",
+		"......kkooooooooooookk..", ".....kkooooooooooookk...", ".....kkooooooooooookk...", "...kkooooooooooookk.....",
+		"...kkooooooooooookk.....", ".kkkooooooooooook.......", ".kkwwwkooooook..........", "kkwwwwwkkookk...........",
+		"kkwwwwwkkkkkk...........", ".kkwwwwwkkk.............", ".kkwwwwwkkk.............", "...kkwwkk...............",
+		"...kkkkkk...............", ".....kk.................", "........................", "........................",
 	],
 	&"bed": [
-		"............", "kk..........", "kbk.........", "kbkkkkkkkkk.", "kbwwwlllllk.", "kbwwwlllllk.",
-		"kbbbbbbbbbbk", "kbbbbbbbbbbk", "kBk.......kB", "kBk.......kB", "kk.........k", "............",
+		"........................", "........................", ".kk.....................", "kkkkk...................",
+		"kkbbk...................", "kkbbkkk.................", "kkbbkkkkkkkkkkkkkkkkk...", "kkbbkkkkkkkkkkkkkkkkkk..",
+		"kkbbwwwwwwlllllllllkkk..", "kkbbwwwwwwllllllllllkk..", "kkbbwwwwwwllllllllllkk..", "kkbbbwwwwwllllllllllkkk.",
+		"kkbbbbbbbbbbbbbbbbbbbkk.", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbkkk",
+		"kkBBkk..............kkkB", "kkBBkk..............kkBB", "kkBBkk..............kkBB", "kkBBk................kkB",
+		"kkkkk................kkk", ".kk...................kk", "........................", "........................",
 	],
 	&"bag": [
-		"....kkkk....", "...kbbbbk...", "....kbbk....", "..kkbbbbkk..", ".kbbbbbbbbk.", "kbbbyybbbbbk",
-		"kbbbyybbbbbk", "kbbbbbbbbbbk", "kbbbbbbbbbbk", ".kbbbbbbbbk.", "..kkkkkkkk..", "............",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", "......kkbbbbbbbbkk......", "......kkbbbbbbbbkk......",
+		"........kkbbbbkk........", "........kkbbbbkk........", ".....kkkkbbbbbbkkkk.....", "...kkkkbbbbbbbbbbkkkk...",
+		"...kkbbbbbbbbbbbbbbkk...", ".kkbbbbbbbbbbbbbbbbbbkk.", ".kkbbbbbbyybbbbbbbbbbkk.", "kkbbbbbbyyyybbbbbbbbbbkk",
+		"kkbbbbbbyyyybbbbbbbbbbkk", "kkbbbbbbbyybbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk",
+		"kkbbbbbbbbbbbbbbbbbbbbkk", ".kkbbbbbbbbbbbbbbbbbbkk.", ".kkbbbbbbbbbbbbbbbbbbkk.", "...kkbbbbbbbbbbbbbbkk...",
+		"...kkkkkkkkkkkkkkkkkk...", ".....kkkkkkkkkkkkkk.....", "........................", "........................",
 	],
 	&"build": [
-		"..kkkkkk....", ".kggggggk...", ".kgsssssgk..", ".kggggggk...", "..kkkbkk....", "....kbk.....",
-		"....kbk.....", "....kbk.....", "....kbk.....", "....kbk.....", "....kBk.....", ".....k......",
+		".....kkkkkkkkkk.........", "...kkkkkkkkkkkkkk.......", "...kkggggggggggkk.......", "..kkgggggggggggggkk.....",
+		"..kkggssssssssssggkk....", "..kkggssssssssssggkk....", "..kkgggggggggggggkk.....", "...kkggggggggggkk.......",
+		"...kkkkkkkbbkkkkk.......", ".....kkkkkbbkkk.........", ".......kkkbbkkk.........", "........kkbbkk..........",
+		"........kkbbkk..........", "........kkbbkk..........", "........kkbbkk..........", "........kkbbkk..........",
+		"........kkbbkk..........", "........kkbbkk..........", "........kkbbkk..........", "........kkbbkk..........",
+		"........kkBBkk..........", ".........kBBk...........", ".........kkkk...........", "..........kk............",
 	],
 	&"hunters": [
-		"...kkkk.....", "..kppppk....", "..kpkkpk....", "..kppppk....", "...kkkk.....", "..klllllk...",
-		".kklllllkk..", ".kplllllpk..", "..klllllk...", "..kkk.kkk...", "..kBk.kBk...", "..kkk.kkk...",
+		".......kkkkkk...........", ".....kkkkkkkkkk.........", ".....kkppppppkk.........", "....kkppppppppkk........",
+		"....kkppkkkkppkk........", "....kkppkkkkppkk........", "....kkppppppppkk........", ".....kkppppppkk.........",
+		"......kkkkkkkkk.........", "......kkkkkkkk..........", ".....kklllllllllk.......", "...kkkllllllllllkkk.....",
+		"...kkkllllllllllkkk.....", "..kkkkllllllllllkkkk....", "..kkppllllllllllppkk....", "...kppllllllllllppk.....",
+		"...kkkllllllllllkkk.....", "....kkkllllllllkkk......", "....kkkkkk..kkkkkk......", "....kkkkkk..kkkkkk......",
+		"....kkBBkk..kkBBkk......", "....kkBBkk..kkBBkk......", "....kkkkkk..kkkkkk......", ".....kkkk....kkkk.......",
 	],
 	&"quests": [
-		".kkkkkkkkk..", "kwwwwwwwwwk.", "kkkkkkkkkkk.", ".kwwwwwwwk..", ".kwkkkkkwk..", ".kwwwwwwwk..",
-		".kwkkkkkwk..", ".kwwwwwwwk..", ".kwkkkwwwk..", "kkkkkkkkkkk.", "kwwwwwwwwwk.", ".kkkkkkkkk..",
+		"...kkkkkkkkkkkkkkkk.....", ".kkkkkkkkkkkkkkkkkkkk...", ".kwwwwwwwwwwwwwwwwwwk...", "kkwwwwwwwwwwwwwwwwwwkk..",
+		"kkkkkkkkkkkkkkkkkkkkkk..", ".kkkkkkkkkkkkkkkkkkkk...", ".kkkkwwwwwwwwwwwwkkkk...", "..kkwwwwwwwwwwwwwwkk....",
+		"..kkwwkkkkkkkkkkwwkk....", "..kkwwkkkkkkkkkkwwkk....", "..kkwwwwwwwwwwwwwwkk....", "..kkwwwwwwwwwwwwwwkk....",
+		"..kkwwkkkkkkkkkkwwkk....", "..kkwwkkkkkkkkkkwwkk....", "..kkwwwwwwwwwwwwwwkk....", "..kkwwwwwwwwwwwwwwkk....",
+		"..kkwwwkkkkwwwwwwwkk....", ".kkkwwkkkkkkkwwwwkkkk...", ".kkkkkkkkkkkkkkkkkkkk...", "kkkkkkkkkkkkkkkkkkkkkk..",
+		"kkwwwwwwwwwwwwwwwwwwkk..", ".kwwwwwwwwwwwwwwwwwwk...", ".kkkkkkkkkkkkkkkkkkkk...", "...kkkkkkkkkkkkkkkk.....",
 	],
 	&"skull": [
-		"..kkkkkkkk..", ".kwwwwwwwwk.", "kwwwwwwwwwwk", "kwwwwwwwwwwk", "kwkkwwwwkkwk", "kwkkwwwwkkwk",
-		"kwwwwkkwwwwk", ".kwwwkkwwwk.", "..kwwwwwwk..", "..kwkwkwkk..", "..kkkkkkkk..", "............",
+		".....kkkkkkkkkkkkkk.....", "...kkkkkkkkkkkkkkkkkk...", "...kkwwwwwwwwwwwwwwkk...", ".kkwwwwwwwwwwwwwwwwwwkk.",
+		".kkwwwwwwwwwwwwwwwwwwkk.", "kkwwwwwwwwwwwwwwwwwwwwkk", "kkwwwwwwwwwwwwwwwwwwwwkk", "kkwwwwwwwwwwwwwwwwwwwwkk",
+		"kkwwwkkwwwwwwwwwwkkwwwkk", "kkwwkkkkwwwwwwwwkkkkwwkk", "kkwwkkkkwwwwwwwwkkkkwwkk", "kkwwwkkwwwwwwwwwwkkwwwkk",
+		"kkwwwwwwwwwkkwwwwwwwwwkk", ".kkwwwwwwwkkkkwwwwwwwkk.", ".kkwwwwwwwkkkkwwwwwwwkk.", "...kkwwwwwwkkwwwwwwkk...",
+		"...kkwwwwwwwwwwwwwwkk...", "....kkwwwwwwwwwwwkkk....", "....kkwwkkwwkkwwwkkk....", "....kkwwkkwwkkwwkkkk....",
+		"....kkkkkkkkkkkkkkkk....", ".....kkkkkkkkkkkkkk.....", "........................", "........................",
 	],
 	&"book": [
-		".kkkkkkkkkk.", "kwwwwkwwwwwk", "kwkkwkwkkkwk", "kwwwwkwwwwwk", "kwkkwkwkkkwk", "kwwwwkwwwwwk",
-		"kwkkwkwkkkwk", "kwwwwkwwwwwk", "kbbbbkbbbbbk", ".kkkkkkkkkk.", "............", "............",
+		"...kkkkkkkkkkkkkkkkkk...", ".kkkkkkkkkkkkkkkkkkkkkk.", ".kkwwwwwwkkkkwwwwwwwwkk.", "kkwwwwwwwwkkwwwwwwwwwwkk",
+		"kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk",
+		"kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk",
+		"kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwkkkkwwkkwwkkkkkkwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk", "kkwwwwwwwwkkwwwwwwwwwwkk",
+		"kkbbbbbbbbkkbbbbbbbbbbkk", ".kkbbbbbbkkkkbbbbbbbbkk.", ".kkkkkkkkkkkkkkkkkkkkkk.", "...kkkkkkkkkkkkkkkkkk...",
+		"........................", "........................", "........................", "........................",
 	],
 	&"trophy": [
-		".kkkkkkkkkk.", "kkyyyyyyyykk", "kykyyyyyykyk", "kykyyyyyykyk", ".kkkyyyykkk.", "...kyyyyk...",
-		"....kyyk....", "....kyyk....", "...kYYYYk...", "..kYYYYYYk..", "..kkkkkkkk..", "............",
+		"...kkkkkkkkkkkkkkkkkk...", ".kkkkkkkkkkkkkkkkkkkkkk.", ".kkkyyyyyyyyyyyyyyyykkk.", "kkkyyyyyyyyyyyyyyyyyykkk",
+		"kkyykkyyyyyyyyyyyykkyykk", "kkyykkyyyyyyyyyyyykkyykk", "kkyykkyyyyyyyyyyyykkyykk", ".kyykkkyyyyyyyyyykkkyyk.",
+		".kkkkkkyyyyyyyyyykkkkkk.", "...kkkkkyyyyyyyykkkkk...", ".....kkkyyyyyyyykkk.....", ".......kkyyyyyykk.......",
+		".......kkyyyyyykk.......", "........kkyyyykk........", "........kkyyyykk........", ".......kkkyyyykkk.......",
+		".......kkYYYYYYkk.......", ".....kkYYYYYYYYYYkk.....", ".....kYYYYYYYYYYYYk.....", "....kkYYYYYYYYYYYYkk....",
+		"....kkkkkkkkkkkkkkkk....", ".....kkkkkkkkkkkkkk.....", "........................", "........................",
 	],
 	&"mail": [
-		"............", "kkkkkkkkkkkk", "kwkwwwwwwkwk", "kwwkwwwwkwwk", "kwwwkwwkwwwk", "kwwwwkkwwwwk",
-		"kwwwwwwwwwwk", "kwwwwwwwwwwk", "kkkkkkkkkkkk", "............", "............", "............",
+		"........................", "........................", ".kkkkkkkkkkkkkkkkkkkkkk.", "kkkkkkkkkkkkkkkkkkkkkkkk",
+		"kkwwkkwwwwwwwwwwwwkkwwkk", "kkwwkkwwwwwwwwwwwwkkwwkk", "kkwwwkkkwwwwwwwwkkkwwwkk", "kkwwwwkkkwwwwwwkkkwwwwkk",
+		"kkwwwwwkkkwwwwkkkwwwwwkk", "kkwwwwwwkkkwwkkkwwwwwwkk", "kkwwwwwwwkkkkkkwwwwwwwkk", "kkwwwwwwwwkkkkwwwwwwwwkk",
+		"kkwwwwwwwwwwwwwwwwwwwwkk", "kkwwwwwwwwwwwwwwwwwwwwkk", "kkwwwwwwwwwwwwwwwwwwwwkk", "kkkwwwwwwwwwwwwwwwwwwkkk",
+		"kkkkkkkkkkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkkkkkkkkkk.", "........................", "........................",
+		"........................", "........................", "........................", "........................",
 	],
 	&"chest": [
-		"..kkkkkkkk..", ".kbbbbbbbbk.", "kbbbbbbbbbbk", "kkkkkyykkkkk", "kbbbbyybbbbk", "kbbbbbbbbbbk",
-		"kbbbbbbbbbbk", "kbbbbbbbbbbk", "kkkkkkkkkkkk", "............", "............", "............",
+		".....kkkkkkkkkkkkkk.....", "...kkkkkkkkkkkkkkkkkk...", "...kkbbbbbbbbbbbbbbkk...", ".kkbbbbbbbbbbbbbbbbbbkk.",
+		".kbbbbbbbbbbbbbbbbbbbbk.", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkkkkkkkkkyyyykkkkkkkkkk", "kkkkkkkkkkyyyykkkkkkkkkk",
+		"kkkbbbbbbbyyyybbbbbbbkkk", "kkbbbbbbbbbyybbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk",
+		"kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkbbbbbbbbbbbbbbbbbbbbkk", "kkkbbbbbbbbbbbbbbbbbbkkk",
+		"kkkkkkkkkkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkkkkkkkkkk.", "........................", "........................",
+		"........................", "........................", "........................", "........................",
 	],
 	&"shop": [
-		"rwrwrwrwrwrw", "rwrwrwrwrwrw", "kkkkkkkkkkkk", ".kb......bk.", ".kb.wwww.bk.", ".kb.wyyw.bk.",
-		".kb.wwww.bk.", ".kbbbbbbbbk.", ".kbbbbbbbbk.", ".kkkkkkkkkk.", "............", "............",
+		".rwwrrwwrrwwrrwwrrwwrrw.", "rrwwrrwwrrwwrrwwrrwwrrww", "rrwwrrwwrrwwrrwwrrwwrrww", "rrwwrrwwrrwwrrwwrrwwrrww",
+		"kkkkkkkkkkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkkkkkkkkkk.", ".kkkkb............bkkkk.", "..kkbb............bbkk..",
+		"..kkbb...wwwwww...bbkk..", "..kkbb..wwwwwwww..bbkk..", "..kkbb..wwyyyyww..bbkk..", "..kkbb..wwyyyyww..bbkk..",
+		"..kkbb..wwwwwwww..bbkk..", "..kkbbb.wwwwwwww.bbbkk..", "..kkbbbbbbbbbbbbbbbbkk..", "..kkbbbbbbbbbbbbbbbbkk..",
+		"..kkbbbbbbbbbbbbbbbbkk..", "..kkkbbbbbbbbbbbbbbkkk..", "..kkkkkkkkkkkkkkkkkkkk..", "...kkkkkkkkkkkkkkkkkk...",
+		"........................", "........................", "........................", "........................",
 	],
 	&"arch": [
-		"..kkkkkkkk..", ".kggggggggk.", "kgsskkkkssgk", "kgskkkkkksgk", "kgskkkkkksgk", "kgskkkkkksgk",
-		"kgskkkkkksgk", "kgskkkkkksgk", "kgskkkkkksgk", "kkkkkkkkkkkk", "............", "............",
+		".....kkkkkkkkkkkkkk.....", "...kkkkkkkkkkkkkkkkkk...", "...kkggggggggggggggkk...", ".kkggggggggggggggggggkk.",
+		".kkggssskkkkkkkksssggkk.", "kkggssskkkkkkkkkksssggkk", "kkggssskkkkkkkkkksssggkk", "kkggsskkkkkkkkkkkkssggkk",
+		"kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk",
+		"kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk", "kkggsskkkkkkkkkkkkssggkk",
+		"kkggsskkkkkkkkkkkkssggkk", "kkkgskkkkkkkkkkkkkksgkkk", "kkkkkkkkkkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkkkkkkkkkk.",
+		"........................", "........................", "........................", "........................",
 	],
 	&"close": [
-		"kk........kk", "kwk......kwk", ".kwk....kwk.", "..kwk..kwk..", "...kwkkwk...", "....kwwk....",
-		"....kwwk....", "...kwkkwk...", "..kwk..kwk..", ".kwk....kwk.", "kwk......kwk", "kk........kk",
+		".kk..................kk.", "kkkkk..............kkkkk", "kkwwk..............kwwkk", ".kwwwkk..........kkwwwk.",
+		".kkwwwk..........kwwwkk.", "...kwwwkk......kkwwwk...", "...kkwwwk......kwwwkk...", ".....kwwwkk..kkwwwk.....",
+		".....kkwwwkkkkwwwkk.....", ".......kwwwkkwwwk.......", ".......kkwkwwkwkk.......", "........kkwwwwkk........",
+		"........kkwwwwkk........", ".......kkwkwwkwkk.......", ".......kwwwkkwwwk.......", ".....kkwwwkkkkwwwkk.....",
+		".....kwwwkk..kkwwwk.....", "...kkwwwk......kwwwkk...", "...kwwwkk......kkwwwk...", ".kkwwwk..........kwwwkk.",
+		".kwwwkk..........kkwwwk.", "kkwwk..............kwwkk", "kkkkk..............kkkkk", ".kk..................kk.",
 	],
 	&"star": [
-		".....kk.....", "....kyyk....", "....kyyk....", "kkkkkyykkkkk", "kyyyyyyyyyyk", ".kyyyyyyyyk.",
-		"..kyyyyyyk..", "..kyyyyyyk..", ".kyyykkyyyk.", ".kyykk.kyyk.", "kyk......kyk", "kk........kk",
+		"...........kk...........", ".........kkkkkk.........", ".........kkyykk.........", "........kkyyyykk........",
+		"........kkyyyykk........", ".......kkkyyyykkk.......", ".kkkkkkkkkyyyykkkkkkkkk.", "kkkkkkkkkyyyyyykkkkkkkkk",
+		"kkyyyyyyyyyyyyyyyyyyyykk", ".kyyyyyyyyyyyyyyyyyyyyk.", ".kkyyyyyyyyyyyyyyyyyykk.", "...kkyyyyyyyyyyyyyykk...",
+		"...kkyyyyyyyyyyyyyykk...", "....kkyyyyyyyyyyyykk....", "....kkyyyyyyyyyyyykk....", "...kkyyyyyyyyyyyyyykk...",
+		"...kkyyyyyykkyyyyyykk...", "..kkyyyyykkkkkkyyyyykk..", "..kkyyyyykkk..kyyyyykk..", ".kkykyyykkk....kyyykykk.",
+		".kyyyk............kyyyk.", "kkyyk..............kyykk", "kkkkk..............kkkkk", ".kk..................kk.",
 	],
 	&"target": [
-		"....kkkk....", "..kkwwwwkk..", ".kwwwkkwwwk.", ".kwwwkkwwwk.", "kwwwwkkwwwwk", "kkkkkwwkkkkk",
-		"kkkkkwwkkkkk", "kwwwwkkwwwwk", ".kwwwkkwwwk.", ".kwwwkkwwwk.", "..kkwwwwkk..", "....kkkk....",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".....kkkkwwwwwwkkkk.....", "...kkkkwwwwwwwwwwkkkk...",
+		"...kkwwwwwwkkwwwwwwkk...", "..kkwwwwwwkkkkwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..", ".kkwwwwwwwkkkkwwwwwwwkk.",
+		".kwwwwwwwwkkkkwwwwwwwwk.", "kkwwwwwwwkwkkwkwwwwwwwkk", "kkkkkkkkkwkwwkwkkkkkkkkk", "kkkkkkkkkkwwwwkkkkkkkkkk",
+		"kkkkkkkkkkwwwwkkkkkkkkkk", "kkkkkkkkkwkwwkwkkkkkkkkk", "kkwwwwwwwkwkkwkwwwwwwwkk", ".kwwwwwwwwkkkkwwwwwwwwk.",
+		".kkwwwwwwwkkkkwwwwwwwkk.", "..kkwwwwwwkkkkwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..", "...kkwwwwwwkkwwwwwwkk...",
+		"...kkkkwwwwwwwwwwkkkk...", ".....kkkkwwwwwwkkkk.....", ".......kkkkkkkkkk.......", ".........kkkkkk.........",
 	],
 	&"dungeon": [
-		".........kk.", "........ksk.", ".......ksk..", "......ksk...", ".k...ksk....", ".kk.ksk.....",
-		"..kksk......", "...kyk......", "..kykyk.....", ".kbk.kyk....", "kbk.........", "kk..........",
+		"...................kk...", ".................kkkkk..", ".................ksskk..", "...............kksssk...",
+		"...............kssskk...", ".............kksssk.....", ".............kssskk.....", "...........kksssk.......",
+		"..kk.......kssskk.......", "..kkk....kksssk.........", "..kkk....kssskk.........", "...kkk..ksssk...........",
+		"...kkkkkssskk...........", ".....kkksskk............", "......kkyykk............", "......kyyyykk...........",
+		".....kyykkyyk...........", "...kkkyykkyyykk.........", "...kbbkk..kyyykk........", ".kkbbbk....kyykk........",
+		".kbbbkk.................", "kkbbk...................", "kkkkk...................", ".kk.....................",
 	],
 }
 
@@ -98,19 +179,23 @@ static func texture(icon: StringName, scale: int = 2) -> Texture2D:
 	var key := "%s@%d" % [icon, scale]
 	if _cache.has(key):
 		return _cache[key]
-	var rows: Array = BITMAPS.get(icon, BITMAPS[&"coin"])
-	var image := Image.create(SIZE * scale, SIZE * scale, false, Image.FORMAT_RGBA8)
-	for y in SIZE:
-		var row: String = rows[y] if y < rows.size() else ""
-		for x in SIZE:
-			var code := row[x] if x < row.length() else "."
-			if code == "." or not PALETTE.has(code):
-				continue
-			for dy in scale:
-				for dx in scale:
-					image.set_pixel(x * scale + dx, y * scale + dy, PALETTE[code])
-	var result := ImageTexture.create_from_image(image)
+	var result := build(BITMAPS.get(icon, BITMAPS[&"coin"]), PALETTE, scale)
 	_cache[key] = result
+	return result
+
+
+## A TEXELS×TEXELS bitmap as a texture that lays out at SIZE × scale px (full-resolution image,
+## size override). Shared with ItemIcons.
+static func build(rows: Array, palette: Dictionary, scale: int) -> ImageTexture:
+	var image := Image.create(TEXELS, TEXELS, false, Image.FORMAT_RGBA8)
+	for y in mini(rows.size(), TEXELS):
+		var row: String = rows[y]
+		for x in mini(row.length(), TEXELS):
+			var code := row[x]
+			if code != "." and palette.has(code):
+				image.set_pixel(x, y, palette[code])
+	var result := ImageTexture.create_from_image(image)
+	result.set_size_override(Vector2i(SIZE, SIZE) * maxi(scale, 1))
 	return result
 
 

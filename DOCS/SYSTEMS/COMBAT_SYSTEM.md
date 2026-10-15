@@ -53,6 +53,12 @@ Every actor offers 6 fixed slots around itself (ring = 0.75 × attacker's attack
 - Each actor's `CombatController` owns its target, slots and attack timing.
 - UI/VFX only subscribe to signals (`CombatFeedback` spawns damage numbers).
 
+## Active skills (D55)
+
+- `Actor._strike` (through `CombatController.attack_override`) fires the first ready active skill (`Actor.get_active_skills()`: a Hunter's loadout via `ActiveSkills`, a monster's `EnemyDefinition.skill_ids`) instead of the plain attack; per-skill cooldowns live on the actor and tick in `_physics_process`.
+- `CombatService.resolve_skill(attacker, target, skill)`: damage × `skill.damage` on the target and the nearest enemies within `skill.radius` (up to `skill.targets`), `effect_id` on everyone hit, `self_effect_id` / `heal_ratio` on the user; emits `skill_used(attacker, targets, skill)` for VFX. Timing is unchanged: the skill uses the attack's cooldown slot.
+- Monster gear (`weapon_id`, `armor_id`) adds item modifiers to the monster's stats in `Enemy.get_combat_stats` / HP at setup.
+
 ## Feedback (MVP)
 
 - hit flash on damage

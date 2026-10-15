@@ -322,3 +322,78 @@ These decisions replace the ones they name. Older decisions that are not mention
 - **Weapon sprites** (`WeaponSprites`): pixel weapons (sword, greatsword, dagger, curved, shadow, fang, bow, mace, club, bone) with a grip pixel, tinted by the item. Hunters hold the sprite of their equipped weapon (by words in the item id; the class default — sword / bow / dagger / mace — without one), rotated to the animation's weapon angle; goblins hold a club, skeletons a bone sword. The line weapon remains as a fallback for unknown kinds.
 - **Tavern**: candidates are a two-column board of cards ("Hunters waiting": portrait, name, talent star, class / level, stats, traits, Hire) instead of a list.
 - **Nameplates**: every Hunter shows its name over its head and an HP bar while hurt; monsters show the HP bar only, bosses also their name (`ActorNameplate`, scaled against the camera zoom so it stays readable).
+
+## D54. Chibi face and class skills (owner request, 2026-10-15; extends D49, COMBAT_SYSTEM.md) — skills superseded by D55 the same day; the head redesign stands
+- **Head redesign**: the chibi head keeps its 15×13 box and parts, with bigger eyes (lid, white + iris, iris; iris = hair colour), blush, a nose and a mouth. Eye rows are 7–9 (`ChibiBody.EYE_ROWS`); the back view clears the face, the side view keeps the near eye. Hair maps are unchanged.
+- **Class skills**: every base class has one signature skill (`HunterDefinition` → Class skill; subclasses use their base class's). It replaces every `skill_every_attacks`-th attack of the Hunter (`CombatController.attack_override`, `CombatService.resolve_skill`): a damage multiplier on the target and, for area skills, on the nearest enemies within `skill_radius` of it (up to `skill_targets`), plus an optional status effect on everyone hit. Numbers in BALANCE.md → Class skills.
+  - Warrior **Power Slam** (`skill_slam`): overhead slam, 1.8×, hits up to 4 enemies within 36 px, ground shockwave.
+  - Ranger **Arrow Volley** (`skill_volley`): draws and releases three arrows, 1.1× on up to 3 enemies within 90 px of the target.
+  - Rogue **Shadow Strike** (`skill_dash`): crouch, dash with afterimages, crossed double cut, 2.2× on one target + Bleed.
+  - Guardian **Shield Bash** (`skill_bash`): shield raised and thrust, 1.4× on up to 3 enemies within 30 px + Stun.
+- Visuals: one ChibiAnimations one-shot per skill (same priority as attack) with in-sprite effects (charge, shockwave, draw / release, afterimage, xslash, bashring) and a world `SkillVfx` (shockwave ring, arrow streaks, shadow burst, stun stars) spawned by `CombatFeedback` on `CombatService.skill_used`.
+- Monsters have no skills. Save schema unchanged (attack counters are scene-only).
+
+## D55. Active skills, monster gear and models (owner request, 2026-10-15; replaces the skill part of D54)
+- **Active skills are data** (`ActiveSkillDefinition`, `data/active_skills/<owner>/`, registry category `active_skill`): owner class, unlock level, cooldown, damage multiplier, radius / targets, effect on targets, effect on self, self heal, animation, VFX kind. **30 per class** (Warrior, Ranger, Rogue, Guardian; subclasses use their base class's), unlocked by Hunter level 1–30, and **2 per monster** (`EnemyDefinition.skill_ids`). Generated from one table (`tools/gen_active_skills.py`, run with `python3 tools/gen_active_skills.py data/active_skills`) so numbers stay consistent; descriptions are derived from the numbers.
+- **Loadout**: a Hunter fights with 2 skills (`ActiveSkills.SLOTS`): the player's picks (`HunterRuntime.active_skills`, saved, optional field) when still valid and unlocked, otherwise the two highest unlocked. The Hunter dialog's Skill tab shows the slots and the whole class list; tapping an unlocked skill equips it.
+- **Use**: `CombatController.attack_override` → `Actor._strike`: the first ready skill (per-skill cooldowns ticked in `_physics_process`, first use immediate) replaces the plain attack, else `resolve_attack`. `CombatService.resolve_skill(attacker, target, skill)` applies damage × multiplier to the target and the nearest enemies within the radius, target effects, self effect and heal, and emits `skill_used`. Buff-only skills (damage 0) hit nobody. Hunters and monsters share this code.
+- **Presentation**: 8 chibi one-shots (slam, volley, dash, bash, thrust, spin, cast, leap) with in-sprite effects; monsters puff up (`MonsterVisual.play_action`). World VFX by kind (`SkillVfx`: shockwave, earth, arrows, shadow, bash, flame, frost, poison, holy, lightning, wind, blood, heal).
+- **Monster character layer**: `EnemyDefinition` gains `weapon_id`, `armor_id` (real `ItemDefinition`s: Goblin Club, Bone Blade, Wolf Pelt, Bark Plate), whose stat modifiers apply to the monster (D18 rule) and whose weapon shows in its hand; `gear_drop_chance` lets one piece drop into the killer's bag (sold with the bag). The coins a monster carries are its existing `gold_min` / `gold_max`.
+- **Models**: goblin, skeleton, wolf and slime pixel bodies redrawn with more shading and detail (D53 bodies replaced).
+- Balance: BALANCE.md → Active skills. Save schema unchanged (new field optional).
+
+## D56. Double texel density for characters, monsters and weapons (owner request, 2026-10-15; extends D20, D49, D53, D55)
+- Every pixel map of Hunters (`ChibiBody` body, outfits, hair), monsters (`MonsterBodies`) and weapons (`WeaponSprites`) is at **2 texels per world pixel** (`SCALE := 2`): the Hunter canvas is 64×96 texels (body 30×58), monsters and weapons are twice as wide and tall. The maps were converted once with the EPX / Scale2x rule (`tools/upscale_pixel_maps.py`), which rounds diagonals; new detail is drawn directly at this density.
+- **World size is unchanged**: textures are drawn with a 1 / SCALE transform, so a Hunter still covers 32×48 world pixels and all gameplay distances, hit boxes, hands (`ChibiBody.hand_position`), weapon reach (`WeaponSprites.length_of`) and nameplate heights stay the same. Animation offsets stay in world pixels and are multiplied by SCALE when composing.
+- **Display** (replaces D20's stretch mode): `window/stretch/mode = canvas_items` (integer scale kept), so 2D is rendered at the device resolution and the half-size texels are visible (a 1080 px wide phone shows 3 screen pixels per world pixel). The desktop test window is 720×1280 (2×).
+- UI icons (`PixelIcons`, `ItemIcons`) follow the same rule: 24×24 texel bitmaps (EPX from the 12×12 set) whose textures lay out at 12 × scale px through `ImageTexture.set_size_override`, so no layout changes and the detail shows on dense screens. Save data unchanged.
+
+## D57. Map redesign (owner request, 2026-10-15; extends D52)
+- **Ground colour from noise**: each region's tiles take their colour from two octaves of smooth value noise blended through a per-biome palette (dark / mid / light / detail, `world_ground.gd` BIOMES keyed by `RegionDefinition.props`), so the ground reads as soft patches instead of a tile grid.
+- **Water**: deep water (clear colour `163846`) with three lighter shallow bands around every plateau, sparse wave marks, foam lines at every cliff foot.
+- **Plateaus**: cliff faces 40 px deep in earth bands with rock blocks, roots and hanging grass; the Town's retaining wall has staggered blocks, buttresses every four tiles, moss and a capstone. Every region has an inner edge shadow and a lit top rim.
+- **Town**: dirt roads with a dark border, worn patches, wheel ruts along the road, pebbles and grass overhang; **footpaths from every building door to the nearest road or plaza** (4-way shortest path around the other buildings and the pond, recomputed when the layout changes); a cobbled plaza with a curb and a compass mosaic in front of the Town Hall; grass tufts, flowers, clover and pebbles; rounded pond.
+- **Hunting regions**: dirt trails (paler in the Ruins) from every bridge and dungeon entrance to the region centre — props keep off them; Dark Forest leaf litter, ferns, mushrooms, roots and moss; Goblin Cave gravel, cracks, stones, bones and glowing crystals; Ancient Ruins two-tile paving slabs, a third missing (grass), cracked or mossy.
+- **Decorations** (`WorldDecor`, no collision, y-sorted): lamp posts at the plaza corners and along the roads, benches and flower planters beside the plaza; hidden while a building stands on or next to them.
+- Designed against a Python preview of the same drawing code; presentation only (navigation, placement and saves unchanged).
+
+## D58. Building models redrawn (owner request, 2026-10-15; replaces the D51/D52 building look)
+- Buildings stay front-facing 3/4 drawings on the footprint (same origin, footprint, collision, door tile and API), now built in layers: ground shadow cast back-right, plinth, front wall (stone blocks in varied shades / alternating planks / plaster with a timber frame and braces), corner quoins or posts, base trim, windows with shutters, lintels and sills (flower boxes on homes, inns, the Tavern and the Restaurant), a framed plank door with two steps, then the roof.
+- **Roofs**: hip roofs (tiled slope with rows shaded towards the eave, staggered tile joints, hip edges, a capped ridge) or gable roofs (tiled side slopes behind a gable with a round window and barge boards; plank lines on wooden gables). An eave shadow falls on the wall.
+- **Silhouettes per building**: Town Hall clock tower with a pyramid roof and flag, columns; Tavern hanging mug sign, barrels, chimney; Blacksmith open forge bay with a hearth glow, anvil, awning, tall chimney; Hospital red cross on the roof and over the door; Warehouse barn door with braces and crates; House chimney and flower boxes; Temple spire with a golden sun and columns; Trading Post striped awning, coin sign, crates; Restaurant striped awning, plate sign, chimney; Inn two dormers, bed sign, lantern; Academy dormers, flag, columns, crest; Forge chimney and glow; the **Reincarnation Portal** is a stone ring arch on a rune dais around a swirling gate (no house).
+- Two-storey fronts (Town Hall, Tavern, Inn, Academy) get two window rows. Lv2: taller wall and plinth, a flag. Chimney smoke and the portal's sparks animate at 6 fps.
+- Designed against a Python preview of the same draw calls.
+
+## D59. Props redrawn (2026-10-15; extends D51, D57)
+- `WorldProp` keeps its kinds, collision and spawn rules; only the drawing changed, in the D57/D58 style (light from the top-left, dark outlines, ground shadow cast to the right).
+- **Leafy tree** (Town edges): tapered trunk with roots, six outlined canopy clumps with a lit layer, highlights on the upper-left clumps and light / dark leaf clusters; a quarter carry apples, a fifth blossoms.
+- **Pine** (Dark Forest): four tiers with saw-tooth skirts, lit left half, needle strokes; some carry cones.
+- **Boulder** (Goblin Cave): a big and a small rock, lit top facet, shaded side, cracks, moss cap, a pebble; three in ten hide a glowing crystal.
+- **Broken column** (Ancient Ruins): stepped base, fluted shaft, jagged break, ivy, rubble; three heights.
+- The variant comes from the prop's position (`WorldProp._variant`), so it is stable across sessions without saving anything.
+
+## D60. One-texel outlines and double-density details (2026-10-15; extends D56)
+- After the D56 upscale every silhouette outline was two texels thick. `tools/thin_outlines.py` removed the inner layer of every silhouette outline in the Hunter body, outfits and hair, the monster bodies and the weapon sprites (≈1,400 texels): an outline texel touching no transparency next to an outline texel that does is painted with the fill it touches. Inner lines (eyes, mouth, seams, straps) keep their weight. Outfits were thinned together with the head rows above them.
+- New detail that only fits at the double density: a white sparkle in each iris (front view; cleared with the face in the back view) and a broken highlight band ("shine") across every hair style.
+- Sizes, anchors, hands and grips are unchanged.
+
+## D61. Scenery around the map (owner request, 2026-10-15; extends D57)
+- The camera may now pan `WorldScenery.MARGIN` (420 px) beyond the regions (was 96 px) and the water is drawn 520 px out, with soft deeper / lighter patches from noise under the shallows and waves.
+- `WorldScenery` (static, drawn once, no collision) fills the water ring: ten islets (beach, foam ring, grass, shore rocks; leafy trees, leaning palms, or a striped lighthouse on the north-west islet), four sandbars, eight rock clusters, kelp beds, drifting logs, a shipwreck off the Goblin Cave, lily pads and reeds off the Town's west shore, and a fishing dock on the Town's west edge. Positions are tile constants tested to stay off the land, bridges and dungeon entrances and inside the camera's reach.
+- `WorldAmbience` (10 fps redraw, above the entities, faint): the boat moored at the dock bobbing on its line, the lighthouse lamp pulsing with a slow sweeping beam, five gulls circling with flapping wings, and five cloud shadows drifting across the map.
+- `WaterShimmer` glints now cover the same ring. Presentation only.
+
+## D62. Landmarks in the hunting regions (2026-10-15; extends D57, D59)
+- `WorldLandmark` (StaticBody2D, navigation obstacle, D57–D59 drawing style) gives each hunting region a few recognisable spots, placed at fixed tiles relative to the region (`WorldMap.LANDMARKS`, keyed by `RegionDefinition.props`) and skipped on trails or near bridges and dungeon entrances. Ordinary props keep their spacing from them.
+  - Dark Forest: a mossy stone shrine with a softly glowing idol, three stumps (one with a mushroom), two fallen logs with moss and mushrooms.
+  - Goblin Cave: a camp of three hide tents around a campfire with a roast on a spit and a skull totem; a second small camp (tent + fire).
+  - Ancient Ruins: two broken knight statues, a rune obelisk, a collapsed arch (only its pillars block, Hunters can walk under it).
+- Campfire flames and sparks, the obelisk's runes and the shrine's idol animate at 8 fps; the rest is static.
+- Collision: circles (tents 14 px, fire 10, totem 6, statue 10, obelisk 8, stump 7) or boxes (log 38×9, shrine 32×8).
+
+## D63. Pictures in the menus and a Storage grid (2026-10-15; extends UI_DESIGN.md)
+- `BuildingThumb`: the map's own `BuildingVisual` scaled into a rounded plate with a strip of grass (chimney smoke still moves), greyed out when the building is locked.
+  - Construct menu: a two-column grid of picture cards (picture, name, coin cost, why it cannot be built, Place); the description is the card's tooltip.
+  - Shop & Services: a picture on every row.
+  - Building panel: a picture of the building at its level next to the description.
+- Storage (`InventorySheet`, titled "Storage" like the nav tab): six-column grids of `ItemIcon` slots — materials with counts, spare equipment with "+N" — and a detail card for the tapped slot (icon, name in its rarity colour, rarity, effect, price) with Sell 1 / Sell all, or Sell for equipment. `ItemIcon.tappable()` and `selected` support it.

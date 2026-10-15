@@ -38,6 +38,28 @@ Recruits roll ±10% on HP/Attack/Defense.
 
 Short Bow: +3 Atk (sell 5). Rusty Dagger: +2 Atk, +5% crit (sell 5).
 
+## Active skills (D55)
+
+Each class has 30 skills (`data/active_skills/<class>/`), unlocked at Hunter level 1–30; a Hunter fights with 2 (its picks, or the two highest unlocked). A ready skill replaces the plain attack; cooldowns 7–30 s.
+
+| Tier (level) | Damage skills | Area | Buffs |
+|---|---|---|---|
+| 1–10 | ×1.3–2.2, cooldown 7–11 s | 3–4 foes, 30–48 px | Strength / Fortify / Haste, 14–18 s |
+| 11–20 | ×1.5–2.8, cooldown 10–14 s, bleed / burn / poison / stun | 4–6 foes, 40–56 px | Lifesteal / Thorns / Shield / Invulnerable (20–30 s), heals 12–20% HP |
+| 21–30 | ×2.0–3.5, cooldown 12–30 s | 6–8 foes, 56–70 px | Focus / Invulnerable; capstones (lv 30) hit 4–8 foes with a debuff and a self buff |
+
+Monsters: Slime (Acid Splash — poison ×1.2 on 2, Bounce ×1.6), Wolf (Lunge Bite ×1.7 + Bleed, Howl → Haste), Goblin (Dirty Trick ×1.3 + Vulnerable, Club Smash ×1.8 + Stun), Skeleton (Bone Rattle → Fortify, Grave Chill ×1.4 on 3 + Slow), Forest Guardian (Root Grasp ×1.5 on 4 + Root, Quake ×2.0 on 6 + Stun, Shield). Cooldowns 8–16 s.
+
+### Monster gear (D55)
+| Monster | Weapon | Armor | Drop |
+|---|---|---|---|
+| Goblin | Goblin Club (+2 ATK, 12 g) | — | 10% |
+| Skeleton | Bone Blade (+4 ATK, +3% crit, 30 g) | — | 10% |
+| Wolf | — | Wolf Pelt (+1 DEF, +8 HP, 16 g) | 8% |
+| Forest Guardian | — | Bark Plate (+5 DEF, +30 HP, 120 g) | 100% |
+
+Gear modifiers apply to the monster's stats before the region level scale; the Enemies table above lists base values without gear.
+
 ## Talents (D46)
 | Talent | Chance at recruitment | Field recipes (time) |
 |---|---|---|

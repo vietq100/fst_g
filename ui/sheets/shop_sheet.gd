@@ -1,7 +1,7 @@
 class_name ShopSheet
 extends Sheet
-## Town services (the "Shop" tab of Evil Hunter Tycoon): one list of every service building with
-## a shortcut to its panel, or what is needed to unlock it.
+## Town services (the "Shop" tab of Evil Hunter Tycoon): one list of every service building, with
+## its picture (D63), a shortcut to its panel, or what is needed to unlock it.
 
 const SERVICES: Array[StringName] = [&"tavern", &"trading_post", &"academy", &"forge", &"portal", &"restaurant",
 	&"blacksmith", &"hospital", &"temple", &"warehouse", &"town_hall", &"inn"]
@@ -36,4 +36,5 @@ func _build(content: VBoxContainer) -> void:
 			action = UIKit.button("Locked", func() -> void: pass, &"", "Not built")
 		action.size_flags_horizontal = Control.SIZE_SHRINK_END
 		action.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([info, action])))
+		var thumb := BuildingThumb.new().setup(building_id, definition.footprint, maxi(level, 1), 56.0, level <= 0)
+		content.add_child(UIKit.card(UIKit.hbox([thumb, info, action], 6)))

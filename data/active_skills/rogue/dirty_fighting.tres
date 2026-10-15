@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/active_skill_definition.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"dirty_fighting"
+display_name = "Dirty Fighting"
+description = "Sand in the eyes, blade on the wrist. 150% damage, applies Disarm. Cooldown 10s."
+owner_class = &"rogue"
+required_level = 12
+cooldown = 10.0
+damage = 1.50
+radius = 0.0
+targets = 1
+effect_id = &"disarm"
+effect_stacks = 1
+self_effect_id = &""
+self_effect_stacks = 1
+heal_ratio = 0.00
+animation = &"skill_dash"
+vfx = &"wind"

@@ -14,7 +14,7 @@ var _frame_time := 0.0
 
 
 func setup(world: WorldService) -> void:
-	var area := world.get_bounds(300.0)
+	var area := world.get_bounds(WorldScenery.MARGIN)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	var tries := 0

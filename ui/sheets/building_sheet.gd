@@ -75,7 +75,8 @@ func _build(content: VBoxContainer) -> void:
 		return
 	var definition := buildings.get_definition(building_id)
 	set_title("%s  Lv %d" % [definition.display_name, placed.level])
-	content.add_child(UIKit.label(DESCRIPTIONS.get(building_id, ""), &"MutedLabel"))
+	var thumb := BuildingThumb.new().setup(building_id, definition.footprint, placed.level, 76.0)
+	content.add_child(UIKit.hbox([thumb, UIKit.label(DESCRIPTIONS.get(building_id, ""), &"MutedLabel")], 8))
 	_build_upgrade(content, buildings, definition, placed)
 	_build_placement(content, buildings, definition)
 	content.add_child(UIKit.separator())

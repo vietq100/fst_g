@@ -173,3 +173,69 @@ func test_pond_blocks_building() -> void:
 	var pond := _world.get_town_pond()
 	assert_true(pond.size != Vector2i.ZERO)
 	assert_eq(_buildings.can_place(&"house", pond.position), "The pond is in the way")
+
+
+func test_ground_footpaths_join_doors_to_roads_and_trails_cover_the_regions() -> void:
+	# D57: a door gets a footpath to the nearest road; hunting regions get trails.
+	var ground = preload("res://world/world/world_ground.gd").new()
+	var roads: Dictionary[Vector2i, bool] = {}
+	for x in range(5, 15):
+		roads[Vector2i(x, 20)] = true
+	ground.setup(_world, roads, {} as Dictionary[Vector2i, bool], Rect2i(), [Vector2i(-1, 56)] as Array[Vector2i])
+	var house := Rect2i(8, 10, 2, 2)
+	ground.set_footprints([house] as Array[Rect2i])
+	var door := BuildingService.get_door_tile(house)
+	for y in range(door.y, 20):
+		assert_true(ground.path_tiles.has(Vector2i(door.x, y)), "path row %d" % y)
+	assert_false(ground.path_tiles.has(Vector2i(door.x, 20)), "the road itself is not a footpath")
+	assert_eq(ground.path_tiles.size(), 20 - door.y)
+	# The Dark Forest trail runs from its dungeon entrance and its bridges to its centre.
+	var forest := _world.get_region(&"dark_forest")
+	assert_true(ground.is_trail_tile(WorldService.tile_at(_world.region_center(forest))))
+	assert_false(ground.is_trail_tile(Vector2i(4, 4)), "no trails in the Town")
+	ground.free()
+
+
+func test_scenery_stays_in_the_water_and_within_camera_reach() -> void:
+	# D61: islets, sandbars, rocks, logs and the wreck never touch a region, a bridge or a dungeon
+	# entrance, and the camera can reach them.
+	var spots: Array[Vector2] = []
+	for islet: Array in WorldScenery.ISLETS:
+		spots.append(islet[0])
+	spots.append_array(WorldScenery.SANDBARS)
+	spots.append_array(WorldScenery.ROCKS)
+	spots.append_array(WorldScenery.LOGS)
+	spots.append_array(WorldScenery.KELP)
+	spots.append(WorldScenery.WRECK)
+	var land: Array[Rect2i] = []
+	for region in _world.get_regions():
+		land.append(region.tile_rect.grow(2))
+	for gate in _world.get_gates():
+		land.append(gate.tiles.grow(3))
+	var reach := _world.get_bounds(WorldScenery.MARGIN)
+	for spot in spots:
+		for rect in land:
+			assert_false(rect.has_point(Vector2i(spot)), "%s on land" % spot)
+		for definition in _registry.get_all(&"expedition"):
+			var entrance := Vector2((definition as ExpeditionDefinition).entrance_tile)
+			assert_true(entrance.distance_to(spot) >= 6.0, "%s too close to %s" % [spot, definition.id])
+		assert_true(reach.has_point(WorldScenery.tile_point(spot)), "%s out of camera reach" % spot)
+	assert_true(reach.has_point(WorldScenery.lighthouse_lamp()))
+
+
+func test_landmarks_sit_inside_their_regions_and_off_the_trails() -> void:
+	# D62: every landmark tile is inside a region of its biome and not on a trail.
+	var ground = preload("res://world/world/world_ground.gd").new()
+	var entrances: Array[Vector2i] = []
+	for definition in _registry.get_all(&"expedition"):
+		entrances.append((definition as ExpeditionDefinition).entrance_tile)
+	ground.setup(_world, {} as Dictionary[Vector2i, bool], {} as Dictionary[Vector2i, bool], Rect2i(), entrances)
+	var count := 0
+	for region in _world.get_regions():
+		for entry: Array in WorldMap.LANDMARKS.get(region.props, []):
+			var tile := WorldService.tile_at(WorldService.tile_to_world(Vector2(region.tile_rect.position) + entry[1]))
+			assert_true(region.tile_rect.grow(-1).has_point(tile), "%s inside %s" % [tile, region.id])
+			assert_false(ground.is_trail_tile(tile), "%s off the trails" % tile)
+			count += 1
+	assert_eq(count, 17)
+	ground.free()

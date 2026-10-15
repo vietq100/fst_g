@@ -12,7 +12,7 @@ extends RefCounted
 ## - "side": keys that replace the frame's own keys in the side view (+x = forward).
 ## - "weapon": weapon angle in degrees (0 = straight up, + = forward). Default WEAPON_REST.
 ## - "fx": effect started when the frame begins (ChibiVisual): step, slash, charge, burst,
-##   sparkle, tap, dust.
+##   sparkle, tap, dust, shockwave, draw, release, afterimage, xslash, bashring, thrust, spin, cast.
 ## - "lying": drawn lying on the ground (death); "lift": extra px off the ground while lying.
 ## - "item": show a picked-up item in the weapon hand.
 
@@ -25,6 +25,15 @@ const ATTACK := &"attack"
 const SKILL := &"skill"
 const HIT := &"hit"
 const DEATH := &"death"
+## Class skills (D54): Warrior slam, Ranger volley, Rogue dash, Guardian bash.
+const SKILL_SLAM := &"skill_slam"
+const SKILL_VOLLEY := &"skill_volley"
+const SKILL_DASH := &"skill_dash"
+const SKILL_BASH := &"skill_bash"
+const SKILL_THRUST := &"skill_thrust"
+const SKILL_SPIN := &"skill_spin"
+const SKILL_CAST := &"skill_cast"
+const SKILL_LEAP := &"skill_leap"
 const PICKUP := &"pickup"
 const LOOT := &"loot"
 const INTERACT := &"interact"
@@ -84,6 +93,81 @@ const ANIMATIONS := {
 		{"lying": true, "lift": -1},
 		{"lying": true},
 	]},
+	SKILL_SLAM: {"fps": 12.0, "loop": false, "frames": [
+		{"head": [0, 1], "arm_r": [0, -2], "weapon": -40.0},
+		{"arm_r": [0, -4], "weapon": -120.0, "fx": "charge"},
+		{"all": [0, -3], "arm_r": [0, -5], "weapon": -150.0},
+		{"all": [0, -4], "arm_r": [0, -5], "weapon": -160.0},
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 2], "arm_r": [1, 2], "weapon": 110.0, "fx": "shockwave"},
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 2], "weapon": 110.0},
+		{"head": [0, 1], "weapon": 80.0},
+		{},
+	]},
+	SKILL_VOLLEY: {"fps": 12.0, "loop": false, "frames": [
+		{"arm_r": [0, -2], "weapon": -10.0},
+		{"arm_r": [0, -3], "arm_l": [1, -3], "weapon": -15.0, "fx": "draw"},
+		{"arm_r": [0, -3], "arm_l": [2, -3], "weapon": -15.0},
+		{"arm_r": [0, -3], "arm_l": [2, -3], "weapon": -15.0, "fx": "draw"},
+		{"head": [0, -1], "arm_r": [0, -3], "arm_l": [-1, -3], "weapon": 0.0, "fx": "release"},
+		{"arm_r": [0, -2], "weapon": 10.0},
+		{},
+	]},
+	SKILL_DASH: {"fps": 14.0, "loop": false, "frames": [
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 1]},
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 1], "fx": "charge"},
+		{"body": [0, -1], "weapon": -50.0, "fx": "afterimage"},
+		{"body": [0, -1], "weapon": -60.0, "side": {"head": [2, -1], "torso": [2, -1], "arms": [2, -1]}},
+		{"arm_r": [1, 1], "weapon": 70.0, "fx": "xslash", "side": {"head": [1, 0], "torso": [1, 0], "arm_r": [2, 1]}},
+		{"arm_r": [1, 1], "weapon": 120.0},
+		{"arm_r": [1, 0], "weapon": -60.0, "fx": "slash"},
+		{"weapon": 90.0},
+		{},
+	]},
+	SKILL_BASH: {"fps": 12.0, "loop": false, "frames": [
+		{"head": [0, 1], "arm_l": [-1, -2]},
+		{"head": [0, 1], "arm_l": [-1, -3], "fx": "charge"},
+		{"arm_l": [-1, -3], "side": {"head": [-1, 0], "torso": [-1, 0], "arm_l": [-1, -3]}},
+		{"all": [0, -1], "arm_l": [-2, -3], "fx": "bashring", "side": {"head": [3, -1], "torso": [3, -1], "arms": [3, -1], "arm_l": [4, -3]}},
+		{"arm_l": [-2, -2], "side": {"head": [2, 0], "torso": [2, 0], "arms": [2, 0], "arm_l": [3, -2]}},
+		{"arm_l": [-1, -1]},
+		{},
+	]},
+	SKILL_THRUST: {"fps": 14.0, "loop": false, "frames": [
+		{"head": [0, 1], "arm_r": [-1, 0], "weapon": -20.0, "side": {"head": [-1, 1], "torso": [-1, 0], "arm_r": [-2, 0]}},
+		{"head": [0, 1], "arm_r": [-1, 0], "weapon": -30.0, "fx": "charge", "side": {"head": [-1, 1], "torso": [-1, 0], "arm_r": [-2, 0]}},
+		{"body": [0, -1], "arm_r": [1, 1], "weapon": 90.0, "fx": "thrust", "side": {"head": [2, -1], "torso": [2, -1], "arms": [2, -1], "arm_r": [4, 0]}},
+		{"arm_r": [1, 1], "weapon": 90.0, "side": {"head": [1, 0], "torso": [1, 0], "arm_r": [3, 0]}},
+		{"weapon": 60.0},
+		{},
+	]},
+	SKILL_SPIN: {"fps": 14.0, "loop": false, "frames": [
+		{"head": [0, 1], "arm_r": [0, -1], "weapon": -60.0},
+		{"head": [0, 1], "arm_r": [1, -1], "weapon": 30.0, "fx": "spin"},
+		{"all": [0, -1], "arm_r": [1, 0], "weapon": 120.0},
+		{"all": [0, -1], "arm_r": [0, 1], "weapon": 210.0, "fx": "spin"},
+		{"arm_r": [-1, 0], "weapon": 300.0},
+		{"arm_r": [0, -1], "weapon": 30.0, "fx": "spin"},
+		{"weapon": 60.0},
+		{},
+	]},
+	SKILL_CAST: {"fps": 10.0, "loop": false, "frames": [
+		{"head": [0, 1], "arms": [0, -1], "weapon": -10.0},
+		{"arms": [0, -3], "arm_l": [-1, -3], "arm_r": [1, -3], "weapon": -30.0, "fx": "cast"},
+		{"all": [0, -1], "arms": [0, -4], "arm_l": [-1, -4], "arm_r": [1, -4], "weapon": -40.0},
+		{"all": [0, -1], "arms": [0, -4], "arm_l": [-1, -4], "arm_r": [1, -4], "weapon": -40.0, "fx": "burst"},
+		{"arms": [0, -2], "weapon": -10.0},
+		{},
+	]},
+	SKILL_LEAP: {"fps": 12.0, "loop": false, "frames": [
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 1]},
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 1], "fx": "dust"},
+		{"all": [0, -6], "arms": [0, -2], "weapon": -40.0},
+		{"all": [0, -9], "arms": [0, -3], "weapon": -60.0},
+		{"all": [0, -6], "arm_r": [0, -1], "weapon": 40.0},
+		{"head": [0, 2], "torso": [0, 1], "arms": [0, 2], "weapon": 110.0, "fx": "shockwave"},
+		{"head": [0, 1], "weapon": 80.0},
+		{},
+	]},
 	PICKUP: {"fps": 10.0, "loop": false, "frames": [
 		{"head": [0, 1], "torso": [0, 1], "arms": [0, 1]},
 		{"head": [0, 3], "torso": [0, 2], "arms": [0, 3], "arm_r": [0, 1]},
@@ -113,7 +197,8 @@ const ANIMATIONS := {
 }
 
 ## Which one-shot animation wins when another is asked for while it plays.
-const PRIORITY := {DEATH: 4, SKILL: 3, ATTACK: 3, HIT: 2, PICKUP: 1, LOOT: 1, INTERACT: 1}
+const PRIORITY := {DEATH: 4, SKILL: 3, SKILL_SLAM: 3, SKILL_VOLLEY: 3, SKILL_DASH: 3, SKILL_BASH: 3, SKILL_THRUST: 3,
+	SKILL_SPIN: 3, SKILL_CAST: 3, SKILL_LEAP: 3, ATTACK: 3, HIT: 2, PICKUP: 1, LOOT: 1, INTERACT: 1}
 
 const GROUPS := {
 	"all": [&"head", &"torso", &"arm_l", &"arm_r", &"leg_l", &"leg_r"],

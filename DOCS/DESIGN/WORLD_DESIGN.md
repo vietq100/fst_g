@@ -21,6 +21,7 @@ Evil Hunter Tycoon. The screen (portrait) is a window onto it: drag, zoom, follo
 - **Ancient Ruins** (top-right): late hunting ground (Skeletons, Goblins). Two locked dungeons.
 - **Goblin Cave** (bottom-right): mid hunting ground (Goblins, Wolves). Two locked dungeons. Reached through the Forest or the Ruins.
 - Bridges (plank decks with railings and lanterns) connect Town–Forest, Town–Ruins, Forest–Cave, Ruins–Cave. Every region is a plateau over dark water with a cliff face below its bottom edge; dungeon entrances stand on rock ledges off the outer edges.
+- Look (D57): noise-patched ground per biome, shallows and foam around the plateaus, dirt roads with ruts and footpaths to every door in the Town, a cobbled plaza with a mosaic, lamp posts, benches and planters; trails through the hunting regions, each with its own ground detail (forest litter and ferns, cave gravel and crystals, broken ruin paving).
 
 The world is open-ended: new regions and dungeons can be added later. There is no final region.
 

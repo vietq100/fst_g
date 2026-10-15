@@ -100,3 +100,19 @@ func _find_button(node: Node, prefix: String) -> Button:
 		if found != null:
 			return found
 	return null
+
+
+func test_icons_keep_layout_size_at_double_density() -> void:
+	# D56: 24×24 texel bitmaps, laid out at 12 × scale px.
+	for icon: StringName in PixelIcons.BITMAPS:
+		var rows: Array = PixelIcons.BITMAPS[icon]
+		assert_eq(rows.size(), PixelIcons.TEXELS, String(icon))
+		for row: String in rows:
+			assert_eq(row.length(), PixelIcons.TEXELS, String(icon))
+	var coin := PixelIcons.texture(&"coin", 2)
+	assert_eq(coin.get_size(), Vector2(24, 24))
+	assert_eq(coin.get_image().get_size(), Vector2i(PixelIcons.TEXELS, PixelIcons.TEXELS))
+	assert_eq(PixelIcons.texture(&"skull", 3).get_size(), Vector2(36, 36))
+	for kind: StringName in ItemIcons.BITMAPS:
+		assert_eq((ItemIcons.BITMAPS[kind] as Array).size(), PixelIcons.TEXELS, String(kind))
+	assert_eq(ItemIcons.texture_of(&"sword", Color.WHITE, 2).get_size(), Vector2(24, 24))

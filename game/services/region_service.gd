@@ -152,6 +152,16 @@ func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: En
 		var added := add_to_bag(killer, item_id, rolled[item_id])
 		if added > 0:
 			reward.items[item_id] = added
+	# The monster's own gear (D55) may drop too.
+	if enemy.gear_drop_chance > 0.0 and _rng.randf() < enemy.gear_drop_chance:
+		var gear: Array[StringName] = []
+		for item_id in [enemy.weapon_id, enemy.armor_id]:
+			if item_id != &"":
+				gear.append(item_id)
+		if not gear.is_empty():
+			var dropped: StringName = gear[_rng.randi_range(0, gear.size() - 1)]
+			if add_to_bag(killer, dropped, 1) > 0:
+				reward.items[dropped] = reward.items.get(dropped, 0) + 1
 	var xp := roundi(enemy.xp_reward * scale)
 	var cap := _stats.level_cap(_progress.town_level)
 	var credited: Array[HunterRuntime] = [killer]

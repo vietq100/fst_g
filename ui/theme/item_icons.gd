@@ -1,9 +1,11 @@
 class_name ItemIcons
 extends RefCounted
-## 12×12 pixel-art item icons drawn from text bitmaps (like PixelIcons), picked by the item's type
-## and id and tinted with its `tint` (T = tint, t = tint shadow). Cached per kind, tint and scale.
+## Pixel-art item icons drawn from text bitmaps (like PixelIcons: 24×24 texels laid out at
+## 12 × scale px, D56), picked by the item's type and id and tinted with its `tint` (T = tint,
+## t = tint shadow). Cached per kind, tint and scale.
 
-const SIZE := 12
+## Layout size of an icon at scale 1, in px.
+const SIZE := PixelIcons.SIZE
 
 const PALETTE := {
 	"k": Color("2a1c10"), "L": Color("ffffff"), "b": Color("8b5e3c"), "B": Color("5a3b22"), "y": Color("f2c94c"),
@@ -19,68 +21,132 @@ const KIND_TINT := {
 
 const BITMAPS := {
 	&"sword": [
-		".........kk.", "........kTLk", ".......kTLk.", "......kTLk..", ".....kTLk...", "kk..kTLk....",
-		".kkkkLk.....", "..kyyk......", ".kykkyk.....", "kbk..kk.....", "kBk.........", ".k..........",
+		"...................kk...", ".................kkkkkk.", ".................kkTLLkk", "...............kkTTLLLkk",
+		"...............kkTTLLkk.", ".............kkTTLLkk...", ".............kkTTLLkk...", "...........kkTTLLkk.....",
+		"...........kkTTLLkk.....", ".........kkTTLLkk.......", "kkk......kkTTLLkk.......", "kkkkk..kkkTLLkk.........",
+		".kkkkkkkkkLLLkk.........", "...kkkkkkkLLk...........", "....kkyyyykk............", "....kyyyyyyk............",
+		"...kyyykkyyyk...........", ".kkkyykkkkyykk..........", ".kbbkkk..kkkkk..........", "kkbbkk.....kk...........",
+		"kkBBkk..................", ".kBBk...................", ".kkkk...................", "..kk....................",
 	],
 	&"dagger": [
-		"............", "........kk..", ".......kTLk.", "......kTLk..", ".....kTLk...", "....kTLk....",
-		"..kkkLk.....", "..kyyk......", ".kbkkk......", ".kBk........", "..k.........", "............",
+		"........................", "........................", ".................kk.....", "...............kkkkkk...",
+		"...............kkTLLkk..", ".............kkTTLLLkk..", ".............kkTTLLkk...", "...........kkTTLLkk.....",
+		"...........kkTTLLkk.....", ".........kkTTLLkk.......", ".........kkTTLLkk.......", ".......kkkTLLkk.........",
+		".....kkkkkLLLkk.........", "....kkkkkkLLk...........", "....kkyyyykkk...........", "...kkkyyyykk............",
+		"...kbbkkkkkk............", "..kkbbkkkkk.............", "..kkBBkkk...............", "...kBBk.................",
+		"...kkkk.................", "....kk..................", "........................", "........................",
 	],
 	&"bow": [
-		".....kk.....", "...kkTTk....", "..kTTkkTk...", ".kTk..kTk...", ".kTk...kk...", "kTk.....k...",
-		"kTk.....k...", ".kTk...kk...", ".kTk..kTk...", "..kTTkkTk...", "...kkTTk....", ".....kk.....",
+		"...........kk...........", ".........kkkkkk.........", ".......kkkTTTTk.........", ".....kkkkTTTTTTkk.......",
+		".....kTTTkTkkTTTk.......", "...kkTTTTTkkkkTTkk......", "...kTTTk...kkkTTkk......", "..kkTTkk.....kTTkk......",
+		"..kkTTkk.....kkkkk......", ".kkTTTk........kkk......", ".kTTTkk........kkk......", "kkTTkk..........kk......",
+		"kkTTkk..........kk......", ".kTTTkk........kkk......", ".kkTTTk........kkk......", "..kkTTkk.....kkkkk......",
+		"..kkTTkk.....kTTkk......", "...kTTTk...kkkTTkk......", "...kkTTTTTkkkkTTkk......", ".....kTTTkTkkTTTk.......",
+		".....kkkkTTTTTTkk.......", ".......kkkTTTTk.........", ".........kkkkkk.........", "...........kk...........",
 	],
 	&"mace": [
-		"........kkk.", ".......kTTTk", "......kTLTTk", ".......kTTTk", "......kTkkk.", ".....kbk....",
-		"....kbk.....", "...kbk......", "..kbk.......", ".kbk........", "kBk.........", ".k..........",
+		".................kkkk...", "...............kkkkkkkk.", "...............kkTTTTkk.", ".............kkTTTTTTTkk",
+		"............kkTTLLTTTTkk", "............kkTTLLTTTTkk", "..............kkTTTTTTkk", "..............kkkTTTTkk.",
+		".............kTTTkkkkkk.", "...........kkkTTkkkkk...", "...........kbbkkk.......", ".........kkbbbk.........",
+		".........kbbbkk.........", ".......kkbbbk...........", ".......kbbbkk...........", ".....kkbbbk.............",
+		".....kbbbkk.............", "...kkbbbk...............", "...kbbbkk...............", ".kkkbbk.................",
+		"kkBBkkk.................", "kkBBk...................", ".kkkk...................", "..kk....................",
 	],
 	&"armor": [
-		"..kkk..kkk..", ".kTTTkkTTTk.", "kTLTTkkTTTtk", "kTTkkTTkkTtk", "kTkTTTTTTktk", ".kTTTTTTTtk.",
-		".kTTtTTtTtk.", ".kTTTTTTTtk.", ".kTtTTTTtTk.", ".kTTTTTTTtk.", "..kTTTTTTk..", "...kkkkkk...",
+		".....kkkk......kkkk.....", "...kkkkkkkk..kkkkkkkk...", "...kkTTTTkkkkkkTTTTkk...", ".kkTTTTTTTkkkkTTTTTTkkk.",
+		".kkTLLTTTTkkkkTTTTTTtkk.", "kkTTLLTTTkTkkTkTTTTTttkk", "kkTTTTkkkkkTTkkkkkTTttkk", "kkTTTkkkkkTTTTkkkkkTttkk",
+		"kkTTkkkTTTTTTTTTTkTkttkk", ".kTTkkTTTTTTTTTTTTktttk.", ".kkTkTTTTTTTTTTTTTtktkk.", "..kkTTTTTTTTTTTTTTttkk..",
+		"..kkTTTTttTTTTttTTttkk..", "..kkTTTTttTTTTttTTttkk..", "..kkTTTTTTTTTTTTTTttkk..", "..kkTTTTTTTTTTTTTtTtkk..",
+		"..kkTTttTTTTTTTTttTTkk..", "..kkTTttTTTTTTTTttTTkk..", "..kkTTTTTTTTTTTTTtTtkk..", "...kkTTTTTTTTTTTTTtkk...",
+		"...kkTTTTTTTTTTTTTkkk...", ".....kkTTTTTTTTTTkk.....", ".....kkkkkkkkkkkkkk.....", ".......kkkkkkkkkk.......",
 	],
 	&"ring": [
-		"....kkkk....", "...kyyyyk...", "..kyk..kyk..", "..ky....yk..", ".kyk.kk.kyk.", ".ky.kTLk.yk.",
-		".ky.kTTk.yk.", ".kyk.kk.kyk.", "..ky....yk..", "..kyk..kyk..", "...kyyyyk...", "....kkkk....",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".......kyyyyyyyyk.......", ".....kkyyyyyyyyyykk.....",
+		".....kyyyk....kyyyk.....", "....kkyyk......kyykk....", "....kkyy........yykk....", "...kkyky........ykykk...",
+		"...kyyyk...kk...kyyyk...", "..kkyyk...kkkk...kyykk..", "..kkyy.k.kkTLkk.k.yykk..", "..kkyy..kkTTTLkk..yykk..",
+		"..kkyy..kkTTTTkk..yykk..", "..kkyy.k.kkTTkk.k.yykk..", "..kkyyk...kkkk...kyykk..", "...kyyyk...kk...kyyyk...",
+		"...kkyky........ykykk...", "....kkyy........yykk....", "....kkyyk......kyykk....", ".....kyyyk....kyyyk.....",
+		".....kkyyyyyyyyyykk.....", ".......kyyyyyyyyk.......", ".......kkkkkkkkkk.......", ".........kkkkkk.........",
 	],
 	&"ore": [
-		"............", "....kkk.....", "...kssSk....", "..ksLsSSk...", ".kssssSSSk..", ".kssLssSSk..",
-		"kssssssSSSk.", "kssssssSSSk.", "kSsssssSSSk.", ".kSSSSSSSk..", "..kkkkkkk...", "............",
+		"........................", "........................", ".........kkkk...........", ".......kkkkkkkk.........",
+		".......kksssSkk.........", ".....kksssssSSSkk.......", ".....kksLLssSSSkk.......", "...kksssLLssSSSSSkk.....",
+		"...kksssssssSSSSSkk.....", "..kksssssssssSSSSSkk....", "..kkssssLLsssSSSSSkk....", ".kksssssLLssssSSSSSkk...",
+		".kksssssssssssSSSSSkk...", "kkssssssssssssSSSSSSkk..", "kkssssssssssssSSSSSSkk..", "kkssssssssssssSSSSSSkk..",
+		"kkSsssssssssssSSSSSSkk..", ".kkSSssssssssSSSSSSkk...", ".kkSSSSSSSSSSSSSSSSkk...", "...kkSSSSSSSSSSSSkk.....",
+		"...kkkkkkkkkkkkkkkk.....", ".....kkkkkkkkkkkk.......", "........................", "........................",
 	],
 	&"herb": [
-		"......kk....", ".....kgGk...", "....kgggk...", "...kggGk....", "..kgGgk.....", ".kggGk.kk...",
-		".kgGk.kgGk..", "..kkk.kggk..", "...kk.kGk...", "....kbkk....", "....kBk.....", "....kk......",
+		".............kk.........", "...........kkkkkk.......", "...........kkgGkk.......", ".........kkggggGkk......",
+		".........kkgggggkk......", ".......kkggggggkk.......", ".......kkggggGkkk.......", ".....kkgggggGkk.........",
+		".....kkgGGggkk..........", "...kkgggGGgkk...........", "...kkgggGGkk...kk.......", "..kkgggGGkk...kkkkk.....",
+		"..kkgggGGk...kkgGkk.....", "...kkgGkkk..kkgggGkk....", "...kkkkkkk..kkggggkk....", ".....kkkkk..kkgggkk.....",
+		".....kkkkk..kkGGkkk.....", ".......kkk..kkGGk.......", ".......kkkbbkkkkk.......", "........kkbbkkk.........",
+		"........kkBBkkk.........", "........kkBBk...........", "........kkkkk...........", ".........kk.............",
 	],
 	&"meat": [
-		"............", "..kkkk......", ".kooook.....", "kooLooook...", "koooooook...", "koooooooook.",
-		".koooooooBk.", "..koooook.k.", "...kkkk..k..", ".....kk..k..", "......kwwk..", "......kk....",
+		"........................", "........................", ".....kkkkkk.............", "...kkkkkkkkkk...........",
+		"...kkooooookk...........", ".kkooooooooook..........", ".kkoooLLooooooook.......", "kkooooLLooooooookk......",
+		"kkooooooooooooookk......", "kkoooooooooooooook......", "kkooooooooooooooooook...", ".kkoooooooooooooooookk..",
+		".kkooooooooooooooooBkk..", "...kkoooooooooooooBBkk..", "...kkooooooooooook..kk..", ".....kkoooooooook...kk..",
+		".....kkkkkkkkk...kkkk...", ".......kkkkkkk....kk....", ".........kkkkk....kk....", "...........kkk....kk....",
+		"...........kkkwwwwkk....", "............kkkwwwk.....", "............kkkk........", ".............kk.........",
 	],
 	&"fang": [
-		"............", "....kk......", "...kwwk.....", "...kwwk.....", "...kwwwk....", "....kwwk....",
-		"....kwwk....", "....kwwwk...", ".....kwwk...", ".....kwwk...", "......kwk...", ".......k....",
+		"........................", "........................", ".........kk.............", ".......kkkkkk...........",
+		".......kkwwkk...........", "......kkwwwwkk..........", "......kkwwwwkk..........", "......kkwwwwwkk.........",
+		"......kkwwwwwkk.........", ".......kkwwwwwkk........", ".......kkwwwwwkk........", "........kkwwwwkk........",
+		"........kkwwwwkk........", "........kkwwwwwkk.......", "........kkwwwwwkk.......", ".........kkwwwwwkk......",
+		".........kkwwwwwkk......", "..........kkwwwwkk......", "..........kkwwwwkk......", "...........kkwwwkk......",
+		"...........kkwwwkk......", ".............kwwk.......", ".............kkkk.......", "..............kk........",
 	],
 	&"gel": [
-		"............", "............", "...kkkkk....", "..kgggggk...", ".kgLgggggk..", "kgggggggggk.",
-		"kgggggggggk.", "kGgggggggGk.", "kGGgggggGGk.", ".kGGGGGGGk..", "..kkkkkkk...", "............",
+		"........................", "........................", "........................", "........................",
+		".......kkkkkkkk.........", ".....kkkkkkkkkkkk.......", ".....kkggggggggkk.......", "...kkggggggggggggkk.....",
+		"...kkgLLgggggggggkk.....", ".kkgggLLgggggggggggkk...", ".kkggggggggggggggggkk...", "kkggggggggggggggggggkk..",
+		"kkggggggggggggggggggkk..", "kkggggggggggggggggggkk..", "kkGggggggggggggggggGkk..", "kkGGGggggggggggggGGGkk..",
+		"kkGGGggggggggggggGGGkk..", ".kkGGGGggggggggGGGGkk...", ".kkGGGGGGGGGGGGGGGGkk...", "...kkGGGGGGGGGGGGkk.....",
+		"...kkkkkkkkkkkkkkkk.....", ".....kkkkkkkkkkkk.......", "........................", "........................",
 	],
 	&"dust": [
-		"............", "............", "............", "......k.....", "....k.kk.k..", "...kk.kkk...",
-		".kkkkkkkkk..", "kssssssSSSk.", "kssSsssSSSk.", "kSSSSSSSSSk.", ".kkkkkkkkk..", "............",
+		"........................", "........................", "........................", "........................",
+		"........................", "........................", "............kk..........", "............kkk.........",
+		"........kk..kkk...kk....", ".......kkk..kkkk..kk....", ".......kkk..kkkkk.......", ".....kkkkk..kkkkkk......",
+		"...kkkkkkkkkkkkkkkk.....", ".kkkkkkkkkkkkkkkkkkkk...", ".kksssssssssssSSSSSkk...", "kkssssssssssssSSSSSSkk..",
+		"kkssssSSssssssSSSSSSkk..", "kksssSSSSssssSSSSSSSkk..", "kkSSSSSSSSSSSSSSSSSSkk..", ".kkSSSSSSSSSSSSSSSSkk...",
+		".kkkkkkkkkkkkkkkkkkkk...", "...kkkkkkkkkkkkkkkk.....", "........................", "........................",
 	],
 	&"essence": [
-		"....kkkk....", "..kkvvvvkk..", ".kvvVvvvvvk.", ".kvLvvvvVvk.", "kvvvvvvvVVk.", "kvvvvvvvVVk.",
-		"kvvvvvvVVVk.", "kVvvvvVVVVk.", ".kVVVVVVVk..", ".kkVVVVVkk..", "...kkkkk....", "............",
+		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".....kkkkvvvvvvkkkk.....", "...kkkkvvvvvvvvvvkkkk...",
+		"...kkvvvVVvvvvvvvvvkk...", "..kkvvvvVVvvvvvvvvvvkk..", "..kkvvLLvvvvvvvvVVvvkk..", ".kkvvvLLvvvvvvvvVVVvkk..",
+		".kkvvvvvvvvvvvvvVVVVkk..", "kkvvvvvvvvvvvvvvVVVVkk..", "kkvvvvvvvvvvvvvvVVVVkk..", "kkvvvvvvvvvvvvvVVVVVkk..",
+		"kkvvvvvvvvvvvvvVVVVVkk..", "kkvvvvvvvvvvvVVVVVVVkk..", "kkVvvvvvvvvvvVVVVVVVkk..", ".kkVVvvvvvvVVVVVVVVkk...",
+		".kkVVVVVVVVVVVVVVVVkk...", "..kkkVVVVVVVVVVVVkkk....", "..kkkVVVVVVVVVVVVkkk....", "...kkkkVVVVVVVVkkkk.....",
+		".....kkkkkkkkkkkk.......", ".......kkkkkkkk.........", "........................", "........................",
 	],
 	&"potion": [
-		"....kkkk....", "....kbbk....", "....kkkk....", "...kwTTwk...", "..kwTTTTwk..", ".kTTTTTTTTk.",
-		"kTTTLTTTTTtk", "kTTTTTTTTTtk", "kTTTTTTTTttk", ".kTTTTTTttk.", "..kkTTTTkk..", "....kkkk....",
+		".........kkkkkk.........", "........kkkkkkkk........", "........kkbbbbkk........", "........kkbbbbkk........",
+		"........kkkkkkkk........", ".......kkkkkkkkkk.......", ".......kkwTTTTwkk.......", ".....kkwwTTTTTTwwkk.....",
+		".....kkwwTTTTTTwwkk.....", "...kkkwTTTTTTTTTTwkkk...", "...kkTTTTTTTTTTTTTTkk...", ".kkTTTTTTTTTTTTTTTTTkkk.",
+		".kkTTTTTLLTTTTTTTTTTtkk.", "kkTTTTTTLLTTTTTTTTTTttkk", "kkTTTTTTTTTTTTTTTTTTttkk", "kkTTTTTTTTTTTTTTTTTtttkk",
+		"kkTTTTTTTTTTTTTTTTTtttkk", ".kkTTTTTTTTTTTTTTttttkk.", ".kkTTTTTTTTTTTTTTttttkk.", "...kkTTTTTTTTTTTtttkk...",
+		"...kkkkTTTTTTTTTkkkkk...", ".....kkkkTTTTTTkkkk.....", ".......kkkkkkkkkk.......", ".........kkkkkk.........",
 	],
 	&"bandage": [
-		"............", ".kkkkkkkkk..", "kwwwwwwwwwk.", "kwkwkwkwkwk.", "kwwwwwwwwwk.", "kwkwkwkwkwk.",
-		"kwwwwwwwwwk.", "kwkwkwkwkwk.", "kwwwwwwwwwk.", ".kkkkkkkkk..", "..kwk.......", "..kk........",
+		"........................", "........................", "...kkkkkkkkkkkkkkkk.....", ".kkkkkkkkkkkkkkkkkkkk...",
+		".kkwwwwwwwwwwwwwwwwkk...", "kkwwwwwwwwwwwwwwwwwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..",
+		"kkwwwwwwwwwwwwwwwwwwkk..", "kkwwwwwwwwwwwwwwwwwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..",
+		"kkwwwwwwwwwwwwwwwwwwkk..", "kkwwwwwwwwwwwwwwwwwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..", "kkwwkkwwkkwwkkwwkkwwkk..",
+		"kkwwwwwwwwwwwwwwwwwwkk..", ".kkwwwwwwwwwwwwwwwwkk...", ".kkkkkkkkkkkkkkkkkkkk...", "...kkkkkkkkkkkkkkkk.....",
+		"...kkkwwkkk.............", "....kkwwk...............", "....kkkkk...............", ".....kk.................",
 	],
 	&"bowl": [
-		"............", "...kk.......", "..kook.k....", "..koook.k...", "kkkkkkkkkkk.", "kwwwwwwwwwk.",
-		".kwwwwwwwk..", ".kBBBBBBBk..", "..kBBBBBk...", "...kkkkk....", "............", "............",
+		"........................", "........................", ".......kk...............", ".....kkkkkk.............",
+		".....kkookk...kk........", "....kkoooook..kkk.......", "....kkooooook...kk......", "...kkkkoooookk..kkk.....",
+		".kkkkkkkkkkkkkkkkkkkk...", "kkkkkkkkkkkkkkkkkkkkkk..", "kkwwwwwwwwwwwwwwwwwwkk..", ".kwwwwwwwwwwwwwwwwwwk...",
+		".kkwwwwwwwwwwwwwwwwkk...", "..kkwwwwwwwwwwwwwwkk....", "..kkBBBBBBBBBBBBBBkk....", "...kkBBBBBBBBBBBBkk.....",
+		"...kkBBBBBBBBBBBBkk.....", ".....kkBBBBBBBBkk.......", ".....kkkkkkkkkkkk.......", ".......kkkkkkkk.........",
+		"........................", "........................", "........................", "........................",
 	],
 }
 
@@ -134,22 +200,10 @@ static func texture_of(kind: StringName, tint: Color, scale: int = 2) -> Texture
 	var key := "%s|%s|%d" % [kind, tint.to_html(false), scale]
 	if _cache.has(key):
 		return _cache[key]
-	var rows: Array = BITMAPS.get(kind, BITMAPS[&"ore"])
 	var palette := PALETTE.duplicate()
 	palette["T"] = tint
 	palette["t"] = tint.darkened(0.35)
-	var image := Image.create(SIZE * scale, SIZE * scale, false, Image.FORMAT_RGBA8)
-	for y in SIZE:
-		var row: String = rows[y] if y < rows.size() else ""
-		for x in SIZE:
-			var code := row[x] if x < row.length() else "."
-			if code == "." or not palette.has(code):
-				continue
-			var color: Color = palette[code]
-			for dy in scale:
-				for dx in scale:
-					image.set_pixel(x * scale + dx, y * scale + dy, color)
-	var result := ImageTexture.create_from_image(image)
+	var result := PixelIcons.build(BITMAPS.get(kind, BITMAPS[&"ore"]), palette, scale)
 	_cache[key] = result
 	return result
 

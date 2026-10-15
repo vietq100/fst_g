@@ -119,10 +119,11 @@ Plain classes or nodes owned by `GameManager` (not autoloads):
 - `game/services/` — gameplay services
 - `game/runtime/` — runtime state objects (`HunterRuntime`, …): ids and plain values, serializable
 - `actors/common/` — reusable actor components (`HealthController`, `StateController`, `CombatController`, `Facing`, `PlaceholderVisual`, `ActorNameplate`)
-- `actors/enemies/` — enemy scenes; `MonsterBodies` + `MonsterVisual` (pixel goblin / skeleton), per-enemy visuals (slime, wolf, Forest Guardian)
+- `actors/enemies/` — enemy scenes; `MonsterBodies` + `MonsterVisual` (pixel goblin, skeleton, wolf, slime, Forest Guardian); monsters carry gear and two active skills (D55)
+- `game/services/active_skills.gd` — active skill lookup and Hunter loadout rules (D55); skills are `ActiveSkillDefinition` resources in `data/active_skills/<class>/`
 - `actors/hunter/` — Hunter actor scene
 - `actors/hunter/chibi/` — the chibi Hunter (D49): `ChibiBody` (32×48 body map, parts, facings, skin/dye recolour, cached frames and portraits), `ChibiAnimations` (frame tables), `ChibiVisual` (animation state machine, weapon, action effects)
-- `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `TownBuilding` + `BuildingVisual`, `WorldProp`, `GateVisual`, `DungeonEntrance`, ground, `WaterShimmer`, `WorldCamera`
+- `world/world/` — the main map: `world.tscn` + `WorldMap` (taps, selection, placement mode, Hunters, departure), `TownBuilding` + `BuildingVisual`, `WorldProp`, `WorldDecor`, `GateVisual`, `DungeonEntrance`, ground (noise biomes, roads, footpaths, trails), `WaterShimmer`, `WorldCamera`
 - `game/services/world_service.gd` — top-down grid geometry (32 px tiles): tile ↔ world, regions, gates (bridges), navigation outlines
 - `world/test_arena/` — combat sandbox, reachable from the Town debug panel (debug builds only)
 - `world/vfx/` — world-space feedback (`CombatFeedback`, `DamageNumber`, `LevelUpBurst`, `LootPopup`)
