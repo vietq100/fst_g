@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"portal"
-display_name = "Gate of Rebirth"
-description = "Build the Reincarnation Portal."
+display_name = "quest.portal.name"
+description = "quest.portal.desc"
 order = 12
 kind = 0
 target_id = &"portal"

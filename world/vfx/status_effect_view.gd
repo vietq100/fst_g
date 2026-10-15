@@ -65,7 +65,7 @@ func _on_effect_applied(effect: StatusEffect) -> void:
 		_last_popup[id] = _time
 		var text: String = effect.definition.display_name
 		if effect.stacks > 1:
-			text += " x%d" % effect.stacks
+			text = Loc.t("world.popup.effect_stacks", {"name": text, "stacks": effect.stacks})
 		_popup(text, effect.definition.color, NAME_FONT_SIZE, ICON_Y - 8.0)
 	queue_redraw()
 

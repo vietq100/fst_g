@@ -2,7 +2,10 @@ class_name TraitDefinition
 extends GameDefinition
 ## Hunter personality trait (HUNTER_LIFE_SYSTEM.md §1).
 
-@export_multiline var description: String
+## A translation key (D61); reading it returns the translated text.
+@export_multiline var description: String:
+	get:
+		return tr(description) if not description.is_empty() else description
 @export var modifiers: Array[StatModifier] = []
 ## Activity id -> rate multiplier, e.g. { &"training": 1.5 }.
 @export var activity_rate_modifiers: Dictionary[StringName, float] = {}

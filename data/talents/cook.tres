@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_talent")
 id = &"cook"
-display_name = "Cook"
-description = "Cooks food in the field from the materials in its bag."
+display_name = "talent.cook.name"
+description = "talent.cook.desc"
 weight = 0.35
 recipe_ids = Array[StringName]([&"meat_stew", &"herb_soup"])

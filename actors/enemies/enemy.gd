@@ -10,26 +10,33 @@ const DEATH_DURATION := 0.5
 var definition: EnemyDefinition
 ## Region monster level (BALANCE.md → Regions); 1 = base stats.
 var level := 1
-## HP / attack / defense multiplier for `level` (set by the spawner).
+## HP / attack / defense multiplier for `level` and tier (set by the spawner).
 var stat_scale := 1.0
+## Tier of this monster (D60): the boss's fixed tier or a roll.
+var tier: int = Tier.Level.C
 
 
 ## Call after the node is in the tree.
 func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, retarget_interval: float,
-		monster_level: int = 1, monster_stat_scale: float = 1.0) -> void:
+		monster_level: int = 1, monster_stat_scale: float = 1.0, monster_tier: int = -1) -> void:
 	definition = enemy_definition
 	level = monster_level
-	stat_scale = monster_stat_scale
+	tier = enemy_definition.tier if monster_tier < 0 else monster_tier
+	stat_scale = monster_stat_scale * Tier.stat_scale(tier)
 	add_to_group(GROUP)
-	health.setup((definition.hp + _gear_flat(HunterService.MAX_HP)) * stat_scale * (1.0 + _gear_percent(HunterService.MAX_HP)))
-	_dress()
+	health.setup(definition.hp * stat_scale)
 	combat.setup(Hunter.GROUP, definition.attack_range, retarget_interval, combat_service)
 	auto_combat = true
 	repositions_in_range = not definition.is_boss
 	# HP bar while hurt; bosses also show their name.
 	var plate := ActorNameplate.new()
 	add_child(plate)
-	plate.setup(self, definition.display_name if definition.is_boss else "", 56.0 if definition.is_boss else 28.0)
+	# Bosses and monsters of tier R and up show their tier code (and bosses their name) in its colour.
+	var label := definition.display_name if definition.is_boss else ""
+	if definition.is_boss or tier >= Tier.Level.R:
+		label = ("[%s] %s" % [Tier.code(tier), label]).strip_edges()
+	plate.setup(self, label, 56.0 if definition.is_boss else 28.0)
+	plate.name_color = Tier.color(tier) if tier > Tier.Level.C else ActorNameplate.NAME_COLOR
 
 
 func get_team_group() -> StringName:
@@ -44,73 +51,21 @@ func get_hit_radius() -> float:
 	return definition.hit_radius if definition != null else 0.0
 
 
-## Base stats scaled by the region level, plus the monster's gear (D55): weapon and armor
-## modifiers follow the D18 rule (base + Σflat) × (1 + Σpercent).
 func get_combat_stats(_against: Actor = null) -> CombatStats:
 	var stats := CombatStats.new()
-	stats.attack = (definition.attack + _gear_flat(HunterService.ATTACK)) * stat_scale * (1.0 + _gear_percent(HunterService.ATTACK))
-	stats.defense = (definition.defense + _gear_flat(HunterService.DEFENSE)) * stat_scale * (1.0 + _gear_percent(HunterService.DEFENSE))
-	stats.attack_speed = (definition.attack_speed + _gear_flat(HunterService.ATTACK_SPEED)) * (1.0 + _gear_percent(HunterService.ATTACK_SPEED))
-	stats.critical_chance = definition.critical_chance + _gear_flat(HunterService.CRITICAL_CHANCE)
-	stats.critical_damage = definition.critical_damage + _gear_flat(HunterService.CRITICAL_DAMAGE)
+	stats.attack = definition.attack * stat_scale
+	stats.defense = definition.defense * stat_scale
+	stats.attack_speed = definition.attack_speed
+	stats.critical_chance = definition.critical_chance
+	stats.critical_damage = definition.critical_damage
 	return stats
 
 
-## The monster's two active skills (D55).
-func get_active_skills() -> Array[ActiveSkillDefinition]:
-	var result: Array[ActiveSkillDefinition] = []
-	if definition == null:
-		return result
-	for skill_id in definition.skill_ids:
-		var skill := ActiveSkills.get_skill(DataRegistry, skill_id)
-		if skill != null:
-			result.append(skill)
-	return result
-
-
-## Weapon and armor items of this monster (missing ids are skipped).
-func get_gear() -> Array[ItemDefinition]:
-	var gear: Array[ItemDefinition] = []
-	if definition == null:
-		return gear
-	for item_id in [definition.weapon_id, definition.armor_id]:
-		if item_id == &"":
-			continue
-		var item := DataRegistry.find_def(DataRegistry.ITEM, item_id) as ItemDefinition
-		if item != null:
-			gear.append(item)
-	return gear
-
-
-func _gear_flat(stat: StringName) -> float:
-	var total := 0.0
-	for item in get_gear():
-		for modifier in item.modifiers:
-			if modifier.stat == stat and modifier.type == StatModifier.Type.FLAT and modifier.condition == &"":
-				total += modifier.value
-	return total
-
-
-func _gear_percent(stat: StringName) -> float:
-	var total := 0.0
-	for item in get_gear():
-		for modifier in item.modifiers:
-			if modifier.stat == stat and modifier.type == StatModifier.Type.PERCENT and modifier.condition == &"":
-				total += modifier.value
-	return total
-
-
-## Shows the weapon item in the monster's hand (MonsterVisual).
-func _dress() -> void:
-	var look := visual as MonsterVisual
-	if look == null or definition.weapon_id == &"":
-		return
-	var weapon := DataRegistry.find_def(DataRegistry.ITEM, definition.weapon_id) as ItemDefinition
-	if weapon == null:
-		return
-	look.weapon_sprite = WeaponSprites.kind_for_item(weapon, look.weapon_sprite)
-	if weapon.tint != Color.WHITE:
-		look.weapon_color = weapon.tint
+## Bosses take a fraction of %-max-HP damage over time (D70, GameConfig.boss_ratio_dot_scale).
+func get_ratio_damage_scale() -> float:
+	if definition == null or not definition.is_boss:
+		return 1.0
+	return DataRegistry.config.boss_ratio_dot_scale if is_instance_valid(DataRegistry) and DataRegistry.config != null else 0.25
 
 
 func get_on_hit_effects() -> Array[StatusEffectChance]:

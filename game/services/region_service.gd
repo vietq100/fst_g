@@ -20,6 +20,11 @@ var _loot: LootService
 var _stats: StatService
 ## `func() -> Array[StringName]`: materials the Trading Post wants (Auto duty follows them).
 var wanted_items: Callable = Callable()
+## `func() -> float`: share of the price the treasury pays for loot (the Market's `buy_price`,
+## 1.0 without a Market; D63).
+var buy_ratio: Callable = Callable()
+## `func(hunter: HunterRuntime) -> void`: a kill wears the killer's weapon (D64).
+var weapon_wear: Callable = Callable()
 var _progress: ProgressService
 var _config: GameConfig
 var _rng: RandomNumberGenerator
@@ -41,9 +46,9 @@ func _init(registry: Node, world: WorldService, hunters: HunterService, purses: 
 	_rng = rng
 
 
-## Monster regions (everything but the Town), easiest first.
+## Regular hunting grounds (not the Town, the gate island or the boss arena), easiest first.
 func get_hunting_regions() -> Array[RegionDefinition]:
-	var regions: Array[RegionDefinition] = _world.get_regions().filter(func(r: RegionDefinition) -> bool: return not r.is_town)
+	var regions: Array[RegionDefinition] = _world.get_regions().filter(func(r: RegionDefinition) -> bool: return r.is_hunting())
 	regions.sort_custom(func(a: RegionDefinition, b: RegionDefinition) -> bool: return a.min_hunter_level < b.min_hunter_level)
 	return regions
 
@@ -55,10 +60,12 @@ func get_duty_region(hunter: HunterRuntime) -> RegionDefinition:
 		return null
 	if hunter.duty != &"":
 		var fixed := _world.get_region(hunter.duty)
-		if fixed != null and not fixed.is_town:
+		if fixed != null and not fixed.is_town and fixed.kind != RegionDefinition.Kind.GATE:
 			return fixed
 	var best: RegionDefinition = null
-	var wanted: Array[StringName] = wanted_items.call() if wanted_items.is_valid() else []
+	var wanted: Array[StringName] = []
+	if wanted_items.is_valid():
+		wanted.assign(wanted_items.call())
 	var wanted_region: RegionDefinition = null
 	for region in get_hunting_regions():
 		if region.min_hunter_level <= hunter.level:
@@ -82,27 +89,30 @@ func region_drops_any(region: RegionDefinition, item_ids: Array[StringName]) -> 
 	return false
 
 
-## Valid duty choices: &"" (Auto), each hunting region id, STAY_IN_TOWN.
+## Valid duty choices: &"" (Auto), each hunting region id, the boss arena (D58), STAY_IN_TOWN.
 func get_duty_options() -> Array[StringName]:
 	var options: Array[StringName] = [&""]
 	for region in get_hunting_regions():
 		options.append(region.id)
+	for region in _world.get_regions():
+		if region.kind == RegionDefinition.Kind.BOSS:
+			options.append(region.id)
 	options.append(HunterRuntime.STAY_IN_TOWN)
 	return options
 
 
 func get_duty_name(duty: StringName) -> String:
 	if duty == &"":
-		return "Auto"
+		return Loc.t("game.region.duty_auto")
 	if duty == HunterRuntime.STAY_IN_TOWN:
-		return "Stay in town"
+		return Loc.t("game.region.duty_stay")
 	var region := _world.get_region(duty)
 	return region.display_name if region != null else String(duty)
 
 
 func set_duty(hunter: HunterRuntime, duty: StringName) -> String:
 	if not get_duty_options().has(duty):
-		return "Unknown duty"
+		return Loc.t("err.region.unknown_duty")
 	hunter.duty = duty
 	_hunters.notify_changed(hunter)
 	return ""
@@ -138,30 +148,29 @@ func _difficulty_value(values: Array[float]) -> float:
 
 ## The killer gets gold (×gold_find) into its purse and items into its bag (what does not fit is
 ## left behind); the killer and every helper get the XP. Returns the reward for popups.
-func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: EnemyDefinition, level: int) -> KillReward:
+func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: EnemyDefinition, level: int,
+		tier: int = -1) -> KillReward:
 	var reward := KillReward.new()
 	if killer == null or enemy == null:
 		return reward
-	var scale := get_reward_scale(level)
+	# Gold and XP grow with the monster's tier (D60); its loot table is rolled once more per tier step above R.
+	var monster_tier := enemy.tier if tier < 0 else tier
+	if weapon_wear.is_valid():
+		weapon_wear.call(killer)
+	var scale := get_reward_scale(level) * Tier.reward_scale(monster_tier)
 	reward.gold = roundi(_rng.randi_range(enemy.gold_min, enemy.gold_max) * scale * _hunters.get_stat(killer, HunterService.GOLD_FIND))
 	_purses.earn(killer, reward.gold)
 	var rolled: Dictionary[StringName, int] = {}
 	if enemy.loot_table_id != &"":
 		rolled = _loot.roll(enemy.loot_table_id)
+		for i in maxi(monster_tier - Tier.Level.R, 0):
+			var extra := _loot.roll(enemy.loot_table_id)
+			for item_id in extra:
+				rolled[item_id] = rolled.get(item_id, 0) + extra[item_id]
 	for item_id in rolled:
 		var added := add_to_bag(killer, item_id, rolled[item_id])
 		if added > 0:
 			reward.items[item_id] = added
-	# The monster's own gear (D55) may drop too.
-	if enemy.gear_drop_chance > 0.0 and _rng.randf() < enemy.gear_drop_chance:
-		var gear: Array[StringName] = []
-		for item_id in [enemy.weapon_id, enemy.armor_id]:
-			if item_id != &"":
-				gear.append(item_id)
-		if not gear.is_empty():
-			var dropped: StringName = gear[_rng.randi_range(0, gear.size() - 1)]
-			if add_to_bag(killer, dropped, 1) > 0:
-				reward.items[dropped] = reward.items.get(dropped, 0) + 1
 	var xp := roundi(enemy.xp_reward * scale)
 	var cap := _stats.level_cap(_progress.town_level)
 	var credited: Array[HunterRuntime] = [killer]
@@ -206,8 +215,16 @@ func remove_from_bag(hunter: HunterRuntime, item_id: StringName, quantity: int) 
 	return taken
 
 
-## Sells the bag to the village (D39): the treasury buys what it can pay for and store, at the
-## item's price, into the Hunter's purse; a passing trader buys the rest at the same price.
+## Price the treasury pays for one `item` now (its sell price × the Market's buy ratio, D63).
+func get_buy_price(item: ItemDefinition) -> int:
+	if item == null:
+		return 0
+	var ratio: float = buy_ratio.call() if buy_ratio.is_valid() else 1.0
+	return maxi(roundi(item.sell_price * ratio), 1) if item.sell_price > 0 else 0
+
+
+## Sells the bag to the village (D39, D63): the treasury buys what it can pay for and store, at
+## the Market's price, into the Hunter's purse; a passing trader buys the rest at that price.
 ## Report: {"items": {id: qty stored}, "village_gold": paid by the treasury, "trader_gold": int}.
 func deposit(hunter: HunterRuntime) -> Dictionary:
 	var report := {"items": {}, "village_gold": 0, "trader_gold": 0}
@@ -216,7 +233,7 @@ func deposit(hunter: HunterRuntime) -> Dictionary:
 	for item_id in hunter.loot_bag:
 		var quantity: int = hunter.loot_bag[item_id]
 		var item := _registry.find_def(&"item", item_id) as ItemDefinition
-		var price := item.sell_price if item != null else 0
+		var price := get_buy_price(item)
 		var affordable := quantity if price <= 0 else mini(quantity, floori(float(_wallet.gold) / price))
 		var stored := _inventory.add_item(item_id, affordable) if affordable > 0 else 0
 		if stored > 0:

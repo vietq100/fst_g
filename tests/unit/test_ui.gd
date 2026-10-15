@@ -33,13 +33,58 @@ func test_every_sheet_builds() -> void:
 		MessageSheet.new("Test", PackedStringArray(["line"])),
 		MessageSheet.for_offline({"seconds": 4000.0, "capped": false, "recovered": PackedStringArray(["A"]), "xp": 10, "levels": 1,
 			"meals": 2, "hungry_ticks": 1}),
-		BuildSheet.new(), ExpeditionSheet.new(&"sunken_crypt", [] as Array[StringName]),
+		BuildSheet.new(), ExpeditionSheet.new(&"sunken_crypt", [] as Array[StringName]), GateSheet.new(), BossSheet.new(),
 	]
 	for building_id in _game.buildings.get_ids():
 		sheets.append(BuildingSheet.new(building_id))
 	for sheet in sheets:
 		_show(sheet)
 		assert_true(sheet._content.get_child_count() > 0, "%s has content" % sheet.get_script().get_global_name())
+
+
+## No sheet may be wider than a phone screen in any language (owner report: the Life tab spilled
+## off screen in Vietnamese). Every tab of the Hunter dialog is checked too.
+func test_sheets_fit_the_screen_in_every_language() -> void:
+	var width := 360.0
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	for code in Loc.LOCALES:
+		Loc.set_locale(code, false)
+		var sheets: Array[Sheet] = [HuntersSheet.new(), HunterSheet.new(hunter), InventorySheet.new(), BuildSheet.new(),
+			ExpeditionSheet.new(&"dark_forest", [hunter.unique_id] as Array[StringName]), GateSheet.new(), BossSheet.new(),
+			SettingsSheet.new(), QuestSheet.new(), ShopSheet.new()]
+		for tab in HunterDialog.Tab.values():
+			var dialog := HunterDialog.new(hunter)
+			dialog._tab = tab
+			sheets.append(dialog)
+		for building_id in _game.buildings.get_ids():
+			sheets.append(BuildingSheet.new(building_id))
+		for sheet in sheets:
+			_show(sheet)
+			var needed := sheet.get_combined_minimum_size().x
+			assert_true(needed <= width, "%s (%s, tab %s) needs %d px" % [sheet.get_script().get_global_name(), code,
+				sheet.get("_tab"), needed])
+	Loc.set_locale("en", false)
+
+
+## Class skills section (D70) with skills, points and swap buttons fits a phone in every language.
+func test_class_skills_tab_fits_the_screen() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var saved_skills := hunter.class_skills.duplicate()
+	var saved := [hunter.skill_points, hunter.skill_swap_points]
+	for skill in _game.class_skills.get_pool(_game.class_skills.get_base_class(hunter)).slice(0, 7):
+		hunter.class_skills[skill.id] = 3
+	hunter.skill_points = 2
+	hunter.skill_swap_points = 1
+	for code in Loc.LOCALES:
+		Loc.set_locale(code, false)
+		var dialog := HunterDialog.new(hunter)
+		dialog._tab = HunterDialog.Tab.SKILLS
+		_show(dialog)
+		assert_true(dialog.get_combined_minimum_size().x <= 360.0, "skills tab (%s) needs %d px" % [code, dialog.get_combined_minimum_size().x])
+	Loc.set_locale("en", false)
+	hunter.class_skills = saved_skills
+	hunter.skill_points = saved[0]
+	hunter.skill_swap_points = saved[1]
 
 
 func test_sheet_actions_report_errors() -> void:
@@ -102,17 +147,22 @@ func _find_button(node: Node, prefix: String) -> Button:
 	return null
 
 
-func test_icons_keep_layout_size_at_double_density() -> void:
-	# D56: 24×24 texel bitmaps, laid out at 12 × scale px.
-	for icon: StringName in PixelIcons.BITMAPS:
-		var rows: Array = PixelIcons.BITMAPS[icon]
-		assert_eq(rows.size(), PixelIcons.TEXELS, String(icon))
-		for row: String in rows:
-			assert_eq(row.length(), PixelIcons.TEXELS, String(icon))
-	var coin := PixelIcons.texture(&"coin", 2)
-	assert_eq(coin.get_size(), Vector2(24, 24))
-	assert_eq(coin.get_image().get_size(), Vector2i(PixelIcons.TEXELS, PixelIcons.TEXELS))
-	assert_eq(PixelIcons.texture(&"skull", 3).get_size(), Vector2(36, 36))
-	for kind: StringName in ItemIcons.BITMAPS:
-		assert_eq((ItemIcons.BITMAPS[kind] as Array).size(), PixelIcons.TEXELS, String(kind))
-	assert_eq(ItemIcons.texture_of(&"sword", Color.WHITE, 2).get_size(), Vector2(24, 24))
+## The item panel and the slot picker are modals (D64–D66) and fit a phone screen.
+func test_item_modal_and_picker_build_and_fit() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var weapon: StringName = hunter.equipment.get(&"weapon", &"")
+	var root := (Engine.get_main_loop() as SceneTree).root
+	for code in Loc.LOCALES:
+		Loc.set_locale(code, false)
+		var modals: Array[Control] = [EquipPickerModal.new().setup(hunter, &"weapon"), EquipPickerModal.new().setup(hunter, &"helmet")]
+		if weapon != &"":
+			modals.append(ItemInfoModal.new().setup(_game.equipment.get_item(weapon), weapon))
+		for modal in modals:
+			root.add_child(modal)
+			_nodes.append(modal)
+			var frame := modal.get_child(1).get_child(0) as Control
+			assert_true(frame.get_child(0).get_child_count() > 1, "%s has content" % modal.get_script().get_global_name())
+			assert_true(frame.get_combined_minimum_size().x <= 360.0, "%s fits (%s): %d" % [modal.get_script().get_global_name(), code,
+				frame.get_combined_minimum_size().x])
+	Loc.set_locale("en", false)
+

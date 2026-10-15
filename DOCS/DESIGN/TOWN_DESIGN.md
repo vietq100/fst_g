@@ -41,10 +41,10 @@ Implemented (`world/town/town.tscn`, 360 × 800 px, front-wall base positions): 
 ## 4. Building visual language
 
 All buildings should share:
-- same roof style
-- same perspective
+- same roof style (hip roof, ridge along the tile x axis, round emblem on the front slope)
+- same perspective (2:1 isometric box: lit south-west face with the door, shaded south-east face, D55)
 - same outline
-- same material language
+- same material language (stone courses / wooden planks / plaster with timber frame)
 
 Each building gets a unique visual marker.
 

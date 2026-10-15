@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_effect")
 id = &"lifesteal"
-display_name = "Lifesteal"
+display_name = "status.lifesteal.name"
 kind = 0
 duration = 8.0
 stacking = 0

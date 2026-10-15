@@ -35,6 +35,7 @@ static func capture(game: Node) -> Dictionary:
 		"tavern_candidates": game.recruitment.to_dict(),
 		"trading": game.trading.to_dict(),
 		"quests": game.quests.to_dict(),
+		"weekly_boss": game.weekly_boss.to_dict(),
 		"activity_time": game.activities.get_accumulator(),
 	}
 
@@ -76,6 +77,7 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 	game.recruitment.from_dict(data.get("tavern_candidates", []), warnings)
 	game.trading.from_dict(data.get("trading", []))
 	game.quests.from_dict(data.get("quests", {}))
+	game.weekly_boss.from_dict(data.get("weekly_boss", {}))
 	game.activities.set_accumulator(float(data.get("activity_time", 0.0)))
 	# Buildings were restored before the Hunters: hand out beds now (old saves have none).
 	game.housing.assign_beds()
@@ -86,7 +88,7 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 static func migrate(data: Dictionary, warnings: PackedStringArray) -> Variant:
 	var version := int(data.get("schema_version", 0))
 	if version > SCHEMA_VERSION:
-		warnings.append("save is from a newer version (%d)" % version)
+		warnings.append(Loc.t("save.newer_version", {"version": version}))
 		return null
 	while version < SCHEMA_VERSION:
 		match version:
@@ -98,7 +100,7 @@ static func migrate(data: Dictionary, warnings: PackedStringArray) -> Variant:
 				data = _migrate_2_to_3(data)
 		version += 1
 		data["schema_version"] = version
-		warnings.append("migrated save to schema %d" % version)
+		warnings.append(Loc.t("save.migrated", {"version": version}))
 	return data
 
 
@@ -147,5 +149,5 @@ static func _section(data: Dictionary, key: String, warnings: PackedStringArray)
 	var value: Variant = data.get(key, {})
 	if value is Dictionary:
 		return value
-	warnings.append("%s: expected an object, using defaults" % key)
+	warnings.append(Loc.t("save.bad_section", {"section": key}))
 	return {}

@@ -15,7 +15,7 @@ visual_variant = &"lv1"
 [resource]
 script = ExtResource("1_building")
 id = &"portal"
-display_name = "Reincarnation Portal"
+display_name = "building.portal.name"
 levels = Array[ExtResource("2_level")]([SubResource("Lvl_0")])
 required_town_level = 3
 build_cost = 1000

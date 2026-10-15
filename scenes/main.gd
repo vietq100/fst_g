@@ -15,6 +15,12 @@ const RESULT_BANNER_TIME := 2.0
 ## Shorter absences are not worth a "while you were away" sheet.
 const OFFLINE_SHEET_MIN_SECONDS := 60.0
 
+## Set after the first `_ready`: a scene reload (language change) must not repeat the save
+## warnings or the offline summary.
+static var _booted := false
+## The scene is being reloaded because the player picked another language.
+static var _locale_reloading := false
+
 @onready var _world_container: Node2D = $WorldContainer
 @onready var _ui: UIRoot = $UI/UIRoot
 @onready var _debug_panel := get_node_or_null(^"UI/DebugPanel") as DebugPanel
@@ -33,6 +39,7 @@ func _ready() -> void:
 	GameManager.expeditions.expedition_finished.connect(_on_expedition_finished)
 	GameManager.world_change_requested.connect(_on_world_change_requested)
 	SaveManager.offline_progress_applied.connect(_on_offline_progress)
+	Loc.locale_changed.connect(_on_locale_changed)
 	_ui.depart_requested.connect(_on_depart_requested)
 	_ui.build_requested.connect(func(building_id: StringName) -> void:
 		if _world is WorldMap:
@@ -50,7 +57,7 @@ func _ready() -> void:
 			_world.cancel_placement())
 	_ui.follow_requested.connect(func(unique_id: StringName) -> void:
 		if _world is WorldMap and not _world.follow_hunter(unique_id):
-			_ui.toast("Not on the map right now", true))
+			_ui.toast(Loc.t("toast.main.not_on_map"), true))
 	_ui.recenter_requested.connect(func() -> void:
 		if _world is WorldMap and not _world.is_in_dungeon():
 			_world.recenter_on_town())
@@ -62,9 +69,23 @@ func _ready() -> void:
 	_banner.visible = false
 	_fade.color.a = 0.0
 	_show_world(WORLDS[&"town"].instantiate())
-	if not SaveManager.last_warnings.is_empty():
-		_ui.toast("Save: " + "; ".join(SaveManager.last_warnings), true)
-	_on_offline_progress(SaveManager.last_offline_summary)
+	if not _booted:
+		_booted = true
+		if not SaveManager.last_warnings.is_empty():
+			# Details are technical (ids): log them; the player gets one translated notice (D61).
+			print("Save warnings: ", "; ".join(SaveManager.last_warnings))
+			_ui.toast(Loc.t("toast.save.warnings", {"count": SaveManager.last_warnings.size()}), true)
+		_on_offline_progress(SaveManager.last_offline_summary)
+	elif _locale_reloading:
+		_locale_reloading = false
+		_ui.toast(Loc.t("ui.settings.changed", {"language": Loc.LOCALE_NAMES[Loc.locale]}))
+
+
+## Settings changed the language: save, then rebuild every text by reloading the scene.
+func _on_locale_changed(_locale: String) -> void:
+	SaveManager.save_game(&"settings")
+	_locale_reloading = true
+	get_tree().reload_current_scene.call_deferred()
 
 
 func _notification(what: int) -> void:
@@ -95,7 +116,7 @@ func _on_world_change_requested(world_id: StringName) -> void:
 func _on_depart_requested(expedition_id: StringName, party: Array[StringName]) -> void:
 	if _world is WorldMap:
 		var definition := DataRegistry.get_expedition(expedition_id)
-		_ui.toast("The party heads to %s" % definition.display_name)
+		_ui.toast(Loc.t("toast.main.party_heads", {"dungeon": definition.display_name}))
 		_world.depart(expedition_id, party)
 
 
@@ -116,7 +137,7 @@ func _on_expedition_started(_run: ExpeditionRun) -> void:
 
 func _on_expedition_finished(run: ExpeditionRun) -> void:
 	_pending_result = run
-	_banner.text = "VICTORY" if run.phase == ExpeditionRun.Phase.SUCCESS else "DEFEAT"
+	_banner.text = Loc.t("ui.hud.victory") if run.phase == ExpeditionRun.Phase.SUCCESS else Loc.t("ui.hud.defeat")
 	_banner.visible = true
 	await get_tree().create_timer(RESULT_BANNER_TIME).timeout
 	_banner.visible = false
@@ -157,6 +178,7 @@ func _show_world(next_world: Node) -> void:
 		map.building_tapped.connect(_ui.open_building)
 		map.hunter_tapped.connect(_ui.open_hunter)
 		map.entrance_tapped.connect(_ui.open_entrance)
+		map.structure_tapped.connect(_ui.open_structure)
 		map.placement_changed.connect(_ui.set_placement)
 		map.depart_failed.connect(func(reason: String) -> void: _ui.toast(reason, true))
 		if _pending_result != null:

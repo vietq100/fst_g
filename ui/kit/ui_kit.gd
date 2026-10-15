@@ -94,7 +94,7 @@ static func separator() -> HSeparator:
 static func format_duration(seconds: float) -> String:
 	var total := maxi(int(ceilf(seconds)), 0)
 	if total >= 3600:
-		return "%dh %02dm" % [total / 3600, total % 3600 / 60]
+		return Loc.t("ui.kit.duration_hours", {"hours": "%d" % (total / 3600), "minutes": "%02d" % (total % 3600 / 60)})
 	return "%d:%02d" % [total / 60, total % 60]
 
 
@@ -102,13 +102,15 @@ static func format_duration(seconds: float) -> String:
 static func describe_modifiers(item: ItemDefinition) -> String:
 	var parts := PackedStringArray()
 	for modifier in item.modifiers:
-		var stat_name := String(modifier.stat).replace("max_hp", "HP").replace("attack", "ATK").replace("defense", "DEF")
-		if modifier.stat == HunterService.CRITICAL_CHANCE or modifier.type == StatModifier.Type.PERCENT:
-			parts.append("%+d%% %s" % [roundi(modifier.value * 100.0), "crit" if modifier.stat == HunterService.CRITICAL_CHANCE else stat_name])
+		# Shared stat names (stat.<id>): "ATK", "HP", "crit"...
+		var stat_name := Loc.t("stat.%s" % modifier.stat)
+		# Small flat ratios (crit damage +0.2) would round to +0: show them as percentages too.
+		if modifier.stat == HunterService.CRITICAL_CHANCE or modifier.type == StatModifier.Type.PERCENT or absf(modifier.value) < 1.0:
+			parts.append("%+d%% %s" % [roundi(modifier.value * 100.0), stat_name])
 		else:
 			parts.append("%+d %s" % [roundi(modifier.value), stat_name])
 	return " ".join(parts)
 
 
 static func rarity_name(item: ItemDefinition) -> String:
-	return String(ItemDefinition.Rarity.keys()[item.rarity]).capitalize()
+	return "%s %s" % [Tier.code(item.rarity), Tier.name_of(item.rarity)]

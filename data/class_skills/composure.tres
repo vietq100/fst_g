@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"critical_damage"
+type = 0
+value = 0.25
+condition = &"high_hp"
+
+[resource]
+script = ExtResource("1_skill")
+id = &"composure"
+display_name = "class_skill.composure.name"
+class_id = &"ranger"
+order = 26
+kind = 1
+description = "class_skill.composure.desc"
+scale_stat = &"critical_damage"
+ratings = Vector3i(2, 1, 2)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

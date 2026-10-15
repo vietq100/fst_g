@@ -11,8 +11,8 @@ quantity = 10
 [resource]
 script = ExtResource("1_q")
 id = &"forge"
-display_name = "Fire and Steel"
-description = "Build an Enhancement Forge."
+display_name = "quest.forge.name"
+description = "quest.forge.desc"
 order = 9
 kind = 0
 target_id = &"forge"

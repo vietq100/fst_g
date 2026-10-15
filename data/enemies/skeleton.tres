@@ -6,7 +6,8 @@
 [resource]
 script = ExtResource("1_enemy")
 id = &"skeleton"
-display_name = "Skeleton"
+tags = Array[StringName]([&"humanoid", &"undead"])
+display_name = "enemy.skeleton.name"
 hp = 70.0
 attack = 16.0
 defense = 6.0
@@ -15,10 +16,6 @@ move_speed = 60.0
 critical_chance = 0.0
 critical_damage = 1.5
 attack_range = 20.0
-skill_ids = Array[StringName]([&"bone_rattle", &"grave_chill"])
-weapon_id = &"bone_blade"
-armor_id = &""
-gear_drop_chance = 0.10
 xp_reward = 18
 gold_min = 8
 gold_max = 14

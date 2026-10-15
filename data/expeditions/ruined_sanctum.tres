@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_def")
 id = &"ruined_sanctum"
-display_name = "Ruined Sanctum"
+display_name = "expedition.ruined_sanctum.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"ancient_ruins"

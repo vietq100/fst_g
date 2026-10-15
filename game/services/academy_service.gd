@@ -69,19 +69,19 @@ func get_next_skill_cost(hunter: HunterRuntime, skill: SkillDefinition) -> int:
 func can_learn_skill(hunter: HunterRuntime, skill_id: StringName) -> String:
 	var skill := get_skill(skill_id)
 	if hunter == null or skill == null:
-		return "Unknown skill"
+		return Loc.t("err.academy.unknown_skill")
 	var academy := _buildings.get_level(BuildingService.ACADEMY)
 	if academy <= 0:
-		return "Needs an Academy"
+		return Loc.t("err.academy.no_academy")
 	if academy < skill.required_academy_level:
-		return "Needs Academy Lv %d" % skill.required_academy_level
+		return Loc.t("err.academy.needs_level", {"level": skill.required_academy_level})
 	if get_skill_level(hunter, skill_id) >= skill.max_level:
-		return "Max level"
+		return Loc.t("err.academy.max_level")
 	if not hunter.alive or hunter.injured:
-		return "%s is hurt" % hunter.display_name
+		return Loc.t("err.academy.hurt", {"name": hunter.display_name})
 	var cost := get_next_skill_cost(hunter, skill)
 	if not _wallet.can_spend(cost):
-		return "Needs %d gold" % cost
+		return Loc.t("ui.common.needs_gold", {"gold": cost})
 	return ""
 
 
@@ -118,15 +118,15 @@ func get_learnable_traits(hunter: HunterRuntime) -> Array[TraitDefinition]:
 func can_learn_trait(hunter: HunterRuntime, trait_id: StringName) -> String:
 	var trait_def := _registry.find_def(&"trait", trait_id) as TraitDefinition
 	if hunter == null or trait_def == null or trait_def.academy_cost <= 0:
-		return "Cannot be learned"
+		return Loc.t("err.academy.not_learnable")
 	if not _buildings.has_building(BuildingService.ACADEMY):
-		return "Needs an Academy"
+		return Loc.t("err.academy.no_academy")
 	if hunter.trait_ids.has(trait_id):
-		return "Already known"
+		return Loc.t("err.academy.already_known")
 	if hunter.trait_ids.size() >= get_max_traits():
-		return "Trait slots full (%d)" % get_max_traits()
+		return Loc.t("err.academy.traits_full", {"max": get_max_traits()})
 	if hunter.rebirth_points < trait_def.academy_cost:
-		return "Needs %d rebirth point(s)" % trait_def.academy_cost
+		return Loc.t("err.academy.needs_rebirth_points", {"points": trait_def.academy_cost})
 	return ""
 
 
@@ -144,11 +144,11 @@ func learn_trait(hunter: HunterRuntime, trait_id: StringName) -> bool:
 
 func can_forget_trait(hunter: HunterRuntime, trait_id: StringName) -> String:
 	if not _buildings.has_building(BuildingService.ACADEMY):
-		return "Needs an Academy"
+		return Loc.t("err.academy.no_academy")
 	if hunter == null or not hunter.trait_ids.has(trait_id):
-		return "Unknown trait"
+		return Loc.t("err.academy.unknown_trait")
 	if not _wallet.can_spend(FORGET_COST):
-		return "Needs %d gold" % FORGET_COST
+		return Loc.t("ui.common.needs_gold", {"gold": FORGET_COST})
 	return ""
 
 
@@ -177,16 +177,16 @@ func get_promotions(hunter: HunterRuntime) -> Array[HunterDefinition]:
 
 func can_change_class(hunter: HunterRuntime, class_id: StringName) -> String:
 	if not _buildings.has_building(BuildingService.ACADEMY):
-		return "Needs an Academy"
+		return Loc.t("err.academy.no_academy")
 	var target := _registry.find_def(&"hunter", class_id) as HunterDefinition
 	if hunter == null or target == null or target.promotion_of != hunter.definition_id:
-		return "Not a promotion of %s" % (hunter.definition_id if hunter != null else "?")
+		return Loc.t("err.academy.not_promotion", {"class": hunter.definition_id if hunter != null else "?"})
 	if hunter.reincarnations < PROMOTION_REINCARNATIONS:
-		return "Needs %d reincarnations" % PROMOTION_REINCARNATIONS
+		return Loc.t("err.academy.needs_reincarnations", {"count": PROMOTION_REINCARNATIONS})
 	if not hunter.alive or hunter.injured:
-		return "%s is hurt" % hunter.display_name
+		return Loc.t("err.academy.hurt", {"name": hunter.display_name})
 	if not _wallet.can_spend(PROMOTION_COST):
-		return "Needs %d gold" % PROMOTION_COST
+		return Loc.t("ui.common.needs_gold", {"gold": PROMOTION_COST})
 	return ""
 
 

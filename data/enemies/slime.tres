@@ -6,7 +6,8 @@
 [resource]
 script = ExtResource("1_enemy")
 id = &"slime"
-display_name = "Slime"
+tags = Array[StringName]([&"slime"])
+display_name = "enemy.slime.name"
 hp = 30.0
 attack = 6.0
 defense = 1.0
@@ -15,10 +16,6 @@ move_speed = 40.0
 critical_chance = 0.0
 critical_damage = 1.5
 attack_range = 18.0
-skill_ids = Array[StringName]([&"acid_splash", &"bounce"])
-weapon_id = &""
-armor_id = &""
-gear_drop_chance = 0.00
 xp_reward = 5
 gold_min = 2
 gold_max = 4

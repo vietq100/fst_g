@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_trait")
 id = &"disciplined"
-display_name = "Disciplined"
-description = "Trains faster. Dislikes sharing a party with reckless Hunters."
+display_name = "trait.disciplined.name"
+description = "trait.disciplined.desc"
 activity_rate_modifiers = Dictionary[StringName, float]({&"training": 1.5})
 mood_likes = Array[StringName]([&"training"])
 mood_dislikes = Array[StringName]([&"reckless_partner"])

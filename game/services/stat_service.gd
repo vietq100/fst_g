@@ -61,4 +61,4 @@ func required_xp(level: int) -> int:
 
 
 func level_cap(town_hall_level: int) -> int:
-	return maxi(town_hall_level, 1) * _config.level_cap_per_town_level
+	return mini(maxi(town_hall_level, 1) * _config.level_cap_per_town_level, _config.max_hunter_level)

@@ -89,6 +89,8 @@ MVP first.
 
 Do not implement multiplayer, online backend, monetization, PvP, guild wars or complex procedural generation unless explicitly requested.
 
+Exception (D68): offline Hunter PvP in the Colosseum (Đấu Trường: 1vs1, 4vs4, 6vs6 against generated rival teams) is requested. See `SYSTEMS/ARENA_SYSTEM.md`.
+
 ## 9. Validation
 
 Never claim a feature works without running or validating it.
@@ -121,6 +123,13 @@ For each task:
 7. Update docs if architecture/design changed.
 8. Report result.
 
+## 11b. Text and localization
+
+- Every player-facing text is a translation key, never a literal: UI labels and buttons, toasts, error reasons returned by services, texts drawn in the world, and the names / descriptions in data files.
+- Keys and their English and Vietnamese texts live in `data/i18n/translations.json`; code reads them with `Loc.t(key, {placeholders})` (DOCS/ARCHITECTURE/LOCALIZATION.md).
+- A new text means a new key with both `en` and `vi` in the same change. Use named placeholders (`{gold}`), never sentence fragments glued together.
+- The player chooses the language in Settings. Developer-only messages (`push_error`, tests, ids) stay in English and are not keys.
+
 ## 12. Never
 
 - rewrite unrelated code
@@ -130,3 +139,4 @@ For each task:
 - create massive files unnecessarily
 - optimize without evidence
 - claim success without validation
+- write a player-facing text literal instead of a translation key

@@ -53,12 +53,6 @@ Every actor offers 6 fixed slots around itself (ring = 0.75 × attacker's attack
 - Each actor's `CombatController` owns its target, slots and attack timing.
 - UI/VFX only subscribe to signals (`CombatFeedback` spawns damage numbers).
 
-## Active skills (D55)
-
-- `Actor._strike` (through `CombatController.attack_override`) fires the first ready active skill (`Actor.get_active_skills()`: a Hunter's loadout via `ActiveSkills`, a monster's `EnemyDefinition.skill_ids`) instead of the plain attack; per-skill cooldowns live on the actor and tick in `_physics_process`.
-- `CombatService.resolve_skill(attacker, target, skill)`: damage × `skill.damage` on the target and the nearest enemies within `skill.radius` (up to `skill.targets`), `effect_id` on everyone hit, `self_effect_id` / `heal_ratio` on the user; emits `skill_used(attacker, targets, skill)` for VFX. Timing is unchanged: the skill uses the attack's cooldown slot.
-- Monster gear (`weapon_id`, `armor_id`) adds item modifiers to the monster's stats in `Enemy.get_combat_stats` / HP at setup.
-
 ## Feedback (MVP)
 
 - hit flash on damage
@@ -96,6 +90,10 @@ Timed buffs/debuffs on any actor, defined in `data/status_effects/`:
 - `StatusEffectController` owns durations, stacks, ticks and flags; `CombatService` applies invulnerability, shields, thorns, lifesteal, on-hit effects and damage over time.
 - Cleanse removes dispellable debuffs, purge dispellable buffs.
 - Test arena: one debug button per effect (selected Hunter, or every enemy when none is selected).
+
+## Class skills (D70)
+
+Hunters cast class skills with mana (`CLASS_SKILL_SYSTEM.md`). `CombatService.resolve_skill_hit` resolves one skill hit (defense once per hit, critical with skill bonuses), `heal` restores HP. Hunters can dodge hits (`dodge`, cap 40%) and shorten crowd control (`tenacity`, cap 70%). On bosses, stun / freeze / root / disarm from skills become Stagger (+10% damage taken).
 
 ## MVP
 

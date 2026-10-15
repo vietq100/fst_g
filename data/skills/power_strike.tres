@@ -12,8 +12,8 @@ value = 2.0
 [resource]
 script = ExtResource("1_skill")
 id = &"power_strike"
-display_name = "Power Strike"
-description = "+2 attack per level."
+display_name = "skill.power_strike.name"
+description = "skill.power_strike.desc"
 max_level = 5
 gold_per_level = 120
 required_academy_level = 1

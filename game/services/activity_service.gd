@@ -70,7 +70,7 @@ func set_assignment(hunter: HunterRuntime, activity_id: StringName) -> String:
 	if activity_id != &"":
 		var definition := get_definition(activity_id)
 		if definition == null or not definition.player_assignable:
-			return "Cannot assign '%s'" % activity_id
+			return Loc.t("err.activity.cannot_assign", {"activity": activity_id})
 	hunter.assigned_activity = activity_id
 	_update_activity(hunter)
 	return ""

@@ -11,8 +11,8 @@ quantity = 10
 [resource]
 script = ExtResource("1_q")
 id = &"clear_forest"
-display_name = "Slay the Guardian"
-description = "Defeat the Forest Guardian for the first time."
+display_name = "quest.clear_forest.name"
+description = "quest.clear_forest.desc"
 order = 2
 kind = 3
 target_id = &"first_boss_clear"

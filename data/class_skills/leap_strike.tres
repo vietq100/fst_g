@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"leap_strike"
+display_name = "class_skill.leap_strike.name"
+class_id = &"warrior"
+order = 8
+kind = 0
+description = "class_skill.leap_strike.desc"
+scale_stat = &"move_speed"
+ratings = Vector3i(2, 3, 1)
+cooldown = 11.0
+mana_cost = 24.0
+target = 0
+cast_range = 80.0
+attack_ratio = 1.4
+stat_multiplier = true

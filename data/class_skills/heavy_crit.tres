@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"critical_chance"
+type = 0
+value = 0.03
+
+[sub_resource type="Resource" id="M1"]
+script = ExtResource("2_mod")
+stat = &"critical_damage"
+type = 0
+value = 0.3
+
+[resource]
+script = ExtResource("1_skill")
+id = &"heavy_crit"
+display_name = "class_skill.heavy_crit.name"
+class_id = &"warrior"
+order = 27
+kind = 1
+description = "class_skill.heavy_crit.desc"
+scale_stat = &"critical_damage"
+ratings = Vector3i(2, 2, 2)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])

@@ -11,8 +11,8 @@ quantity = 10
 [resource]
 script = ExtResource("1_q")
 id = &"enhance"
-display_name = "Sharper Steel"
-description = "Enhance a piece of equipment at the Forge."
+display_name = "quest.enhance.name"
+description = "quest.enhance.desc"
 order = 11
 kind = 8
 target_id = &""

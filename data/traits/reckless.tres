@@ -20,8 +20,8 @@ condition = &""
 [resource]
 script = ExtResource("1_trait")
 id = &"reckless"
-display_name = "Reckless"
-description = "Hits harder and gets hit harder. Bored by long rests."
+display_name = "trait.reckless.name"
+description = "trait.reckless.desc"
 modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0"), SubResource("StatModifier_1")])
 activity_rate_modifiers = Dictionary[StringName, float]({})
 mood_likes = Array[StringName]([&"boss_fight"])

@@ -50,13 +50,15 @@ func test_stat_rolls_stay_within_variance() -> void:
 		for stat in HunterService.ROLLED_STATS:
 			var roll: float = hunter.stat_rolls[stat]
 			assert_true(roll >= -0.1 and roll <= 0.1, "roll %f for %s" % [roll, stat])
-		var attack := _service.get_stat(hunter, HunterService.ATTACK)
+		var attack := _service.get_stat(hunter, HunterService.ATTACK) / Tier.stat_scale(hunter.tier)
 		assert_true(attack >= 14.0 * 0.9 - 0.001 and attack <= 14.0 * 1.1 + 0.001)
+		assert_true(hunter.tier <= Tier.RANDOM_MAX, "LR and Mythic are never rolled")
 
 
 func test_stats_without_rolls_match_balance() -> void:
 	var hunter := _service.create_hunter(&"warrior", _rng)
 	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
 	assert_almost_eq(_service.get_stat(hunter, HunterService.MAX_HP), 120.0)
 	assert_almost_eq(_service.get_stat(hunter, HunterService.ATTACK), 14.0)
 	assert_almost_eq(_service.get_stat(hunter, HunterService.DEFENSE), 6.0)
@@ -67,6 +69,7 @@ func test_stats_without_rolls_match_balance() -> void:
 func test_set_level_grows_stats_and_emits() -> void:
 	var hunter := _service.create_hunter(&"warrior", _rng)
 	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
 	var changed: Array[HunterRuntime] = []
 	_service.hunter_changed.connect(func(h: HunterRuntime) -> void: changed.append(h))
 	_service.set_level(hunter, 4)
@@ -74,3 +77,22 @@ func test_set_level_grows_stats_and_emits() -> void:
 	assert_almost_eq(_service.get_stat(hunter, HunterService.MAX_HP), 156.0)
 	assert_almost_eq(_service.get_stat(hunter, HunterService.ATTACK), 20.0)
 	assert_eq(changed.size(), 1)
+
+
+func test_tiers_scale_stats_and_survive_a_save() -> void:
+	var hunter := _service.create_hunter(&"warrior", _rng)
+	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
+	var base := _service.get_stat(hunter, HunterService.ATTACK)
+	hunter.tier = Tier.Level.SSR
+	assert_almost_eq(_service.get_stat(hunter, HunterService.ATTACK), base * Tier.stat_scale(Tier.Level.SSR))
+	assert_eq(HunterRuntime.from_dict(hunter.to_dict()).tier, Tier.Level.SSR)
+	assert_eq(HunterRuntime.from_dict({"unique_id": "h_9"}).tier, Tier.Level.C, "old saves: Common")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	var seen := {}
+	for i in 2000:
+		seen[Tier.roll(rng, Tier.HUNTER_WEIGHTS)] = true
+	assert_false(seen.has(Tier.Level.LR) or seen.has(Tier.Level.MYTHIC), "LR / Mythic are declared only")
+	assert_true(seen.has(Tier.Level.UR), "UR can be rolled")
+	assert_true(Tier.is_fixed(Tier.Level.LR) and Tier.is_fixed(Tier.Level.MYTHIC) and not Tier.is_fixed(Tier.Level.UR))

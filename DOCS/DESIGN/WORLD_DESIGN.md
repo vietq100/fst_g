@@ -1,9 +1,11 @@
 # WORLD DESIGN
 
-## World structure (D52, formerly D27)
+## World structure (D55, formerly D27 / D52)
 
-One continuous top-down world (32 px square tiles, buildings drawn front-facing) in the style of
-Evil Hunter Tycoon. The screen (portrait) is a window onto it: drag, zoom, follow.
+One continuous 2:1 isometric world (44 × 22 px diamond tiles, D56) in the style of Evil Hunter
+Tycoon. Buildings are isometric boxes with two visible walls (lit south-west face with the door,
+shaded south-east face) and hip roofs with round emblems. The screen (portrait) is a window onto
+it: drag, zoom, follow.
 
 ```
    ┌────────────┐ bridge ┌───────────────┐
@@ -20,8 +22,7 @@ Evil Hunter Tycoon. The screen (portrait) is a window onto it: drag, zoom, follo
 - **Dark Forest** (bottom-left): first hunting ground (Slimes, Wolves). Dungeon: Forest Guardian's Grove (MVP) + one locked.
 - **Ancient Ruins** (top-right): late hunting ground (Skeletons, Goblins). Two locked dungeons.
 - **Goblin Cave** (bottom-right): mid hunting ground (Goblins, Wolves). Two locked dungeons. Reached through the Forest or the Ruins.
-- Bridges (plank decks with railings and lanterns) connect Town–Forest, Town–Ruins, Forest–Cave, Ruins–Cave. Every region is a plateau over dark water with a cliff face below its bottom edge; dungeon entrances stand on rock ledges off the outer edges.
-- Look (D57): noise-patched ground per biome, shallows and foam around the plateaus, dirt roads with ruts and footpaths to every door in the Town, a cobbled plaza with a mosaic, lamp posts, benches and planters; trails through the hunting regions, each with its own ground detail (forest litter and ferns, cave gravel and crystals, broken ruin paving).
+- Bridges (plank decks with railings and lanterns) connect Town–Forest, Town–Ruins, Forest–Cave, Ruins–Cave, plus Town–Hunter Gate (north-west island where Hunters are hired and expelled) and Ruins–Boss Arena (north-east, the weekly boss; D58). Every region is a plateau with rounded corners (straight edges, D57) over dark water with cliff faces below its front edges; dungeon entrances stand on rock ledges off the outer edges.
 
 The world is open-ended: new regions and dungeons can be added later. There is no final region.
 

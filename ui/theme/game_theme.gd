@@ -20,6 +20,8 @@ const DANGER := Color("c9503f")
 const GOOD := Color("6fbf5f")
 const INFO := Color("5fa8ff")
 const MOOD := Color("e8c547")
+## Mana bars (D70).
+const MANA := Color("6a7dff")
 const STAMINA := Color("4fc1b0")
 const ENERGY := Color("e0874a")
 
@@ -134,6 +136,7 @@ static func _create() -> Theme:
 	_bar(theme, &"StaminaBar", STAMINA)
 	_bar(theme, &"EnergyBar", ENERGY)
 	_bar(theme, &"TimerBar", ACCENT)
+	_bar(theme, &"ManaBar", MANA)
 	theme.set_stylebox(&"panel", &"ScrollContainer", StyleBoxEmpty.new())
 	return theme
 

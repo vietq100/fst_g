@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"move_speed"
+type = 1
+value = 0.1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"catwalk"
+display_name = "class_skill.catwalk.name"
+class_id = &"rogue"
+order = 22
+kind = 1
+description = "class_skill.catwalk.desc"
+scale_stat = &"move_speed"
+ratings = Vector3i(2, 2, 1)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

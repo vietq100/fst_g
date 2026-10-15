@@ -142,14 +142,14 @@ func test_recipes_match_balance() -> void:
 func test_items_match_balance() -> void:
 	# id: [sell_price, rarity, stackable, slot, {stat: value}]
 	var expected := {
-		&"iron_ore": [3, ItemDefinition.Rarity.COMMON, true, ItemDefinition.EquipmentSlot.NONE, {}],
-		&"beast_fang": [4, ItemDefinition.Rarity.COMMON, true, ItemDefinition.EquipmentSlot.NONE, {}],
-		&"dark_essence": [25, ItemDefinition.Rarity.RARE, true, ItemDefinition.EquipmentSlot.NONE, {}],
-		&"rusty_sword": [5, ItemDefinition.Rarity.COMMON, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 3.0}],
-		&"leather_armor": [5, ItemDefinition.Rarity.COMMON, false, ItemDefinition.EquipmentSlot.ARMOR, {&"defense": 3.0, &"max_hp": 10.0}],
-		&"iron_sword": [20, ItemDefinition.Rarity.UNCOMMON, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 7.0}],
-		&"iron_armor": [25, ItemDefinition.Rarity.UNCOMMON, false, ItemDefinition.EquipmentSlot.ARMOR, {&"defense": 6.0, &"max_hp": 20.0}],
-		&"fang_blade": [60, ItemDefinition.Rarity.RARE, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 10.0, &"critical_chance": 0.05}],
+		&"iron_ore": [3, Tier.Level.C, true, ItemDefinition.EquipmentSlot.NONE, {}],
+		&"beast_fang": [4, Tier.Level.C, true, ItemDefinition.EquipmentSlot.NONE, {}],
+		&"dark_essence": [25, Tier.Level.R, true, ItemDefinition.EquipmentSlot.NONE, {}],
+		&"rusty_sword": [5, Tier.Level.C, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 3.0}],
+		&"leather_armor": [5, Tier.Level.C, false, ItemDefinition.EquipmentSlot.ARMOR, {&"defense": 3.0, &"max_hp": 10.0}],
+		&"iron_sword": [20, Tier.Level.U, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 7.0}],
+		&"iron_armor": [25, Tier.Level.U, false, ItemDefinition.EquipmentSlot.ARMOR, {&"defense": 6.0, &"max_hp": 20.0}],
+		&"fang_blade": [60, Tier.Level.R, false, ItemDefinition.EquipmentSlot.WEAPON, {&"attack": 10.0, &"critical_chance": 0.05}],
 	}
 	for item_id: StringName in expected:
 		var values: Array = expected[item_id]
@@ -166,7 +166,7 @@ func test_items_match_balance() -> void:
 
 
 func test_loot_tables_reference_real_items() -> void:
-	assert_eq(_registry.get_count(&"loot_table"), 6)
+	assert_eq(_registry.get_count(&"loot_table"), 7)
 	for table: LootTableDefinition in _registry.get_all(&"loot_table"):
 		for entry in table.entries:
 			assert_true(_registry.has_def(&"item", entry.item_id), "%s → %s" % [table.id, entry.item_id])

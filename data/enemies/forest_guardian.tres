@@ -6,8 +6,10 @@
 [resource]
 script = ExtResource("1_enemy")
 id = &"forest_guardian"
-display_name = "Forest Guardian"
+tags = Array[StringName]([&"beast"])
+display_name = "enemy.forest_guardian.name"
 is_boss = true
+tier = 3
 hp = 900.0
 attack = 28.0
 defense = 10.0
@@ -17,10 +19,6 @@ critical_chance = 0.0
 critical_damage = 1.5
 attack_range = 30.0
 hit_radius = 14.0
-skill_ids = Array[StringName]([&"root_grasp", &"quake"])
-weapon_id = &""
-armor_id = &"bark_plate"
-gear_drop_chance = 1.00
 xp_reward = 150
 gold_min = 150
 gold_max = 150

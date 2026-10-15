@@ -70,10 +70,19 @@ var world_position: Vector2 = Vector2.ZERO
 var task: StringName
 ## Evil Hunter Tycoon systems: reincarnation count, unspent points (Academy traits), Academy skills.
 var reincarnations: int = 0
+## Tier (D60): rolled C..UR when the candidate is generated; scales HP / attack / defense.
+var tier: int = Tier.Level.C
 var rebirth_points: int = 0
 var skills: Dictionary[StringName, int] = {}
-## Active skills picked by the player (D55), up to ActiveSkills.SLOTS; empty = automatic.
-var active_skills: Array[StringName] = []
+## Class skills (D70): skill id -> level 1–6, in the order they were opened.
+var class_skills: Dictionary[StringName, int] = {}
+## Unspent class skill points (1 per 10 levels) and swap points (1 per reincarnation).
+var skill_points: int = 0
+var skill_swap_points: int = 0
+## Hunter level up to which skill points were granted in this life (ClassSkillService.sync_points).
+var skill_point_level: int = 1
+## Mana for active class skills (D70).
+var current_mana: float = 0.0
 ## Items carried back from hunting (item id -> quantity).
 var loot_bag: Dictionary[StringName, int] = {}
 
@@ -114,10 +123,23 @@ func to_dict() -> Dictionary:
 		"world_position": [world_position.x, world_position.y],
 		"loot_bag": loot_bag.duplicate(),
 		"reincarnations": reincarnations,
+		"tier": tier,
 		"rebirth_points": rebirth_points,
 		"skills": skills.duplicate(),
-		"active_skills": active_skills.duplicate(),
+		"class_skills": _class_skill_list(),
+		"skill_points": skill_points,
+		"skill_swap_points": skill_swap_points,
+		"skill_point_level": skill_point_level,
+		"current_mana": current_mana,
 	}
+
+
+## Ordered [[id, level], …] so the opening order survives JSON.
+func _class_skill_list() -> Array:
+	var list: Array = []
+	for skill_id: StringName in class_skills:
+		list.append([String(skill_id), class_skills[skill_id]])
+	return list
 
 
 ## Builds a Hunter from saved data. Missing fields get defaults; values are sanitized.
@@ -176,14 +198,20 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 		for item_id in bag:
 			hunter.loot_bag[StringName(str(item_id))] = maxi(int(bag[item_id]), 0)
 	hunter.reincarnations = maxi(int(data.get("reincarnations", 0)), 0)
+	hunter.tier = Tier.clamp_level(int(data.get("tier", Tier.Level.C)))
 	hunter.rebirth_points = maxi(int(data.get("rebirth_points", 0)), 0)
 	var learned: Variant = data.get("skills", {})
 	if learned is Dictionary:
 		for skill_id in learned:
 			hunter.skills[StringName(str(skill_id))] = maxi(int(learned[skill_id]), 0)
-	var picks: Variant = data.get("active_skills", [])
-	if picks is Array:
-		for skill_id in picks:
-			if hunter.active_skills.size() < 2:
-				hunter.active_skills.append(StringName(str(skill_id)))
+	var class_list: Variant = data.get("class_skills", [])
+	if class_list is Array:
+		for entry: Variant in class_list:
+			if entry is Array and entry.size() == 2:
+				hunter.class_skills[StringName(str(entry[0]))] = clampi(int(entry[1]), 1, 99)
+	hunter.skill_points = maxi(int(data.get("skill_points", 0)), 0)
+	hunter.skill_swap_points = maxi(int(data.get("skill_swap_points", 0)), 0)
+	# Missing (saves before D70): 1, so ClassSkillService.sync_points grants the earned points.
+	hunter.skill_point_level = maxi(int(data.get("skill_point_level", 1)), 1)
+	hunter.current_mana = maxf(float(data.get("current_mana", 0.0)), 0.0)
 	return hunter

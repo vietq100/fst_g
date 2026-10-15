@@ -11,3 +11,5 @@ var critical_damage: float = 1.0
 ## Outgoing / incoming damage multipliers (traits, e.g. Reckless, Cautious, Brave vs boss).
 var damage_dealt: float = 1.0
 var damage_taken: float = 1.0
+## Chance to dodge an incoming attack (D70), already capped.
+var dodge: float = 0.0

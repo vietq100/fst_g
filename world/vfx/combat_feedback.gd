@@ -12,7 +12,9 @@ func _ready() -> void:
 	z_index = 100
 	GameManager.combat.damage_dealt.connect(_on_damage_dealt)
 	GameManager.combat.effect_damage_dealt.connect(_on_effect_damage_dealt)
-	GameManager.combat.skill_used.connect(_on_skill_used)
+	GameManager.combat.skill_cast.connect(_on_skill_cast)
+	GameManager.combat.attack_dodged.connect(_on_attack_dodged)
+	GameManager.combat.actor_healed.connect(_on_actor_healed)
 
 
 ## Attackers with a longer reach than this shoot (arrow streak).
@@ -30,7 +32,7 @@ func _on_damage_dealt(attacker: Actor, target: Actor, amount: float, is_critical
 		streak.setup(attacker.global_position + Vector2(0, -14), target.global_position + Vector2(0, -12))
 	var number := _spawn_number(target)
 	if amount <= 0.0 and target.effects.is_invulnerable():
-		number.show_text("Immune", IMMUNE_COLOR)
+		number.show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR)
 	else:
 		number.setup(amount, is_critical, target is Hunter)
 
@@ -42,7 +44,7 @@ func _on_effect_damage_dealt(_source: Actor, target: Actor, amount: float, effec
 	var color := effect.color if effect != null else DamageNumber.COLOR
 	if amount <= 0.0:
 		if target.effects.is_invulnerable():
-			_spawn_number(target).show_text("Immune", IMMUNE_COLOR, EFFECT_FONT_SIZE)
+			_spawn_number(target).show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR, EFFECT_FONT_SIZE)
 		return
 	_spawn_number(target).show_text(str(roundi(amount)), color, EFFECT_FONT_SIZE)
 
@@ -54,26 +56,22 @@ func _spawn_number(target: Actor) -> DamageNumber:
 	return number
 
 
-## Active skill (D55): a SkillVfx at the attacker (ground / self skills) or the main target, plus
-## one arrow streak per target for arrow skills, each a little later than the last.
-func _on_skill_used(attacker: Actor, targets: Array[Actor], skill: ActiveSkillDefinition) -> void:
-	if not is_instance_valid(attacker) or skill == null:
-		return
-	if skill.vfx == &"arrows":
-		for i in targets.size():
-			var target := targets[i]
-			if not is_instance_valid(target):
-				continue
-			var streak := ArrowStreak.new()
-			add_child(streak)
-			streak.setup(attacker.global_position + Vector2(0, -14), target.global_position + Vector2(0, -12))
-			if i > 0:
-				streak.set_process(false)
-				get_tree().create_timer(0.06 * i).timeout.connect(func() -> void:
-					if is_instance_valid(streak):
-						streak.set_process(true))
-	var on_self := skill.damage <= 0.0 or skill.vfx == &"shockwave" or skill.vfx == &"earth" or targets.is_empty()
-	var centre := attacker.global_position if on_self or not is_instance_valid(targets[0]) else targets[0].global_position
-	var vfx := SkillVfx.new()
-	add_child(vfx)
-	vfx.setup(skill.vfx, centre, skill.radius)
+const SKILL_COLOR := Color("9fb4ff")
+const HEAL_COLOR := Color("7fe08a")
+const MISS_COLOR := Color("d8dde3")
+
+
+## Class skill name over the caster (D70).
+func _on_skill_cast(caster: Actor, skill: ClassSkillDefinition) -> void:
+	if is_instance_valid(caster) and skill != null:
+		_spawn_number(caster).show_text(skill.display_name, SKILL_COLOR, EFFECT_FONT_SIZE)
+
+
+func _on_attack_dodged(_attacker: Actor, target: Actor) -> void:
+	if is_instance_valid(target):
+		_spawn_number(target).show_text(Loc.t("world.popup.miss"), MISS_COLOR, EFFECT_FONT_SIZE)
+
+
+func _on_actor_healed(_source: Actor, target: Actor, amount: float) -> void:
+	if is_instance_valid(target) and amount >= 1.0:
+		_spawn_number(target).show_text("+%d" % roundi(amount), HEAL_COLOR, EFFECT_FONT_SIZE)

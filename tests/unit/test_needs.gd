@@ -68,7 +68,7 @@ func test_food_comes_from_the_village_stock() -> void:
 	assert_eq(_game.inventory.count(&"meat_stew"), 5)
 	_hunter.energy = 20.0
 	assert_false(_game.needs.wants_meal(_hunter), "8 gold cannot pay for a stew")
-	assert_eq(_game.supply.food_reason(_hunter), SupplyService.NO_MONEY_FOR_FOOD)
+	assert_eq(_game.supply.food_reason(_hunter), Loc.t(SupplyService.NO_MONEY_FOR_FOOD))
 	_game.inventory.add_item(&"herb_soup", 1)
 	assert_true(_game.needs.eat(_hunter), "the soup is affordable")
 	assert_almost_eq(_hunter.energy, 60.0)
@@ -76,7 +76,7 @@ func test_food_comes_from_the_village_stock() -> void:
 	_game.inventory.remove_item(&"meat_stew", 5)
 	_hunter.purse = 100
 	assert_false(_game.needs.eat(_hunter))
-	assert_eq(_game.supply.food_reason(_hunter), SupplyService.NO_FOOD)
+	assert_eq(_game.supply.food_reason(_hunter), Loc.t(SupplyService.NO_FOOD))
 
 
 func test_medicine_heals_and_pays_the_village() -> void:

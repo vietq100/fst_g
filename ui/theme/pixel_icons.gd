@@ -1,13 +1,11 @@
 class_name PixelIcons
 extends RefCounted
-## Tiny pixel-art icons drawn from text bitmaps (matches the game's pixel look, no asset files).
-## Bitmaps are 24×24 texels (D56: twice the density of the original 12×12 set); an icon of
-## `scale` still lays out at 12 × scale px, and the texture keeps its full resolution so the
-## extra detail shows on high-density screens (canvas_items stretch).
+## Tiny 12×12 pixel-art icons drawn from text bitmaps (matches the game's pixel look, no asset
+## files). Each row is padded with '.' (transparent) to 12 pixels.
 
-## Layout size of an icon at scale 1, in px.
+## Layout size of an icon at scale 1, in px. Bitmaps are TEXELS square (D71: twice the density
+## of the 12×12 set); textures keep their full resolution and lay out at SIZE × scale px.
 const SIZE := 12
-## Bitmap size in texels.
 const TEXELS := 24
 
 const PALETTE := {
@@ -153,6 +151,14 @@ const BITMAPS := {
 		"...kkyyyyyykkyyyyyykk...", "..kkyyyyykkkkkkyyyyykk..", "..kkyyyyykkk..kyyyyykk..", ".kkykyyykkk....kyyykykk.",
 		".kyyyk............kyyyk.", "kkyyk..............kyykk", "kkkkk..............kkkkk", ".kk..................kk.",
 	],
+	&"locate": [
+		"...........ww...........", "..........wwww..........", ".........kwwwwk.........", ".......kkwwwwwwkk.......",
+		".....kkkwwwwwwwwkkk.....", "...kkkkwwwwwwwwwwkkkk...", "...kkwwwwk....kwwwwkk...", "..kkwwwwk......kwwwwkk..",
+		"..kkwwwkk......kkwwwkk..", "..kwwwkk........kkwwwk..", ".wwwwwkk...ww...kkwwwww.", "wwwwwwkk..wwww..kkwwwwww",
+		"wwwwwwkk..wwww..kkwwwwww", ".wwwwwkk...ww...kkwwwww.", "..kwwwkk........kkwwwk..", "..kkwwwkk......kkwwwkk..",
+		"..kkwwwwk......kwwwwkk..", "...kkwwwwk....kwwwwkk...", "...kkkkwwwwwwwwwwkkkk...", ".....kkkwwwwwwwwkkk.....",
+		".......kkwwwwwwkk.......", ".........kwwwwk.........", "..........wwww..........", "...........ww...........",
+	],
 	&"target": [
 		".........kkkkkk.........", ".......kkkkkkkkkk.......", ".....kkkkwwwwwwkkkk.....", "...kkkkwwwwwwwwwwkkkk...",
 		"...kkwwwwwwkkwwwwwwkk...", "..kkwwwwwwkkkkwwwwwwkk..", "..kkwwwwwwkkkkwwwwwwkk..", ".kkwwwwwwwkkkkwwwwwwwkk.",
@@ -168,6 +174,14 @@ const BITMAPS := {
 		"...kkkkkssskk...........", ".....kkksskk............", "......kkyykk............", "......kyyyykk...........",
 		".....kyykkyyk...........", "...kkkyykkyyykk.........", "...kbbkk..kyyykk........", ".kkbbbk....kyykk........",
 		".kbbbkk.................", "kkbbk...................", "kkkkk...................", ".kk.....................",
+	],
+	&"gear": [
+		".........kkkkkk.........", "........kkkkkkkk........", "...kk...kkksskkk...kk...", "..kkkk..kksssskk..kkkk..",
+		"..kksskkkggggggkkksskk..", "...ksskggggggggggkssk...", "....kkkggggggggggkkk....", "....kggggggggggggggk....",
+		".kkkkggggkkkkkkggggkkkk.", "kkkkggggkkkkkkkkgggggkkk", "kkksggggkkk..kkkgggggkkk", "kkssggggkk....kkggggggkk",
+		"kkssggggkk....kkggggggkk", "kkksggggkkk..kkkgggggkkk", "kkkkggggkkkkkkkkgggggkkk", ".kkkkggggkkkkkkggggkkkk.",
+		"....kkggggggggggggkk....", "....kkkggggggggggkkk....", "...kggkkggggggggkkggk...", "..kkggkkkggggggkkkggkk..",
+		"..kkkk..kggggggk..kkkk..", "...kk...kkkggkkk...kk...", "........kkkkkkkk........", ".........kkkkkk.........",
 	],
 }
 

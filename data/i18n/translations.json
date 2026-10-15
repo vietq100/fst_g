@@ -1,0 +1,4634 @@
+{
+ "activity.recovering.name": {
+  "en": "Recovering",
+  "vi": "Hồi phục"
+ },
+ "activity.resting.name": {
+  "en": "Resting",
+  "vi": "Nghỉ ngơi"
+ },
+ "activity.socializing.name": {
+  "en": "Socializing",
+  "vi": "Giao lưu"
+ },
+ "activity.training.name": {
+  "en": "Training",
+  "vi": "Luyện tập"
+ },
+ "building.academy.name": {
+  "en": "Academy",
+  "vi": "Học Viện"
+ },
+ "building.blacksmith.name": {
+  "en": "Blacksmith",
+  "vi": "Thợ Rèn"
+ },
+ "building.forge.name": {
+  "en": "Enhancement Forge",
+  "vi": "Lò Cường Hóa"
+ },
+ "building.hospital.name": {
+  "en": "Hospital",
+  "vi": "Bệnh Viện"
+ },
+ "building.house.name": {
+  "en": "House",
+  "vi": "Nhà Ở"
+ },
+ "building.inn.name": {
+  "en": "Inn",
+  "vi": "Nhà Trọ"
+ },
+ "building.market.name": {
+  "en": "Market",
+  "vi": "Chợ"
+ },
+ "building.portal.name": {
+  "en": "Reincarnation Portal",
+  "vi": "Cổng Luân Hồi"
+ },
+ "building.restaurant.name": {
+  "en": "Restaurant",
+  "vi": "Nhà Hàng"
+ },
+ "building.tavern.name": {
+  "en": "Tavern",
+  "vi": "Quán Rượu"
+ },
+ "building.temple.name": {
+  "en": "Temple",
+  "vi": "Đền Thờ"
+ },
+ "building.town_hall.name": {
+  "en": "Town Hall",
+  "vi": "Tòa Thị Chính"
+ },
+ "building.trading_post.name": {
+  "en": "Trading Post",
+  "vi": "Trạm Giao Thương"
+ },
+ "building.warehouse.name": {
+  "en": "Warehouse",
+  "vi": "Nhà Kho"
+ },
+ "class.assassin.name": {
+  "en": "Assassin",
+  "vi": "Sát Thủ"
+ },
+ "class.crusader.name": {
+  "en": "Crusader",
+  "vi": "Thập Tự Quân"
+ },
+ "class.duelist.name": {
+  "en": "Duelist",
+  "vi": "Kiếm Khách"
+ },
+ "class.guardian.name": {
+  "en": "Guardian",
+  "vi": "Hộ Vệ"
+ },
+ "class.hawkeye.name": {
+  "en": "Hawkeye",
+  "vi": "Mắt Ưng"
+ },
+ "class.nightblade.name": {
+  "en": "Nightblade",
+  "vi": "Dạ Kiếm"
+ },
+ "class.ranger.name": {
+  "en": "Ranger",
+  "vi": "Du Hiệp"
+ },
+ "class.rogue.name": {
+  "en": "Rogue",
+  "vi": "Đạo Tặc"
+ },
+ "class.slayer.name": {
+  "en": "Slayer",
+  "vi": "Đồ Sát"
+ },
+ "class.sniper.name": {
+  "en": "Sniper",
+  "vi": "Thiện Xạ"
+ },
+ "class.templar.name": {
+  "en": "Templar",
+  "vi": "Thánh Kỵ Sĩ"
+ },
+ "class.warrior.name": {
+  "en": "Warrior",
+  "vi": "Chiến Binh"
+ },
+ "class_skill.advanced_evasion.desc": {
+  "en": "Very hard to hit.",
+  "vi": "Rất khó bị đánh trúng."
+ },
+ "class_skill.advanced_evasion.name": {
+  "en": "Advanced Evasion",
+  "vi": "Né Cao Cấp"
+ },
+ "class_skill.arrow_rain.desc": {
+  "en": "Arrows rain down on the target's area.",
+  "vi": "Tên rơi như mưa xuống vùng mục tiêu."
+ },
+ "class_skill.arrow_rain.name": {
+  "en": "Arrow Rain",
+  "vi": "Mưa Tên"
+ },
+ "class_skill.assassinate.desc": {
+  "en": "The first blow is the deadliest.",
+  "vi": "Đòn đầu là đòn chí tử."
+ },
+ "class_skill.assassinate.name": {
+  "en": "Assassinate",
+  "vi": "Mưu Sát"
+ },
+ "class_skill.aura_of_might.desc": {
+  "en": "Empowers allies.",
+  "vi": "Tăng sức mạnh đồng đội."
+ },
+ "class_skill.aura_of_might.name": {
+  "en": "Aura of Might",
+  "vi": "Hào Quang Sức Mạnh"
+ },
+ "class_skill.backflip_shot.desc": {
+  "en": "Backflips and shoots; faster Hunters hit harder.",
+  "vi": "Nhảy lùi rồi bắn, càng nhanh càng đau."
+ },
+ "class_skill.backflip_shot.name": {
+  "en": "Backflip Shot",
+  "vi": "Nhảy Lùi Bắn"
+ },
+ "class_skill.backstab.desc": {
+  "en": "A stab at a weak spot, likely to crit.",
+  "vi": "Đâm vào chỗ hiểm, rất dễ chí mạng."
+ },
+ "class_skill.backstab.name": {
+  "en": "Backstab",
+  "vi": "Đâm Lén"
+ },
+ "class_skill.battle_cry.desc": {
+  "en": "The Hunter and nearby allies gain Strength.",
+  "vi": "Bản thân và đồng đội gần đó nhận Cường Lực."
+ },
+ "class_skill.battle_cry.name": {
+  "en": "Battle Cry",
+  "vi": "Tiếng Gầm Chiến Trận"
+ },
+ "class_skill.battle_hardened.desc": {
+  "en": "Armor that thickens with the years.",
+  "vi": "Giáp dày theo năm tháng."
+ },
+ "class_skill.battle_hardened.name": {
+  "en": "Battle-Hardened",
+  "vi": "Dày Dạn Trận Mạc"
+ },
+ "class_skill.battle_regen.desc": {
+  "en": "Heals on every kill.",
+  "vi": "Hạ địch thì hồi máu."
+ },
+ "class_skill.battle_regen.name": {
+  "en": "Battle Regen",
+  "vi": "Hồi Phục Chiến Trường"
+ },
+ "class_skill.beast_tracker.desc": {
+  "en": "Bane of wild beasts.",
+  "vi": "Khắc tinh thú rừng."
+ },
+ "class_skill.beast_tracker.name": {
+  "en": "Beast Tracker",
+  "vi": "Thợ Săn Thú"
+ },
+ "class_skill.berserk.desc": {
+  "en": "Attacks faster and harder for a while.",
+  "vi": "Đánh nhanh và mạnh hơn trong một lúc."
+ },
+ "class_skill.berserk.name": {
+  "en": "Berserk",
+  "vi": "Cuồng Nộ"
+ },
+ "class_skill.blade_dance.desc": {
+  "en": "A flurry of stabs.",
+  "vi": "Chuỗi đâm liên tục."
+ },
+ "class_skill.blade_dance.name": {
+  "en": "Blade Dance",
+  "vi": "Vũ Điệu Dao"
+ },
+ "class_skill.blade_storm.desc": {
+  "en": "A storm of blows on every nearby enemy.",
+  "vi": "Múa kiếm đánh liên tục mọi kẻ địch quanh mình."
+ },
+ "class_skill.blade_storm.name": {
+  "en": "Blade Storm",
+  "vi": "Bão Kiếm"
+ },
+ "class_skill.bloodlust.desc": {
+  "en": "Thirst for battle.",
+  "vi": "Hăng máu khi xông trận."
+ },
+ "class_skill.bloodlust.name": {
+  "en": "Bloodlust",
+  "vi": "Khát Máu"
+ },
+ "class_skill.bodyguard.desc": {
+  "en": "Now and then shields the most wounded ally.",
+  "vi": "Định kỳ che khiên cho đồng đội yếu nhất."
+ },
+ "class_skill.bodyguard.name": {
+  "en": "Bodyguard",
+  "vi": "Người Che Chắn"
+ },
+ "class_skill.boss_challenger.desc": {
+  "en": "Stands firm before bosses.",
+  "vi": "Đứng trước boss không lùi bước."
+ },
+ "class_skill.boss_challenger.name": {
+  "en": "Boss Challenger",
+  "vi": "Kẻ Thách Thức"
+ },
+ "class_skill.bulwark.desc": {
+  "en": "Raises a damage-absorbing shield.",
+  "vi": "Tạo khiên hấp thụ sát thương."
+ },
+ "class_skill.bulwark.name": {
+  "en": "Bulwark",
+  "vi": "Điểm Tựa"
+ },
+ "class_skill.catwalk.desc": {
+  "en": "Silent steps.",
+  "vi": "Đi không tiếng động."
+ },
+ "class_skill.catwalk.name": {
+  "en": "Catwalk",
+  "vi": "Bước Chân Mèo"
+ },
+ "class_skill.cleanse.desc": {
+  "en": "Removes harmful effects from allies.",
+  "vi": "Xoá hiệu ứng xấu khỏi đồng đội."
+ },
+ "class_skill.cleanse.name": {
+  "en": "Cleanse",
+  "vi": "Thanh Tẩy"
+ },
+ "class_skill.coated_arrows.desc": {
+  "en": "Normal attacks sometimes poison.",
+  "vi": "Đòn thường đôi khi gây độc."
+ },
+ "class_skill.coated_arrows.name": {
+  "en": "Coated Arrows",
+  "vi": "Tên Tẩm"
+ },
+ "class_skill.composure.desc": {
+  "en": "Cool-headed while healthy.",
+  "vi": "Đầu lạnh khi còn khoẻ."
+ },
+ "class_skill.composure.name": {
+  "en": "Composure",
+  "vi": "Bình Tĩnh"
+ },
+ "class_skill.condition.high_hp": {
+  "en": "above 70% HP",
+  "vi": "khi HP trên 70%"
+ },
+ "class_skill.condition.low_hp": {
+  "en": "below 50% HP",
+  "vi": "khi HP dưới 50%"
+ },
+ "class_skill.condition.unnoticed": {
+  "en": "when unnoticed",
+  "vi": "khi không bị nhắm"
+ },
+ "class_skill.condition.vs_beast": {
+  "en": "vs beasts",
+  "vi": "với thú"
+ },
+ "class_skill.condition.vs_boss": {
+  "en": "vs bosses",
+  "vi": "với boss"
+ },
+ "class_skill.condition.vs_full_hp": {
+  "en": "vs targets above 90% HP",
+  "vi": "với mục tiêu trên 90% HP"
+ },
+ "class_skill.condition.vs_humanoid": {
+  "en": "vs people",
+  "vi": "với người"
+ },
+ "class_skill.condition.vs_undead": {
+  "en": "vs undead",
+  "vi": "với undead"
+ },
+ "class_skill.consecrate.desc": {
+  "en": "Consecrates the ground so allies regenerate.",
+  "vi": "Thánh hoá mặt đất, đồng đội hồi máu."
+ },
+ "class_skill.consecrate.name": {
+  "en": "Consecrate",
+  "vi": "Thánh Địa"
+ },
+ "class_skill.crushing_blow.desc": {
+  "en": "Shatters the target's armor.",
+  "vi": "Đập vỡ giáp mục tiêu."
+ },
+ "class_skill.crushing_blow.name": {
+  "en": "Crushing Blow",
+  "vi": "Đập Nát"
+ },
+ "class_skill.detonate_poison.desc": {
+  "en": "Detonates all poison on the target.",
+  "vi": "Kích nổ toàn bộ độc trên mục tiêu."
+ },
+ "class_skill.detonate_poison.name": {
+  "en": "Detonate Poison",
+  "vi": "Kích Nổ Độc"
+ },
+ "class_skill.disengage.desc": {
+  "en": "Rolls away and speeds up.",
+  "vi": "Lộn ra sau, tăng tốc chạy."
+ },
+ "class_skill.disengage.name": {
+  "en": "Disengage",
+  "vi": "Lùi Bước"
+ },
+ "class_skill.distract.desc": {
+  "en": "Weakens the target.",
+  "vi": "Làm mục tiêu suy yếu."
+ },
+ "class_skill.distract.name": {
+  "en": "Distract",
+  "vi": "Đánh Lạc Hướng"
+ },
+ "class_skill.divine_shield.desc": {
+  "en": "Briefly invulnerable below 35% HP.",
+  "vi": "Bất tử chốc lát khi máu dưới 35%."
+ },
+ "class_skill.divine_shield.name": {
+  "en": "Divine Shield",
+  "vi": "Thánh Hộ"
+ },
+ "class_skill.double_nock.desc": {
+  "en": "Nocks two arrows at once.",
+  "vi": "Lắp hai mũi tên một lúc."
+ },
+ "class_skill.double_nock.name": {
+  "en": "Double Nock",
+  "vi": "Hai Mũi Tên"
+ },
+ "class_skill.envenom.desc": {
+  "en": "A heavily poisoned blade.",
+  "vi": "Dao tẩm độc nặng."
+ },
+ "class_skill.envenom.name": {
+  "en": "Envenom",
+  "vi": "Lưỡi Độc"
+ },
+ "class_skill.escape_artist.desc": {
+  "en": "When in danger: haste and fortify.",
+  "vi": "Nguy kịch thì tăng tốc và cứng cáp."
+ },
+ "class_skill.escape_artist.name": {
+  "en": "Escape Artist",
+  "vi": "Thoát Hiểm"
+ },
+ "class_skill.evasion.desc": {
+  "en": "Dodges blows.",
+  "vi": "Né đòn."
+ },
+ "class_skill.evasion.name": {
+  "en": "Evasion",
+  "vi": "Né Tránh"
+ },
+ "class_skill.eviscerate.desc": {
+  "en": "A finisher that grows with bleeding.",
+  "vi": "Đòn kết thúc, mạnh theo vết chảy máu."
+ },
+ "class_skill.eviscerate.name": {
+  "en": "Eviscerate",
+  "vi": "Moi Ruột"
+ },
+ "class_skill.execute.desc": {
+  "en": "A finishing blow, brutal on wounded targets.",
+  "vi": "Đòn kết liễu, cực mạnh với mục tiêu yếu máu."
+ },
+ "class_skill.execute.name": {
+  "en": "Execute",
+  "vi": "Đòn Kết Liễu"
+ },
+ "class_skill.explosive_arrow.desc": {
+  "en": "An exploding arrow; stronger with more range.",
+  "vi": "Mũi tên nổ tung, mạnh hơn khi tầm xa hơn."
+ },
+ "class_skill.explosive_arrow.name": {
+  "en": "Explosive Arrow",
+  "vi": "Tên Nổ"
+ },
+ "class_skill.faith.desc": {
+  "en": "Stronger heals with level.",
+  "vi": "Hồi máu mạnh hơn theo cấp."
+ },
+ "class_skill.faith.name": {
+  "en": "Faith",
+  "vi": "Tín Niệm"
+ },
+ "class_skill.fan_of_knives.desc": {
+  "en": "Throws knives in every direction.",
+  "vi": "Ném dao ra mọi hướng."
+ },
+ "class_skill.fan_of_knives.name": {
+  "en": "Fan of Knives",
+  "vi": "Mưa Dao"
+ },
+ "class_skill.fire_arrow.desc": {
+  "en": "A burning arrow.",
+  "vi": "Mũi tên thiêu đốt mục tiêu."
+ },
+ "class_skill.fire_arrow.name": {
+  "en": "Fire Arrow",
+  "vi": "Tên Lửa"
+ },
+ "class_skill.fmt.ally_effects": {
+  "en": "Allies: {effects}",
+  "vi": "Đồng đội: {effects}"
+ },
+ "class_skill.fmt.area": {
+  "en": "Area {radius} px",
+  "vi": "Diện rộng {radius} px"
+ },
+ "class_skill.fmt.bonus_crit": {
+  "en": "+{value}% crit chance",
+  "vi": "+{value}% tỉ lệ chí mạng"
+ },
+ "class_skill.fmt.bonus_crit_damage": {
+  "en": "+{value}% crit damage",
+  "vi": "+{value}% ST chí mạng"
+ },
+ "class_skill.fmt.cleanse": {
+  "en": "Removes debuffs",
+  "vi": "Xoá hiệu ứng xấu"
+ },
+ "class_skill.fmt.cost": {
+  "en": "{mana} mana · cooldown {cooldown} s",
+  "vi": "{mana} mana · hồi chiêu {cooldown} giây"
+ },
+ "class_skill.fmt.damage": {
+  "en": "Damage: {value}",
+  "vi": "Sát thương: {value}"
+ },
+ "class_skill.fmt.execute": {
+  "en": "Target below {threshold}% HP: ×{value} (bosses: 15%)",
+  "vi": "Mục tiêu dưới {threshold}% HP: ×{value} (boss: 15%)"
+ },
+ "class_skill.fmt.extra_hits": {
+  "en": "+1 hit per 0.25 ATK SPD above 1.0 (max {max})",
+  "vi": "+1 hit mỗi 0.25 Tốc đánh trên 1.0 (tối đa {max})"
+ },
+ "class_skill.fmt.heal": {
+  "en": "Heals {value}% max HP",
+  "vi": "Hồi {value}% HP tối đa"
+ },
+ "class_skill.fmt.ignore_dodge": {
+  "en": "Cannot be dodged",
+  "vi": "Không thể né"
+ },
+ "class_skill.fmt.kill_heal": {
+  "en": "Heals {value}% max HP per kill",
+  "vi": "Hồi {value}% HP tối đa mỗi lần hạ địch"
+ },
+ "class_skill.fmt.on_hit": {
+  "en": "Normal attacks: {effects}",
+  "vi": "Đòn thường: {effects}"
+ },
+ "class_skill.fmt.passive_cooldown": {
+  "en": "Triggers on its own · cooldown {cooldown} s",
+  "vi": "Tự kích hoạt · hồi chiêu {cooldown} giây"
+ },
+ "class_skill.fmt.per_level": {
+  "en": "{value} per {step} Hunter levels",
+  "vi": "{value} mỗi {step} cấp Hunter"
+ },
+ "class_skill.fmt.per_stack": {
+  "en": "+{value}% ATK per {effect} stack",
+  "vi": "+{value}% ATK mỗi stack {effect}"
+ },
+ "class_skill.fmt.reset_on_kill": {
+  "en": "A kill resets the cooldown (not bosses)",
+  "vi": "Hạ mục tiêu thì hồi chiêu ngay (trừ boss)"
+ },
+ "class_skill.fmt.self_effects": {
+  "en": "Self: {effects}",
+  "vi": "Bản thân: {effects}"
+ },
+ "class_skill.fmt.shield": {
+  "en": "Shield {value}% max HP",
+  "vi": "Khiên {value}% HP tối đa"
+ },
+ "class_skill.fmt.tag_bonus": {
+  "en": "+{value}% vs {tag}",
+  "vi": "+{value}% với {tag}"
+ },
+ "class_skill.fmt.target_effects": {
+  "en": "Applies: {effects}",
+  "vi": "Gây: {effects}"
+ },
+ "class_skill.fmt.taunt": {
+  "en": "Taunts enemies within {radius} px",
+  "vi": "Khiêu khích kẻ địch trong {radius} px"
+ },
+ "class_skill.fmt.times_stat": {
+  "en": "({value}) × {stat} / base",
+  "vi": "({value}) × {stat} / gốc"
+ },
+ "class_skill.fmt.trigger_hp": {
+  "en": "Triggers below {value}% HP",
+  "vi": "Kích hoạt khi HP dưới {value}%"
+ },
+ "class_skill.forager.desc": {
+  "en": "Finds more gold.",
+  "vi": "Nhặt được nhiều vàng hơn."
+ },
+ "class_skill.forager.name": {
+  "en": "Forager",
+  "vi": "Người Hái Lượm"
+ },
+ "class_skill.frost_arrow.desc": {
+  "en": "Slows and may freeze the target.",
+  "vi": "Làm chậm, có thể đóng băng mục tiêu."
+ },
+ "class_skill.frost_arrow.name": {
+  "en": "Frost Arrow",
+  "vi": "Tên Băng"
+ },
+ "class_skill.gatekeeper.desc": {
+  "en": "Stands firm against crowds.",
+  "vi": "Đứng vững trước đám đông."
+ },
+ "class_skill.gatekeeper.name": {
+  "en": "Gatekeeper",
+  "vi": "Người Gác Cửa"
+ },
+ "class_skill.giant_slayer.desc": {
+  "en": "The bigger they are, the easier to find a weak spot.",
+  "vi": "Càng to càng dễ trúng chỗ hiểm."
+ },
+ "class_skill.giant_slayer.name": {
+  "en": "Giant Slayer",
+  "vi": "Kẻ Diệt Khổng Lồ"
+ },
+ "class_skill.gladiator.desc": {
+  "en": "Born to fight people.",
+  "vi": "Sinh ra để đấu với người."
+ },
+ "class_skill.gladiator.name": {
+  "en": "Gladiator",
+  "vi": "Đấu Sĩ"
+ },
+ "class_skill.ground_slam.desc": {
+  "en": "Slams the ground, slowing every nearby enemy.",
+  "vi": "Đập kiếm xuống đất, làm chậm kẻ địch xung quanh."
+ },
+ "class_skill.ground_slam.name": {
+  "en": "Ground Slam",
+  "vi": "Đập Đất"
+ },
+ "class_skill.hamstring.desc": {
+  "en": "Cuts a tendon, slowing the target.",
+  "vi": "Chém gân làm chậm."
+ },
+ "class_skill.hamstring.name": {
+  "en": "Hamstring",
+  "vi": "Cắt Gân"
+ },
+ "class_skill.hawk_eye.desc": {
+  "en": "Deep focus.",
+  "vi": "Tập trung cao độ."
+ },
+ "class_skill.hawk_eye.name": {
+  "en": "Hawk Eye",
+  "vi": "Mắt Diều Hâu"
+ },
+ "class_skill.healing_light.desc": {
+  "en": "Heals the most wounded ally.",
+  "vi": "Hồi máu đồng đội thấp máu nhất."
+ },
+ "class_skill.healing_light.name": {
+  "en": "Healing Light",
+  "vi": "Ánh Sáng Chữa Lành"
+ },
+ "class_skill.heavy_crit.desc": {
+  "en": "Crushing critical hits.",
+  "vi": "Chí mạng nặng tay."
+ },
+ "class_skill.heavy_crit.name": {
+  "en": "Heavy Crit",
+  "vi": "Đòn Nặng"
+ },
+ "class_skill.heavy_slash.desc": {
+  "en": "A heavy slash at the target.",
+  "vi": "Một nhát chém nặng vào mục tiêu."
+ },
+ "class_skill.heavy_slash.name": {
+  "en": "Heavy Slash",
+  "vi": "Chém Mạnh"
+ },
+ "class_skill.holy_hammer.desc": {
+  "en": "A holy hammer blow, strong against undead.",
+  "vi": "Giáng chuỳ thần thánh, mạnh với Undead."
+ },
+ "class_skill.holy_hammer.name": {
+  "en": "Holy Hammer",
+  "vi": "Búa Thánh"
+ },
+ "class_skill.homing_arrow.desc": {
+  "en": "Cannot be dodged.",
+  "vi": "Không thể né."
+ },
+ "class_skill.homing_arrow.name": {
+  "en": "Homing Arrow",
+  "vi": "Tên Truy Đuổi"
+ },
+ "class_skill.honed_blades.desc": {
+  "en": "Always-sharp blades.",
+  "vi": "Lưỡi dao luôn sắc."
+ },
+ "class_skill.honed_blades.name": {
+  "en": "Honed Blades",
+  "vi": "Dao Sắc"
+ },
+ "class_skill.hot_blood.desc": {
+  "en": "Stronger when wounded.",
+  "vi": "Càng mất máu càng mạnh."
+ },
+ "class_skill.hot_blood.name": {
+  "en": "Hot Blood",
+  "vi": "Máu Nóng"
+ },
+ "class_skill.hunters_mark.desc": {
+  "en": "Marks the prey so the whole party hits harder.",
+  "vi": "Đánh dấu con mồi, cả đội đánh đau hơn."
+ },
+ "class_skill.hunters_mark.name": {
+  "en": "Hunter's Mark",
+  "vi": "Dấu Thợ Săn"
+ },
+ "class_skill.hunting_companion.desc": {
+  "en": "A hunting wolf mauls the target.",
+  "vi": "Sói săn cắn xé mục tiêu."
+ },
+ "class_skill.hunting_companion.name": {
+  "en": "Hunting Companion",
+  "vi": "Gọi Thú Săn"
+ },
+ "class_skill.intercept.desc": {
+  "en": "Shields the most wounded ally.",
+  "vi": "Che khiên cho đồng đội yếu nhất."
+ },
+ "class_skill.intercept.name": {
+  "en": "Intercept",
+  "vi": "Chắn Đòn"
+ },
+ "class_skill.iron_constitution.desc": {
+  "en": "An iron constitution.",
+  "vi": "Thân thể bền bỉ."
+ },
+ "class_skill.iron_constitution.name": {
+  "en": "Iron Constitution",
+  "vi": "Thể Chất Thép"
+ },
+ "class_skill.iron_stance.desc": {
+  "en": "Braces, raising defense sharply.",
+  "vi": "Trụ vững, tăng mạnh phòng thủ."
+ },
+ "class_skill.iron_stance.name": {
+  "en": "Iron Stance",
+  "vi": "Thế Thép"
+ },
+ "class_skill.iron_will.desc": {
+  "en": "Hard to control; steadier with every level.",
+  "vi": "Khó bị khống chế, càng già dặn càng vững."
+ },
+ "class_skill.iron_will.name": {
+  "en": "Iron Will",
+  "vi": "Ý Chí Sắt"
+ },
+ "class_skill.judgment.desc": {
+  "en": "Hits harder once the enemy is below half HP.",
+  "vi": "Đánh mạnh hơn khi địch đã mất nửa máu."
+ },
+ "class_skill.judgment.name": {
+  "en": "Judgment",
+  "vi": "Phán Xét"
+ },
+ "class_skill.keen_sight.desc": {
+  "en": "Sees and shoots further.",
+  "vi": "Nhìn xa, bắn xa."
+ },
+ "class_skill.keen_sight.name": {
+  "en": "Keen Sight",
+  "vi": "Mắt Sắc"
+ },
+ "class_skill.kind.active": {
+  "en": "Active",
+  "vi": "Thi triển"
+ },
+ "class_skill.kind.passive": {
+  "en": "Passive",
+  "vi": "Nội tại"
+ },
+ "class_skill.last_stand.desc": {
+  "en": "Below 30% HP: heals and fortifies.",
+  "vi": "Khi máu dưới 30%: hồi máu và cứng cáp lại."
+ },
+ "class_skill.last_stand.name": {
+  "en": "Last Stand",
+  "vi": "Tử Chiến"
+ },
+ "class_skill.leap_strike.desc": {
+  "en": "Leaps at a distant target; faster Hunters hit harder.",
+  "vi": "Nhảy tới mục tiêu ở xa, càng nhanh càng đau."
+ },
+ "class_skill.leap_strike.name": {
+  "en": "Leap Strike",
+  "vi": "Nhảy Chém"
+ },
+ "class_skill.leeching_arrow.desc": {
+  "en": "An arrow that drains life.",
+  "vi": "Mũi tên rút sinh lực."
+ },
+ "class_skill.leeching_arrow.name": {
+  "en": "Leeching Arrow",
+  "vi": "Tên Hút Máu"
+ },
+ "class_skill.light_feet.desc": {
+  "en": "Runs fast, shoots on the move.",
+  "vi": "Chạy nhanh, bắn khi chạy."
+ },
+ "class_skill.light_feet.name": {
+  "en": "Light Feet",
+  "vi": "Chân Nhẹ"
+ },
+ "class_skill.long_shot.desc": {
+  "en": "Distance is a friend.",
+  "vi": "Khoảng cách là bạn."
+ },
+ "class_skill.long_shot.name": {
+  "en": "Long Shot",
+  "vi": "Bắn Xa"
+ },
+ "class_skill.lurker.desc": {
+  "en": "Hits harder when unnoticed.",
+  "vi": "Đau hơn khi mục tiêu không để ý mình."
+ },
+ "class_skill.lurker.name": {
+  "en": "Lurker",
+  "vi": "Kẻ Rình Rập"
+ },
+ "class_skill.manhunter.desc": {
+  "en": "Hunts people.",
+  "vi": "Chuyên săn người."
+ },
+ "class_skill.manhunter.name": {
+  "en": "Manhunter",
+  "vi": "Săn Người"
+ },
+ "class_skill.mass_taunt.desc": {
+  "en": "Every nearby enemy attacks the Guardian; spikes grow on its armor.",
+  "vi": "Mọi kẻ địch gần đó đánh mình, giáp mọc gai."
+ },
+ "class_skill.mass_taunt.name": {
+  "en": "Mass Taunt",
+  "vi": "Khiêu Khích Toàn Thể"
+ },
+ "class_skill.night_leech.desc": {
+  "en": "Every hit heals for a while.",
+  "vi": "Mỗi đòn hồi máu trong một lúc."
+ },
+ "class_skill.night_leech.name": {
+  "en": "Night Leech",
+  "vi": "Hút Máu Bóng Đêm"
+ },
+ "class_skill.nimble.desc": {
+  "en": "Hands faster than eyes.",
+  "vi": "Tay nhanh hơn mắt."
+ },
+ "class_skill.nimble.name": {
+  "en": "Nimble",
+  "vi": "Nhanh Tay"
+ },
+ "class_skill.oath.desc": {
+  "en": "Swears to protect the most wounded ally.",
+  "vi": "Thề bảo vệ đồng đội yếu nhất."
+ },
+ "class_skill.oath.name": {
+  "en": "Oath",
+  "vi": "Lời Thề Bảo Hộ"
+ },
+ "class_skill.opener.desc": {
+  "en": "Likely to crit targets at full HP.",
+  "vi": "Rất dễ chí mạng lên mục tiêu còn đầy máu."
+ },
+ "class_skill.opener.name": {
+  "en": "Opener",
+  "vi": "Đòn Mở Màn"
+ },
+ "class_skill.perseverance.desc": {
+  "en": "Regenerates below 50% HP.",
+  "vi": "Máu dưới 50% thì tự hồi phục."
+ },
+ "class_skill.perseverance.name": {
+  "en": "Perseverance",
+  "vi": "Kiên Trì"
+ },
+ "class_skill.pickpocket.desc": {
+  "en": "More gold.",
+  "vi": "Vàng rơi nhiều hơn."
+ },
+ "class_skill.pickpocket.name": {
+  "en": "Pickpocket",
+  "vi": "Kẻ Móc Túi"
+ },
+ "class_skill.pierce.desc": {
+  "en": "A piercing thrust that breaks the armor of those it hits.",
+  "vi": "Đâm xuyên, phá giáp các mục tiêu trúng đòn."
+ },
+ "class_skill.pierce.name": {
+  "en": "Pierce",
+  "vi": "Đâm Xuyên"
+ },
+ "class_skill.piercing_arrow.desc": {
+  "en": "An arrow that pierces through a group.",
+  "vi": "Mũi tên xuyên qua nhóm kẻ địch."
+ },
+ "class_skill.piercing_arrow.name": {
+  "en": "Piercing Arrow",
+  "vi": "Mũi Tên Xuyên"
+ },
+ "class_skill.pinning_shot.desc": {
+  "en": "Pins the enemy's arm so it cannot attack.",
+  "vi": "Ghim tay kẻ địch, không thể tấn công."
+ },
+ "class_skill.pinning_shot.name": {
+  "en": "Pinning Shot",
+  "vi": "Đóng Đinh"
+ },
+ "class_skill.poison_arrow.desc": {
+  "en": "A poisoned arrow.",
+  "vi": "Mũi tên tẩm độc."
+ },
+ "class_skill.poison_arrow.name": {
+  "en": "Poison Arrow",
+  "vi": "Tên Độc"
+ },
+ "class_skill.protective_aura.desc": {
+  "en": "Now and then shields nearby allies.",
+  "vi": "Định kỳ che chở đồng đội gần đó."
+ },
+ "class_skill.protective_aura.name": {
+  "en": "Protective Aura",
+  "vi": "Hào Quang Bảo Hộ"
+ },
+ "class_skill.quiver_mastery.desc": {
+  "en": "Draws arrows faster.",
+  "vi": "Rút tên nhanh."
+ },
+ "class_skill.quiver_mastery.name": {
+  "en": "Quiver Mastery",
+  "vi": "Ống Tên Nhẹ"
+ },
+ "class_skill.rapid_fire.desc": {
+  "en": "Fires a quick volley.",
+  "vi": "Bắn liên tiếp nhiều mũi tên."
+ },
+ "class_skill.rapid_fire.name": {
+  "en": "Rapid Fire",
+  "vi": "Bắn Nhanh"
+ },
+ "class_skill.reflective_guard.desc": {
+  "en": "Blocks and reflects blows.",
+  "vi": "Chặn và phản đòn."
+ },
+ "class_skill.reflective_guard.name": {
+  "en": "Reflective Guard",
+  "vi": "Khiên Phản Xạ"
+ },
+ "class_skill.reflex.desc": {
+  "en": "Slips aside and strikes back.",
+  "vi": "Lách người và đâm trả."
+ },
+ "class_skill.reflex.name": {
+  "en": "Reflex",
+  "vi": "Phản Xạ"
+ },
+ "class_skill.rend.desc": {
+  "en": "A slash that makes the target bleed.",
+  "vi": "Chém gây chảy máu."
+ },
+ "class_skill.rend.name": {
+  "en": "Rend",
+  "vi": "Vết Chém Chảy Máu"
+ },
+ "class_skill.resolve.desc": {
+  "en": "Fortifies below 60% HP.",
+  "vi": "Máu dưới 60% thì cứng cáp lại."
+ },
+ "class_skill.resolve.name": {
+  "en": "Resolve",
+  "vi": "Tâm Kiên"
+ },
+ "class_skill.retaliation.desc": {
+  "en": "Hits harder when pressed.",
+  "vi": "Bị dồn ép thì đánh mạnh hơn."
+ },
+ "class_skill.retaliation.name": {
+  "en": "Retaliation",
+  "vi": "Phản Kích"
+ },
+ "class_skill.riposte.desc": {
+  "en": "A guard stance that reflects damage taken.",
+  "vi": "Vào thế thủ, phản lại sát thương nhận vào."
+ },
+ "class_skill.riposte.name": {
+  "en": "Riposte",
+  "vi": "Phản Đòn"
+ },
+ "class_skill.second_wind.desc": {
+  "en": "Catches a second wind below 60% HP.",
+  "vi": "Lấy lại hơi thở khi máu dưới 60%."
+ },
+ "class_skill.second_wind.name": {
+  "en": "Second Wind",
+  "vi": "Hồi Sức"
+ },
+ "class_skill.serrated.desc": {
+  "en": "Normal attacks sometimes cause bleeding.",
+  "vi": "Đòn thường đôi khi gây chảy máu."
+ },
+ "class_skill.serrated.name": {
+  "en": "Serrated",
+  "vi": "Lưỡi Răng Cưa"
+ },
+ "class_skill.shadow_execute.desc": {
+  "en": "Finishes wounded targets; a kill resets it.",
+  "vi": "Kết liễu mục tiêu yếu máu; hạ được thì hồi chiêu."
+ },
+ "class_skill.shadow_execute.name": {
+  "en": "Shadow Execute",
+  "vi": "Kết Liễu Bóng Tối"
+ },
+ "class_skill.shadow_step.desc": {
+  "en": "Steps to the target and stabs; faster Hunters hit harder.",
+  "vi": "Lướt tới mục tiêu và đâm, càng nhanh càng đau."
+ },
+ "class_skill.shadow_step.name": {
+  "en": "Shadow Step",
+  "vi": "Bước Bóng"
+ },
+ "class_skill.shield_bash.desc": {
+  "en": "A stunning shield bash that scales with defense.",
+  "vi": "Đập khiên làm choáng, mạnh theo phòng thủ."
+ },
+ "class_skill.shield_bash.name": {
+  "en": "Shield Bash",
+  "vi": "Đập Khiên"
+ },
+ "class_skill.shield_mastery.desc": {
+  "en": "Blocks with the shield.",
+  "vi": "Chặn đòn bằng khiên."
+ },
+ "class_skill.shield_mastery.name": {
+  "en": "Shield Mastery",
+  "vi": "Thuẫn Thuật"
+ },
+ "class_skill.shield_wall.desc": {
+  "en": "Shields the whole party.",
+  "vi": "Che chắn cả đội."
+ },
+ "class_skill.shield_wall.name": {
+  "en": "Shield Wall",
+  "vi": "Tường Khiên"
+ },
+ "class_skill.shockwave.desc": {
+  "en": "A hammer blow that shakes the ground.",
+  "vi": "Đập chuỳ làm rung chuyển mặt đất."
+ },
+ "class_skill.shockwave.name": {
+  "en": "Shockwave",
+  "vi": "Chấn Động"
+ },
+ "class_skill.shoulder_bash.desc": {
+  "en": "A shoulder charge that stuns; scales with max HP.",
+  "vi": "Húc vai làm choáng mục tiêu, mạnh theo thể lực."
+ },
+ "class_skill.shoulder_bash.name": {
+  "en": "Shoulder Bash",
+  "vi": "Vai Húc"
+ },
+ "class_skill.smite.desc": {
+  "en": "A punishing blow backed by armor.",
+  "vi": "Đòn trừng phạt bằng sức nặng của giáp."
+ },
+ "class_skill.smite.name": {
+  "en": "Smite",
+  "vi": "Trừng Phạt"
+ },
+ "class_skill.smoke_bomb.desc": {
+  "en": "Smoke that stops nearby enemies from attacking.",
+  "vi": "Khói làm kẻ địch xung quanh không thể tấn công."
+ },
+ "class_skill.smoke_bomb.name": {
+  "en": "Smoke Bomb",
+  "vi": "Bom Khói"
+ },
+ "class_skill.snare_trap.desc": {
+  "en": "A trap that roots the target.",
+  "vi": "Bẫy trói chân mục tiêu."
+ },
+ "class_skill.snare_trap.name": {
+  "en": "Snare Trap",
+  "vi": "Bẫy Gấu"
+ },
+ "class_skill.snipe.desc": {
+  "en": "A very long shot with a high crit chance.",
+  "vi": "Phát bắn tầm cực xa, rất dễ chí mạng."
+ },
+ "class_skill.snipe.name": {
+  "en": "Snipe",
+  "vi": "Bắn Tỉa"
+ },
+ "class_skill.spiked_armor.desc": {
+  "en": "Spikes on the armor reflect damage.",
+  "vi": "Gai mọc trên giáp, phản sát thương."
+ },
+ "class_skill.spiked_armor.name": {
+  "en": "Spiked Armor",
+  "vi": "Giáp Gai"
+ },
+ "class_skill.split_shot.desc": {
+  "en": "An arrow that splits over a group.",
+  "vi": "Mũi tên tách ra trúng cả nhóm."
+ },
+ "class_skill.split_shot.name": {
+  "en": "Split Shot",
+  "vi": "Tên Tách"
+ },
+ "class_skill.steal_vigor.desc": {
+  "en": "Steals the enemy's strength.",
+  "vi": "Đánh cắp sức mạnh kẻ địch."
+ },
+ "class_skill.steal_vigor.name": {
+  "en": "Steal Vigor",
+  "vi": "Cướp Sức"
+ },
+ "class_skill.sword_wave.desc": {
+  "en": "Sends a sword wave that hits the target's group from afar.",
+  "vi": "Phóng sóng kiếm bay xa, trúng cả nhóm quanh mục tiêu."
+ },
+ "class_skill.sword_wave.name": {
+  "en": "Sword Wave",
+  "vi": "Kiếm Khí"
+ },
+ "class_skill.swordsmanship.desc": {
+  "en": "Sword mastery.",
+  "vi": "Thành thạo kiếm."
+ },
+ "class_skill.swordsmanship.name": {
+  "en": "Swordsmanship",
+  "vi": "Kiếm Thuật"
+ },
+ "class_skill.tag.beast": {
+  "en": "beasts",
+  "vi": "thú"
+ },
+ "class_skill.tag.humanoid": {
+  "en": "people",
+  "vi": "người"
+ },
+ "class_skill.tag.undead": {
+  "en": "undead",
+  "vi": "undead"
+ },
+ "class_skill.take_aim.desc": {
+  "en": "A shot that always crits.",
+  "vi": "Phát bắn chắc chắn chí mạng."
+ },
+ "class_skill.take_aim.name": {
+  "en": "Take Aim",
+  "vi": "Ngắm Kỹ"
+ },
+ "class_skill.taunt.desc": {
+  "en": "Forces nearby enemies to attack the Hunter and fortifies.",
+  "vi": "Ép kẻ địch gần đó đánh mình và cứng cáp lại."
+ },
+ "class_skill.taunt.name": {
+  "en": "Taunt",
+  "vi": "Khiêu Khích"
+ },
+ "class_skill.tempo.desc": {
+  "en": "Speeds everything up.",
+  "vi": "Tăng tốc toàn thân."
+ },
+ "class_skill.tempo.name": {
+  "en": "Tempo",
+  "vi": "Nhịp Độ"
+ },
+ "class_skill.thick_skin.desc": {
+  "en": "A tough hide.",
+  "vi": "Thân thể dày dạn."
+ },
+ "class_skill.thick_skin.name": {
+  "en": "Thick Skin",
+  "vi": "Da Thép"
+ },
+ "class_skill.throwing_knife.desc": {
+  "en": "A thrown knife that slows.",
+  "vi": "Ném dao tầm xa, làm chậm."
+ },
+ "class_skill.throwing_knife.name": {
+  "en": "Throwing Knife",
+  "vi": "Phi Dao"
+ },
+ "class_skill.toxicologist.desc": {
+  "en": "Normal attacks sometimes poison.",
+  "vi": "Đòn thường đôi khi gây độc."
+ },
+ "class_skill.toxicologist.name": {
+  "en": "Toxicologist",
+  "vi": "Chuyên Gia Độc"
+ },
+ "class_skill.triple_slash.desc": {
+  "en": "Three quick slashes that crit separately.",
+  "vi": "Ba nhát chém liên tiếp, mỗi nhát chí mạng riêng."
+ },
+ "class_skill.triple_slash.name": {
+  "en": "Triple Slash",
+  "vi": "Chém Liên Hoàn"
+ },
+ "class_skill.twin_strike.desc": {
+  "en": "Two quick strikes.",
+  "vi": "Hai nhát liên tiếp."
+ },
+ "class_skill.twin_strike.name": {
+  "en": "Twin Strike",
+  "vi": "Song Đao"
+ },
+ "class_skill.unshakable.desc": {
+  "en": "Rooted like a tree.",
+  "vi": "Chân như cắm rễ."
+ },
+ "class_skill.unshakable.name": {
+  "en": "Unshakable",
+  "vi": "Bất Động"
+ },
+ "class_skill.unyielding.desc": {
+  "en": "On the brink: briefly invulnerable and heals.",
+  "vi": "Khi sắp gục: bất tử chốc lát và hồi máu."
+ },
+ "class_skill.unyielding.name": {
+  "en": "Unyielding",
+  "vi": "Bất Khuất"
+ },
+ "class_skill.vanish.desc": {
+  "en": "Vanishes for a moment, then strikes to kill.",
+  "vi": "Biến mất trong chốc lát rồi ra đòn chí tử."
+ },
+ "class_skill.vanish.name": {
+  "en": "Vanish",
+  "vi": "Tàng Hình"
+ },
+ "class_skill.vengeance.desc": {
+  "en": "Armor is a weapon too.",
+  "vi": "Giáp cũng là vũ khí."
+ },
+ "class_skill.vengeance.name": {
+  "en": "Vengeance",
+  "vi": "Trả Đũa"
+ },
+ "class_skill.veteran.desc": {
+  "en": "Battlefield experience that grows with level.",
+  "vi": "Kinh nghiệm chiến trường theo cấp."
+ },
+ "class_skill.veteran.name": {
+  "en": "Veteran",
+  "vi": "Dày Dạn"
+ },
+ "class_skill.weak_spot.desc": {
+  "en": "Aims for weak spots.",
+  "vi": "Nhắm vào chỗ hiểm."
+ },
+ "class_skill.weak_spot.name": {
+  "en": "Weak Spot",
+  "vi": "Điểm Yếu"
+ },
+ "class_skill.whirlwind.desc": {
+  "en": "Spins the blade through every nearby enemy.",
+  "vi": "Xoay kiếm đánh mọi kẻ địch xung quanh."
+ },
+ "class_skill.whirlwind.name": {
+  "en": "Whirlwind",
+  "vi": "Xoáy Kiếm"
+ },
+ "enemy.forest_guardian.name": {
+  "en": "Forest Guardian",
+  "vi": "Hộ Vệ Rừng"
+ },
+ "enemy.goblin.name": {
+  "en": "Goblin",
+  "vi": "Goblin"
+ },
+ "enemy.skeleton.name": {
+  "en": "Skeleton",
+  "vi": "Bộ Xương"
+ },
+ "enemy.slime.name": {
+  "en": "Slime",
+  "vi": "Slime"
+ },
+ "enemy.weekly_boss.name": {
+  "en": "Abyss Warden",
+  "vi": "Cai Ngục Vực Thẳm"
+ },
+ "enemy.wolf.name": {
+  "en": "Wolf",
+  "vi": "Sói"
+ },
+ "err.academy.already_known": {
+  "en": "Already known",
+  "vi": "Đã biết rồi"
+ },
+ "err.academy.hurt": {
+  "en": "{name} is hurt",
+  "vi": "{name} đang bị thương"
+ },
+ "err.academy.max_level": {
+  "en": "Max level",
+  "vi": "Cấp tối đa"
+ },
+ "err.academy.needs_level": {
+  "en": "Needs Academy Lv {level}",
+  "vi": "Cần Học Viện Lv {level}"
+ },
+ "err.academy.needs_rebirth_points": {
+  "en": "Needs {points} rebirth point(s)",
+  "vi": "Cần {points} điểm tái sinh"
+ },
+ "err.academy.needs_reincarnations": {
+  "en": "Needs {count} reincarnations",
+  "vi": "Cần {count} lần luân hồi"
+ },
+ "err.academy.no_academy": {
+  "en": "Needs an Academy",
+  "vi": "Cần có Học Viện"
+ },
+ "err.academy.not_learnable": {
+  "en": "Cannot be learned",
+  "vi": "Không thể học"
+ },
+ "err.academy.not_promotion": {
+  "en": "Not a promotion of {class}",
+  "vi": "Không phải bậc thăng cấp của {class}"
+ },
+ "err.academy.traits_full": {
+  "en": "Trait slots full ({max})",
+  "vi": "Hết ô Trait ({max})"
+ },
+ "err.academy.unknown_skill": {
+  "en": "Unknown skill",
+  "vi": "Skill không tồn tại"
+ },
+ "err.academy.unknown_trait": {
+  "en": "Unknown trait",
+  "vi": "Trait không tồn tại"
+ },
+ "err.activity.cannot_assign": {
+  "en": "Cannot assign '{activity}'",
+  "vi": "Không thể giao '{activity}'"
+ },
+ "err.building.already_built": {
+  "en": "Already built",
+  "vi": "Đã xây rồi"
+ },
+ "err.building.blocks_door": {
+  "en": "Blocks a door",
+  "vi": "Chắn cửa công trình khác"
+ },
+ "err.building.door_outside": {
+  "en": "The door must face the Town",
+  "vi": "Cửa phải hướng vào Thị trấn"
+ },
+ "err.building.gate_road": {
+  "en": "Keep the gate road free",
+  "vi": "Không chắn đường ra cổng"
+ },
+ "err.building.max_level": {
+  "en": "{building} is at max level",
+  "vi": "{building} đã đạt cấp tối đa"
+ },
+ "err.building.needs_items": {
+  "en": "Needs {count} {item}",
+  "vi": "Cần {count} {item}"
+ },
+ "err.building.needs_town_level": {
+  "en": "Requires Town Hall Lv {level}",
+  "vi": "Cần Tòa Thị Chính Lv {level}"
+ },
+ "err.building.not_buildable": {
+  "en": "{building} cannot be built",
+  "vi": "Không thể xây {building}"
+ },
+ "err.building.not_built": {
+  "en": "{building} is not built",
+  "vi": "Chưa xây {building}"
+ },
+ "err.building.not_removable": {
+  "en": "{building} cannot be removed",
+  "vi": "Không thể dỡ {building}"
+ },
+ "err.building.outside_town": {
+  "en": "Must be inside the Town",
+  "vi": "Phải đặt trong Thị trấn"
+ },
+ "err.building.pond": {
+  "en": "The pond is in the way",
+  "vi": "Vướng cái ao"
+ },
+ "err.building.requires_flag": {
+  "en": "Requires {flag}",
+  "vi": "Cần {flag}"
+ },
+ "err.building.space_taken": {
+  "en": "Space is taken",
+  "vi": "Chỗ này đã có công trình"
+ },
+ "err.building.unknown": {
+  "en": "Unknown building",
+  "vi": "Công trình không tồn tại"
+ },
+ "err.class_skill.full": {
+  "en": "Already has {max} skills",
+  "vi": "Đã đủ {max} skill"
+ },
+ "err.class_skill.max_level": {
+  "en": "Already at level {max}",
+  "vi": "Đã đạt cấp {max}"
+ },
+ "err.class_skill.no_points": {
+  "en": "No skill points",
+  "vi": "Không còn điểm skill"
+ },
+ "err.class_skill.no_swap_points": {
+  "en": "No swap points",
+  "vi": "Không còn điểm đổi skill"
+ },
+ "err.class_skill.not_owned": {
+  "en": "Skill not learned",
+  "vi": "Chưa học skill này"
+ },
+ "err.class_skill.pool_empty": {
+  "en": "No skill left to learn",
+  "vi": "Không còn skill để học"
+ },
+ "err.class_skill.unknown_hunter": {
+  "en": "Unknown Hunter",
+  "vi": "Hunter không tồn tại"
+ },
+ "err.corpse.cannot_carry": {
+  "en": "{name} cannot carry now",
+  "vi": "{name} không thể khiêng lúc này"
+ },
+ "err.corpse.has_carrier": {
+  "en": "Already has a carrier",
+  "vi": "Đã có người khiêng"
+ },
+ "err.corpse.not_body": {
+  "en": "Not a body",
+  "vi": "Không phải thi thể"
+ },
+ "err.corpse.staff_busy": {
+  "en": "Staff member is busy",
+  "vi": "Nhân viên đang bận"
+ },
+ "err.corpse.staff_fee": {
+  "en": "Needs {gold} gold for the staff",
+  "vi": "Cần {gold} vàng để thuê nhân viên"
+ },
+ "err.craft.needs_building": {
+  "en": "Needs a {building}",
+  "vi": "Cần có {building}"
+ },
+ "err.craft.needs_building_level": {
+  "en": "Needs {building} Lv {level}",
+  "vi": "Cần {building} Lv {level}"
+ },
+ "err.craft.needs_items": {
+  "en": "Needs {count} {item}",
+  "vi": "Cần {count} {item}"
+ },
+ "err.craft.unknown_recipe": {
+  "en": "Unknown recipe '{recipe}'",
+  "vi": "Công thức không tồn tại '{recipe}'"
+ },
+ "err.craft.warehouse_full": {
+  "en": "Warehouse is full",
+  "vi": "Kho đã đầy"
+ },
+ "err.equip.not_equippable": {
+  "en": "{item} cannot be equipped",
+  "vi": "Không thể trang bị {item}"
+ },
+ "err.equip.not_in_warehouse": {
+  "en": "Item is not in the Warehouse",
+  "vi": "Vật phẩm không có trong Kho"
+ },
+ "err.equip.nothing_equipped": {
+  "en": "Nothing equipped",
+  "vi": "Chưa trang bị gì"
+ },
+ "err.equip.on_expedition": {
+  "en": "{name} is on an expedition",
+  "vi": "{name} đang đi Dungeon"
+ },
+ "err.equip.warehouse_full": {
+  "en": "Warehouse is full",
+  "vi": "Kho đã đầy"
+ },
+ "err.expedition.duplicate_hunter": {
+  "en": "Hunter listed twice",
+  "vi": "Hunter bị chọn hai lần"
+ },
+ "err.expedition.locked": {
+  "en": "{expedition} is locked",
+  "vi": "{expedition} chưa mở khóa"
+ },
+ "err.expedition.party_size": {
+  "en": "Party needs 1–{max} Hunters",
+  "vi": "Nhóm cần 1–{max} Hunter"
+ },
+ "err.expedition.running": {
+  "en": "An expedition is already running",
+  "vi": "Đang có một chuyến Dungeon"
+ },
+ "err.expedition.unavailable": {
+  "en": "{name} is not available",
+  "vi": "{name} không rảnh"
+ },
+ "err.expedition.unknown": {
+  "en": "Unknown expedition '{expedition}'",
+  "vi": "Dungeon không tồn tại '{expedition}'"
+ },
+ "err.expedition.unknown_hunter": {
+  "en": "Unknown Hunter '{hunter}'",
+  "vi": "Hunter không tồn tại '{hunter}'"
+ },
+ "err.forge.limit": {
+  "en": "Forge limit reached (+{max}) — upgrade the Forge",
+  "vi": "Đã đạt giới hạn cường hóa (+{max}) — hãy nâng cấp Lò"
+ },
+ "err.forge.needs_items": {
+  "en": "Needs {count} {item}",
+  "vi": "Cần {count} {item}"
+ },
+ "err.forge.no_forge": {
+  "en": "Needs an Enhancement Forge",
+  "vi": "Cần có Lò cường hóa"
+ },
+ "err.forge.not_equipment": {
+  "en": "Not equipment",
+  "vi": "Không phải trang bị"
+ },
+ "err.market.missing": {
+  "en": "Build a Market to buy loot into the Warehouse",
+  "vi": "Hãy xây Chợ để thu mua đồ vào Nhà Kho"
+ },
+ "err.purse.nothing_to_give": {
+  "en": "Nothing to give",
+  "vi": "Không có gì để đưa"
+ },
+ "err.purse.nothing_to_take": {
+  "en": "Nothing to take",
+  "vi": "Không có gì để lấy"
+ },
+ "err.purse.only_has": {
+  "en": "{name} only has {gold} gold",
+  "vi": "{name} chỉ có {gold} vàng"
+ },
+ "err.purse.treasury_short": {
+  "en": "Needs {gold} gold in the treasury",
+  "vi": "Ngân khố cần {gold} vàng"
+ },
+ "err.purse.unknown_hunter": {
+  "en": "Unknown Hunter",
+  "vi": "Hunter không tồn tại"
+ },
+ "err.quest.claimed": {
+  "en": "Already claimed",
+  "vi": "Đã nhận thưởng"
+ },
+ "err.quest.unfinished": {
+  "en": "Not finished yet",
+  "vi": "Chưa hoàn thành"
+ },
+ "err.recruit.carrying": {
+  "en": "Carrying a body",
+  "vi": "Đang khiêng thi thể"
+ },
+ "err.recruit.dead": {
+  "en": "Revive this Hunter first",
+  "vi": "Hãy hồi sinh Hunter này trước"
+ },
+ "err.recruit.no_bed": {
+  "en": "No free bed — build a House",
+  "vi": "Hết giường — hãy xây thêm Nhà"
+ },
+ "err.recruit.no_candidate": {
+  "en": "No such candidate",
+  "vi": "Không có ứng viên này"
+ },
+ "err.recruit.on_dungeon": {
+  "en": "On a dungeon run",
+  "vi": "Đang đi Dungeon"
+ },
+ "err.recruit.roster_full": {
+  "en": "Roster full ({count}/{max}) — upgrade the Town Hall",
+  "vi": "Đội đã đầy ({count}/{max}) — hãy nâng cấp Tòa Thị Chính"
+ },
+ "err.recruit.unknown_hunter": {
+  "en": "Unknown Hunter",
+  "vi": "Hunter không tồn tại"
+ },
+ "err.region.unknown_duty": {
+  "en": "Unknown duty",
+  "vi": "Nhiệm vụ không hợp lệ"
+ },
+ "err.reincarnation.difficulty_locked": {
+  "en": "Needs {count} reincarnations (have {have})",
+  "vi": "Cần {count} lần luân hồi (hiện có {have})"
+ },
+ "err.reincarnation.hurt": {
+  "en": "{name} is hurt",
+  "vi": "{name} đang bị thương"
+ },
+ "err.reincarnation.needs_level": {
+  "en": "Needs level {level}",
+  "vi": "Cần cấp {level}"
+ },
+ "err.reincarnation.no_portal": {
+  "en": "Needs a Reincarnation Portal",
+  "vi": "Cần có Cổng Luân hồi"
+ },
+ "err.reincarnation.on_expedition": {
+  "en": "{name} is on an expedition",
+  "vi": "{name} đang đi Dungeon"
+ },
+ "err.reincarnation.unknown_difficulty": {
+  "en": "Unknown difficulty",
+  "vi": "Độ khó không tồn tại"
+ },
+ "err.reincarnation.unknown_hunter": {
+  "en": "Unknown Hunter",
+  "vi": "Hunter không tồn tại"
+ },
+ "err.repair.needs_blacksmith": {
+  "en": "Build a Blacksmith to repair weapons",
+  "vi": "Hãy xây Thợ Rèn để sửa vũ khí"
+ },
+ "err.repair.not_needed": {
+  "en": "Nothing to repair",
+  "vi": "Không cần sửa"
+ },
+ "err.supply.no_food": {
+  "en": "No food in the Tavern",
+  "vi": "Quán Rượu hết đồ ăn"
+ },
+ "err.supply.no_money_for_food": {
+  "en": "Cannot afford food",
+  "vi": "Không đủ tiền mua đồ ăn"
+ },
+ "err.trading.already_requested": {
+  "en": "Already requested",
+  "vi": "Đã đặt rồi"
+ },
+ "err.trading.no_post": {
+  "en": "Needs a Trading Post",
+  "vi": "Cần có Trạm giao thương"
+ },
+ "err.trading.not_requestable": {
+  "en": "Cannot be requested",
+  "vi": "Không thể đặt mua"
+ },
+ "err.trading.nothing": {
+  "en": "Nothing to request",
+  "vi": "Không có gì để đặt"
+ },
+ "err.trading.slots_full": {
+  "en": "All request slots are used ({slots})",
+  "vi": "Đã dùng hết ô đặt hàng ({slots})"
+ },
+ "expedition.dark_forest.name": {
+  "en": "Forest Guardian's Grove",
+  "vi": "Lãnh Địa Hộ Vệ Rừng"
+ },
+ "expedition.deep_mine.name": {
+  "en": "Deep Mine",
+  "vi": "Mỏ Sâu"
+ },
+ "expedition.goblin_warren.name": {
+  "en": "Goblin Warren",
+  "vi": "Hang Ổ Goblin"
+ },
+ "expedition.hollow_of_whispers.name": {
+  "en": "Hollow of Whispers",
+  "vi": "Hốc Thì Thầm"
+ },
+ "expedition.ruined_sanctum.name": {
+  "en": "Ruined Sanctum",
+  "vi": "Thánh Điện Đổ Nát"
+ },
+ "expedition.sunken_crypt.name": {
+  "en": "Sunken Crypt",
+  "vi": "Hầm Mộ Chìm"
+ },
+ "game.corpse.staff_info": {
+  "en": "Staff: {total} ({free} free). Each trip costs the village {gold} gold; when they are busy or the treasury is short, a free Hunter carries instead.",
+  "vi": "Nhân viên: {total} ({free} rảnh). Mỗi chuyến tốn của làng {gold} vàng; khi họ bận hoặc ngân khố thiếu tiền, một Hunter rảnh sẽ khiêng thay."
+ },
+ "game.difficulty.easy": {
+  "en": "Easy",
+  "vi": "Dễ"
+ },
+ "game.difficulty.hard": {
+  "en": "Hard",
+  "vi": "Khó"
+ },
+ "game.difficulty.nightmare": {
+  "en": "Nightmare",
+  "vi": "Ác mộng"
+ },
+ "game.difficulty.normal": {
+  "en": "Normal",
+  "vi": "Thường"
+ },
+ "game.flag.first_boss_clear": {
+  "en": "first boss clear",
+  "vi": "hạ Boss đầu tiên"
+ },
+ "game.quest.reward_item": {
+  "en": "{count} {item}",
+  "vi": "{count} {item}"
+ },
+ "game.region.duty_auto": {
+  "en": "Auto",
+  "vi": "Tự động"
+ },
+ "game.region.duty_stay": {
+  "en": "Stay in town",
+  "vi": "Ở lại thị trấn"
+ },
+ "item.bandage.name": {
+  "en": "Bandage",
+  "vi": "Băng Gạc"
+ },
+ "item.beast_fang.name": {
+  "en": "Beast Fang",
+  "vi": "Nanh Thú"
+ },
+ "item.bone_amulet.name": {
+  "en": "Bone Amulet",
+  "vi": "Bùa Xương"
+ },
+ "item.bone_dust.name": {
+  "en": "Bone Dust",
+  "vi": "Bột Xương"
+ },
+ "item.crimson_suit.name": {
+  "en": "Crimson Suit",
+  "vi": "Bộ Đồ Đỏ Thẫm"
+ },
+ "item.dark_essence.name": {
+  "en": "Dark Essence",
+  "vi": "Tinh Chất Bóng Tối"
+ },
+ "item.fang_blade.name": {
+  "en": "Fang Blade",
+  "vi": "Kiếm Nanh"
+ },
+ "item.fang_necklace.name": {
+  "en": "Fang Necklace",
+  "vi": "Vòng Cổ Nanh"
+ },
+ "item.forest_cloak.name": {
+  "en": "Forest Cloak",
+  "vi": "Áo Choàng Rừng"
+ },
+ "item.golden_crown.name": {
+  "en": "Golden Crown",
+  "vi": "Vương Miện Vàng"
+ },
+ "item.healing_potion.name": {
+  "en": "Healing Potion",
+  "vi": "Thuốc Hồi Máu"
+ },
+ "item.herb_soup.name": {
+  "en": "Herb Soup",
+  "vi": "Súp Thảo Dược"
+ },
+ "item.hunters_badge.name": {
+  "en": "Hunter's Badge",
+  "vi": "Huy Hiệu Hunter"
+ },
+ "item.iron_armor.name": {
+  "en": "Iron Armor",
+  "vi": "Giáp Sắt"
+ },
+ "item.iron_boots.name": {
+  "en": "Iron Boots",
+  "vi": "Giày Sắt"
+ },
+ "item.iron_greaves.name": {
+  "en": "Iron Greaves",
+  "vi": "Giáp Chân Sắt"
+ },
+ "item.iron_helm.name": {
+  "en": "Iron Helm",
+  "vi": "Mũ Sắt"
+ },
+ "item.iron_ore.name": {
+  "en": "Iron Ore",
+  "vi": "Quặng Sắt"
+ },
+ "item.iron_ring.name": {
+  "en": "Iron Ring",
+  "vi": "Nhẫn Sắt"
+ },
+ "item.iron_sword.name": {
+  "en": "Iron Sword",
+  "vi": "Kiếm Sắt"
+ },
+ "item.leather_armor.name": {
+  "en": "Leather Armor",
+  "vi": "Giáp Da"
+ },
+ "item.leather_boots.name": {
+  "en": "Leather Boots",
+  "vi": "Giày Da"
+ },
+ "item.leather_cap.name": {
+  "en": "Leather Cap",
+  "vi": "Mũ Da"
+ },
+ "item.leather_pants.name": {
+  "en": "Leather Pants",
+  "vi": "Quần Da"
+ },
+ "item.lucky_charm.name": {
+  "en": "Lucky Charm",
+  "vi": "Bùa May Mắn"
+ },
+ "item.meat_stew.name": {
+  "en": "Meat Stew",
+  "vi": "Thịt Hầm"
+ },
+ "item.night_garb.name": {
+  "en": "Night Garb",
+  "vi": "Y Phục Bóng Đêm"
+ },
+ "item.pet_chick.name": {
+  "en": "Chick",
+  "vi": "Gà Con"
+ },
+ "item.pet_pup.name": {
+  "en": "Pup",
+  "vi": "Cún Con"
+ },
+ "item.pet_slime.name": {
+  "en": "Pet Slime",
+  "vi": "Pet Slime"
+ },
+ "item.pet_teddy.name": {
+  "en": "Teddy",
+  "vi": "Gấu Bông"
+ },
+ "item.pet_wisp.name": {
+  "en": "Wisp",
+  "vi": "Ma Trơi"
+ },
+ "item.raw_meat.name": {
+  "en": "Raw Meat",
+  "vi": "Thịt Sống"
+ },
+ "item.royal_garb.name": {
+  "en": "Royal Garb",
+  "vi": "Y Phục Hoàng Gia"
+ },
+ "item.ruby_ring.name": {
+  "en": "Ruby Ring",
+  "vi": "Nhẫn Hồng Ngọc"
+ },
+ "item.rusty_dagger.name": {
+  "en": "Rusty Dagger",
+  "vi": "Dao Găm Gỉ"
+ },
+ "item.rusty_sword.name": {
+  "en": "Rusty Sword",
+  "vi": "Kiếm Gỉ"
+ },
+ "item.shadow_armor.name": {
+  "en": "Shadow Armor",
+  "vi": "Giáp Bóng Tối"
+ },
+ "item.shadow_blade.name": {
+  "en": "Shadow Blade",
+  "vi": "Kiếm Bóng Tối"
+ },
+ "item.shadow_hood.name": {
+  "en": "Shadow Hood",
+  "vi": "Mũ Trùm Bóng Tối"
+ },
+ "item.shadow_leggings.name": {
+  "en": "Shadow Leggings",
+  "vi": "Quần Giáp Bóng Tối"
+ },
+ "item.shadow_pendant.name": {
+  "en": "Shadow Pendant",
+  "vi": "Mặt Dây Bóng Tối"
+ },
+ "item.shadow_ring.name": {
+  "en": "Shadow Ring",
+  "vi": "Nhẫn Bóng Tối"
+ },
+ "item.short_bow.name": {
+  "en": "Short Bow",
+  "vi": "Cung Ngắn"
+ },
+ "item.slime_gel.name": {
+  "en": "Slime Gel",
+  "vi": "Gel Slime"
+ },
+ "item.snow_robe.name": {
+  "en": "Snow Robe",
+  "vi": "Áo Choàng Tuyết"
+ },
+ "item.steel_armor.name": {
+  "en": "Steel Armor",
+  "vi": "Giáp Thép"
+ },
+ "item.steel_helm.name": {
+  "en": "Steel Helm",
+  "vi": "Mũ Thép"
+ },
+ "item.steel_sword.name": {
+  "en": "Steel Sword",
+  "vi": "Kiếm Thép"
+ },
+ "item.swift_boots.name": {
+  "en": "Swift Boots",
+  "vi": "Giày Tốc Hành"
+ },
+ "item.wild_herb.name": {
+  "en": "Wild Herb",
+  "vi": "Thảo Dược Dại"
+ },
+ "item.wizard_hat.name": {
+  "en": "Wizard Hat",
+  "vi": "Mũ Phù Thủy"
+ },
+ "loot.forest_guardian_first.name": {
+  "en": "Forest Guardian First",
+  "vi": "Hộ Vệ Rừng (lần đầu)"
+ },
+ "loot.forest_guardian_repeat.name": {
+  "en": "Forest Guardian Repeat",
+  "vi": "Hộ Vệ Rừng (lặp lại)"
+ },
+ "loot.goblin.name": {
+  "en": "Goblin",
+  "vi": "Goblin"
+ },
+ "loot.skeleton.name": {
+  "en": "Skeleton",
+  "vi": "Bộ Xương"
+ },
+ "loot.slime.name": {
+  "en": "Slime",
+  "vi": "Slime"
+ },
+ "loot.weekly_boss.name": {
+  "en": "Weekly Boss",
+  "vi": "Boss Tuần"
+ },
+ "loot.wolf.name": {
+  "en": "Wolf",
+  "vi": "Sói"
+ },
+ "quest.academy.desc": {
+  "en": "Build an Academy.",
+  "vi": "Xây Học Viện."
+ },
+ "quest.academy.name": {
+  "en": "School of Hunters",
+  "vi": "Trường Đào Tạo Hunter"
+ },
+ "quest.build_house.desc": {
+  "en": "Build a second House for your Hunters.",
+  "vi": "Xây thêm một Nhà Ở thứ hai cho các Hunter."
+ },
+ "quest.build_house.name": {
+  "en": "A Roof Overhead",
+  "vi": "Mái Nhà Che Thân"
+ },
+ "quest.clear_forest.desc": {
+  "en": "Defeat the Forest Guardian for the first time.",
+  "vi": "Đánh bại Hộ Vệ Rừng lần đầu tiên."
+ },
+ "quest.clear_forest.name": {
+  "en": "Slay the Guardian",
+  "vi": "Hạ Gục Hộ Vệ"
+ },
+ "quest.enhance.desc": {
+  "en": "Enhance a piece of equipment at the Forge.",
+  "vi": "Cường hóa một trang bị tại Lò Cường Hóa."
+ },
+ "quest.enhance.name": {
+  "en": "Sharper Steel",
+  "vi": "Thép Thêm Sắc"
+ },
+ "quest.forge.desc": {
+  "en": "Build an Enhancement Forge.",
+  "vi": "Xây Lò Cường Hóa."
+ },
+ "quest.forge.name": {
+  "en": "Fire and Steel",
+  "vi": "Lửa Và Thép"
+ },
+ "quest.hard_mode.desc": {
+  "en": "Unlock and select the Normal difficulty.",
+  "vi": "Mở khóa và chọn độ khó Thường."
+ },
+ "quest.hard_mode.name": {
+  "en": "Into the Fire",
+  "vi": "Lao Vào Biển Lửa"
+ },
+ "quest.hire_two.desc": {
+  "en": "Have 2 Hunters in the village.",
+  "vi": "Có 2 Hunter trong làng."
+ },
+ "quest.hire_two.name": {
+  "en": "Grow the Roster",
+  "vi": "Mở Rộng Đội Hình"
+ },
+ "quest.hunters_five.desc": {
+  "en": "Have 5 Hunters in the village.",
+  "vi": "Có 5 Hunter trong làng."
+ },
+ "quest.hunters_five.name": {
+  "en": "A Proper Guild",
+  "vi": "Hội Hunter Đúng Nghĩa"
+ },
+ "quest.inn.desc": {
+  "en": "Build an Inn.",
+  "vi": "Xây Nhà Trọ."
+ },
+ "quest.inn.name": {
+  "en": "Rest for the Weary",
+  "vi": "Chốn Nghỉ Chân"
+ },
+ "quest.level_20.desc": {
+  "en": "Bring a Hunter to level 20.",
+  "vi": "Đưa một Hunter lên level 20."
+ },
+ "quest.level_20.name": {
+  "en": "Peak of Power",
+  "vi": "Đỉnh Cao Sức Mạnh"
+ },
+ "quest.portal.desc": {
+  "en": "Build the Reincarnation Portal.",
+  "vi": "Xây Cổng Luân Hồi."
+ },
+ "quest.portal.name": {
+  "en": "Gate of Rebirth",
+  "vi": "Cánh Cổng Tái Sinh"
+ },
+ "quest.reborn.desc": {
+  "en": "Reincarnate a Hunter for the first time.",
+  "vi": "Chuyển sinh một Hunter lần đầu tiên."
+ },
+ "quest.reborn.name": {
+  "en": "Reborn",
+  "vi": "Tái Sinh"
+ },
+ "quest.town_hall_2.desc": {
+  "en": "Upgrade the Town Hall to level 2.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 2."
+ },
+ "quest.town_hall_2.name": {
+  "en": "Town Hall Lv 2",
+  "vi": "Tòa Thị Chính Lv 2"
+ },
+ "quest.town_hall_3.desc": {
+  "en": "Upgrade the Town Hall to level 3.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 3."
+ },
+ "quest.town_hall_3.name": {
+  "en": "Town Hall Lv 3",
+  "vi": "Tòa Thị Chính Lv 3"
+ },
+ "quest.trading_post.desc": {
+  "en": "Build a Trading Post.",
+  "vi": "Xây Trạm Giao Thương."
+ },
+ "quest.trading_post.name": {
+  "en": "Open for Trade",
+  "vi": "Mở Cửa Giao Thương"
+ },
+ "quest.train_skill.desc": {
+  "en": "Train 3 skill levels at the Academy.",
+  "vi": "Luyện 3 cấp Skill tại Học Viện."
+ },
+ "quest.train_skill.name": {
+  "en": "Study Hard",
+  "vi": "Chăm Chỉ Học Hành"
+ },
+ "recipe.bandage.name": {
+  "en": "Bandage",
+  "vi": "Băng Gạc"
+ },
+ "recipe.bone_amulet.name": {
+  "en": "Bone Amulet",
+  "vi": "Bùa Xương"
+ },
+ "recipe.crimson_suit.name": {
+  "en": "Crimson Suit",
+  "vi": "Bộ Đồ Đỏ Thẫm"
+ },
+ "recipe.fang_blade.name": {
+  "en": "Fang Blade",
+  "vi": "Kiếm Nanh"
+ },
+ "recipe.fang_necklace.name": {
+  "en": "Fang Necklace",
+  "vi": "Vòng Cổ Nanh"
+ },
+ "recipe.forest_cloak.name": {
+  "en": "Forest Cloak",
+  "vi": "Áo Choàng Rừng"
+ },
+ "recipe.healing_potion.name": {
+  "en": "Healing Potion",
+  "vi": "Thuốc Hồi Máu"
+ },
+ "recipe.herb_soup.name": {
+  "en": "Herb Soup",
+  "vi": "Súp Thảo Dược"
+ },
+ "recipe.hunters_badge.name": {
+  "en": "Hunter's Badge",
+  "vi": "Huy Hiệu Hunter"
+ },
+ "recipe.iron_armor.name": {
+  "en": "Iron Armor",
+  "vi": "Giáp Sắt"
+ },
+ "recipe.iron_boots.name": {
+  "en": "Iron Boots",
+  "vi": "Giày Sắt"
+ },
+ "recipe.iron_greaves.name": {
+  "en": "Iron Greaves",
+  "vi": "Giáp Chân Sắt"
+ },
+ "recipe.iron_helm.name": {
+  "en": "Iron Helm",
+  "vi": "Mũ Sắt"
+ },
+ "recipe.iron_ring.name": {
+  "en": "Iron Ring",
+  "vi": "Nhẫn Sắt"
+ },
+ "recipe.iron_sword.name": {
+  "en": "Iron Sword",
+  "vi": "Kiếm Sắt"
+ },
+ "recipe.leather_boots.name": {
+  "en": "Leather Boots",
+  "vi": "Giày Da"
+ },
+ "recipe.leather_cap.name": {
+  "en": "Leather Cap",
+  "vi": "Mũ Da"
+ },
+ "recipe.leather_pants.name": {
+  "en": "Leather Pants",
+  "vi": "Quần Da"
+ },
+ "recipe.lucky_charm.name": {
+  "en": "Lucky Charm",
+  "vi": "Bùa May Mắn"
+ },
+ "recipe.meat_stew.name": {
+  "en": "Meat Stew",
+  "vi": "Thịt Hầm"
+ },
+ "recipe.night_garb.name": {
+  "en": "Night Garb",
+  "vi": "Y Phục Bóng Đêm"
+ },
+ "recipe.pet_chick.name": {
+  "en": "Chick",
+  "vi": "Gà Con"
+ },
+ "recipe.pet_pup.name": {
+  "en": "Pup",
+  "vi": "Cún Con"
+ },
+ "recipe.pet_slime.name": {
+  "en": "Pet Slime",
+  "vi": "Pet Slime"
+ },
+ "recipe.pet_teddy.name": {
+  "en": "Teddy",
+  "vi": "Gấu Bông"
+ },
+ "recipe.royal_garb.name": {
+  "en": "Royal Garb",
+  "vi": "Y Phục Hoàng Gia"
+ },
+ "recipe.ruby_ring.name": {
+  "en": "Ruby Ring",
+  "vi": "Nhẫn Hồng Ngọc"
+ },
+ "recipe.shadow_armor.name": {
+  "en": "Shadow Armor",
+  "vi": "Giáp Bóng Tối"
+ },
+ "recipe.shadow_blade.name": {
+  "en": "Shadow Blade",
+  "vi": "Kiếm Bóng Tối"
+ },
+ "recipe.shadow_hood.name": {
+  "en": "Shadow Hood",
+  "vi": "Mũ Trùm Bóng Tối"
+ },
+ "recipe.shadow_leggings.name": {
+  "en": "Shadow Leggings",
+  "vi": "Quần Giáp Bóng Tối"
+ },
+ "recipe.shadow_pendant.name": {
+  "en": "Shadow Pendant",
+  "vi": "Mặt Dây Bóng Tối"
+ },
+ "recipe.shadow_ring.name": {
+  "en": "Shadow Ring",
+  "vi": "Nhẫn Bóng Tối"
+ },
+ "recipe.snow_robe.name": {
+  "en": "Snow Robe",
+  "vi": "Áo Choàng Tuyết"
+ },
+ "recipe.steel_armor.name": {
+  "en": "Steel Armor",
+  "vi": "Giáp Thép"
+ },
+ "recipe.steel_helm.name": {
+  "en": "Steel Helm",
+  "vi": "Mũ Thép"
+ },
+ "recipe.steel_sword.name": {
+  "en": "Steel Sword",
+  "vi": "Kiếm Thép"
+ },
+ "recipe.swift_boots.name": {
+  "en": "Swift Boots",
+  "vi": "Giày Tốc Hành"
+ },
+ "recipe.wizard_hat.name": {
+  "en": "Wizard Hat",
+  "vi": "Mũ Phù Thủy"
+ },
+ "region.ancient_ruins.name": {
+  "en": "Ancient Ruins",
+  "vi": "Tàn Tích Cổ"
+ },
+ "region.boss_arena.name": {
+  "en": "Boss Arena",
+  "vi": "Đấu Trường Boss"
+ },
+ "region.dark_forest.name": {
+  "en": "Dark Forest",
+  "vi": "Rừng Tối"
+ },
+ "region.goblin_cave.name": {
+  "en": "Goblin Cave",
+  "vi": "Hang Goblin"
+ },
+ "region.hunter_gate.name": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "region.town.name": {
+  "en": "Town",
+  "vi": "Thị Trấn"
+ },
+ "save.bad_section": {
+  "en": "{section}: expected an object, using defaults",
+  "vi": "{section}: dữ liệu sai, dùng mặc định"
+ },
+ "save.corrupt": {
+  "en": "{file} is corrupt",
+  "vi": "{file} bị hỏng"
+ },
+ "save.migrated": {
+  "en": "migrated save to schema {version}",
+  "vi": "đã nâng cấp bản lưu lên schema {version}"
+ },
+ "save.new_game": {
+  "en": "no usable save, started a new game",
+  "vi": "không có bản lưu dùng được, đã bắt đầu game mới"
+ },
+ "save.newer_version": {
+  "en": "save is from a newer version ({version})",
+  "vi": "bản lưu từ phiên bản mới hơn ({version})"
+ },
+ "save.restored_backup": {
+  "en": "restored from backup",
+  "vi": "đã khôi phục từ bản sao lưu"
+ },
+ "skill.iron_skin.desc": {
+  "en": "+1.5 defense per level.",
+  "vi": "+1.5 DEF mỗi cấp."
+ },
+ "skill.iron_skin.name": {
+  "en": "Iron Skin",
+  "vi": "Da Sắt"
+ },
+ "skill.keen_eye.desc": {
+  "en": "+2% critical chance per level.",
+  "vi": "+2% tỉ lệ chí mạng mỗi cấp."
+ },
+ "skill.keen_eye.name": {
+  "en": "Keen Eye",
+  "vi": "Mắt Tinh Tường"
+ },
+ "skill.mastery.desc": {
+  "en": "+3% damage dealt per level.",
+  "vi": "+3% sát thương gây ra mỗi cấp."
+ },
+ "skill.mastery.name": {
+  "en": "Combat Mastery",
+  "vi": "Tinh Thông Chiến Đấu"
+ },
+ "skill.power_strike.desc": {
+  "en": "+2 attack per level.",
+  "vi": "+2 ATK mỗi cấp."
+ },
+ "skill.power_strike.name": {
+  "en": "Power Strike",
+  "vi": "Đòn Mạnh"
+ },
+ "skill.quick_hands.desc": {
+  "en": "+4% attack speed per level.",
+  "vi": "+4% tốc độ đánh mỗi cấp."
+ },
+ "skill.quick_hands.name": {
+  "en": "Quick Hands",
+  "vi": "Tay Nhanh"
+ },
+ "skill.scavenger.desc": {
+  "en": "+5% gold find per level.",
+  "vi": "+5% vàng nhặt được mỗi cấp."
+ },
+ "skill.scavenger.name": {
+  "en": "Scavenger",
+  "vi": "Kẻ Nhặt Nhạnh"
+ },
+ "skill.vitality.desc": {
+  "en": "+12 max HP per level.",
+  "vi": "+12 HP tối đa mỗi cấp."
+ },
+ "skill.vitality.name": {
+  "en": "Vitality",
+  "vi": "Sinh Lực"
+ },
+ "slot.accessory": {
+  "en": "Charm",
+  "vi": "Bùa"
+ },
+ "slot.armor": {
+  "en": "Top",
+  "vi": "Áo"
+ },
+ "slot.boots": {
+  "en": "Boots",
+  "vi": "Giày"
+ },
+ "slot.helmet": {
+  "en": "Helmet",
+  "vi": "Nón"
+ },
+ "slot.necklace": {
+  "en": "Necklace",
+  "vi": "Dây chuyền"
+ },
+ "slot.pants": {
+  "en": "Pants",
+  "vi": "Quần"
+ },
+ "slot.pet": {
+  "en": "Pet",
+  "vi": "Pet"
+ },
+ "slot.ring": {
+  "en": "Ring",
+  "vi": "Nhẫn"
+ },
+ "slot.skin": {
+  "en": "Skin",
+  "vi": "Skin"
+ },
+ "slot.weapon": {
+  "en": "Weapon",
+  "vi": "Vũ khí"
+ },
+ "stat.attack": {
+  "en": "ATK",
+  "vi": "ATK"
+ },
+ "stat.attack_range": {
+  "en": "range",
+  "vi": "tầm đánh"
+ },
+ "stat.attack_speed": {
+  "en": "ATK SPD",
+  "vi": "Tốc đánh"
+ },
+ "stat.critical_chance": {
+  "en": "crit",
+  "vi": "chí mạng"
+ },
+ "stat.critical_damage": {
+  "en": "crit dmg",
+  "vi": "ST chí mạng"
+ },
+ "stat.damage_dealt": {
+  "en": "damage",
+  "vi": "sát thương"
+ },
+ "stat.damage_taken": {
+  "en": "damage taken",
+  "vi": "sát thương nhận"
+ },
+ "stat.defense": {
+  "en": "DEF",
+  "vi": "DEF"
+ },
+ "stat.dodge": {
+  "en": "dodge",
+  "vi": "né tránh"
+ },
+ "stat.gold_find": {
+  "en": "gold find",
+  "vi": "tìm vàng"
+ },
+ "stat.healing": {
+  "en": "healing",
+  "vi": "hồi máu"
+ },
+ "stat.level": {
+  "en": "level",
+  "vi": "cấp"
+ },
+ "stat.mana_regen": {
+  "en": "mana regen",
+  "vi": "hồi mana"
+ },
+ "stat.max_hp": {
+  "en": "HP",
+  "vi": "HP"
+ },
+ "stat.max_mana": {
+  "en": "mana",
+  "vi": "mana"
+ },
+ "stat.move_speed": {
+  "en": "MOVE",
+  "vi": "Tốc chạy"
+ },
+ "stat.range_bonus": {
+  "en": "range",
+  "vi": "tầm đánh"
+ },
+ "stat.tenacity": {
+  "en": "tenacity",
+  "vi": "kháng khống chế"
+ },
+ "stat.xp_gain": {
+  "en": "XP gain",
+  "vi": "XP nhận"
+ },
+ "status.armor_break.name": {
+  "en": "Armor Break",
+  "vi": "Phá Giáp"
+ },
+ "status.bleed.name": {
+  "en": "Bleed",
+  "vi": "Chảy Máu"
+ },
+ "status.burn.name": {
+  "en": "Burn",
+  "vi": "Bỏng"
+ },
+ "status.disarm.name": {
+  "en": "Disarmed",
+  "vi": "Tước Vũ Khí"
+ },
+ "status.focus.name": {
+  "en": "Focus",
+  "vi": "Tập Trung"
+ },
+ "status.fortify.name": {
+  "en": "Fortify",
+  "vi": "Kiên Cố"
+ },
+ "status.freeze.name": {
+  "en": "Frozen",
+  "vi": "Đóng Băng"
+ },
+ "status.haste.name": {
+  "en": "Haste",
+  "vi": "Tăng Tốc"
+ },
+ "status.invulnerable.name": {
+  "en": "Invulnerable",
+  "vi": "Bất Tử"
+ },
+ "status.lifesteal.name": {
+  "en": "Lifesteal",
+  "vi": "Hút Máu"
+ },
+ "status.poison.name": {
+  "en": "Poison",
+  "vi": "Trúng Độc"
+ },
+ "status.regeneration.name": {
+  "en": "Regen",
+  "vi": "Hồi Máu"
+ },
+ "status.root.name": {
+  "en": "Rooted",
+  "vi": "Trói Chân"
+ },
+ "status.shield.name": {
+  "en": "Shield",
+  "vi": "Khiên"
+ },
+ "status.slow.name": {
+  "en": "Slowed",
+  "vi": "Làm Chậm"
+ },
+ "status.stagger.name": {
+  "en": "Stagger",
+  "vi": "Loạng Choạng"
+ },
+ "status.strength.name": {
+  "en": "Strength",
+  "vi": "Cường Lực"
+ },
+ "status.stun.name": {
+  "en": "Stunned",
+  "vi": "Choáng"
+ },
+ "status.thorns.name": {
+  "en": "Thorns",
+  "vi": "Phản Đòn"
+ },
+ "status.vulnerable.name": {
+  "en": "Vulnerable",
+  "vi": "Dễ Tổn Thương"
+ },
+ "status.weaken.name": {
+  "en": "Weakened",
+  "vi": "Suy Yếu"
+ },
+ "talent.cook.desc": {
+  "en": "Cooks food in the field from the materials in its bag.",
+  "vi": "Nấu đồ ăn ngay trên đường đi từ nguyên liệu trong túi."
+ },
+ "talent.cook.name": {
+  "en": "Cook",
+  "vi": "Đầu Bếp"
+ },
+ "talent.herbalist.desc": {
+  "en": "Makes bandages and potions in the field from the materials in its bag.",
+  "vi": "Chế băng gạc và thuốc ngay trên đường đi từ nguyên liệu trong túi."
+ },
+ "talent.herbalist.name": {
+  "en": "Herbalist",
+  "vi": "Thầy Thuốc"
+ },
+ "tier.c.name": {
+  "en": "Common",
+  "vi": "Thường"
+ },
+ "tier.lr.name": {
+  "en": "Legendary Rare",
+  "vi": "Huyền thoại"
+ },
+ "tier.mr.name": {
+  "en": "Mythic",
+  "vi": "Thần thoại"
+ },
+ "tier.r.name": {
+  "en": "Rare",
+  "vi": "Hiếm"
+ },
+ "tier.sr.name": {
+  "en": "Super Rare",
+  "vi": "Siêu hiếm"
+ },
+ "tier.ssr.name": {
+  "en": "Special Super Rare",
+  "vi": "Siêu hiếm đặc biệt"
+ },
+ "tier.u.name": {
+  "en": "Uncommon",
+  "vi": "Khá"
+ },
+ "tier.ur.name": {
+  "en": "Ultra Rare",
+  "vi": "Cực hiếm"
+ },
+ "toast.main.not_on_map": {
+  "en": "Not on the map right now",
+  "vi": "Hiện không có trên bản đồ"
+ },
+ "toast.main.party_heads": {
+  "en": "The party heads to {dungeon}",
+  "vi": "Đội lên đường tới {dungeon}"
+ },
+ "toast.root.bonded": {
+  "en": "{a} and {b} are now bonded",
+  "vi": "{a} và {b} đã gắn bó"
+ },
+ "toast.root.build_portal": {
+  "en": "Build the Reincarnation Portal (Town Hall Lv 3) to change difficulty",
+  "vi": "Xây Cổng Luân Hồi (Tòa Thị Chính Lv 3) để đổi độ khó"
+ },
+ "toast.root.delivered": {
+  "en": "{name} was carried to the Temple",
+  "vi": "{name} đã được đưa về Đền"
+ },
+ "toast.root.fallen": {
+  "en": "{name} has fallen",
+  "vi": "{name} đã gục ngã"
+ },
+ "toast.root.quest_done": {
+  "en": "Quest done: {quest} — claim your reward",
+  "vi": "Xong nhiệm vụ: {quest} — hãy nhận thưởng"
+ },
+ "toast.root.reached_level": {
+  "en": "{name} reached Lv {level}",
+  "vi": "{name} đạt Lv {level}"
+ },
+ "toast.root.reborn": {
+  "en": "{name} was reborn (×{count})",
+  "vi": "{name} đã luân hồi (×{count})"
+ },
+ "toast.root.recovered": {
+  "en": "{name} is back on their feet",
+  "vi": "{name} đã hồi phục"
+ },
+ "toast.root.recruited": {
+  "en": "{name} joined the roster",
+  "vi": "{name} đã gia nhập đội"
+ },
+ "toast.root.request_done": {
+  "en": "Request done: {count} {item}",
+  "vi": "Xong yêu cầu: {count} {item}"
+ },
+ "toast.save.warnings": {
+  "en": "Save loaded with {count} fix(es). Details are in the log.",
+  "vi": "Đã tải save và sửa {count} lỗi dữ liệu. Chi tiết trong log."
+ },
+ "trait.brave.desc": {
+  "en": "Fights harder against bosses. Gets restless when left at home.",
+  "vi": "Chiến đấu hăng hơn khi gặp Boss. Bồn chồn khi bị để ở nhà."
+ },
+ "trait.brave.name": {
+  "en": "Brave",
+  "vi": "Dũng Cảm"
+ },
+ "trait.cautious.desc": {
+  "en": "Takes less damage but holds back a little. Dislikes expeditions above their level.",
+  "vi": "Nhận ít sát thương hơn nhưng hơi dè dặt. Không thích chuyến thám hiểm vượt cấp."
+ },
+ "trait.cautious.name": {
+  "en": "Cautious",
+  "vi": "Thận Trọng"
+ },
+ "trait.coward.desc": {
+  "en": "Flees the fight: takes +15% damage.",
+  "vi": "Chùn bước khi chiến đấu: nhận thêm +15% sát thương."
+ },
+ "trait.coward.name": {
+  "en": "Coward",
+  "vi": "Nhát Gan"
+ },
+ "trait.disciplined.desc": {
+  "en": "Trains faster. Dislikes sharing a party with reckless Hunters.",
+  "vi": "Luyện tập nhanh hơn. Không thích chung đội với Hunter liều lĩnh."
+ },
+ "trait.disciplined.name": {
+  "en": "Disciplined",
+  "vi": "Kỷ Luật"
+ },
+ "trait.ferocious.desc": {
+  "en": "Hits harder: +10% damage dealt.",
+  "vi": "Đánh mạnh hơn: +10% sát thương gây ra."
+ },
+ "trait.ferocious.name": {
+  "en": "Ferocious",
+  "vi": "Hung Tợn"
+ },
+ "trait.greedy.desc": {
+  "en": "Finds more gold. Loves boss loot, hates coming home empty-handed.",
+  "vi": "Nhặt được nhiều vàng hơn. Mê chiến lợi phẩm Boss, ghét về tay trắng."
+ },
+ "trait.greedy.name": {
+  "en": "Greedy",
+  "vi": "Tham Lam"
+ },
+ "trait.lazy.desc": {
+  "en": "Trains slowly, rests well. Dislikes back-to-back expeditions.",
+  "vi": "Luyện tập chậm, nghỉ ngơi tốt. Không thích thám hiểm liên tục."
+ },
+ "trait.lazy.name": {
+  "en": "Lazy",
+  "vi": "Lười Biếng"
+ },
+ "trait.lucky.desc": {
+  "en": "Finds more gold: +20% gold find.",
+  "vi": "Nhặt được nhiều vàng hơn: +20% vàng nhặt được."
+ },
+ "trait.lucky.name": {
+  "en": "Lucky",
+  "vi": "May Mắn"
+ },
+ "trait.reckless.desc": {
+  "en": "Hits harder and gets hit harder. Bored by long rests.",
+  "vi": "Đánh mạnh hơn nhưng cũng bị đánh đau hơn. Chán khi phải nghỉ lâu."
+ },
+ "trait.reckless.name": {
+  "en": "Reckless",
+  "vi": "Liều Lĩnh"
+ },
+ "trait.scholar.desc": {
+  "en": "Learns fast: +20% XP gain.",
+  "vi": "Học nhanh: +20% XP nhận được."
+ },
+ "trait.scholar.name": {
+  "en": "Scholar",
+  "vi": "Học Giả"
+ },
+ "trait.sturdy.desc": {
+  "en": "Tough body: +15% max HP.",
+  "vi": "Thân thể cứng cáp: +15% HP tối đa."
+ },
+ "trait.sturdy.name": {
+  "en": "Sturdy",
+  "vi": "Cứng Cáp"
+ },
+ "trait.swift.desc": {
+  "en": "Quick hands: +12% attack speed.",
+  "vi": "Tay nhanh: +12% tốc độ đánh."
+ },
+ "trait.swift.name": {
+  "en": "Swift",
+  "vi": "Nhanh Nhẹn"
+ },
+ "ui.boss.assigned": {
+  "en": "Hunters assigned: {count}",
+  "vi": "Hunter được giao: {count}"
+ },
+ "ui.boss.available": {
+  "en": "The boss is in the arena now.",
+  "vi": "Boss đang ở đấu trường."
+ },
+ "ui.boss.chest": {
+  "en": "Chest on defeat: {gold} gold to the treasury and {items} to the Warehouse. The killer also keeps the boss's gold and loot.",
+  "vi": "Rương khi hạ Boss: {gold} vàng vào kho bạc và {items} vào Nhà Kho. Người kết liễu còn giữ vàng và đồ rơi của Boss."
+ },
+ "ui.boss.kills.one": {
+  "en": "Defeated {count} time so far.",
+  "vi": "Đã hạ {count} lần."
+ },
+ "ui.boss.kills.other": {
+  "en": "Defeated {count} times so far.",
+  "vi": "Đã hạ {count} lần."
+ },
+ "ui.boss.look": {
+  "en": "Look at the arena",
+  "vi": "Xem đấu trường"
+ },
+ "ui.boss.no_arena": {
+  "en": "No boss arena in this world.",
+  "vi": "Thế giới này không có đấu trường Boss."
+ },
+ "ui.boss.none_assigned": {
+  "en": "Nobody is assigned",
+  "vi": "Chưa giao cho ai"
+ },
+ "ui.boss.none_strong": {
+  "en": "Nobody is strong enough yet",
+  "vi": "Chưa ai đủ mạnh"
+ },
+ "ui.boss.recall": {
+  "en": "Recall everyone (back to Auto)",
+  "vi": "Gọi tất cả về (về Tự động)"
+ },
+ "ui.boss.recalled": {
+  "en": "Hunters return to their usual duties",
+  "vi": "Hunter trở lại nhiệm vụ thường ngày"
+ },
+ "ui.boss.returns": {
+  "en": "Defeated. Returns in {time}.",
+  "vi": "Đã bị hạ. Quay lại sau {time}."
+ },
+ "ui.boss.send": {
+  "en": "Send everyone Lv {level}+ ({count})",
+  "vi": "Gửi mọi Hunter Lv {level}+ ({count})"
+ },
+ "ui.boss.sent": {
+  "en": "{count} Hunters head for the arena",
+  "vi": "{count} Hunter lên đường tới đấu trường"
+ },
+ "ui.boss.stats": {
+  "en": "HP {hp} · ATK {atk} · DEF {def} · Lv {level}+ recommended",
+  "vi": "HP {hp} · ATK {atk} · DEF {def} · nên Lv {level}+"
+ },
+ "ui.boss.title": {
+  "en": "Weekly Boss",
+  "vi": "Boss tuần"
+ },
+ "ui.build.beds_note": {
+  "en": "Beds {used} / {total} used. Tap a spot in the Town to place, then confirm.",
+  "vi": "Đã dùng {used} / {total} giường. Chạm một chỗ trong thị trấn để đặt, rồi xác nhận."
+ },
+ "ui.build.entry": {
+  "en": "{name} — {gold} gold",
+  "vi": "{name} — {gold} vàng"
+ },
+ "ui.build.place": {
+  "en": "Place",
+  "vi": "Đặt"
+ },
+ "ui.build.title": {
+  "en": "Build",
+  "vi": "Xây dựng"
+ },
+ "ui.building.become": {
+  "en": "Become\n{class}",
+  "vi": "Thành\n{class}"
+ },
+ "ui.building.beds": {
+  "en": "Beds {used} / {total}",
+  "vi": "Giường {used} / {total}"
+ },
+ "ui.building.bounty": {
+  "en": "Bounty +{gold} g each for the Hunter who brings it",
+  "vi": "Thưởng +{gold} g mỗi món cho Hunter mang về"
+ },
+ "ui.building.boutique": {
+  "en": "Boutique",
+  "vi": "Cửa hàng thời trang"
+ },
+ "ui.building.boutique_note": {
+  "en": "Skins change how a Hunter looks; pets follow their owner around. Both give a small bonus.",
+  "vi": "Skin đổi ngoại hình Hunter; Pet đi theo chủ. Cả hai đều cho một chút chỉ số."
+ },
+ "ui.building.candidates.one": {
+  "en": "{count} candidate waiting at the gate.",
+  "vi": "{count} ứng viên đang chờ ở cổng."
+ },
+ "ui.building.candidates.other": {
+  "en": "{count} candidates waiting at the gate.",
+  "vi": "{count} ứng viên đang chờ ở cổng."
+ },
+ "ui.building.class_change": {
+  "en": "Class change (needs {count} reincarnations, {gold} g)",
+  "vi": "Đổi class (cần {count} lần chuyển sinh, {gold} g)"
+ },
+ "ui.building.class_changed": {
+  "en": "{name} is now a {class}",
+  "vi": "{name} giờ là {class}"
+ },
+ "ui.building.consumable_price": {
+  "en": "Hunters pay {gold} g · in stock {stock}",
+  "vi": "Hunter trả {gold} g · còn {stock}"
+ },
+ "ui.building.craft": {
+  "en": "Craft",
+  "vi": "Chế tạo"
+ },
+ "ui.building.delivered": {
+  "en": "{delivered} / {quantity} delivered",
+  "vi": "Đã giao {delivered} / {quantity}"
+ },
+ "ui.building.desc.academy": {
+  "en": "Train skills for gold. Rebirth points teach new traits.",
+  "vi": "Luyện Skill bằng vàng. Điểm tái sinh dùng để học đặc điểm mới."
+ },
+ "ui.building.desc.blacksmith": {
+  "en": "Forges better weapons and armor from materials.",
+  "vi": "Rèn vũ khí và giáp tốt hơn từ nguyên liệu."
+ },
+ "ui.building.desc.forge": {
+  "en": "Enhance weapons and armor. Each level makes the item stronger; the Forge's level sets the limit.",
+  "vi": "Cường hóa vũ khí và giáp. Mỗi cấp làm món đồ mạnh hơn; cấp của Lò Cường Hóa quyết định giới hạn."
+ },
+ "ui.building.desc.hospital": {
+  "en": "Makes medicine from monster materials. Hunters who come home hurt buy it and heal at once.",
+  "vi": "Bào chế thuốc từ nguyên liệu quái vật. Hunter bị thương khi về sẽ mua và hồi phục ngay."
+ },
+ "ui.building.desc.house": {
+  "en": "Hunters sleep here. Every House has beds for four.",
+  "vi": "Hunter ngủ ở đây. Mỗi Nhà có giường cho bốn người."
+ },
+ "ui.building.desc.inn": {
+  "en": "Rooms for weary Hunters: many beds in one building.",
+  "vi": "Phòng cho Hunter mệt mỏi: nhiều giường trong một tòa nhà."
+ },
+ "ui.building.desc.market": {
+  "en": "Buys the loot Hunters bring back from hunting and stores it in the Warehouse. Higher levels haggle a better price.",
+  "vi": "Thu mua đồ Hunter săn được và cất vào Nhà Kho. Cấp càng cao càng trả giá rẻ hơn."
+ },
+ "ui.building.desc.portal": {
+  "en": "Hunters who reach the required level may reincarnate: back to level 1, permanently stronger, with rebirth points. Higher difficulties unlock with total reincarnations.",
+  "vi": "Hunter đạt cấp yêu cầu có thể chuyển sinh: về lại cấp 1, mạnh hơn vĩnh viễn, kèm điểm tái sinh. Độ khó cao hơn mở khóa theo tổng số lần chuyển sinh."
+ },
+ "ui.building.desc.restaurant": {
+  "en": "Hunters enjoy their meals more: every portion restores extra energy. Needs a Tavern to cook the food.",
+  "vi": "Hunter ăn ngon miệng hơn: mỗi suất hồi thêm năng lượng. Cần Quán Rượu để nấu món ăn."
+ },
+ "ui.building.desc.tavern": {
+  "en": "Hunters looking for work gather here, rest and eat. The kitchen cooks food from monster materials; Hunters buy it when hungry.",
+  "vi": "Hunter tìm việc tụ tập, nghỉ ngơi và ăn uống ở đây. Nhà bếp nấu món ăn từ nguyên liệu quái vật; Hunter mua khi đói."
+ },
+ "ui.building.desc.temple": {
+  "en": "Fallen Hunters are revived here (they lose a little XP). Two village staff live here and carry bodies home for a fee.",
+  "vi": "Hunter gục ngã được hồi sinh tại đây (mất một ít XP). Hai người làng sống ở đây và khiêng xác về với một khoản phí."
+ },
+ "ui.building.desc.town_hall": {
+  "en": "The heart of the settlement. Its level sets how many Hunters you can keep and how far they can grow.",
+  "vi": "Trái tim của thị trấn. Cấp của nó quyết định số Hunter bạn giữ được và họ mạnh lên tới đâu."
+ },
+ "ui.building.desc.trading_post": {
+  "en": "Post material requests. Hunters who bring the material home are paid a bounty on top of the normal price.",
+  "vi": "Đăng yêu cầu nguyên liệu. Hunter mang nguyên liệu về được thưởng thêm ngoài giá thường."
+ },
+ "ui.building.desc.warehouse": {
+  "en": "Stores materials and spare equipment. More levels, more slots.",
+  "vi": "Cất nguyên liệu và trang bị dư. Cấp càng cao, càng nhiều ô."
+ },
+ "ui.building.difficulty": {
+  "en": "Difficulty",
+  "vi": "Độ khó"
+ },
+ "ui.building.difficulty_scale": {
+  "en": "Monsters are {stat}× stronger and give {reward}× rewards.",
+  "vi": "Quái mạnh hơn {stat}× và cho {reward}× phần thưởng."
+ },
+ "ui.building.effect.beds": {
+  "en": "Beds",
+  "vi": "Giường"
+ },
+ "ui.building.effect.buy_price": {
+  "en": "Buy Price",
+  "vi": "Giá thu mua"
+ },
+ "ui.building.effect.candidate_count": {
+  "en": "Candidate Count",
+  "vi": "Số ứng viên"
+ },
+ "ui.building.effect.food_bonus": {
+  "en": "Food Bonus",
+  "vi": "Thưởng món ăn"
+ },
+ "ui.building.effect.hunter_capacity": {
+  "en": "Hunter Capacity",
+  "vi": "Sức chứa Hunter"
+ },
+ "ui.building.effect.inventory_slots": {
+  "en": "Inventory Slots",
+  "vi": "Ô kho"
+ },
+ "ui.building.effect.max_enhance": {
+  "en": "Max Enhance",
+  "vi": "Cường hóa tối đa"
+ },
+ "ui.building.effect.max_traits": {
+  "en": "Max Traits",
+  "vi": "Đặc điểm tối đa"
+ },
+ "ui.building.effect.recipe_level": {
+  "en": "Recipe Level",
+  "vi": "Cấp công thức"
+ },
+ "ui.building.effect.recovery_seconds": {
+  "en": "Recovery Seconds",
+  "vi": "Giây hồi sinh"
+ },
+ "ui.building.effect.refresh_cost": {
+  "en": "Refresh Cost",
+  "vi": "Phí làm mới"
+ },
+ "ui.building.effect.request_slots": {
+  "en": "Request Slots",
+  "vi": "Ô yêu cầu"
+ },
+ "ui.building.effect.skill_level": {
+  "en": "Skill Level",
+  "vi": "Cấp Skill"
+ },
+ "ui.building.effect.speedup_gold_per_minute": {
+  "en": "Speedup Gold Per Minute",
+  "vi": "Vàng tăng tốc mỗi phút"
+ },
+ "ui.building.effect_value": {
+  "en": "{name} {value}",
+  "vi": "{name} {value}"
+ },
+ "ui.building.energy": {
+  "en": "+{energy} energy",
+  "vi": "+{energy} năng lượng"
+ },
+ "ui.building.enhance": {
+  "en": "Enhance",
+  "vi": "Cường hóa"
+ },
+ "ui.building.enhance_cost": {
+  "en": "Next: {gold} g + {ore} Iron Ore",
+  "vi": "Lần sau: {gold} g + {ore} Quặng sắt"
+ },
+ "ui.building.enhance_limit": {
+  "en": "Enhancement limit: +{limit} · Iron Ore: {ore}",
+  "vi": "Giới hạn cường hóa: +{limit} · Quặng sắt: {ore}"
+ },
+ "ui.building.enhanced": {
+  "en": "{name} enhanced",
+  "vi": "Đã cường hóa {name}"
+ },
+ "ui.building.forge_heading": {
+  "en": "Forge",
+  "vi": "Lò rèn"
+ },
+ "ui.building.forget": {
+  "en": "Forget\n{gold} g",
+  "vi": "Quên\n{gold} g"
+ },
+ "ui.building.forgotten": {
+  "en": "{name} forgotten",
+  "vi": "Đã quên {name}"
+ },
+ "ui.building.gone": {
+  "en": "This building is gone.",
+  "vi": "Công trình này không còn nữa."
+ },
+ "ui.building.heals": {
+  "en": "heals {percent}% HP",
+  "vi": "hồi {percent}% HP"
+ },
+ "ui.building.in_warehouse": {
+  "en": "in the Warehouse",
+  "vi": "trong Nhà Kho"
+ },
+ "ui.building.kitchen": {
+  "en": "Kitchen",
+  "vi": "Nhà bếp"
+ },
+ "ui.building.kitchen_note": {
+  "en": "Food in stock: {count} portions. Hungry Hunters buy the most filling food they can afford.",
+  "vi": "Món ăn trong kho: {count} suất. Hunter đói sẽ mua món no nhất họ đủ tiền."
+ },
+ "ui.building.known_traits": {
+  "en": "Known traits",
+  "vi": "Đặc điểm đã có"
+ },
+ "ui.building.learn": {
+  "en": "Learn\n{points} pt",
+  "vi": "Học\n{points} điểm"
+ },
+ "ui.building.learn_trait": {
+  "en": "Learn a trait (rebirth points)",
+  "vi": "Học đặc điểm (điểm tái sinh)"
+ },
+ "ui.building.learned": {
+  "en": "{name} learned",
+  "vi": "Đã học {name}"
+ },
+ "ui.building.locked": {
+  "en": "Locked",
+  "vi": "Đang khóa"
+ },
+ "ui.building.made": {
+  "en": "Made {name}",
+  "vi": "Đã làm {name}"
+ },
+ "ui.building.make": {
+  "en": "Make",
+  "vi": "Làm"
+ },
+ "ui.building.material_cost": {
+  "en": "{count} {item}",
+  "vi": "{count} {item}"
+ },
+ "ui.building.max": {
+  "en": "Max",
+  "vi": "Max"
+ },
+ "ui.building.max_level": {
+  "en": "Max level ({level}).",
+  "vi": "Cấp tối đa ({level})."
+ },
+ "ui.building.move": {
+  "en": "Move",
+  "vi": "Di chuyển"
+ },
+ "ui.building.next": {
+  "en": "Next: {effects}",
+  "vi": "Cấp sau: {effects}"
+ },
+ "ui.building.no_equipment": {
+  "en": "No equipment to enhance.",
+  "vi": "Không có trang bị để cường hóa."
+ },
+ "ui.building.no_hunters": {
+  "en": "No Hunters.",
+  "vi": "Chưa có Hunter."
+ },
+ "ui.building.no_patients": {
+  "en": "Nobody is waiting to be revived.",
+  "vi": "Không ai đang chờ hồi sinh."
+ },
+ "ui.building.no_requests": {
+  "en": "No open requests. Order a material below.",
+  "vi": "Chưa có yêu cầu nào. Đặt nguyên liệu bên dưới."
+ },
+ "ui.building.open_gate": {
+  "en": "Open the Hunter Gate",
+  "vi": "Mở Cổng Hunter"
+ },
+ "ui.building.open_inventory": {
+  "en": "Open inventory",
+  "vi": "Mở kho đồ"
+ },
+ "ui.building.order_item": {
+  "en": "{item} · price {gold} g · in stock {stock}",
+  "vi": "{item} · giá {gold} g · còn {stock}"
+ },
+ "ui.building.order_materials": {
+  "en": "Order materials",
+  "vi": "Đặt nguyên liệu"
+ },
+ "ui.building.patient": {
+  "en": "{name}  (−{xp} XP)",
+  "vi": "{name}  (−{xp} XP)"
+ },
+ "ui.building.pharmacy": {
+  "en": "Pharmacy",
+  "vi": "Nhà thuốc"
+ },
+ "ui.building.pharmacy_note": {
+  "en": "Hunters who come home hurt buy the strongest medicine they can afford until they are above 90% HP.",
+  "vi": "Hunter bị thương khi về mua thuốc mạnh nhất họ đủ tiền cho tới khi trên 90% HP."
+ },
+ "ui.building.picker_entry": {
+  "en": "{name} · Lv {level}",
+  "vi": "{name} · Lv {level}"
+ },
+ "ui.building.rebirth_bonus": {
+  "en": "+{percent}% HP/ATK/DEF per rebirth · +{points} point(s) next",
+  "vi": "+{percent}% HP/ATK/DEF mỗi lần chuyển sinh · lần tới +{points} điểm"
+ },
+ "ui.building.rebirth_points": {
+  "en": "Rebirth points: {points} · Trait slots {used} / {max}",
+  "vi": "Điểm tái sinh: {points} · Ô đặc điểm {used} / {max}"
+ },
+ "ui.building.reborn": {
+  "en": "{name} was reborn",
+  "vi": "{name} đã chuyển sinh"
+ },
+ "ui.building.recipe_cost": {
+  "en": "{count} {item} (have {have})",
+  "vi": "{count} {item} (có {have})"
+ },
+ "ui.building.reincarnate": {
+  "en": "Reincarnate",
+  "vi": "Chuyển sinh"
+ },
+ "ui.building.reincarnate_entry": {
+  "en": "{name} · Lv {level} · reborn {count}×",
+  "vi": "{name} · Lv {level} · chuyển sinh {count}×"
+ },
+ "ui.building.reincarnate_title": {
+  "en": "Reincarnate a Hunter",
+  "vi": "Chuyển sinh Hunter"
+ },
+ "ui.building.remove_confirm": {
+  "en": "Tap again to remove",
+  "vi": "Chạm lần nữa để dỡ"
+ },
+ "ui.building.remove_refund": {
+  "en": "Remove (+{gold} g)",
+  "vi": "Dỡ bỏ (+{gold} g)"
+ },
+ "ui.building.removed": {
+  "en": "{name} removed",
+  "vi": "Đã dỡ {name}"
+ },
+ "ui.building.removed_title": {
+  "en": "Removed",
+  "vi": "Đã dỡ bỏ"
+ },
+ "ui.building.requested": {
+  "en": "Requested {count} {item}",
+  "vi": "Đã yêu cầu {count} {item}"
+ },
+ "ui.building.requests": {
+  "en": "Requests {used} / {total}",
+  "vi": "Yêu cầu {used} / {total}"
+ },
+ "ui.building.restaurant_bonus": {
+  "en": "Meals give +{percent}% energy.",
+  "vi": "Bữa ăn cho thêm +{percent}% năng lượng."
+ },
+ "ui.building.revive_info": {
+  "en": "Revival takes {time} and costs {percent}% of the XP of the Hunter's level.",
+  "vi": "Hồi sinh mất {time} và tốn {percent}% XP của cấp Hunter."
+ },
+ "ui.building.revive_now": {
+  "en": "Revive now\n{gold} g",
+  "vi": "Hồi sinh ngay\n{gold} g"
+ },
+ "ui.building.revived": {
+  "en": "{name} is back",
+  "vi": "{name} đã trở lại"
+ },
+ "ui.building.skills": {
+  "en": "Skills",
+  "vi": "Skill"
+ },
+ "ui.building.slots": {
+  "en": "Slots {used} / {total}",
+  "vi": "Ô {used} / {total}"
+ },
+ "ui.building.tavern_note": {
+  "en": "Hunters rest, eat and drink here. Hiring moved to the Hunter Gate.",
+  "vi": "Hunter nghỉ ngơi, ăn uống ở đây. Việc thuê đã chuyển sang Cổng Hunter."
+ },
+ "ui.building.time_left": {
+  "en": "{time} left",
+  "vi": "còn {time}"
+ },
+ "ui.building.title": {
+  "en": "{name}  Lv {level}",
+  "vi": "{name}  Lv {level}"
+ },
+ "ui.building.total_reincarnations": {
+  "en": "Total reincarnations: {count}",
+  "vi": "Tổng số lần chuyển sinh: {count}"
+ },
+ "ui.building.town_beds": {
+  "en": "Town beds: {free} free of {total}",
+  "vi": "Giường thị trấn: trống {free} / {total}"
+ },
+ "ui.building.town_hall_info": {
+  "en": "Hunters {hunters} / {capacity}\nHunter level cap {cap}\nTown level {town_level}",
+  "vi": "Hunter {hunters} / {capacity}\nCấp Hunter tối đa {cap}\nCấp thị trấn {town_level}"
+ },
+ "ui.building.train": {
+  "en": "Train\n{gold} g",
+  "vi": "Luyện\n{gold} g"
+ },
+ "ui.building.trained": {
+  "en": "{name} trained",
+  "vi": "Đã luyện {name}"
+ },
+ "ui.building.unlocks": {
+  "en": "unlocks {recipe}",
+  "vi": "mở khóa {recipe}"
+ },
+ "ui.building.upgrade": {
+  "en": "Upgrade",
+  "vi": "Nâng cấp"
+ },
+ "ui.building.upgrade_to": {
+  "en": "Upgrade to Lv {level}: {costs}",
+  "vi": "Nâng lên Lv {level}: {costs}"
+ },
+ "ui.building.upgraded": {
+  "en": "{name} upgraded",
+  "vi": "Đã nâng cấp {name}"
+ },
+ "ui.building.worn": {
+  "en": "worn",
+  "vi": "đang mặc"
+ },
+ "ui.building.worn_by": {
+  "en": "worn by {name}",
+  "vi": "{name} đang mặc"
+ },
+ "ui.class_skill.learned": {
+  "en": "Learned {name}!",
+  "vi": "Đã mở {name}!"
+ },
+ "ui.class_skill.level": {
+  "en": "Lv {level}/{max}",
+  "vi": "Cấp {level}/{max}"
+ },
+ "ui.class_skill.mana": {
+  "en": "Mana {current} / {max} · +{regen}/s",
+  "vi": "Mana {current} / {max} · +{regen}/giây"
+ },
+ "ui.class_skill.next_point": {
+  "en": "Next point at level {level}",
+  "vi": "Điểm tiếp theo ở cấp {level}"
+ },
+ "ui.class_skill.none": {
+  "en": "No class skill yet. Every 10 levels gives a point.",
+  "vi": "Chưa có skill class. Mỗi 10 cấp được 1 điểm."
+ },
+ "ui.class_skill.points": {
+  "en": "Skill points: {points} · Swap points: {swaps}",
+  "vi": "Điểm skill: {points} · Điểm đổi skill: {swaps}"
+ },
+ "ui.class_skill.slots": {
+  "en": "{count} / {max} skills",
+  "vi": "{count} / {max} skill"
+ },
+ "ui.class_skill.swap": {
+  "en": "Swap",
+  "vi": "Đổi"
+ },
+ "ui.class_skill.swapped": {
+  "en": "Swapped for {name}",
+  "vi": "Đã đổi thành {name}"
+ },
+ "ui.class_skill.title": {
+  "en": "Class skills",
+  "vi": "Skill class"
+ },
+ "ui.class_skill.unlock": {
+  "en": "Learn a random skill (1 point)",
+  "vi": "Mở skill ngẫu nhiên (1 điểm)"
+ },
+ "ui.class_skill.upgrade": {
+  "en": "Level up",
+  "vi": "Nâng cấp"
+ },
+ "ui.class_skill.upgraded": {
+  "en": "{name} is now level {level}",
+  "vi": "{name} lên cấp {level}"
+ },
+ "ui.common.back": {
+  "en": "Back",
+  "vi": "Quay lại"
+ },
+ "ui.common.cancel": {
+  "en": "Cancel",
+  "vi": "Hủy"
+ },
+ "ui.common.close": {
+  "en": "Close",
+  "vi": "Đóng"
+ },
+ "ui.common.confirm": {
+  "en": "Confirm",
+  "vi": "Xác nhận"
+ },
+ "ui.common.gold": {
+  "en": "{gold} gold",
+  "vi": "{gold} vàng"
+ },
+ "ui.common.gold_short": {
+  "en": "{gold} g",
+  "vi": "{gold} g"
+ },
+ "ui.common.info": {
+  "en": "Info",
+  "vi": "Thông Tin"
+ },
+ "ui.common.level_class": {
+  "en": "Lv.{level} {class}",
+  "vi": "Lv.{level} {class}"
+ },
+ "ui.common.level_short": {
+  "en": "Lv.{level}",
+  "vi": "Lv.{level}"
+ },
+ "ui.common.needs_gold": {
+  "en": "Needs {gold} gold",
+  "vi": "Cần {gold} vàng"
+ },
+ "ui.common.no": {
+  "en": "No",
+  "vi": "Không"
+ },
+ "ui.common.ok": {
+  "en": "OK",
+  "vi": "OK"
+ },
+ "ui.common.remove": {
+  "en": "Remove",
+  "vi": "Gỡ"
+ },
+ "ui.common.yes": {
+  "en": "Yes",
+  "vi": "Có"
+ },
+ "ui.debug.header_closed": {
+  "en": "Dev +",
+  "vi": "Dev +"
+ },
+ "ui.debug.header_open": {
+  "en": "Dev -",
+  "vi": "Dev -"
+ },
+ "ui.equip_slot.empty": {
+  "en": "Nothing in this slot.",
+  "vi": "Ô này đang trống."
+ },
+ "ui.equip_slot.equip": {
+  "en": "Equip",
+  "vi": "Mặc"
+ },
+ "ui.equip_slot.none": {
+  "en": "Nothing in the Warehouse fits this slot. Craft some at the Blacksmith or the Trading Post's Boutique.",
+  "vi": "Nhà Kho không có đồ hợp ô này. Hãy chế ở Thợ Rèn hoặc Boutique của Trạm Giao Thương."
+ },
+ "ui.equip_slot.removed": {
+  "en": "Removed {item}",
+  "vi": "Đã gỡ {item}"
+ },
+ "ui.equip_slot.stored": {
+  "en": "In the Warehouse",
+  "vi": "Trong Nhà Kho"
+ },
+ "ui.equip_slot.title": {
+  "en": "{slot} · {name}",
+  "vi": "{slot} · {name}"
+ },
+ "ui.equip_slot.worn": {
+  "en": "Worn now",
+  "vi": "Đang mặc"
+ },
+ "ui.expedition.add": {
+  "en": "Add",
+  "vi": "Thêm"
+ },
+ "ui.expedition.busy": {
+  "en": "Busy",
+  "vi": "Đang bận"
+ },
+ "ui.expedition.enemies": {
+  "en": "Enemies: {enemies}\nBoss: {boss}",
+  "vi": "Kẻ địch: {enemies}\nBoss: {boss}"
+ },
+ "ui.expedition.entrance": {
+  "en": "Entrance on the edge of the {region}. The rest of the world keeps living while the party is inside.",
+  "vi": "Lối vào ở rìa {region}. Thế giới vẫn tiếp diễn khi tổ đội ở bên trong."
+ },
+ "ui.expedition.fallen": {
+  "en": "Fallen",
+  "vi": "Đã gục"
+ },
+ "ui.expedition.fallen_note": {
+  "en": "Fallen members come out as bodies at the entrance and are carried home.",
+  "vi": "Thành viên gục ngã sẽ nằm ở lối vào và được khiêng về."
+ },
+ "ui.expedition.in_party": {
+  "en": "In party",
+  "vi": "Trong đội"
+ },
+ "ui.expedition.injured": {
+  "en": "Injured",
+  "vi": "Bị thương"
+ },
+ "ui.expedition.member_detail": {
+  "en": "{traits} · Mood {mood}",
+  "vi": "{traits} · Tâm trạng {mood}"
+ },
+ "ui.expedition.member_detail_tired": {
+  "en": "{traits} · Mood {mood} · tired or hungry",
+  "vi": "{traits} · Tâm trạng {mood} · mệt hoặc đói"
+ },
+ "ui.expedition.member_name": {
+  "en": "{name}  Lv {level}",
+  "vi": "{name}  Lv {level}"
+ },
+ "ui.expedition.not_available": {
+  "en": "Not available",
+  "vi": "Không sẵn sàng"
+ },
+ "ui.expedition.party": {
+  "en": "Party ({count} / {max})",
+  "vi": "Tổ đội ({count} / {max})"
+ },
+ "ui.expedition.party_full": {
+  "en": "Party is full",
+  "vi": "Tổ đội đã đủ"
+ },
+ "ui.expedition.recommended": {
+  "en": "Recommended level {level}",
+  "vi": "Cấp đề nghị {level}"
+ },
+ "ui.expedition.rewards": {
+  "en": "Rewards: gold, {ore}, {fang}; boss: {essence}, chance of a {blade}; +{gold} gold for clearing",
+  "vi": "Phần thưởng: vàng, {ore}, {fang}; Boss: {essence}, có thể rơi {blade}; +{gold} vàng khi hoàn thành"
+ },
+ "ui.expedition.rewards_first": {
+  "en": "Rewards: gold, {ore}, {fang}; boss: {essence}, chance of a {blade}; +{gold} gold for clearing; first clear unlocks Town Hall Lv 2",
+  "vi": "Phần thưởng: vàng, {ore}, {fang}; Boss: {essence}, có thể rơi {blade}; +{gold} vàng khi hoàn thành; lần đầu hoàn thành mở khóa Tòa Thị Chính Lv 2"
+ },
+ "ui.expedition.sealed": {
+  "en": "Sealed — this dungeon opens in a later update.",
+  "vi": "Bị phong ấn — Dungeon này sẽ mở ở bản cập nhật sau."
+ },
+ "ui.expedition.walk": {
+  "en": "Walk to the entrance",
+  "vi": "Đi tới lối vào"
+ },
+ "ui.expedition.warn_bonded": {
+  "en": "{a} and {b} are bonded: +5% ATK together.",
+  "vi": "{a} và {b} đã gắn bó: +5% ATK khi đi cùng."
+ },
+ "ui.expedition.warn_level": {
+  "en": "{name} is below the recommended level.",
+  "vi": "{name} dưới cấp đề nghị."
+ },
+ "ui.expedition.warn_mood": {
+  "en": "{name} is in a low mood (−10% ATK/DEF).",
+  "vi": "{name} đang tâm trạng tệ (−10% ATK/DEF)."
+ },
+ "ui.expedition_hud.area": {
+  "en": "Area {area} / {total}",
+  "vi": "Khu {area} / {total}"
+ },
+ "ui.expedition_hud.boss": {
+  "en": "Boss",
+  "vi": "Boss"
+ },
+ "ui.expedition_hud.header": {
+  "en": "{dungeon} — {where}",
+  "vi": "{dungeon} — {where}"
+ },
+ "ui.expedition_hud.returning": {
+  "en": "Returning",
+  "vi": "Đang trở về"
+ },
+ "ui.expedition_hud.stash": {
+  "en": "Found: {gold} gold · {items} items · {kills} defeated",
+  "vi": "Thu được: {gold} vàng · {items} món · hạ {kills}"
+ },
+ "ui.gate.candidate_stats": {
+  "en": "HP {hp} · ATK {atk} · DEF {def}",
+  "vi": "HP {hp} · ATK {atk} · DEF {def}"
+ },
+ "ui.gate.expel": {
+  "en": "Expel",
+  "vi": "Đuổi"
+ },
+ "ui.gate.expel_note": {
+  "en": "An expelled Hunter leaves through the gate for good: no refund, their purse and bag go with them.",
+  "vi": "Hunter bị đuổi sẽ rời cổng vĩnh viễn: không hoàn tiền, túi tiền và túi đồ đi theo họ."
+ },
+ "ui.gate.expel_title": {
+  "en": "Expel a Hunter",
+  "vi": "Đuổi Hunter"
+ },
+ "ui.gate.expelled": {
+  "en": "{name} left through the gate",
+  "vi": "{name} đã rời đi qua cổng"
+ },
+ "ui.gate.hire": {
+  "en": "Hire  {gold} g",
+  "vi": "Thuê  {gold} g"
+ },
+ "ui.gate.hired": {
+  "en": "{name} walked in through the gate",
+  "vi": "{name} đã bước qua cổng"
+ },
+ "ui.gate.nobody_waiting": {
+  "en": "Nobody is waiting at the gate right now.",
+  "vi": "Hiện không có ai chờ ở cổng."
+ },
+ "ui.gate.refresh": {
+  "en": "New candidates ({gold} gold)",
+  "vi": "Ứng viên mới ({gold} vàng)"
+ },
+ "ui.gate.refresh_note": {
+  "en": "Candidates also change after every expedition.",
+  "vi": "Ứng viên cũng đổi sau mỗi chuyến Dungeon."
+ },
+ "ui.gate.roster": {
+  "en": "Hunters {count} / {max}  ·  free beds {beds}",
+  "vi": "Hunter {count} / {max}  ·  giường trống {beds}"
+ },
+ "ui.gate.title": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "ui.gate.waiting": {
+  "en": "Hunters waiting",
+  "vi": "Hunter đang chờ"
+ },
+ "ui.hud.defeat": {
+  "en": "DEFEAT",
+  "vi": "THẤT BẠI"
+ },
+ "ui.hud.victory": {
+  "en": "VICTORY",
+  "vi": "CHIẾN THẮNG"
+ },
+ "ui.hunter.academy_hint": {
+  "en": "Build an Academy (Town Hall Lv 3) to train skills and learn traits.",
+  "vi": "Xây Học Viện (Tòa Thị Chính Lv 3) để luyện Skill và học tính cách."
+ },
+ "ui.hunter.activity.eating": {
+  "en": "Eating",
+  "vi": "Đang ăn"
+ },
+ "ui.hunter.activity.hunting": {
+  "en": "Hunting",
+  "vi": "Đi săn"
+ },
+ "ui.hunter.activity.sleeping": {
+  "en": "Sleeping",
+  "vi": "Đang ngủ"
+ },
+ "ui.hunter.assign.auto": {
+  "en": "Auto",
+  "vi": "Tự động"
+ },
+ "ui.hunter.assign.rest": {
+  "en": "Rest",
+  "vi": "Nghỉ"
+ },
+ "ui.hunter.assign.social": {
+  "en": "Social",
+  "vi": "Giao lưu"
+ },
+ "ui.hunter.assign.train": {
+  "en": "Train",
+  "vi": "Luyện"
+ },
+ "ui.hunter.awakening": {
+  "en": "Awakening   Reborn {count}×   ·   {status}",
+  "vi": "Thức tỉnh   Tái sinh {count}×   ·   {status}"
+ },
+ "ui.hunter.bag.capacity": {
+  "en": "Loot bag {count} / {max}",
+  "vi": "Túi đồ {count} / {max}"
+ },
+ "ui.hunter.bag.each": {
+  "en": "{gold} g each",
+  "vi": "{gold} g mỗi món"
+ },
+ "ui.hunter.bag.empty": {
+  "en": "The bag is empty.",
+  "vi": "Túi đồ trống."
+ },
+ "ui.hunter.bag.note": {
+  "en": "The Market stores the items in the Warehouse and pays the Hunter's purse. What the treasury cannot afford goes to a passing trader.",
+  "vi": "Chợ cất đồ vào Nhà Kho và trả tiền vào túi Hunter. Phần kho bạc không đủ tiền sẽ bán cho thương nhân qua đường."
+ },
+ "ui.hunter.bag.sell": {
+  "en": "Sell to the Market ({gold} g)",
+  "vi": "Bán cho Chợ ({gold} g)"
+ },
+ "ui.hunter.bag.sold": {
+  "en": "Sold {count} items for {gold} g",
+  "vi": "Đã bán {count} món được {gold} g"
+ },
+ "ui.hunter.bond_bonded": {
+  "en": "{name} — bonded (+5% ATK together)",
+  "vi": "{name} — đã gắn bó (+5% ATK khi đi cùng)"
+ },
+ "ui.hunter.bonds": {
+  "en": "Bonds",
+  "vi": "Gắn bó"
+ },
+ "ui.hunter.crit": {
+  "en": "CRIT",
+  "vi": "CRIT"
+ },
+ "ui.hunter.doing": {
+  "en": "Doing: {activity}",
+  "vi": "Đang làm: {activity}"
+ },
+ "ui.hunter.doing_auto": {
+  "en": "Doing: {activity} (automatic)",
+  "vi": "Đang làm: {activity} (tự động)"
+ },
+ "ui.hunter.duty": {
+  "en": "Duty: {duty}",
+  "vi": "Nhiệm vụ: {duty}"
+ },
+ "ui.hunter.duty_button": {
+  "en": "{name}\nLv {level}+",
+  "vi": "{name}\nLv {level}+"
+ },
+ "ui.hunter.duty_short.ancient_ruins": {
+  "en": "Ruins",
+  "vi": "Tàn Tích"
+ },
+ "ui.hunter.duty_short.boss_arena": {
+  "en": "Boss Arena",
+  "vi": "Boss Tuần"
+ },
+ "ui.hunter.duty_short.dark_forest": {
+  "en": "Forest",
+  "vi": "Rừng"
+ },
+ "ui.hunter.duty_short.goblin_cave": {
+  "en": "Cave",
+  "vi": "Hang"
+ },
+ "ui.hunter.duty_short.hunter_gate": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "ui.hunter.duty_short.town": {
+  "en": "Town",
+  "vi": "Thị trấn"
+ },
+ "ui.hunter.duty_stay": {
+  "en": "Stay",
+  "vi": "Ở lại"
+ },
+ "ui.hunter.duty_target": {
+  "en": "Duty: {duty} → {region}",
+  "vi": "Nhiệm vụ: {duty} → {region}"
+ },
+ "ui.hunter.energy": {
+  "en": "Energy {value}",
+  "vi": "Năng lượng {value}"
+ },
+ "ui.hunter.energy_hungry": {
+  "en": "Energy {value} — hungry",
+  "vi": "Năng lượng {value} — đói"
+ },
+ "ui.hunter.energy_reason": {
+  "en": "{text} ({reason})",
+  "vi": "{text} ({reason})"
+ },
+ "ui.hunter.energy_starving": {
+  "en": "Energy {value} — starving",
+  "vi": "Năng lượng {value} — đói lả"
+ },
+ "ui.hunter.equip_option": {
+  "en": "{slot}: equip {item} ({mods})",
+  "vi": "{slot}: mặc {item} ({mods})"
+ },
+ "ui.hunter.equipment": {
+  "en": "Equipment",
+  "vi": "Trang bị"
+ },
+ "ui.hunter.equipped": {
+  "en": "Equipped {item}",
+  "vi": "Đã trang bị {item}"
+ },
+ "ui.hunter.follow": {
+  "en": "Follow on the map",
+  "vi": "Theo dõi trên bản đồ"
+ },
+ "ui.hunter.gave": {
+  "en": "Gave {gold} gold to {name}",
+  "vi": "Đã cho {name} {gold} vàng"
+ },
+ "ui.hunter.give": {
+  "en": "Give {amount}\n(+{received})",
+  "vi": "Cho {amount}\n(+{received})"
+ },
+ "ui.hunter.header": {
+  "en": "{class} · Lv {level}",
+  "vi": "{class} · Lv {level}"
+ },
+ "ui.hunter.header_cap": {
+  "en": "{class} · Lv {level} (cap)",
+  "vi": "{class} · Lv {level} (tối đa)"
+ },
+ "ui.hunter.header_reborn": {
+  "en": "{header} · reborn {count}×",
+  "vi": "{header} · tái sinh {count}×"
+ },
+ "ui.hunter.history": {
+  "en": "History",
+  "vi": "Tiểu sử"
+ },
+ "ui.hunter.history_line": {
+  "en": "Joined on day {day} · {won} expeditions won · {lost} lost · {bosses} bosses defeated · injured {injured} times",
+  "vi": "Gia nhập ngày {day} · thắng {won} Dungeon · thua {lost} · hạ {bosses} Boss · bị thương {injured} lần"
+ },
+ "ui.hunter.hp_bar": {
+  "en": "HP {current} / {max}",
+  "vi": "HP {current} / {max}"
+ },
+ "ui.hunter.hp_short": {
+  "en": "HP {current}/{max}",
+  "vi": "HP {current}/{max}"
+ },
+ "ui.hunter.loot_bag": {
+  "en": "Loot bag {count} / {max}",
+  "vi": "Túi đồ {count} / {max}"
+ },
+ "ui.hunter.loot_bag_items": {
+  "en": "Loot bag {count} / {max}: {items}",
+  "vi": "Túi đồ {count} / {max}: {items}"
+ },
+ "ui.hunter.mood_bar": {
+  "en": "Mood {mood} — {state}",
+  "vi": "Tâm trạng {mood} — {state}"
+ },
+ "ui.hunter.mood_bar_high": {
+  "en": "Mood {mood} — {state} · fights and learns better",
+  "vi": "Tâm trạng {mood} — {state} · đánh và học tốt hơn"
+ },
+ "ui.hunter.mood_bar_low": {
+  "en": "Mood {mood} — {state} · weaker until rested",
+  "vi": "Tâm trạng {mood} — {state} · yếu đi tới khi nghỉ ngơi"
+ },
+ "ui.hunter.mood_short": {
+  "en": "Mood {current}/{max}",
+  "vi": "Tâm trạng {current}/{max}"
+ },
+ "ui.hunter.mood_state.high": {
+  "en": "High",
+  "vi": "Tốt"
+ },
+ "ui.hunter.mood_state.low": {
+  "en": "Low",
+  "vi": "Tệ"
+ },
+ "ui.hunter.mood_state.normal": {
+  "en": "Normal",
+  "vi": "Bình thường"
+ },
+ "ui.hunter.no_bonds": {
+  "en": "No bonds yet — share expeditions or socialize at the Tavern.",
+  "vi": "Chưa gắn bó với ai — cùng đi Dungeon hoặc giao lưu ở Quán Rượu."
+ },
+ "ui.hunter.no_spare": {
+  "en": "No spare equipment in the Warehouse. Craft gear at the Blacksmith; skins and pets come from the Trading Post's boutique.",
+  "vi": "Nhà Kho không có trang bị dư. Rèn đồ ở Thợ Rèn; Skin và Pet mua ở Boutique của Trạm Giao Thương."
+ },
+ "ui.hunter.no_talent": {
+  "en": "No talent",
+  "vi": "Không có thiên phú"
+ },
+ "ui.hunter.not_on_map": {
+  "en": "Not on the map",
+  "vi": "Không có trên bản đồ"
+ },
+ "ui.hunter.nothing_equipped": {
+  "en": "Nothing equipped",
+  "vi": "Chưa trang bị gì"
+ },
+ "ui.hunter.open_academy": {
+  "en": "Open the Academy",
+  "vi": "Mở Học Viện"
+ },
+ "ui.hunter.personality": {
+  "en": "Personality",
+  "vi": "Tính cách"
+ },
+ "ui.hunter.purse": {
+  "en": "Purse {gold} gold",
+  "vi": "Túi tiền {gold} vàng"
+ },
+ "ui.hunter.purse_note": {
+  "en": "Earns by selling materials; buys food and medicine. Transfers lose {fee}%.",
+  "vi": "Kiếm tiền nhờ bán nguyên liệu; mua đồ ăn và thuốc. Chuyển tiền mất {fee}%."
+ },
+ "ui.hunter.rebirth_points": {
+  "en": "Own {points} Rebirth Points",
+  "vi": "Có {points} điểm tái sinh"
+ },
+ "ui.hunter.rebirth_pt": {
+  "en": "{points} rebirth pt",
+  "vi": "{points} điểm tái sinh"
+ },
+ "ui.hunter.reincarnate_swap": {
+  "en": "Reincarnating keeps class skills and gives 1 swap point.",
+  "vi": "Chuyển sinh giữ nguyên skill class và nhận 1 điểm đổi skill."
+ },
+ "ui.hunter.reincarnation": {
+  "en": "Reincarnation {count}",
+  "vi": "Tái sinh {count}"
+ },
+ "ui.hunter.satiety_short": {
+  "en": "Satiety {current}/{max}",
+  "vi": "No bụng {current}/{max}"
+ },
+ "ui.hunter.skills": {
+  "en": "Skills: {skills}",
+  "vi": "Skill: {skills}"
+ },
+ "ui.hunter.skills_none": {
+  "en": "none",
+  "vi": "chưa có"
+ },
+ "ui.hunter.stamina": {
+  "en": "Stamina {value}",
+  "vi": "Thể lực {value}"
+ },
+ "ui.hunter.stamina_exhausted": {
+  "en": "Stamina {value} — exhausted",
+  "vi": "Thể lực {value} — kiệt sức"
+ },
+ "ui.hunter.stamina_short": {
+  "en": "Stamina {current}/{max}",
+  "vi": "Thể lực {current}/{max}"
+ },
+ "ui.hunter.stats_line": {
+  "en": "ATK {atk} · DEF {def} · SPD {spd} · Crit {crit}%",
+  "vi": "ATK {atk} · DEF {def} · SPD {spd} · Chí mạng {crit}%"
+ },
+ "ui.hunter.status.carrying": {
+  "en": "Carrying {name}",
+  "vi": "Đang khiêng {name}"
+ },
+ "ui.hunter.status.fallen_carrying": {
+  "en": "Fallen — {who} is carrying them to the Temple",
+  "vi": "Đã gục — {who} đang khiêng về Đền"
+ },
+ "ui.hunter.status.fallen_on_way": {
+  "en": "Fallen — {who} is on the way",
+  "vi": "Đã gục — {who} đang tới"
+ },
+ "ui.hunter.status.fallen_reviving": {
+  "en": "Fallen — revived at the Temple in {time}",
+  "vi": "Đã gục — hồi sinh ở Đền sau {time}"
+ },
+ "ui.hunter.status.fallen_waiting": {
+  "en": "Fallen — waiting for someone to carry them home",
+  "vi": "Đã gục — chờ người khiêng về"
+ },
+ "ui.hunter.status.fetching": {
+  "en": "Fetching {name}",
+  "vi": "Đang đi đón {name}"
+ },
+ "ui.hunter.status.hunting": {
+  "en": "Hunting",
+  "vi": "Đang săn"
+ },
+ "ui.hunter.status.hunting_in": {
+  "en": "Hunting in {region}",
+  "vi": "Đang săn ở {region}"
+ },
+ "ui.hunter.status.in_town": {
+  "en": "In town",
+  "vi": "Trong thị trấn"
+ },
+ "ui.hunter.status.injured": {
+  "en": "Injured — {time} at the Temple",
+  "vi": "Bị thương — {time} ở Đền"
+ },
+ "ui.hunter.status.on_expedition": {
+  "en": "On an expedition",
+  "vi": "Đang đi Dungeon"
+ },
+ "ui.hunter.status.village_staff": {
+  "en": "Village staff",
+  "vi": "Người làng"
+ },
+ "ui.hunter.tab.bag": {
+  "en": "Bag",
+  "vi": "Túi đồ"
+ },
+ "ui.hunter.tab.life": {
+  "en": "Life",
+  "vi": "Đời sống"
+ },
+ "ui.hunter.tab.skills": {
+  "en": "Skill&Trait",
+  "vi": "Skill"
+ },
+ "ui.hunter.take_all": {
+  "en": "Take all\n(+{received})",
+  "vi": "Lấy hết\n(+{received})"
+ },
+ "ui.hunter.talent": {
+  "en": "Talent: {name} — {desc}",
+  "vi": "Thiên phú: {name} — {desc}"
+ },
+ "ui.hunter.task.brewing": {
+  "en": "Brewing",
+  "vi": "Đang pha thuốc"
+ },
+ "ui.hunter.task.carrying": {
+  "en": "Carrying",
+  "vi": "Đang khiêng"
+ },
+ "ui.hunter.task.cooking": {
+  "en": "Cooking",
+  "vi": "Đang nấu ăn"
+ },
+ "ui.hunter.task.departing": {
+  "en": "Departing",
+  "vi": "Đang lên đường"
+ },
+ "ui.hunter.task.fetching": {
+  "en": "Fetching",
+  "vi": "Đang đi đón"
+ },
+ "ui.hunter.task.hunting": {
+  "en": "Hunting",
+  "vi": "Đang săn"
+ },
+ "ui.hunter.task.returning": {
+  "en": "Returning",
+  "vi": "Đang về"
+ },
+ "ui.hunter.treasury_gain": {
+  "en": "Treasury +{gold} gold",
+  "vi": "Kho bạc +{gold} vàng"
+ },
+ "ui.hunter.xp_bar": {
+  "en": "XP {current} / {max}",
+  "vi": "XP {current} / {max}"
+ },
+ "ui.hunter.xp_short": {
+  "en": "XP {current}/{max}",
+  "vi": "XP {current}/{max}"
+ },
+ "ui.hunters.everyone": {
+  "en": "Everyone: {duty}",
+  "vi": "Tất cả: {duty}"
+ },
+ "ui.hunters.hire_more": {
+  "en": "Hire more Hunters at the Hunter Gate.",
+  "vi": "Thuê thêm Hunter ở Cổng Hunter."
+ },
+ "ui.hunters.hunting_grounds": {
+  "en": "Hunting grounds: {duty}",
+  "vi": "Bãi săn: {duty}"
+ },
+ "ui.hunters.hunting_grounds_tip": {
+  "en": "Tap to send every Hunter to the next hunting ground (next: {next})",
+  "vi": "Chạm để đưa mọi Hunter tới bãi săn kế tiếp (kế tiếp: {next})"
+ },
+ "ui.hunters.locate": {
+  "en": "Find on the map",
+  "vi": "Tìm trên bản đồ"
+ },
+ "ui.hunters.sort": {
+  "en": "Sort: {mode}",
+  "vi": "Xếp: {mode}"
+ },
+ "ui.hunters.sort_mode.class": {
+  "en": "Class",
+  "vi": "Nghề"
+ },
+ "ui.hunters.sort_mode.level": {
+  "en": "Level",
+  "vi": "Cấp"
+ },
+ "ui.hunters.sort_mode.name": {
+  "en": "Name",
+  "vi": "Tên"
+ },
+ "ui.hunters.status.fallen": {
+  "en": "Fallen",
+  "vi": "Đã gục"
+ },
+ "ui.hunters.status.hunting": {
+  "en": "Hunting",
+  "vi": "Đang săn"
+ },
+ "ui.hunters.status.idle": {
+  "en": "Idle",
+  "vi": "Rảnh"
+ },
+ "ui.hunters.status.injured": {
+  "en": "Injured {time}",
+  "vi": "Bị thương {time}"
+ },
+ "ui.hunters.status.on_expedition": {
+  "en": "On expedition",
+  "vi": "Đang đi Dungeon"
+ },
+ "ui.hunters.status.reviving": {
+  "en": "Reviving {time}",
+  "vi": "Hồi sinh {time}"
+ },
+ "ui.hunters.title": {
+  "en": "Hunters",
+  "vi": "Hunter"
+ },
+ "ui.hunters.title_count": {
+  "en": "Hunters  {count} / {max}",
+  "vi": "Hunter  {count} / {max}"
+ },
+ "ui.inventory.cannot_sell": {
+  "en": "Cannot sell",
+  "vi": "Không bán được"
+ },
+ "ui.inventory.equip_hint": {
+  "en": "Equip items from a Hunter's panel.",
+  "vi": "Trang bị đồ từ bảng của Hunter."
+ },
+ "ui.inventory.materials": {
+  "en": "Materials",
+  "vi": "Nguyên liệu"
+ },
+ "ui.inventory.no_materials": {
+  "en": "No materials yet. Expeditions bring them home.",
+  "vi": "Chưa có nguyên liệu. Các chuyến thám hiểm sẽ mang về."
+ },
+ "ui.inventory.no_spare": {
+  "en": "Nothing spare. Equipped items are on your Hunters.",
+  "vi": "Không có đồ dư. Đồ đã trang bị nằm trên Hunter."
+ },
+ "ui.inventory.nothing_to_sell": {
+  "en": "Nothing to sell",
+  "vi": "Không có gì để bán"
+ },
+ "ui.inventory.sell": {
+  "en": "Sell\n{gold} g",
+  "vi": "Bán\n{gold} g"
+ },
+ "ui.inventory.sell_one": {
+  "en": "Sell 1\n{gold} g",
+  "vi": "Bán 1\n{gold} g"
+ },
+ "ui.inventory.slots": {
+  "en": "Warehouse slots {used} / {total}",
+  "vi": "Ô Nhà Kho {used} / {total}"
+ },
+ "ui.inventory.spare": {
+  "en": "Spare equipment",
+  "vi": "Trang bị dư"
+ },
+ "ui.inventory.title": {
+  "en": "Inventory",
+  "vi": "Kho đồ"
+ },
+ "ui.item.broken": {
+  "en": "Broken: no bonuses until repaired at the Blacksmith.",
+  "vi": "Đã hỏng: mất chỉ số cho tới khi sửa ở Thợ Rèn."
+ },
+ "ui.item.change": {
+  "en": "Change",
+  "vi": "Đổi đồ"
+ },
+ "ui.item.durability": {
+  "en": "Durability {current} / {max}",
+  "vi": "Độ bền {current} / {max}"
+ },
+ "ui.item.durability_note": {
+  "en": "Each kill wears the weapon by 1. At 0 it breaks and gives no bonus until it is repaired at the Blacksmith.",
+  "vi": "Mỗi lần hạ quái vũ khí mòn 1. Về 0 thì hỏng và mất chỉ số cho tới khi sửa ở Thợ Rèn."
+ },
+ "ui.item.enhance": {
+  "en": "Enhanced",
+  "vi": "Cường hóa"
+ },
+ "ui.item.food": {
+  "en": "Food: +{energy} energy",
+  "vi": "Đồ ăn: +{energy} năng lượng"
+ },
+ "ui.item.kind": {
+  "en": "Kind",
+  "vi": "Loại"
+ },
+ "ui.item.kind.consumable": {
+  "en": "Consumable",
+  "vi": "Tiêu hao"
+ },
+ "ui.item.kind.material": {
+  "en": "Material",
+  "vi": "Nguyên liệu"
+ },
+ "ui.item.material_note": {
+  "en": "Used for crafting, Trading Post requests and enhancing.",
+  "vi": "Dùng để chế tạo, giao cho Trạm Giao Thương và cường hóa."
+ },
+ "ui.item.medicine": {
+  "en": "Medicine: heals {percent}% HP",
+  "vi": "Thuốc: hồi {percent}% HP"
+ },
+ "ui.item.quality": {
+  "en": "Quality",
+  "vi": "Chất lượng"
+ },
+ "ui.item.repair": {
+  "en": "Repair ({gold} g)",
+  "vi": "Sửa ({gold} g)"
+ },
+ "ui.item.repaired": {
+  "en": "{item} is like new",
+  "vi": "{item} đã như mới"
+ },
+ "ui.item.value": {
+  "en": "Worth {gold} g",
+  "vi": "Giá trị {gold} g"
+ },
+ "ui.item.worn_by": {
+  "en": "Worn by {name}",
+  "vi": "Đang được {name} dùng"
+ },
+ "ui.kit.duration_hours": {
+  "en": "{hours}h {minutes}m",
+  "vi": "{hours}g {minutes}p"
+ },
+ "ui.market.bag": {
+  "en": "{name}: {count} items, {gold} g",
+  "vi": "{name}: {count} món, {gold} g"
+ },
+ "ui.market.bought": {
+  "en": "Bought {name}'s loot",
+  "vi": "Đã mua đồ của {name}"
+ },
+ "ui.market.bought_all": {
+  "en": "Bought {count} bags",
+  "vi": "Đã mua {count} túi"
+ },
+ "ui.market.buy": {
+  "en": "Buy",
+  "vi": "Mua"
+ },
+ "ui.market.buy_all": {
+  "en": "Buy every bag ({count})",
+  "vi": "Mua tất cả túi ({count})"
+ },
+ "ui.market.no_loot": {
+  "en": "No Hunter is carrying loot right now.",
+  "vi": "Hiện không Hunter nào mang đồ."
+ },
+ "ui.market.note": {
+  "en": "Hunters sell their loot bag here when they come back to town. You can also buy a bag now.",
+  "vi": "Hunter bán túi đồ ở đây khi về thị trấn. Bạn cũng có thể mua ngay một túi."
+ },
+ "ui.market.price": {
+  "en": "Pays {percent}% of an item's price",
+  "vi": "Trả {percent}% giá món đồ"
+ },
+ "ui.message.away": {
+  "en": "You were away for {time}.",
+  "vi": "Bạn đã vắng mặt {time}."
+ },
+ "ui.message.away_capped": {
+  "en": "You were away for {time} (progress is capped at {hours} hours).",
+  "vi": "Bạn đã vắng mặt {time} (tiến trình tính tối đa {hours} giờ)."
+ },
+ "ui.message.fallen": {
+  "en": "Fallen: {names} — lying at the entrance until someone carries them home",
+  "vi": "Đã gục: {names} — nằm ở lối vào chờ người khiêng về"
+ },
+ "ui.message.first_clear": {
+  "en": "First clear! The Town Hall can now be upgraded.",
+  "vi": "Hoàn thành lần đầu! Giờ có thể nâng cấp Tòa Thị Chính."
+ },
+ "ui.message.gold_gained": {
+  "en": "+{gold} gold",
+  "vi": "+{gold} vàng"
+ },
+ "ui.message.gold_gained_half": {
+  "en": "+{gold} gold (half the loot was lost)",
+  "vi": "+{gold} vàng (mất một nửa chiến lợi phẩm)"
+ },
+ "ui.message.hungry": {
+  "en": "Some Hunters went hungry — give them gold for food.",
+  "vi": "Vài Hunter bị đói — hãy cho họ vàng mua đồ ăn."
+ },
+ "ui.message.items": {
+  "en": "Items: {items}",
+  "vi": "Vật phẩm: {items}"
+ },
+ "ui.message.meals": {
+  "en": "Meals at the Tavern: {meals}",
+  "vi": "Bữa ăn ở Quán Rượu: {meals}"
+ },
+ "ui.message.offline_title": {
+  "en": "While you were away",
+  "vi": "Trong lúc bạn vắng mặt"
+ },
+ "ui.message.overflow": {
+  "en": "Warehouse full — sold {items} for {gold} gold",
+  "vi": "Nhà Kho đầy — đã bán {items} được {gold} vàng"
+ },
+ "ui.message.recovered": {
+  "en": "Recovered at the Hospital: {names}",
+  "vi": "Đã hồi phục ở Bệnh Viện: {names}"
+ },
+ "ui.message.rested": {
+  "en": "Your Hunters rested in town.",
+  "vi": "Các Hunter đã nghỉ ngơi trong thị trấn."
+ },
+ "ui.message.result_defeat": {
+  "en": "The party was defeated · {kills} enemies defeated",
+  "vi": "Tổ đội thất bại · hạ {kills} kẻ địch"
+ },
+ "ui.message.result_victory": {
+  "en": "Victory · {kills} enemies defeated",
+  "vi": "Chiến thắng · hạ {kills} kẻ địch"
+ },
+ "ui.message.title_defeat": {
+  "en": "Defeat",
+  "vi": "Thất bại"
+ },
+ "ui.message.title_victory": {
+  "en": "Victory",
+  "vi": "Chiến thắng"
+ },
+ "ui.message.training": {
+  "en": "Training: +{xp} XP across your Hunters",
+  "vi": "Luyện tập: +{xp} XP cho các Hunter"
+ },
+ "ui.message.training_levels": {
+  "en": "Training: +{xp} XP across your Hunters · {levels} level-ups",
+  "vi": "Luyện tập: +{xp} XP cho các Hunter · {levels} lần lên cấp"
+ },
+ "ui.message.xp": {
+  "en": "XP {xp} per Hunter",
+  "vi": "XP {xp} mỗi Hunter"
+ },
+ "ui.message.xp_levels": {
+  "en": "XP {xp} per Hunter · {levels} level-ups",
+  "vi": "XP {xp} mỗi Hunter · {levels} lần lên cấp"
+ },
+ "ui.nav.construct": {
+  "en": "Construct",
+  "vi": "Xây dựng"
+ },
+ "ui.nav.dungeon": {
+  "en": "Dungeon",
+  "vi": "Dungeon"
+ },
+ "ui.nav.hunters": {
+  "en": "Hunters",
+  "vi": "Hunter"
+ },
+ "ui.nav.shop": {
+  "en": "Shop",
+  "vi": "Cửa hàng"
+ },
+ "ui.nav.storage": {
+  "en": "Storage",
+  "vi": "Kho"
+ },
+ "ui.quest.all_done": {
+  "en": "All quests are done. Play on at your own pace.",
+  "vi": "Đã xong mọi nhiệm vụ. Cứ chơi tiếp theo nhịp của bạn."
+ },
+ "ui.quest.claim": {
+  "en": "Claim",
+  "vi": "Nhận"
+ },
+ "ui.quest.claimed": {
+  "en": "Reward claimed: {reward}",
+  "vi": "Đã nhận thưởng: {reward}"
+ },
+ "ui.quest.done": {
+  "en": "Done: {done} / {total}",
+  "vi": "Hoàn thành: {done} / {total}"
+ },
+ "ui.quest.reward": {
+  "en": "Reward: {reward}",
+  "vi": "Phần thưởng: {reward}"
+ },
+ "ui.quest.title": {
+  "en": "Quests",
+  "vi": "Nhiệm vụ"
+ },
+ "ui.repair.heading": {
+  "en": "Repairs",
+  "vi": "Sửa chữa"
+ },
+ "ui.repair.none": {
+  "en": "Every weapon is in good shape.",
+  "vi": "Mọi vũ khí đều còn tốt."
+ },
+ "ui.repair.note": {
+  "en": "Weapons wear with every kill. Hunters come here on their own and pay from their purse; you can also repair now with the treasury.",
+  "vi": "Vũ khí mòn sau mỗi lần hạ quái. Hunter tự đến đây và trả bằng túi tiền; bạn cũng có thể sửa ngay bằng ngân khố."
+ },
+ "ui.repair.worn_by": {
+  "en": "{item} ({name})",
+  "vi": "{item} ({name})"
+ },
+ "ui.root.all_quests_done": {
+  "en": "All quests done. Play on at your own pace.",
+  "vi": "Đã xong mọi nhiệm vụ. Cứ chơi tiếp theo nhịp của bạn."
+ },
+ "ui.root.feed_sold": {
+  "en": "{name} has sold {count} items (+{gold} g)",
+  "vi": "{name} đã bán {count} món (+{gold} g)"
+ },
+ "ui.root.feed_weapon_broken": {
+  "en": "{name}'s {item} broke!",
+  "vi": "{item} của {name} đã hỏng!"
+ },
+ "ui.root.feed_weapon_repaired": {
+  "en": "{name} repaired {item} (-{gold} g)",
+  "vi": "{name} đã sửa {item} (-{gold} g)"
+ },
+ "ui.root.hunters_waiting": {
+  "en": "Hunters\nWaiting",
+  "vi": "Hunter\nđang chờ"
+ },
+ "ui.root.no_candidates": {
+  "en": "No\ncandidates",
+  "vi": "Chưa có\nứng viên"
+ },
+ "ui.root.quest_claim": {
+  "en": "Claim reward! {quest} ({progress}/{goal})",
+  "vi": "Nhận thưởng! {quest} ({progress}/{goal})"
+ },
+ "ui.root.quest_progress": {
+  "en": "Quest: {quest} ({progress}/{goal})",
+  "vi": "Nhiệm vụ: {quest} ({progress}/{goal})"
+ },
+ "ui.root.quest_title": {
+  "en": "Quest",
+  "vi": "Nhiệm vụ"
+ },
+ "ui.root.tip_portal": {
+  "en": "Portal",
+  "vi": "Cổng luân hồi"
+ },
+ "ui.root.tip_quests": {
+  "en": "Quests",
+  "vi": "Nhiệm vụ"
+ },
+ "ui.root.tip_recruit": {
+  "en": "Recruit",
+  "vi": "Tuyển Hunter"
+ },
+ "ui.root.town": {
+  "en": "Town",
+  "vi": "Thị trấn"
+ },
+ "ui.settings.busy_dungeon": {
+  "en": "Finish the dungeon run first",
+  "vi": "Hãy hoàn thành lượt dungeon trước"
+ },
+ "ui.settings.changed": {
+  "en": "Language: {language}",
+  "vi": "Ngôn ngữ: {language}"
+ },
+ "ui.settings.language": {
+  "en": "Language",
+  "vi": "Ngôn ngữ"
+ },
+ "ui.settings.language_note": {
+  "en": "The game reloads the screen in the new language. Your progress is kept.",
+  "vi": "Game sẽ tải lại màn hình bằng ngôn ngữ mới. Tiến trình của bạn được giữ nguyên."
+ },
+ "ui.settings.title": {
+  "en": "Settings",
+  "vi": "Cài đặt"
+ },
+ "ui.shop.locked": {
+  "en": "Locked",
+  "vi": "Đang khóa"
+ },
+ "ui.shop.name_level": {
+  "en": "{name}  Lv {level}",
+  "vi": "{name}  Lv {level}"
+ },
+ "ui.shop.not_built": {
+  "en": "Not built",
+  "vi": "Chưa xây"
+ },
+ "ui.shop.not_built_hint": {
+  "en": "Not built — use Construct",
+  "vi": "Chưa xây — hãy dùng Xây dựng"
+ },
+ "ui.shop.open": {
+  "en": "Open",
+  "vi": "Mở"
+ },
+ "ui.shop.quests": {
+  "en": "Quests ({count} ready)",
+  "vi": "Nhiệm vụ ({count} sẵn sàng)"
+ },
+ "ui.shop.title": {
+  "en": "Shop & Services",
+  "vi": "Cửa hàng & Dịch vụ"
+ },
+ "world.arena.cleanse": {
+  "en": "Cleanse",
+  "vi": "Giải debuff"
+ },
+ "world.arena.effects_help": {
+  "en": "Effects: selected Hunter, else all enemies",
+  "vi": "Hiệu ứng: Hunter đang chọn, nếu không thì mọi kẻ địch"
+ },
+ "world.arena.heal_all": {
+  "en": "Heal all",
+  "vi": "Hồi máu tất cả"
+ },
+ "world.arena.help": {
+  "en": "Tap ground: move. Tap Hunter: select.",
+  "vi": "Chạm đất: di chuyển. Chạm Hunter: chọn."
+ },
+ "world.arena.hit": {
+  "en": "Hit 25",
+  "vi": "Đánh 25"
+ },
+ "world.arena.hunter": {
+  "en": "Hunter",
+  "vi": "Hunter"
+ },
+ "world.arena.info": {
+  "en": "{name}  Lv {level}\nHP {hp}/{max_hp}  ATK {atk}  DEF {def}\nSPD {spd}  CRIT {crit}%  {state}",
+  "vi": "{name}  Lv {level}\nHP {hp}/{max_hp}  ATK {atk}  DEF {def}\nSPD {spd}  CRIT {crit}%  {state}"
+ },
+ "world.arena.level_up": {
+  "en": "Lv +1",
+  "vi": "Lv +1"
+ },
+ "world.arena.log_crit": {
+  "en": "{attacker} CRIT {target} for {amount}",
+  "vi": "{attacker} CRIT {target} {amount} sát thương"
+ },
+ "world.arena.log_downed": {
+  "en": "{by} downed {target}",
+  "vi": "{by} đánh gục {target}"
+ },
+ "world.arena.log_killed": {
+  "en": "{by} killed {target}",
+  "vi": "{by} hạ gục {target}"
+ },
+ "world.arena.loot": {
+  "en": "Loot",
+  "vi": "Lục đồ"
+ },
+ "world.arena.no_selection": {
+  "en": "No Hunter selected",
+  "vi": "Chưa chọn Hunter"
+ },
+ "world.arena.pickup": {
+  "en": "Pickup",
+  "vi": "Nhặt"
+ },
+ "world.arena.purge": {
+  "en": "Purge",
+  "vi": "Xóa buff"
+ },
+ "world.arena.revive": {
+  "en": "Revive",
+  "vi": "Hồi sinh"
+ },
+ "world.arena.skill": {
+  "en": "Skill",
+  "vi": "Skill"
+ },
+ "world.arena.slime": {
+  "en": "Slime",
+  "vi": "Slime"
+ },
+ "world.arena.slime_3": {
+  "en": "Slime x3",
+  "vi": "Slime x3"
+ },
+ "world.arena.slime_6": {
+  "en": "Slime x6",
+  "vi": "Slime x6"
+ },
+ "world.arena.town": {
+  "en": "Town",
+  "vi": "Thị trấn"
+ },
+ "world.arena.use": {
+  "en": "Use",
+  "vi": "Dùng"
+ },
+ "world.boss.plaque": {
+  "en": "Weekly Boss",
+  "vi": "Boss tuần"
+ },
+ "world.boss.plaque_away": {
+  "en": "Weekly Boss (away)",
+  "vi": "Boss tuần (vắng mặt)"
+ },
+ "world.building.plaque_level": {
+  "en": "{name}  Lv{level}",
+  "vi": "{name}  Lv{level}"
+ },
+ "world.depart.party_out": {
+  "en": "A party is already out",
+  "vi": "Đã có một đội đang ra ngoài"
+ },
+ "world.depart.sealed": {
+  "en": "This dungeon is sealed",
+  "vi": "Dungeon này đang bị phong ấn"
+ },
+ "world.depart.unreachable": {
+  "en": "The party could not reach the entrance",
+  "vi": "Đội không thể tới được lối vào"
+ },
+ "world.dev.add_gold": {
+  "en": "+500 gold",
+  "vi": "+500 vàng"
+ },
+ "world.dev.add_hour": {
+  "en": "+1 h",
+  "vi": "+1 giờ"
+ },
+ "world.dev.new_game": {
+  "en": "New game",
+  "vi": "Game mới"
+ },
+ "world.dev.sandbox": {
+  "en": "Sandbox",
+  "vi": "Sandbox"
+ },
+ "world.dev.save": {
+  "en": "Save",
+  "vi": "Lưu"
+ },
+ "world.dev.save_failed": {
+  "en": "Save failed",
+  "vi": "Lưu thất bại"
+ },
+ "world.dev.saved": {
+  "en": "Saved",
+  "vi": "Đã lưu"
+ },
+ "world.dev.tire_all": {
+  "en": "Tire all",
+  "vi": "Làm mệt tất cả"
+ },
+ "world.entrance.locked": {
+  "en": "{name} (locked)",
+  "vi": "{name} (đã khóa)"
+ },
+ "world.expedition.boss": {
+  "en": "Boss",
+  "vi": "Boss"
+ },
+ "world.expedition.dev_kill_wave": {
+  "en": "Kill wave",
+  "vi": "Diệt đợt quái"
+ },
+ "world.expedition.dev_party_level": {
+  "en": "Party Lv 10",
+  "vi": "Đội Lv 10"
+ },
+ "world.expedition.dev_wipe": {
+  "en": "Wipe party",
+  "vi": "Hạ cả đội"
+ },
+ "world.expedition.section": {
+  "en": "Section {index}/{count}",
+  "vi": "Khu {index}/{count}"
+ },
+ "world.expedition.status": {
+  "en": "{name}  {where}  {stage}\nKills {kills}  Stash {gold} gold  XP {xp} each\nDowned {downed}/{party}\nStash: {stash}",
+  "vi": "{name}  {where}  {stage}\nĐã hạ {kills}  Kho {gold} vàng  XP {xp} mỗi người\nGục {downed}/{party}\nKho: {stash}"
+ },
+ "world.gate.plaque": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "world.placement.build": {
+  "en": "Build {name}",
+  "vi": "Xây {name}"
+ },
+ "world.placement.cannot_build": {
+  "en": "Cannot build here",
+  "vi": "Không thể xây ở đây"
+ },
+ "world.placement.move": {
+  "en": "Move {name}",
+  "vi": "Dời {name}"
+ },
+ "world.placement.nothing": {
+  "en": "Nothing to place",
+  "vi": "Không có gì để đặt"
+ },
+ "world.popup.effect_stacks": {
+  "en": "{name} x{stacks}",
+  "vi": "{name} x{stacks}"
+ },
+ "world.popup.gold": {
+  "en": "+{gold} gold",
+  "vi": "+{gold} vàng"
+ },
+ "world.popup.immune": {
+  "en": "Immune",
+  "vi": "Miễn nhiễm"
+ },
+ "world.popup.item": {
+  "en": "+{count} {name}",
+  "vi": "+{count} {name}"
+ },
+ "world.popup.level_up": {
+  "en": "LEVEL UP",
+  "vi": "LÊN CẤP"
+ },
+ "world.popup.miss": {
+  "en": "Miss",
+  "vi": "Trượt"
+ }
+}

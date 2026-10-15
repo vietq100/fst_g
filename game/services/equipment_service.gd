@@ -4,15 +4,44 @@ extends RefCounted
 ## HunterRuntime.equipment maps slot name -> instance id; the instance's item gives modifiers.
 
 signal equipment_changed(hunter: HunterRuntime)
+## A weapon reached 0 durability and stops giving its bonuses (D64).
+signal weapon_broken(hunter: HunterRuntime, item: ItemDefinition)
+## A Hunter had its weapon repaired at the Blacksmith (`cost` from its purse, D64).
+signal weapon_repaired(hunter: HunterRuntime, item: ItemDefinition, cost: int)
 
 const SLOT_NAMES := {
 	ItemDefinition.EquipmentSlot.WEAPON: &"weapon",
 	ItemDefinition.EquipmentSlot.ARMOR: &"armor",
 	ItemDefinition.EquipmentSlot.ACCESSORY: &"accessory",
+	ItemDefinition.EquipmentSlot.HELMET: &"helmet",
+	ItemDefinition.EquipmentSlot.PANTS: &"pants",
+	ItemDefinition.EquipmentSlot.BOOTS: &"boots",
+	ItemDefinition.EquipmentSlot.NECKLACE: &"necklace",
+	ItemDefinition.EquipmentSlot.RING: &"ring",
+	ItemDefinition.EquipmentSlot.SKIN: &"skin",
+	ItemDefinition.EquipmentSlot.PET: &"pet",
 }
+## Display order and names of the slots (paper doll, Gear tab; D59).
+const SLOT_ORDER: Array[StringName] = [&"weapon", &"helmet", &"armor", &"pants", &"boots", &"necklace", &"ring",
+	&"accessory", &"skin", &"pet"]
+## Slot name of a slot id (D61 key "slot.<id>").
+static func slot_label(slot: StringName) -> String:
+	return Loc.t("slot.%s" % slot) if slot != &"" else ""
 
 ## Stat growth per Forge level (mirrors GameConfig.enhance_stat_bonus).
 const ENHANCE_BONUS := 0.12
+## Weapon durability (D64): base + per tier step; each kill wears one point.
+const DURABILITY_BASE := 40
+const DURABILITY_PER_TIER := 20
+## Gold per point of durability repaired: 1 + the tier.
+const REPAIR_GOLD_PER_POINT := 1
+## Hunters go to the Blacksmith when their weapon is at or below this share of its durability.
+const REPAIR_THRESHOLD := 0.3
+
+## Set by GameManager (D64): the Blacksmith repairs; purses pay a Hunter's own repairs.
+var buildings: BuildingService
+var purses: PurseService
+var wallet: WalletService
 
 var _registry: Node
 var _hunters: HunterService
@@ -31,7 +60,7 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 	for slot in hunter.equipment:
 		var instance_id: StringName = hunter.equipment[slot]
 		var item := get_item(instance_id)
-		if item == null:
+		if item == null or is_broken(instance_id):
 			continue
 		var enhance := _inventory.get_enhance(instance_id)
 		if enhance <= 0:
@@ -48,6 +77,134 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 	return modifiers
 
 
+## What the Hunter's sprite wears (D59): the class outfit, the top's / skin's cloth colour, pants,
+## boots, hat and pet from the equipped items.
+func get_dress(hunter: HunterRuntime) -> ChibiDress:
+	return dress_for(hunter, _hunters.get_definition(hunter), func(slot: StringName) -> ItemDefinition:
+		return get_equipped_item(hunter, slot))
+
+
+## Same, for any item lookup (`item_of(slot) -> ItemDefinition`, may return null).
+static func dress_for(_hunter: HunterRuntime, definition: HunterDefinition, item_of: Callable) -> ChibiDress:
+	var dress := ChibiDress.new()
+	dress.outfit = ChibiBody.outfit_for(definition)
+	var top: ItemDefinition = item_of.call(&"armor")
+	if top != null and top.tint != Color.WHITE:
+		dress.cloth = top.tint
+		dress.has_cloth = true
+	var skin: ItemDefinition = item_of.call(&"skin")
+	if skin != null:
+		if ChibiBody.OUTFITS.has(skin.outfit_id):
+			dress.outfit = skin.outfit_id
+		dress.cloth = skin.tint
+		dress.has_cloth = true
+		dress.skin = true
+	var pants: ItemDefinition = item_of.call(&"pants")
+	if pants != null:
+		dress.pants = pants.tint
+		dress.has_pants = true
+	var boots: ItemDefinition = item_of.call(&"boots")
+	if boots != null:
+		dress.boots = boots.tint
+		dress.has_boots = true
+	var helmet: ItemDefinition = item_of.call(&"helmet")
+	if helmet != null:
+		dress.hat = ChibiBody.hat_style_for(helmet)
+		dress.hat_tint = helmet.tint
+	var pet: ItemDefinition = item_of.call(&"pet")
+	if pet != null:
+		dress.pet = PetSprites.kind_for(pet)
+		dress.pet_tint = pet.tint
+	return dress
+
+
+# --- Durability (D64) -----------------------------------------------------------------------
+
+## Full durability of an item; 0 = it does not wear (everything but weapons).
+static func max_durability(item: ItemDefinition) -> int:
+	if item == null or item.equipment_slot != ItemDefinition.EquipmentSlot.WEAPON:
+		return 0
+	return DURABILITY_BASE + DURABILITY_PER_TIER * int(item.rarity)
+
+
+func get_durability(instance_id: StringName) -> int:
+	return maxi(max_durability(get_item(instance_id)) - _inventory.get_wear(instance_id), 0)
+
+
+func is_broken(instance_id: StringName) -> bool:
+	return max_durability(get_item(instance_id)) > 0 and get_durability(instance_id) <= 0
+
+
+## One kill's worth of wear on the Hunter's weapon. Breaking it removes its bonuses.
+func wear_weapon(hunter: HunterRuntime, amount: int = 1) -> void:
+	var instance_id: StringName = hunter.equipment.get(&"weapon", &"")
+	var item := get_item(instance_id)
+	var full := max_durability(item)
+	if full <= 0 or is_broken(instance_id):
+		return
+	_inventory.set_wear(instance_id, mini(_inventory.get_wear(instance_id) + amount, full))
+	if is_broken(instance_id):
+		_changed(hunter)
+		weapon_broken.emit(hunter, item)
+
+
+func get_repair_cost(instance_id: StringName) -> int:
+	var item := get_item(instance_id)
+	return _inventory.get_wear(instance_id) * (REPAIR_GOLD_PER_POINT + (int(item.rarity) if item != null else 0))
+
+
+## Empty string when the treasury can repair the instance now, otherwise the reason.
+func can_repair(instance_id: StringName) -> String:
+	if _inventory.get_wear(instance_id) <= 0:
+		return Loc.t("err.repair.not_needed")
+	if buildings == null or not buildings.has_building(BuildingService.BLACKSMITH):
+		return Loc.t("err.repair.needs_blacksmith")
+	if wallet != null and not wallet.can_spend(get_repair_cost(instance_id)):
+		return Loc.t("ui.common.needs_gold", {"gold": get_repair_cost(instance_id)})
+	return ""
+
+
+## Repairs paid by the treasury (the player, from an item panel or the Blacksmith).
+func repair(instance_id: StringName) -> String:
+	var reason := can_repair(instance_id)
+	if not reason.is_empty():
+		return reason
+	var was_broken := is_broken(instance_id)
+	wallet.spend(get_repair_cost(instance_id))
+	_inventory.set_wear(instance_id, 0)
+	var owner := _hunters.get_hunter(_inventory.get_owner_id(instance_id))
+	if owner != null and was_broken:
+		_changed(owner)
+	return ""
+
+
+## The Hunter's weapon is worn enough to visit the Blacksmith, which exists, and it can pay.
+func wants_repair(hunter: HunterRuntime) -> bool:
+	var instance_id: StringName = hunter.equipment.get(&"weapon", &"")
+	var full := max_durability(get_item(instance_id))
+	if full <= 0 or get_durability(instance_id) > full * REPAIR_THRESHOLD:
+		return false
+	if buildings == null or not buildings.has_building(BuildingService.BLACKSMITH):
+		return false
+	return hunter.purse >= get_repair_cost(instance_id)
+
+
+## The Hunter pays the Blacksmith from its purse (gold goes to the treasury).
+func repair_by_hunter(hunter: HunterRuntime) -> bool:
+	if not wants_repair(hunter) or purses == null:
+		return false
+	var instance_id: StringName = hunter.equipment[&"weapon"]
+	var cost := get_repair_cost(instance_id)
+	var was_broken := is_broken(instance_id)
+	if not purses.pay_village(hunter, cost):
+		return false
+	_inventory.set_wear(instance_id, 0)
+	if was_broken:
+		_changed(hunter)
+	weapon_repaired.emit(hunter, get_item(instance_id), cost)
+	return true
+
+
 func get_item(instance_id: StringName) -> ItemDefinition:
 	return _registry.find_def(&"item", _inventory.get_instance_item(instance_id)) as ItemDefinition
 
@@ -59,12 +216,12 @@ func get_equipped_item(hunter: HunterRuntime, slot: StringName) -> ItemDefinitio
 ## Empty string on success, otherwise the reason. Swaps out whatever is in that slot.
 func equip(hunter: HunterRuntime, instance_id: StringName) -> String:
 	if hunter.expedition_id != &"":
-		return "%s is on an expedition" % hunter.display_name
+		return Loc.t("err.equip.on_expedition", {"name": hunter.display_name})
 	if not _inventory.is_stored(instance_id):
-		return "Item is not in the Warehouse"
+		return Loc.t("err.equip.not_in_warehouse")
 	var item := get_item(instance_id)
 	if item == null or not SLOT_NAMES.has(item.equipment_slot):
-		return "%s cannot be equipped" % (item.display_name if item != null else String(instance_id))
+		return Loc.t("err.equip.not_equippable", {"item": item.display_name if item != null else String(instance_id)})
 	var slot: StringName = SLOT_NAMES[item.equipment_slot]
 	var previous: StringName = hunter.equipment.get(slot, &"")
 	_inventory.set_equipped(instance_id, hunter.unique_id)
@@ -78,12 +235,12 @@ func equip(hunter: HunterRuntime, instance_id: StringName) -> String:
 
 func unequip(hunter: HunterRuntime, slot: StringName) -> String:
 	if hunter.expedition_id != &"":
-		return "%s is on an expedition" % hunter.display_name
+		return Loc.t("err.equip.on_expedition", {"name": hunter.display_name})
 	var instance_id: StringName = hunter.equipment.get(slot, &"")
 	if instance_id == &"":
-		return "Nothing equipped"
+		return Loc.t("err.equip.nothing_equipped")
 	if not _inventory.set_stored(instance_id):
-		return "Warehouse is full"
+		return Loc.t("err.equip.warehouse_full")
 	hunter.equipment.erase(slot)
 	_changed(hunter)
 	return ""

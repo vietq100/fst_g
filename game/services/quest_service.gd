@@ -121,9 +121,9 @@ func is_complete(quest: QuestDefinition) -> bool:
 
 func can_claim(quest: QuestDefinition) -> String:
 	if _claimed.has(quest.id):
-		return "Already claimed"
+		return Loc.t("err.quest.claimed")
 	if not is_complete(quest):
-		return "Not finished yet"
+		return Loc.t("err.quest.unfinished")
 	return ""
 
 
@@ -144,10 +144,10 @@ func claim(quest: QuestDefinition) -> bool:
 func describe_reward(quest: QuestDefinition) -> String:
 	var parts := PackedStringArray()
 	if quest.reward_gold > 0:
-		parts.append("%d gold" % quest.reward_gold)
+		parts.append(Loc.t("ui.common.gold", {"gold": quest.reward_gold}))
 	for entry in quest.reward_items:
 		var item := _registry.find_def(&"item", entry.item_id) as ItemDefinition
-		parts.append("%d %s" % [entry.quantity, item.display_name if item != null else String(entry.item_id)])
+		parts.append(Loc.t("game.quest.reward_item", {"count": entry.quantity, "item": item.display_name if item != null else String(entry.item_id)}))
 	return ", ".join(parts)
 
 

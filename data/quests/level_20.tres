@@ -11,8 +11,8 @@ quantity = 5
 [resource]
 script = ExtResource("1_q")
 id = &"level_20"
-display_name = "Peak of Power"
-description = "Bring a Hunter to level 20."
+display_name = "quest.level_20.name"
+description = "quest.level_20.desc"
 order = 13
 kind = 6
 target_id = &""

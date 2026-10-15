@@ -102,67 +102,6 @@ func test_slots_run_out() -> void:
 	assert_eq(target.combat.get_claimed_slot_count(), CombatController.SLOT_COUNT)
 
 
-func test_skill_hits_nearby_targets_with_multiplier_and_effect() -> void:
-	var attacker := _slime()
-	var target := _slime()
-	target.global_position = Vector2(100, 100)
-	var near := _slime()
-	near.global_position = Vector2(120, 100)
-	var far := _slime()
-	far.global_position = Vector2(300, 100)
-	var used: Array = []
-	_service.skill_used.connect(func(_a: Actor, hit: Array[Actor], skill: ActiveSkillDefinition) -> void: used.append([hit, skill.id]))
-	var bash := ActiveSkillDefinition.new()
-	bash.id = &"test_bash"
-	bash.damage = 2.0
-	bash.radius = 50.0
-	bash.targets = 2
-	bash.effect_id = &"stun"
-	bash.self_effect_id = &"fortify"
-	var hit := _service.resolve_skill(attacker, target, bash)
-	assert_eq(hit, [target, near] as Array[Actor], "target first, then the nearest within range")
-	assert_almost_eq(target.health.current_health, 30.0 - 11.0, 0.0001, "5.5 × 2")
-	assert_almost_eq(near.health.current_health, 19.0)
-	assert_almost_eq(far.health.current_health, 30.0, 0.0001, "out of range")
-	assert_false(target.effects.can_attack(), "stunned")
-	assert_false(near.effects.can_attack(), "stunned")
-	assert_true(far.effects.can_attack())
-	assert_true(attacker.effects.has_effect(&"fortify"), "self buff")
-	assert_eq(used.size(), 1)
-	assert_eq(used[0][1], &"test_bash")
-	# Buff-only skill: no damage, heals the user.
-	var hurt := _slime()
-	hurt.health.take_damage(15.0)
-	var mend := ActiveSkillDefinition.new()
-	mend.id = &"test_mend"
-	mend.damage = 0.0
-	mend.heal_ratio = 0.5
-	assert_eq(_service.resolve_skill(hurt, target, mend).size(), 0)
-	assert_almost_eq(hurt.health.current_health, 30.0)
-	assert_almost_eq(target.health.current_health, 19.0, 0.0001, "untouched by a buff")
-
-
-func test_actor_uses_a_ready_skill_then_waits_for_the_cooldown() -> void:
-	var definition := (_registry.find_def(&"enemy", &"goblin") as EnemyDefinition)
-	var goblin := definition.actor_scene.instantiate() as Enemy
-	(Engine.get_main_loop() as SceneTree).root.add_child(goblin)
-	_actors.append(goblin)
-	goblin.setup(definition, _service, 0.5)
-	assert_eq(goblin.get_active_skills().size(), 2, "two monster skills")
-	# Gear: the Goblin Club adds +2 attack to the base 10.
-	assert_almost_eq(goblin.get_combat_stats().attack, 12.0)
-	var target := _slime()
-	var skills: Array[StringName] = []
-	_service.skill_used.connect(func(_a: Actor, _hit: Array[Actor], skill: ActiveSkillDefinition) -> void: skills.append(skill.id))
-	goblin._strike(target)
-	assert_eq(skills, [&"dirty_trick"] as Array[StringName], "first skill, ready at once")
-	assert_true(goblin.get_skill_cooldown(&"dirty_trick") > 0.0)
-	goblin._strike(target)
-	assert_eq(skills.size(), 2, "second skill is ready too")
-	goblin._strike(target)
-	assert_eq(skills.size(), 2, "both on cooldown: plain attack")
-
-
 func _slime(definition: EnemyDefinition = null) -> Enemy:
 	if definition == null:
 		definition = _registry.find_def(&"enemy", &"slime") as EnemyDefinition

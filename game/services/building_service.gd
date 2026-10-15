@@ -27,6 +27,8 @@ const ACADEMY := &"academy"
 const FORGE := &"forge"
 const PORTAL := &"portal"
 const RESTAURANT := &"restaurant"
+## Buys Hunters' loot into the Warehouse (D63).
+const MARKET := &"market"
 
 ## Effect keys used by code. Values live in data.
 const HUNTER_CAPACITY := &"hunter_capacity"
@@ -42,6 +44,8 @@ const MAX_ENHANCE := &"max_enhance"
 const SKILL_LEVEL := &"skill_level"
 const MAX_TRAITS := &"max_traits"
 const FOOD_BONUS := &"food_bonus"
+## Market: share of an item's price the treasury pays when it buys loot (D63).
+const BUY_PRICE := &"buy_price"
 
 ## Share of the build cost refunded on removal (BALANCE.md → Building placement).
 const REFUND_RATIO := 0.5
@@ -66,6 +70,8 @@ var _wallet: WalletService
 var _inventory: InventoryService
 var _progress: ProgressService
 var _town_rect := Rect2i(0, 0, 36, 36)
+## The Town's tiles (its organic shape, D57); empty = the whole rectangle.
+var _town_tiles: Dictionary = {}
 var _reserved: Array[Rect2i] = []
 var _pond := Rect2i()
 var _placed: Array[Placed] = []
@@ -80,6 +86,7 @@ func _init(registry: Node, wallet: WalletService, inventory: InventoryService, p
 	_progress = progress
 	if world != null and world.get_town() != null:
 		_town_rect = world.get_town().tile_rect
+		_town_tiles = world.region_tiles(world.get_town().id)
 		_pond = world.get_town_pond()
 		for gate in world.gates_of(world.get_town().id):
 			_reserved.append(_approach(gate.tiles))
@@ -177,28 +184,39 @@ func instance_at_tile(tile: Vector2i) -> Placed:
 func can_place(building_id: StringName, tile: Vector2i, ignore: StringName = &"") -> String:
 	var definition := get_definition(building_id)
 	if definition == null:
-		return "Unknown building"
+		return Loc.t("err.building.unknown")
 	var rect := Rect2i(tile, definition.footprint)
-	if not _town_rect.encloses(rect):
-		return "Must be inside the Town"
+	if not _town_rect.encloses(rect) or not _inside_town(rect):
+		return Loc.t("err.building.outside_town")
 	for reserved in _reserved:
 		if reserved.intersects(rect):
-			return "Keep the gate road free"
+			return Loc.t("err.building.gate_road")
 	if _pond.intersects(rect):
-		return "The pond is in the way"
+		return Loc.t("err.building.pond")
 	var door := get_door_tile(rect)
-	if not _town_rect.has_point(door):
-		return "The door must face the Town"
+	if not _town_rect.has_point(door) or (not _town_tiles.is_empty() and not _town_tiles.has(door)):
+		return Loc.t("err.building.door_outside")
 	for placed in _placed:
 		if placed.instance_id == ignore:
 			continue
 		var other := get_footprint_rect(placed)
 		if other.intersects(rect):
-			return "Space is taken"
+			return Loc.t("err.building.space_taken")
 		# Doors stay reachable: Hunters deliver loot and bodies there.
 		if other.has_point(door) or rect.has_point(get_door_tile(other)):
-			return "Blocks a door"
+			return Loc.t("err.building.blocks_door")
 	return ""
+
+
+## Every tile of `rect` is Town ground (not a cut corner or an eroded edge).
+func _inside_town(rect: Rect2i) -> bool:
+	if _town_tiles.is_empty():
+		return true
+	for gx in range(rect.position.x, rect.end.x):
+		for gy in range(rect.position.y, rect.end.y):
+			if not _town_tiles.has(Vector2i(gx, gy)):
+				return false
+	return true
 
 
 ## The tile in front of a footprint's door (middle of the front / bottom face,
@@ -236,15 +254,15 @@ func ensure_building(building_id: StringName) -> Placed:
 func can_build(building_id: StringName) -> String:
 	var definition := get_definition(building_id)
 	if definition == null:
-		return "Unknown building"
+		return Loc.t("err.building.unknown")
 	if definition.build_cost <= 0:
-		return "%s cannot be built" % definition.display_name
+		return Loc.t("err.building.not_buildable", {"building": definition.display_name})
 	if definition.unique and has_building(building_id):
-		return "Already built"
+		return Loc.t("err.building.already_built")
 	if get_town_level() < definition.required_town_level:
-		return "Requires Town Hall Lv %d" % definition.required_town_level
+		return Loc.t("err.building.needs_town_level", {"level": definition.required_town_level})
 	if not _wallet.can_spend(definition.build_cost):
-		return "Needs %d gold" % definition.build_cost
+		return Loc.t("ui.common.needs_gold", {"gold": definition.build_cost})
 	return ""
 
 
@@ -264,7 +282,7 @@ func build(building_id: StringName, tile: Vector2i) -> Placed:
 func move(instance_id: StringName, tile: Vector2i) -> String:
 	var placed := get_instance(instance_id)
 	if placed == null:
-		return "Unknown building"
+		return Loc.t("err.building.unknown")
 	var reason := can_place(placed.building_id, tile, instance_id)
 	if not reason.is_empty():
 		return reason
@@ -278,10 +296,10 @@ func move(instance_id: StringName, tile: Vector2i) -> String:
 func can_remove(instance_id: StringName) -> String:
 	var placed := get_instance(instance_id)
 	if placed == null:
-		return "Unknown building"
+		return Loc.t("err.building.unknown")
 	var definition := get_definition(placed.building_id)
 	if not definition.removable:
-		return "%s cannot be removed" % definition.display_name
+		return Loc.t("err.building.not_removable", {"building": definition.display_name})
 	return ""
 
 
@@ -324,27 +342,29 @@ func can_upgrade(building_id: StringName) -> String:
 	var placed := find_first(building_id)
 	if placed == null:
 		var definition := get_definition(building_id)
-		return "%s is not built" % (definition.display_name if definition != null else String(building_id))
+		return Loc.t("err.building.not_built", {"building": definition.display_name if definition != null else String(building_id)})
 	return can_upgrade_instance(placed.instance_id)
 
 
 func can_upgrade_instance(instance_id: StringName) -> String:
 	var placed := get_instance(instance_id)
 	if placed == null:
-		return "Unknown building"
+		return Loc.t("err.building.unknown")
 	var definition := get_definition(placed.building_id)
 	var next := definition.get_level(placed.level + 1)
 	if next == null:
-		return "%s is at max level" % definition.display_name
+		return Loc.t("err.building.max_level", {"building": definition.display_name})
 	for flag in next.required_flags:
 		if not _progress.has_flag(flag):
-			return "Requires %s" % String(flag).replace("_", " ")
+			var flag_key := "game.flag.%s" % flag
+			var flag_text := Loc.t(flag_key) if Loc.has_key(flag_key) else String(flag).replace("_", " ")
+			return Loc.t("err.building.requires_flag", {"flag": flag_text})
 	if not _wallet.can_spend(next.gold_cost):
-		return "Needs %d gold" % next.gold_cost
+		return Loc.t("ui.common.needs_gold", {"gold": next.gold_cost})
 	for cost in next.material_costs:
 		if not _inventory.has(cost.item_id, cost.quantity):
 			var item := _registry.find_def(&"item", cost.item_id) as ItemDefinition
-			return "Needs %d %s" % [cost.quantity, item.display_name if item != null else String(cost.item_id)]
+			return Loc.t("err.building.needs_items", {"count": cost.quantity, "item": item.display_name if item != null else String(cost.item_id)})
 	return ""
 
 

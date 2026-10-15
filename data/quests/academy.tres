@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"academy"
-display_name = "School of Hunters"
-description = "Build an Academy."
+display_name = "quest.academy.name"
+description = "quest.academy.desc"
 order = 8
 kind = 0
 target_id = &"academy"

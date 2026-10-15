@@ -11,8 +11,8 @@ quantity = 8
 [resource]
 script = ExtResource("1_q")
 id = &"reborn"
-display_name = "Reborn"
-description = "Reincarnate a Hunter for the first time."
+display_name = "quest.reborn.name"
+description = "quest.reborn.desc"
 order = 14
 kind = 4
 target_id = &""

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"execute"
+display_name = "class_skill.execute.name"
+class_id = &"warrior"
+order = 13
+kind = 0
+description = "class_skill.execute.desc"
+scale_stat = &"critical_damage"
+ratings = Vector3i(3, 3, 2)
+cooldown = 15.0
+mana_cost = 30.0
+target = 0
+attack_ratio = 1.8
+bonus_crit_damage = 0.3
+execute_threshold = 0.25
+execute_multiplier = 1.5

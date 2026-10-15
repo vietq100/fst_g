@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"max_hp"
+type = 1
+value = 0.1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"iron_constitution"
+display_name = "class_skill.iron_constitution.name"
+class_id = &"guardian"
+order = 19
+kind = 1
+description = "class_skill.iron_constitution.desc"
+scale_stat = &"max_hp"
+ratings = Vector3i(2, 2, 2)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0")])

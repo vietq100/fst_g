@@ -11,8 +11,8 @@ quantity = 3
 [resource]
 script = ExtResource("1_q")
 id = &"town_hall_3"
-display_name = "Town Hall Lv 3"
-description = "Upgrade the Town Hall to level 3."
+display_name = "quest.town_hall_3.name"
+description = "quest.town_hall_3.desc"
 order = 7
 kind = 1
 target_id = &""

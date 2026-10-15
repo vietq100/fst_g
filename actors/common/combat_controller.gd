@@ -30,9 +30,6 @@ var attacks_enabled := true
 ## targets (aggro range), `keep_filter` also drops the current one (leash, left the region).
 var acquire_filter: Callable
 var keep_filter: Callable
-## Optional `func(target: Actor) -> void` resolving the attack instead of the service's plain
-## attack (Hunters use it for their class skill, D54).
-var attack_override: Callable
 
 var _service: CombatService
 var _timer: Timer
@@ -94,6 +91,12 @@ func refresh_target() -> void:
 func is_valid_target(candidate: Actor) -> bool:
 	return is_instance_valid(candidate) and candidate != _owner_actor() and candidate.is_targetable() \
 		and (not keep_filter.is_valid() or keep_filter.call(candidate))
+
+
+## Makes `attacker` this actor's target now (taunt, D70). Ignored if it is not a valid target.
+func force_target(attacker: Actor) -> void:
+	if _active and is_valid_target(attacker):
+		_set_target(attacker)
 
 
 ## Drops the current target if it is no longer valid and looks for a new one now.
@@ -188,10 +191,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_cooldown = _service.attack_cooldown(_owner_actor())
 	attacked.emit(target)
-	if attack_override.is_valid():
-		attack_override.call(target)
-	else:
-		_service.resolve_attack(_owner_actor(), target)
+	_service.resolve_attack(_owner_actor(), target)
 
 
 ## Nearest candidate for which `is_valid` returns true, or null.

@@ -102,18 +102,18 @@ func load_game() -> bool:
 			continue
 		var data: Variant = _read_json(path)
 		if not data is Dictionary:
-			last_warnings.append("%s is corrupt" % path.get_file())
+			last_warnings.append(Loc.t("save.corrupt", {"file": path.get_file()}))
 			continue
 		var migrated: Variant = SaveCodec.migrate(data, last_warnings)
 		if migrated == null:
 			continue
 		SaveCodec.restore(game, migrated, last_warnings)
 		if path == backup_path:
-			last_warnings.append("restored from backup")
+			last_warnings.append(Loc.t("save.restored_backup"))
 		loaded.emit(last_warnings)
 		apply_offline_progress(Time.get_unix_time_from_system() - float(migrated.get("saved_at_unix", 0.0)))
 		return true
-	last_warnings.append("no usable save, started a new game")
+	last_warnings.append(Loc.t("save.new_game"))
 	game.reset_to_new_game()
 	loaded.emit(last_warnings)
 	return false

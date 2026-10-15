@@ -28,15 +28,14 @@ Camera should be readable and stable.
 
 Initial target:
 - environment tile: 32x32 px
-- standard character: 32x48 world px (Hunters: 64×96 texel canvas at 2 texels per px, D56)
+- standard character: approximately 32x48 px (Hunters, D67: 23×44 px body on a 40×64 canvas) (Hunters, D47: 34×50 canvas, body ≈ 23×44; portraits use a 2x version)
 - larger bosses may use 64x64 or larger
 
 These values are targets, not absolute constraints.
 
 Display (`DECISIONS.md` D20):
 - portrait, base viewport 360×640 (expands on taller/wider screens)
-- stretch mode `canvas_items` (D56; was `viewport`), integer scaling, nearest filtering
-- characters, monsters and weapons are drawn at 2 texels per world pixel (D56): same world size, twice the detail
+- stretch mode `viewport`, integer scaling, nearest filtering
 - 4-direction sprites
 - about 11 tiles across the screen width: keep silhouettes readable on a phone
 

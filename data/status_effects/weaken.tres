@@ -12,7 +12,7 @@ value = -0.3
 [resource]
 script = ExtResource("1_effect")
 id = &"weaken"
-display_name = "Weakened"
+display_name = "status.weaken.name"
 kind = 1
 duration = 6.0
 stacking = 0

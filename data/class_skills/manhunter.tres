@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"critical_chance"
+type = 0
+value = 0.08
+condition = &"vs_humanoid"
+
+[sub_resource type="Resource" id="M1"]
+script = ExtResource("2_mod")
+stat = &"critical_damage"
+type = 0
+value = 0.2
+condition = &"vs_humanoid"
+
+[resource]
+script = ExtResource("1_skill")
+id = &"manhunter"
+display_name = "class_skill.manhunter.name"
+class_id = &"rogue"
+order = 30
+kind = 1
+description = "class_skill.manhunter.desc"
+scale_stat = &"critical_chance"
+ratings = Vector3i(1, 3, 1)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])

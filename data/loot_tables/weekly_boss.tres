@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
+[ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootEntry_0"]
+script = ExtResource("2_entry")
+item_id = &"dark_essence"
+quantity_min = 2
+quantity_max = 3
+chance = 1.0
+
+[sub_resource type="Resource" id="LootEntry_1"]
+script = ExtResource("2_entry")
+item_id = &"steel_sword"
+quantity_min = 1
+quantity_max = 1
+chance = 0.3
+
+[sub_resource type="Resource" id="LootEntry_2"]
+script = ExtResource("2_entry")
+item_id = &"shadow_blade"
+quantity_min = 1
+quantity_max = 1
+chance = 0.15
+
+[sub_resource type="Resource" id="LootEntry_3"]
+script = ExtResource("2_entry")
+item_id = &"shadow_armor"
+quantity_min = 1
+quantity_max = 1
+chance = 0.15
+
+[sub_resource type="Resource" id="LootEntry_4"]
+script = ExtResource("2_entry")
+item_id = &"golden_crown"
+quantity_min = 1
+quantity_max = 1
+chance = 0.12
+
+[sub_resource type="Resource" id="LootEntry_5"]
+script = ExtResource("2_entry")
+item_id = &"pet_wisp"
+quantity_min = 1
+quantity_max = 1
+chance = 0.08
+
+[resource]
+script = ExtResource("1_table")
+id = &"weekly_boss"
+display_name = "loot.weekly_boss.name"
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1"), SubResource("LootEntry_2"), SubResource("LootEntry_3"), SubResource("LootEntry_4"), SubResource("LootEntry_5")])

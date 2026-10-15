@@ -20,6 +20,8 @@ var _instances: Dictionary[StringName, StringName] = {}
 var _equipped: Dictionary[StringName, StringName] = {}
 ## Forge enhancement level per equipment instance (absent = +0).
 var _enhance: Dictionary[StringName, int] = {}
+## Durability lost per weapon instance (D64); missing = like new.
+var _wear: Dictionary[StringName, int] = {}
 var _next_instance := 1
 
 
@@ -75,8 +77,28 @@ func remove_instance(instance_id: StringName) -> bool:
 		return false
 	_instances.erase(instance_id)
 	_enhance.erase(instance_id)
+	_wear.erase(instance_id)
 	inventory_changed.emit()
 	return true
+
+
+## Id of the Hunter wearing an instance (&"" = stored or unknown).
+func get_owner_id(instance_id: StringName) -> StringName:
+	return _equipped.get(instance_id, &"")
+
+
+func get_wear(instance_id: StringName) -> int:
+	return _wear.get(instance_id, 0)
+
+
+func set_wear(instance_id: StringName, wear: int) -> void:
+	if not _instances.has(instance_id):
+		return
+	if wear <= 0:
+		_wear.erase(instance_id)
+	else:
+		_wear[instance_id] = wear
+	inventory_changed.emit()
 
 
 func get_enhance(instance_id: StringName) -> int:
@@ -200,6 +222,7 @@ func to_dict() -> Dictionary:
 		"equipped": _equipped.duplicate(),
 		"next_instance": _next_instance,
 		"enhance": _enhance.duplicate(),
+		"wear": _wear.duplicate(),
 	}
 
 
@@ -209,6 +232,7 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 	_instances.clear()
 	_equipped.clear()
 	_enhance.clear()
+	_wear.clear()
 	var stacks: Dictionary = data.get("stacks", {})
 	for item_id in stacks:
 		var item := _get_item(StringName(item_id))
@@ -232,6 +256,11 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 		for instance_id in enhance:
 			if _instances.has(StringName(instance_id)) and int(enhance[instance_id]) > 0:
 				_enhance[StringName(instance_id)] = int(enhance[instance_id])
+	var wear: Variant = data.get("wear", {})
+	if wear is Dictionary:
+		for instance_id in wear:
+			if _instances.has(StringName(instance_id)) and int(wear[instance_id]) > 0:
+				_wear[StringName(instance_id)] = int(wear[instance_id])
 	_next_instance = maxi(int(data.get("next_instance", 1)), _instances.size() + 1)
 	inventory_changed.emit()
 

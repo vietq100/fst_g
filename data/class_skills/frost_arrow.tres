@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/slow.tres" id="e_slow"]
+[ext_resource type="Resource" path="res://data/status_effects/freeze.tres" id="e_freeze"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_slow")
+chance = 1.0
+stacks = 1
+
+[sub_resource type="Resource" id="C1"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_freeze")
+chance = 0.3
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"frost_arrow"
+display_name = "class_skill.frost_arrow.name"
+class_id = &"ranger"
+order = 6
+kind = 0
+description = "class_skill.frost_arrow.desc"
+scale_stat = &"attack_range"
+ratings = Vector3i(2, 3, 1)
+cooldown = 11.0
+mana_cost = 24.0
+target = 0
+attack_ratio = 1.0
+target_effects = Array[ExtResource("3_chance")]([SubResource("C0"), SubResource("C1")])

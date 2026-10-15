@@ -13,13 +13,16 @@ Consumable exists as a data category but has no items in MVP.
 
 MVP item list and stats: `BALANCE.md` → Equipment.
 
-## Rarity
+## Rarity (tiers, D60)
 
-Common
-Uncommon
-Rare
+C Common · U Uncommon · R Rare · SR Super Rare · SSR Special Super Rare · UR Ultra Rare · LR Legendary Rare · MR Mythic.
+The same tiers apply to Hunters, monsters and bosses. LR and Mythic are fixed in data, never rolled.
 
-Use a consistent visual language for rarity.
+Use a consistent visual language for rarity: one colour per tier (`Tier.COLORS`) on item rims, names, Hunter badges and monster labels.
+
+## Slots (D59)
+
+Weapon · Helmet · Top · Pants · Boots · Necklace · Ring · Charm · Skin · Pet. Helmet, top, pants, boots and skin change the Hunter's sprite; the pet follows the Hunter.
 
 ## Weapons
 

@@ -35,7 +35,7 @@ Every playable Hunter should support:
 
 MVP may use simplified animations.
 
-Implemented for Hunters: the chibi core (D49, `actors/hunter/chibi/`). A 30×58 texel body on a 64×96 canvas, drawn at half size (32×48 world px, D56), split into head, torso, two arms and two legs that frames move by whole pixels. Views: front, back, side (left = mirrored). Layers (D51): hair (10 styles, 10 colours), class outfit (Warrior, Ranger, Rogue, Guardian; trousers in the Hunter's dye), class weapon (sword, bow, dagger, mace + shield).
+Implemented for Hunters: the chibi core (D49, `actors/hunter/chibi/`; redrawn larger in D67). A 23×44 px body on a 40×64 canvas (head 20 rows, torso 17, legs 7), split into head, torso, two arms and two legs that frames move by whole pixels. Face: 3×5 px eyes (lid, shine, iris in the hair colour's base and dark tones), blush, a 1 px mouth, lash flicks for female Hunters; skin and hair use 5-step ramps lit from the top left; hair outlines are the hair's own darkest tone. Views: front, back, side (left = mirrored). Layers (D51): hair (10 styles, 10 colours), class outfit (Warrior, Ranger, Rogue, Guardian; trousers in the Hunter's dye), class weapon (sword, bow, dagger, mace + shield).
 
 ```
 Hunter
@@ -48,7 +48,7 @@ Hunter
 ```
 
 One-shot actions play over the state loop by priority: death > attack / skill > hit > pickup / loot / interact.
-Triggers: attack on each attack, hit on damage, pickup when lifting a body, loot when a kill drops items, interact at the Warehouse, Hospital and Temple. Active skills (D55) play one of eight one-shots (`skill_slam`, `skill_volley`, `skill_dash`, `skill_bash`, `skill_thrust`, `skill_spin`, `skill_cast`, `skill_leap`) named by the skill's data; the generic `skill` stays as a test-arena demo.
+Triggers: attack on each attack, hit on damage, pickup when lifting a body, loot when a kill drops items, interact at the Warehouse, Hospital and Temple. Skill has no gameplay trigger yet (test arena button).
 - victory: not yet
 
 ## 4. Direction

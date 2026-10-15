@@ -35,24 +35,24 @@ func get_recipes(building_id: StringName = &"") -> Array[RecipeDefinition]:
 func can_craft(recipe_id: StringName) -> String:
 	var recipe := _registry.find_def(&"recipe", recipe_id) as RecipeDefinition
 	if recipe == null:
-		return "Unknown recipe '%s'" % recipe_id
+		return Loc.t("err.craft.unknown_recipe", {"recipe": recipe_id})
 	var building := _buildings.get_definition(recipe.building_id)
 	var building_name := building.display_name if building != null else String(recipe.building_id)
 	var level := _buildings.get_level(recipe.building_id)
 	if level <= 0:
-		return "Needs a %s" % building_name
+		return Loc.t("err.craft.needs_building", {"building": building_name})
 	if level < recipe.required_level:
-		return "Needs %s Lv %d" % [building_name, recipe.required_level]
+		return Loc.t("err.craft.needs_building_level", {"building": building_name, "level": recipe.required_level})
 	if not _wallet.can_spend(recipe.gold_cost):
-		return "Needs %d gold" % recipe.gold_cost
+		return Loc.t("ui.common.needs_gold", {"gold": recipe.gold_cost})
 	for cost in recipe.material_costs:
 		if not _inventory.has(cost.item_id, cost.quantity):
 			var item := _registry.find_def(&"item", cost.item_id) as ItemDefinition
-			return "Needs %d %s" % [cost.quantity, item.display_name if item != null else String(cost.item_id)]
+			return Loc.t("err.craft.needs_items", {"count": cost.quantity, "item": item.display_name if item != null else String(cost.item_id)})
 	var result := _registry.find_def(&"item", recipe.result_item_id) as ItemDefinition
 	var stacks_onto_existing := result != null and result.stackable and _inventory.count(recipe.result_item_id) > 0
 	if _inventory.free_slots() <= 0 and not stacks_onto_existing:
-		return "Warehouse is full"
+		return Loc.t("err.craft.warehouse_full")
 	return ""
 
 

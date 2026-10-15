@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"sword_wave"
+display_name = "class_skill.sword_wave.name"
+class_id = &"warrior"
+order = 10
+kind = 0
+description = "class_skill.sword_wave.desc"
+scale_stat = &"attack_range"
+ratings = Vector3i(2, 2, 1)
+cooldown = 7.0
+mana_cost = 18.0
+target = 2
+cast_range = 60.0
+radius = 20.0
+attack_ratio = 1.2

@@ -20,8 +20,8 @@ const REGION := &"region"
 const TALENT := &"talent"
 const STATUS_EFFECT := &"status_effect"
 const SKILL := &"skill"
-const ACTIVE_SKILL := &"active_skill"
 const QUEST := &"quest"
+const CLASS_SKILL := &"class_skill"
 
 ## Category -> [folder under the data root, expected definition class].
 const CATEGORIES := {
@@ -38,8 +38,8 @@ const CATEGORIES := {
 	TALENT: ["talents", &"TalentDefinition"],
 	STATUS_EFFECT: ["status_effects", &"StatusEffectDefinition"],
 	SKILL: ["skills", &"SkillDefinition"],
-	ACTIVE_SKILL: ["active_skills", &"ActiveSkillDefinition"],
 	QUEST: ["quests", &"QuestDefinition"],
+	CLASS_SKILL: ["class_skills", &"ClassSkillDefinition"],
 }
 
 ## Push load problems to the Godot error log. Tests turn this off.

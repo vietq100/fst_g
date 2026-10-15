@@ -12,7 +12,7 @@ value = 0.15
 [resource]
 script = ExtResource("1_effect")
 id = &"strength"
-display_name = "Strength"
+display_name = "status.strength.name"
 kind = 0
 duration = 8.0
 stacking = 1

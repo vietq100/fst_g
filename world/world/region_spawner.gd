@@ -33,6 +33,8 @@ var _monsters: Array[Monster] = []
 ## Seconds left for each pending respawn.
 var _respawns: Array[float] = []
 var _rng := RandomNumberGenerator.new()
+## Seconds until the arena checks for its boss again.
+var _boss_timer := 0.0
 
 
 func setup(map: WorldMap, actors: Node2D, region_definition: RegionDefinition, seed_value: int) -> void:
@@ -45,12 +47,32 @@ func setup(map: WorldMap, actors: Node2D, region_definition: RegionDefinition, s
 	GameManager.combat.actor_defeated.connect(_on_actor_defeated)
 
 
-## Fills the region (call once navigation is baked).
+## Fills the region (call once navigation is baked). The boss arena only spawns while the
+## weekly boss is available (D58).
 func populate() -> void:
+	if _is_boss_arena():
+		_boss_check()
+		return
 	for i in region.population_cap - _monsters.size():
 		if _spawn() == null:
 			# No spot found (yet): try again shortly.
 			_respawns.append(1.0)
+
+
+func _is_boss_arena() -> bool:
+	return region.kind == RegionDefinition.Kind.BOSS
+
+
+## Spawns the boss at the arena's centre when it is due and not already there.
+func _boss_check() -> void:
+	_boss_timer = 1.0
+	if not _monsters.is_empty() or not GameManager.weekly_boss.is_available():
+		return
+	var centre := NavigationServer2D.map_get_closest_point(_map.get_world_2d().navigation_map, _map.world.region_center(region))
+	# Before the navigation mesh is baked the closest point is nowhere near: try again next second.
+	if _map.world.region_at(centre) != region:
+		return
+	_spawn(centre)
 
 
 func get_monsters() -> Array[Enemy]:
@@ -62,6 +84,10 @@ func get_monsters() -> Array[Enemy]:
 
 
 func _physics_process(delta: float) -> void:
+	if _is_boss_arena():
+		_boss_timer -= delta
+		if _boss_timer <= 0.0:
+			_boss_check()
 	for i in range(_respawns.size() - 1, -1, -1):
 		_respawns[i] -= delta
 		if _respawns[i] <= 0.0:
@@ -73,18 +99,21 @@ func _physics_process(delta: float) -> void:
 			_update_monster(monster, delta)
 
 
-func _spawn() -> Enemy:
+func _spawn(at: Vector2 = Vector2.INF) -> Enemy:
 	var definition := GameManager.regions.roll_monster(region)
 	if definition == null or definition.actor_scene == null:
 		return null
-	var at := _random_point()
+	if at == Vector2.INF:
+		at = _random_point()
 	if at == Vector2.INF:
 		return null
 	var level := GameManager.regions.roll_level(region)
 	var enemy := definition.actor_scene.instantiate() as Enemy
 	_actors.add_child(enemy)
 	enemy.global_position = at
-	enemy.setup(definition, GameManager.combat, DataRegistry.config.retarget_interval, level, GameManager.regions.get_stat_scale(level))
+	# Regular monsters roll a tier (never below their own); bosses keep theirs (D60).
+	var tier := definition.tier if definition.is_boss else maxi(definition.tier, Tier.roll(_rng, Tier.MONSTER_WEIGHTS))
+	enemy.setup(definition, GameManager.combat, DataRegistry.config.retarget_interval, level, GameManager.regions.get_stat_scale(level), tier)
 	var monster := Monster.new()
 	monster.enemy = enemy
 	monster.home = at
@@ -97,10 +126,10 @@ func _spawn() -> Enemy:
 
 ## A walkable point inside the region, away from gates and dungeon entrances.
 func _random_point() -> Vector2:
-	var rect := region.tile_rect.grow(-1)
+	var tiles := _map.world.region_tile_list(region.id)
 	var navigation_map := _map.get_world_2d().navigation_map
 	for attempt in SPAWN_TRIES:
-		var tile := Vector2(_rng.randf_range(rect.position.x, rect.end.x), _rng.randf_range(rect.position.y, rect.end.y))
+		var tile := Vector2(tiles[_rng.randi() % tiles.size()]) + Vector2(0.15 + _rng.randf() * 0.7, 0.15 + _rng.randf() * 0.7)
 		var point := NavigationServer2D.map_get_closest_point(navigation_map, WorldService.tile_to_world(tile))
 		if _map.world.region_at(point) != region:
 			continue
@@ -168,7 +197,10 @@ func _on_actor_defeated(actor: Actor, by: Actor) -> void:
 	if monster == null:
 		return
 	_monsters.erase(monster)
-	_respawns.append(region.respawn_seconds)
+	if _is_boss_arena():
+		GameManager.weekly_boss.record_defeat()
+	else:
+		_respawns.append(region.respawn_seconds)
 	var killer := by as Hunter
 	if killer == null or killer.runtime == null:
 		return
@@ -176,5 +208,5 @@ func _on_actor_defeated(actor: Actor, by: Actor) -> void:
 	for hunter in monster.attackers:
 		if is_instance_valid(hunter) and hunter != killer:
 			helpers.append(hunter.runtime)
-	var reward := GameManager.regions.record_kill(killer.runtime, helpers, monster.enemy.definition, monster.enemy.level)
+	var reward := GameManager.regions.record_kill(killer.runtime, helpers, monster.enemy.definition, monster.enemy.level, monster.enemy.tier)
 	monster_killed.emit(monster.enemy, killer, reward)

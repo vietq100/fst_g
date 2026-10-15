@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_region")
 id = &"ancient_ruins"
-display_name = "Ancient Ruins"
+display_name = "region.ancient_ruins.name"
 tile_rect = Rect2i(38, 0, 36, 36)
 is_town = false
 min_hunter_level = 9

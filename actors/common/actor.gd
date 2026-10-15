@@ -32,8 +32,6 @@ var travel_target := Vector2.INF
 var repositions_in_range := true
 ## Set while following a player command; auto combat resumes on arrival.
 var _manual_move := false
-## Active skill id -> seconds until it may be used again (D55).
-var _skill_cooldowns: Dictionary[StringName, float] = {}
 
 
 func _ready() -> void:
@@ -46,44 +44,11 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	health.damaged.connect(func(_amount: float) -> void: visual.play_hit_flash())
 	combat.attacked.connect(_on_attacked)
-	combat.attack_override = _strike
 
 
 ## Group of this actor's own side (Hunter.GROUP / Enemy.GROUP).
 func get_team_group() -> StringName:
 	return &""
-
-
-## Active skills this actor may use, in priority order (D55). Overridden by subclasses.
-func get_active_skills() -> Array[ActiveSkillDefinition]:
-	return []
-
-
-## Seconds until `skill_id` is ready (0 = now).
-func get_skill_cooldown(skill_id: StringName) -> float:
-	return maxf(_skill_cooldowns.get(skill_id, 0.0), 0.0)
-
-
-## Every attack: the first ready active skill, or the plain attack (CombatController calls it
-## through `attack_override`).
-func _strike(target: Actor) -> void:
-	var service := combat.get_service()
-	if service == null:
-		return
-	for skill in get_active_skills():
-		if skill == null or get_skill_cooldown(skill.id) > 0.0:
-			continue
-		_skill_cooldowns[skill.id] = skill.cooldown
-		visual.play_action(skill.animation)
-		service.resolve_skill(self, target, skill)
-		return
-	service.resolve_attack(self, target)
-
-
-func _tick_skill_cooldowns(delta: float) -> void:
-	for skill_id in _skill_cooldowns:
-		if _skill_cooldowns[skill_id] > 0.0:
-			_skill_cooldowns[skill_id] -= delta
 
 
 ## Pixels per second. Overridden by subclasses.
@@ -104,6 +69,16 @@ func get_final_combat_stats(against: Actor = null) -> CombatStats:
 ## Effects this actor's hits may apply. Overridden by subclasses.
 func get_on_hit_effects() -> Array[StatusEffectChance]:
 	return []
+
+
+## Share of crowd control duration shrugged off (D70). Overridden by Hunters.
+func get_tenacity() -> float:
+	return 0.0
+
+
+## Multiplier for damage over time in % of max HP (D70). Bosses override it.
+func get_ratio_damage_scale() -> float:
+	return 1.0
 
 
 ## Move speed after status effects (slow, haste).
@@ -159,7 +134,6 @@ func face_towards(point: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	_tick_skill_cooldowns(delta)
 	if not effects.can_move():
 		# Stunned / rooted: keep the current order, just do not move.
 		velocity = Vector2.ZERO

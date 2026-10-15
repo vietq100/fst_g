@@ -97,6 +97,11 @@ Plan: `plans/PHASE_11_WORLD.md`. Sub-phases, each playable and tested:
 ## Phase 11b — Village economy (owner request, D38–D44)
 Plan: `plans/PHASE_11B_VILLAGE.md`. The player is the village chief: Hunters sell materials to the village, the chief crafts food (Tavern) and medicine (Hospital) sold back to Hunters, the Temple revives at an XP cost, two staff carry bodies, steeper XP curve and weaker offline training.
 
+## Post-MVP — Class skills and Colosseum (owner request, D68–D69)
+- ✅ Class skills (D70): 30 per class, skill points every 10 levels (random learn or level up to 6), mana, AI casting, Stagger, reincarnation at 100 with swap points (`SYSTEMS/CLASS_SKILL_SYSTEM.md`). Next: Town Hall Lv 6–10 so level 100 is reachable; Grievous effect for the Colosseum.
+- Colosseum building, 1vs1 first, then 4vs4 and 6vs6; rival generation, ranking, seasons, Token shop (`SYSTEMS/ARENA_SYSTEM.md`).
+- Depends on: skill system, team formation UI, a separate arena combat scene.
+
 ## Phase 12 — Polish
 - art
 - animation
@@ -109,3 +114,6 @@ Plan: `plans/PHASE_11B_VILLAGE.md`. The player is the village chief: Hunters sel
 Do not jump to polish while core loop is broken.
 
 There is no "final" phase for content: after MVP, new regions, classes, traits and life events are added as expansions (see `01_PROJECT_OVERVIEW.md`).
+
+## Map areas from the owner's sketch (2026-10-13, D57, D58) ✅
+- Hunter Gate island (hire / expel) and the Boss Arena (weekly boss) are built; see D58.

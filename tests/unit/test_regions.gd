@@ -44,7 +44,7 @@ func test_fixed_duty_and_stay_in_town() -> void:
 	assert_eq(_regions.set_duty(_hunter, HunterRuntime.STAY_IN_TOWN), "")
 	assert_null(_regions.get_duty_region(_hunter))
 	assert_false(_regions.set_duty(_hunter, &"town").is_empty(), "the Town is not a hunting duty")
-	assert_eq(_regions.get_duty_options().size(), 5)
+	assert_eq(_regions.get_duty_options().size(), 6, "Auto, 3 regions, the Boss Arena, Stay in town")
 
 
 func test_monster_level_scaling() -> void:

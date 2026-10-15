@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_item")
 id = &"slime_gel"
-display_name = "Slime Gel"
+display_name = "item.slime_gel.name"
 item_type = 3
 rarity = 0
 stackable = true

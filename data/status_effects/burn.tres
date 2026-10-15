@@ -12,7 +12,7 @@ value = -0.1
 [resource]
 script = ExtResource("1_effect")
 id = &"burn"
-display_name = "Burn"
+display_name = "status.burn.name"
 kind = 1
 duration = 4.0
 stacking = 0

@@ -11,8 +11,8 @@ quantity = 5
 [resource]
 script = ExtResource("1_q")
 id = &"trading_post"
-display_name = "Open for Trade"
-description = "Build a Trading Post."
+display_name = "quest.trading_post.name"
+description = "quest.trading_post.desc"
 order = 4
 kind = 0
 target_id = &"trading_post"

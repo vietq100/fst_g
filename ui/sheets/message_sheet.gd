@@ -13,49 +13,50 @@ func _init(sheet_title: String, lines: PackedStringArray) -> void:
 func _build(content: VBoxContainer) -> void:
 	for line in _lines:
 		content.add_child(UIKit.label(line))
-	content.add_child(UIKit.button("OK", func() -> void: closed.emit(), &"PrimaryButton"))
+	content.add_child(UIKit.button(Loc.t("ui.common.ok"), func() -> void: closed.emit(), &"PrimaryButton"))
 
 
 ## Text for an expedition result (EXPEDITION_SYSTEM.md → Completion / Failure).
 static func for_expedition(run: ExpeditionRun) -> MessageSheet:
 	var success := run.phase == ExpeditionRun.Phase.SUCCESS
 	var lines := PackedStringArray()
-	lines.append("%s · %d enemies defeated" % ["Victory" if success else "The party was defeated", run.kills])
+	lines.append(Loc.t("ui.message.result_victory" if success else "ui.message.result_defeat", {"kills": run.kills}))
 	if success and run.is_first_clear:
-		lines.append("First clear! The Town Hall can now be upgraded.")
-	lines.append("+%d gold%s" % [run.gold_granted, "" if success else " (half the loot was lost)"])
+		lines.append(Loc.t("ui.message.first_clear"))
+	lines.append(Loc.t("ui.message.gold_gained" if success else "ui.message.gold_gained_half", {"gold": run.gold_granted}))
 	if not run.items_granted.is_empty():
-		lines.append("Items: " + ItemText.describe(run.items_granted, DataRegistry))
+		lines.append(Loc.t("ui.message.items", {"items": ItemText.describe(run.items_granted, DataRegistry)}))
 	if not run.items_overflowed.is_empty():
-		lines.append("Warehouse full — sold %s for %d gold" % [ItemText.describe(run.items_overflowed, DataRegistry), run.overflow_gold])
+		lines.append(Loc.t("ui.message.overflow", {"items": ItemText.describe(run.items_overflowed, DataRegistry), "gold": run.overflow_gold}))
 	var levels := 0
 	for gained in run.levels_gained.values():
 		levels += gained
-	lines.append("XP %d per Hunter%s" % [run.xp_per_hunter, " · %d level-ups" % levels if levels > 0 else ""])
+	lines.append(Loc.t("ui.message.xp_levels" if levels > 0 else "ui.message.xp", {"xp": run.xp_per_hunter, "levels": levels}))
 	if not run.downed_ids.is_empty():
 		var names := PackedStringArray()
 		for id in run.downed_ids:
 			var hunter := GameManager.hunters.get_hunter(id)
 			if hunter != null:
 				names.append(hunter.display_name)
-		lines.append("Fallen: %s — lying at the entrance until someone carries them home" % ", ".join(names))
-	return MessageSheet.new("Victory" if success else "Defeat", lines)
+		lines.append(Loc.t("ui.message.fallen", {"names": ", ".join(names)}))
+	return MessageSheet.new(Loc.t("ui.message.title_victory") if success else Loc.t("ui.message.title_defeat"), lines)
 
 
 ## "While you were away" (DECISIONS.md D24).
 static func for_offline(summary: Dictionary) -> MessageSheet:
 	var lines := PackedStringArray()
-	lines.append("You were away for %s%s." % [UIKit.format_duration(summary["seconds"]),
-		" (progress is capped at %d hours)" % int(DataRegistry.config.offline_cap_hours) if summary.get("capped", false) else ""])
+	lines.append(Loc.t("ui.message.away_capped" if summary.get("capped", false) else "ui.message.away", {
+		"time": UIKit.format_duration(summary["seconds"]), "hours": int(DataRegistry.config.offline_cap_hours)}))
 	var recovered: PackedStringArray = summary.get("recovered", PackedStringArray())
 	if not recovered.is_empty():
-		lines.append("Recovered at the Hospital: " + ", ".join(recovered))
+		lines.append(Loc.t("ui.message.recovered", {"names": ", ".join(recovered)}))
 	if int(summary.get("xp", 0)) > 0:
-		lines.append("Training: +%d XP across your Hunters%s" % [int(summary["xp"]), " · %d level-ups" % int(summary["levels"]) if int(summary.get("levels", 0)) > 0 else ""])
+		var levels := int(summary.get("levels", 0))
+		lines.append(Loc.t("ui.message.training_levels" if levels > 0 else "ui.message.training", {"xp": int(summary["xp"]), "levels": levels}))
 	if int(summary.get("meals", 0)) > 0:
-		lines.append("Meals at the Tavern: %d" % int(summary["meals"]))
+		lines.append(Loc.t("ui.message.meals", {"meals": int(summary["meals"])}))
 	if int(summary.get("hungry_ticks", 0)) > 0:
-		lines.append("Some Hunters went hungry — give them gold for food.")
+		lines.append(Loc.t("ui.message.hungry"))
 	if lines.size() == 1:
-		lines.append("Your Hunters rested in town.")
-	return MessageSheet.new("While you were away", lines)
+		lines.append(Loc.t("ui.message.rested"))
+	return MessageSheet.new(Loc.t("ui.message.offline_title"), lines)

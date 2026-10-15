@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/haste.tres" id="e_haste"]
+[ext_resource type="Resource" path="res://data/status_effects/fortify.tres" id="e_fortify"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_haste")
+chance = 1.0
+stacks = 1
+
+[sub_resource type="Resource" id="C1"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_fortify")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"escape_artist"
+display_name = "class_skill.escape_artist.name"
+class_id = &"rogue"
+order = 25
+kind = 1
+description = "class_skill.escape_artist.desc"
+scale_stat = &"max_hp"
+ratings = Vector3i(2, 3, 2)
+cooldown = 90.0
+target = 3
+trigger_hp_below = 0.25
+self_effects = Array[ExtResource("3_chance")]([SubResource("C0"), SubResource("C1")])

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_effect")
 id = &"root"
-display_name = "Rooted"
+display_name = "status.root.name"
 kind = 1
 duration = 3.0
 stacking = 0

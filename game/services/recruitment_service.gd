@@ -1,17 +1,21 @@
 class_name RecruitmentService
 extends RefCounted
-## Tavern recruitment (DECISIONS.md D11): N candidates, refreshed after each expedition
-## return or for gold; recruiting costs the class recruit cost and needs roster capacity
-## (Town Hall).
+## Hunter Gate recruitment and dismissal (DECISIONS.md D11, D58): N candidates, refreshed after
+## each expedition return or for gold; recruiting costs the class recruit cost and needs roster
+## capacity (Town Hall) and a bed. Expelling sends a Hunter away for good.
 
 signal candidates_changed
 ## Emitted after the Hunter joined the roster (starting gear and traits hook in here).
 signal hunter_recruited(hunter: HunterRuntime)
+## Emitted after the Hunter was taken off the roster.
+signal hunter_dismissed(hunter: HunterRuntime)
 signal autosave_requested(reason: StringName)
 
 var candidates: Array[HunterRuntime] = []
 ## Beds (DECISIONS.md D32); optional so the service also works standalone.
 var housing: HousingService
+## Bodies and carriers (D30); optional.
+var corpses: CorpseService
 
 var _registry: Node
 var _hunters: HunterService
@@ -70,19 +74,20 @@ func get_recruit_cost(index: int) -> int:
 	if index < 0 or index >= candidates.size():
 		return 0
 	var definition := _hunters.get_definition(candidates[index])
-	return definition.recruit_cost if definition != null else 0
+	# Higher tiers cost more (D60).
+	return roundi(definition.recruit_cost * Tier.reward_scale(candidates[index].tier)) if definition != null else 0
 
 
 ## Empty string when candidate `index` can be recruited, otherwise the reason.
 func can_recruit(index: int) -> String:
 	if index < 0 or index >= candidates.size():
-		return "No such candidate"
+		return Loc.t("err.recruit.no_candidate")
 	if _hunters.count() >= get_capacity():
-		return "Roster full (%d/%d) — upgrade the Town Hall" % [_hunters.count(), get_capacity()]
+		return Loc.t("err.recruit.roster_full", {"count": _hunters.count(), "max": get_capacity()})
 	if housing != null and housing.get_free_beds() <= 0:
-		return "No free bed — build a House"
+		return Loc.t("err.recruit.no_bed")
 	if not _wallet.can_spend(get_recruit_cost(index)):
-		return "Needs %d gold" % get_recruit_cost(index)
+		return Loc.t("ui.common.needs_gold", {"gold": get_recruit_cost(index)})
 	return ""
 
 
@@ -96,6 +101,30 @@ func recruit(index: int) -> HunterRuntime:
 	hunter_recruited.emit(hunter)
 	autosave_requested.emit(&"recruitment")
 	return hunter
+
+
+## Empty string when the Hunter can be expelled, otherwise the reason.
+func can_dismiss(hunter: HunterRuntime) -> String:
+	if hunter == null or _hunters.get_hunter(hunter.unique_id) == null:
+		return Loc.t("err.recruit.unknown_hunter")
+	if hunter.expedition_id != &"":
+		return Loc.t("err.recruit.on_dungeon")
+	if not hunter.alive:
+		return Loc.t("err.recruit.dead")
+	if corpses != null and corpses.get_body_of(hunter) != null:
+		return Loc.t("err.recruit.carrying")
+	return ""
+
+
+## Expels a Hunter through the gate: gone for good, no refund (D58).
+func dismiss(hunter: HunterRuntime) -> String:
+	var reason := can_dismiss(hunter)
+	if not reason.is_empty():
+		return reason
+	_hunters.remove_hunter(hunter.unique_id)
+	hunter_dismissed.emit(hunter)
+	autosave_requested.emit(&"dismissal")
+	return ""
 
 
 func to_dict() -> Array:

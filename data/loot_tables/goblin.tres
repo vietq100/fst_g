@@ -20,5 +20,5 @@ chance = 0.35
 [resource]
 script = ExtResource("1_table")
 id = &"goblin"
-display_name = "Goblin"
+display_name = "loot.goblin.name"
 entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1")])

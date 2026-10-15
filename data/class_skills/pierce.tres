@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/armor_break.tres" id="e_armor_break"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_armor_break")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"pierce"
+display_name = "class_skill.pierce.name"
+class_id = &"warrior"
+order = 4
+kind = 0
+description = "class_skill.pierce.desc"
+scale_stat = &"attack"
+ratings = Vector3i(2, 2, 3)
+cooldown = 10.0
+mana_cost = 23.0
+target = 2
+radius = 24.0
+attack_ratio = 1.4
+target_effects = Array[ExtResource("3_chance")]([SubResource("C0")])

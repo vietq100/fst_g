@@ -34,5 +34,5 @@ chance = 0.1
 [resource]
 script = ExtResource("1_table")
 id = &"forest_guardian_first"
-display_name = "Forest Guardian First"
+display_name = "loot.forest_guardian_first.name"
 entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1"), SubResource("LootEntry_2"), SubResource("LootEntry_3")])

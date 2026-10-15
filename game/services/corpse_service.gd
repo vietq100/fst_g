@@ -73,11 +73,11 @@ func can_carry(hunter: HunterRuntime) -> bool:
 
 func assign(body: HunterRuntime, carrier: HunterRuntime) -> String:
 	if not is_body(body):
-		return "Not a body"
+		return Loc.t("err.corpse.not_body")
 	if has_carrier(body):
-		return "Already has a carrier"
+		return Loc.t("err.corpse.has_carrier")
 	if not can_carry(carrier):
-		return "%s cannot carry now" % carrier.display_name
+		return Loc.t("err.corpse.cannot_carry", {"name": carrier.display_name})
 	_carriers[body.unique_id] = carrier.unique_id
 	carrier_assigned.emit(body, carrier)
 	return ""
@@ -131,21 +131,21 @@ func get_free_staff() -> Array[StringName]:
 ## Sends a staff member for a body; the treasury pays the fee now. Returns the error.
 func assign_staff(body: HunterRuntime, staff_id: StringName) -> String:
 	if not is_body(body):
-		return "Not a body"
+		return Loc.t("err.corpse.not_body")
 	if has_carrier(body):
-		return "Already has a carrier"
+		return Loc.t("err.corpse.has_carrier")
 	if not is_staff_free(staff_id):
-		return "Staff member is busy"
+		return Loc.t("err.corpse.staff_busy")
 	if not _wallet.spend(_config.staff_fee):
-		return "Needs %d gold for the staff" % _config.staff_fee
+		return Loc.t("err.corpse.staff_fee", {"gold": _config.staff_fee})
 	_carriers[body.unique_id] = staff_id
 	staff_dispatched.emit(body, staff_id)
 	return ""
 
 
 func describe_staff() -> String:
-	return "Staff: %d (%d free). Each trip costs the village %d gold; when they are busy or the treasury is short, a free Hunter carries instead." % [
-		_staff_ids.size(), get_free_staff().size(), _config.staff_fee]
+	return Loc.t("game.corpse.staff_info", {"total": _staff_ids.size(), "free": get_free_staff().size(),
+		"gold": _config.staff_fee})
 
 
 func is_carried(body: HunterRuntime) -> bool:

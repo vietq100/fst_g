@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/bleed.tres" id="e_bleed"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_bleed")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"fan_of_knives"
+display_name = "class_skill.fan_of_knives.name"
+class_id = &"rogue"
+order = 3
+kind = 0
+description = "class_skill.fan_of_knives.desc"
+scale_stat = &"attack_speed"
+ratings = Vector3i(3, 1, 1)
+cooldown = 10.0
+mana_cost = 23.0
+target = 1
+radius = 45.0
+attack_ratio = 0.7
+hits = 1
+max_hits = 3
+target_effects = Array[ExtResource("3_chance")]([SubResource("C0")])

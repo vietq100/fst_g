@@ -1,8 +1,7 @@
 @tool
 class_name ChibiVisual
 extends ActorVisual
-## Hunter drawn as the chibi body (D49): a 64×96 texel frame shown at half size (D56), so it
-## covers 32×48 world pixels. Origin is at the feet.
+## Hunter drawn as the 32×48 chibi body (D49). Origin is at the feet.
 ## Picks a looping animation from the actor's state (idle / walk / run / death) and plays
 ## one-shot actions on top (attack, skill, hit, pickup, loot, interact), higher priority first
 ## (ChibiAnimations.PRIORITY). Frames come from ChibiBody (outfit = the base class). The weapon
@@ -40,12 +39,7 @@ const STRING_COLOR := Color(0.92, 0.9, 0.82, 0.85)
 const SHIELD_FACE := Color("41629e")
 const SHIELD_RIM := Color("c9d0d8")
 const SHIELD_EMBLEM := Color("e8c35a")
-const SHOCK_COLOR := Color("ffd27a")
-const SHADOW_FX_COLOR := Color("8a5cff")
-const BASH_COLOR := Color("9fd6ff")
-const FX_DURATION := {"step": 0.3, "slash": 0.18, "charge": 0.25, "burst": 0.45, "sparkle": 0.5, "tap": 0.25, "dust": 0.4, "soul": 1.4,
-	"shockwave": 0.4, "draw": 0.2, "release": 0.25, "afterimage": 0.35, "xslash": 0.22, "bashring": 0.35, "thrust": 0.2,
-	"spin": 0.2, "cast": 0.4}
+const FX_DURATION := {"step": 0.3, "slash": 0.18, "charge": 0.25, "burst": 0.45, "sparkle": 0.5, "tap": 0.25, "dust": 0.4, "soul": 1.4}
 
 var appearance: HunterAppearance = HunterAppearance.new():
 	set(value):
@@ -58,6 +52,16 @@ var outfit: StringName = &"":
 		if outfit == value:
 			return
 		outfit = value
+		_frames_cache.clear()
+		queue_redraw()
+## Gear worn over the outfit (D59): top / skin colours, pants, boots, hat and pet. Null = the
+## plain class outfit.
+var dress: ChibiDress = null:
+	set(value):
+		if dress != null and value != null and dress.key() == value.key() and dress.pet == value.pet \
+				and dress.pet_tint == value.pet_tint:
+			return
+		dress = value
 		_frames_cache.clear()
 		queue_redraw()
 ## How the weapon is drawn: SWORD, BOW, DAGGER or MACE.
@@ -247,12 +251,10 @@ func _add_fx(kind: String) -> void:
 	var frame := ChibiAnimations.get_frame(_animation, _frame)
 	var at := Vector2.ZERO
 	match kind:
-		"slash", "sparkle", "tap", "charge", "draw", "release", "xslash", "thrust":
+		"slash", "sparkle", "tap", "charge":
 			at = _hand_position(frame)
-		"bashring":
-			at = _off_hand_position(frame)
 		"soul":
-			at = Vector2(0, -14)
+			at = Vector2(0, -22)
 	_fx.append({"kind": kind, "at": at, "age": 0.0, "side": _side_sign()})
 
 
@@ -264,45 +266,59 @@ func _side_sign() -> float:
 
 
 func _draw() -> void:
-	fill_ellipse(Vector2.ZERO, Vector2(8.0, 3.0), SHADOW_COLOR)
+	fill_ellipse(Vector2.ZERO, Vector2(11.0, 4.0), SHADOW_COLOR)
 	if selected:
-		outline_ellipse(Vector2.ZERO, Vector2(10.0, 4.5), SELECTION_COLOR)
+		outline_ellipse(Vector2.ZERO, Vector2(13.0, 6.0), SELECTION_COLOR)
 	var frame := ChibiAnimations.get_frame(_animation, _frame)
 	var textures := _textures(_animation)
 	var show_weapon: bool = not frame.get("lying", false) and not frame.get("item", false)
 	var behind := facing == Facing.Direction.UP
 	# The shield arm is the far arm in the side view.
 	var shield_behind := ChibiBody.view_of(facing) == ChibiBody.View.SIDE
+	_draw_pet(frame)
 	if shield and show_weapon and shield_behind:
 		_draw_shield(frame)
 	if show_weapon and behind:
 		_draw_weapon(frame)
 	if not textures.is_empty():
-		_draw_body(textures[clampi(_frame, 0, textures.size() - 1)], Vector2.ZERO, Color.WHITE)
+		draw_texture(textures[clampi(_frame, 0, textures.size() - 1)], -Vector2(ChibiBody.FEET))
 	if show_weapon and not behind:
 		_draw_weapon(frame)
 	if shield and show_weapon and not shield_behind:
 		_draw_shield(frame)
 	if frame.get("item", false):
 		var hand := _hand_position(frame)
-		draw_rect(Rect2(hand + Vector2(-2, -5), Vector2(4, 4)), OUTLINE_COLOR)
-		draw_rect(Rect2(hand + Vector2(-1, -4), Vector2(2, 2)), ITEM_COLOR)
+		draw_rect(Rect2(hand + Vector2(-3, -7), Vector2(6, 6)), OUTLINE_COLOR)
+		draw_rect(Rect2(hand + Vector2(-2, -6), Vector2(4, 4)), ITEM_COLOR)
 	for effect in _fx:
 		_draw_fx(effect)
 
 
-## A body frame with its feet at `offset` (world pixels), drawn at 1 / ChibiBody.SCALE (D56).
-func _draw_body(texture: Texture2D, offset: Vector2, tint: Color) -> void:
-	var texel := 1.0 / ChibiBody.SCALE
-	draw_set_transform(offset, 0.0, Vector2(texel, texel))
-	draw_texture(texture, -Vector2(ChibiBody.FEET), tint)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+## The pet trots a step behind the Hunter's heels and hops while it walks (D59).
+func _draw_pet(frame: Dictionary) -> void:
+	if dress == null or dress.pet == &"" or frame.get("lying", false):
+		return
+	var moving := _animation == ChibiAnimations.WALK or _animation == ChibiAnimations.RUN
+	var texture := PetSprites.texture(dress.pet, dress.pet_tint, _frame % 2 if moving else 0)
+	if texture == null:
+		return
+	var side := _side_sign()
+	var x := -18.0 * side if facing == Facing.Direction.LEFT or facing == Facing.Direction.RIGHT else -16.0
+	var size := Vector2(PetSprites.SIZE)
+	fill_ellipse(Vector2(x, 0.5), Vector2(5.0, 1.8), SHADOW_COLOR)
+	var at := Vector2(x - size.x * 0.5, -size.y + 1.0)
+	if side < 0.0:
+		draw_set_transform(Vector2(x * 2.0, 0.0), 0.0, Vector2(-1, 1))
+		draw_texture(texture, at)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	else:
+		draw_texture(texture, at)
 
 
 func _textures(animation: StringName) -> Array[ImageTexture]:
 	var key := "%d|%s" % [facing, animation]
 	if not _frames_cache.has(key):
-		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation, outfit)
+		_frames_cache[key] = ChibiBody.get_frames(appearance, facing, animation, outfit, dress)
 	return _frames_cache[key]
 
 
@@ -353,6 +369,7 @@ func _draw_weapon(frame: Dictionary) -> void:
 ## Pixel weapon rotated about the hand; mirrored facings flip the sprite and the swing.
 func _draw_weapon_sprite(hand: Vector2, angle: float, mirrored: bool) -> void:
 	var texture := WeaponSprites.texture(weapon_sprite, weapon_color)
+	# Weapon bitmaps are at WeaponSprites.SCALE texels per world pixel (D71): draw them scaled down.
 	var grip := WeaponSprites.grip_center(weapon_sprite)
 	var rotation := deg_to_rad(angle) * (-1.0 if mirrored else 1.0)
 	var texel := 1.0 / WeaponSprites.SCALE
@@ -408,16 +425,16 @@ func _draw_mace(hand: Vector2, direction: Vector2) -> void:
 
 ## Kite shield on the left arm; seen from behind it shows its plain back.
 func _draw_shield(frame: Dictionary) -> void:
-	var at := _off_hand_position(frame) + Vector2(0, -2)
-	var points := PackedVector2Array([at + Vector2(-3, -4), at + Vector2(3, -4), at + Vector2(3, 1),
-		at + Vector2(0, 4), at + Vector2(-3, 1)])
+	var at := _off_hand_position(frame) + Vector2(0, -3)
+	var points := PackedVector2Array([at + Vector2(-4, -6), at + Vector2(4, -6), at + Vector2(4, 2),
+		at + Vector2(0, 6), at + Vector2(-4, 2)])
 	draw_colored_polygon(BuildingVisual._grow(points, 1.0), OUTLINE_COLOR)
 	if facing == Facing.Direction.UP:
 		draw_colored_polygon(points, SHIELD_RIM.darkened(0.35))
 		return
 	draw_colored_polygon(points, SHIELD_FACE)
-	draw_line(at + Vector2(-3, -3.5), at + Vector2(3, -3.5), SHIELD_RIM, 1.0)
-	draw_rect(Rect2(at + Vector2(-1, -2), Vector2(2, 3)), SHIELD_EMBLEM)
+	draw_line(at + Vector2(-4, -5.5), at + Vector2(4, -5.5), SHIELD_RIM, 1.0)
+	draw_rect(Rect2(at + Vector2(-1, -3), Vector2(2, 5)), SHIELD_EMBLEM)
 
 
 func _draw_fx(effect: Dictionary) -> void:
@@ -440,8 +457,8 @@ func _draw_fx(effect: Dictionary) -> void:
 				arc.append(at + Vector2(cos(angle) * side, sin(angle)) * radius)
 			draw_polyline(arc, Color(SLASH_COLOR, SLASH_COLOR.a * (1.0 - t)), 2.0)
 		"charge":
-			draw_circle(Vector2(0, -14), 4.0 + t * 12.0, Color(CHARGE_COLOR, 0.35 * (1.0 - t)))
-			draw_arc(Vector2(0, -14), 16.0 - t * 12.0, 0.0, TAU, 20, Color(CHARGE_COLOR, 0.9 * t), 1.0)
+			draw_circle(Vector2(0, -22), 5.0 + t * 14.0, Color(CHARGE_COLOR, 0.35 * (1.0 - t)))
+			draw_arc(Vector2(0, -22), 20.0 - t * 14.0, 0.0, TAU, 20, Color(CHARGE_COLOR, 0.9 * t), 1.0)
 		"burst":
 			var radius := 6.0 + t * 18.0
 			draw_ellipse(Vector2(0, -1), radius, radius * 0.4, Color(BURST_COLOR, 1.0 - t), false, 2.0)
@@ -457,62 +474,6 @@ func _draw_fx(effect: Dictionary) -> void:
 				draw_line(point + Vector2(0, -arm), point + Vector2(0, arm), Color(SPARKLE_COLOR, 1.0 - t), 1.0)
 		"tap":
 			draw_arc(at + Vector2(side * 2.0, 0), 2.0 + t * 5.0, 0.0, TAU, 12, Color(1, 1, 1, 0.8 * (1.0 - t)), 1.0)
-		"shockwave":
-			# Ground ring from the slam, with flying dirt.
-			var radius := 6.0 + t * 30.0
-			draw_ellipse(Vector2(0, -2), radius, radius * 0.45, Color(SHOCK_COLOR, 0.9 * (1.0 - t)), false, 2.0)
-			draw_ellipse(Vector2(0, -2), radius * 0.6, radius * 0.27, Color(SHOCK_COLOR, 0.4 * (1.0 - t)), false, 1.0)
-			for i in 6:
-				var direction := Vector2.RIGHT.rotated(i * TAU / 6.0 + 0.4) * Vector2(1.0, 0.5)
-				draw_circle(direction * radius * 0.8 + Vector2(0, -2.0 - t * 6.0), 1.5 * (1.0 - t), Color(DUST_COLOR, DUST_COLOR.a * (1.0 - t)))
-		"draw":
-			# Bow drawn: glow on the string hand.
-			draw_circle(at, 2.0 + t * 3.0, Color(SPARKLE_COLOR, 0.5 * (1.0 - t)))
-		"release":
-			# Three streaks leaving the bow (the world draws the arrows themselves).
-			for i in 3:
-				var spread := Vector2.RIGHT.rotated((i - 1) * 0.35) * side
-				draw_line(at + spread * (4.0 + t * 14.0), at + spread * (10.0 + t * 14.0), Color(SPARKLE_COLOR, 0.9 * (1.0 - t)), 1.0)
-		"afterimage":
-			# Ghost copies trailing behind the dash.
-			var textures := _textures(_animation)
-			if not textures.is_empty():
-				var texture := textures[clampi(_frame, 0, textures.size() - 1)]
-				for i in 3:
-					var ghost_alpha := 0.35 * (1.0 - t) * (1.0 - i * 0.25)
-					_draw_body(texture, Vector2(-side * 6.0 * (i + 1), 0), Color(SHADOW_FX_COLOR, ghost_alpha))
-		"xslash":
-			# Two crossing arcs of the double cut.
-			for flip: float in [-1.0, 1.0]:
-				var arc := PackedVector2Array()
-				for i in 7:
-					var angle := deg_to_rad(lerpf(-50.0, 100.0, float(i) / 6.0)) - PI * 0.5
-					arc.append(at + Vector2(cos(angle) * side, sin(angle) * flip) * (weapon_length + 3.0))
-				draw_polyline(arc, Color(SHADOW_FX_COLOR.lightened(0.4), 0.95 * (1.0 - t)), 2.0)
-		"bashring":
-			# Shield impact: ring and sparks in front of the shield.
-			var radius := 3.0 + t * 14.0
-			draw_arc(at + Vector2(side * 4.0, 0), radius, 0.0, TAU, 16, Color(BASH_COLOR, 0.9 * (1.0 - t)), 2.0)
-			for i in 5:
-				var direction := Vector2.RIGHT.rotated(-PI * 0.5 + (i - 2) * 0.5) * side
-				draw_line(at + direction * radius * 0.5, at + direction * (radius + 3.0), Color(BASH_COLOR, 0.7 * (1.0 - t)), 1.0)
-		"thrust":
-			# Straight lunge streak from the weapon tip.
-			var from := at + Vector2(side * 2.0, 0)
-			draw_line(from, from + Vector2(side * (weapon_length + 8.0 + t * 6.0), 0), Color(SLASH_COLOR, 0.9 * (1.0 - t)), 2.0)
-			draw_line(from + Vector2(0, -2), from + Vector2(side * (weapon_length + t * 6.0), -2), Color(SLASH_COLOR, 0.4 * (1.0 - t)), 1.0)
-		"spin":
-			# Full circle of the blade around the body.
-			var radius := weapon_length + 4.0
-			draw_arc(Vector2(0, -12), radius, t * TAU, t * TAU + PI * 1.4, 18, Color(SLASH_COLOR, 0.9 * (1.0 - t)), 2.0)
-			draw_ellipse(Vector2(0, -2), radius, radius * 0.35, Color(SLASH_COLOR, 0.3 * (1.0 - t)), false, 1.0)
-		"cast":
-			# Motes rising from the raised hands.
-			for i in 5:
-				var x := (i - 2) * 5.0
-				var y := -24.0 - fmod(t * 30.0 + i * 6.0, 20.0)
-				draw_circle(Vector2(x, y), 1.5 * (1.0 - t) + 0.5, Color(CHARGE_COLOR, 0.9 * (1.0 - t)))
-			draw_circle(Vector2(0, -32), 3.0 + t * 8.0, Color(CHARGE_COLOR, 0.3 * (1.0 - t)))
 		"soul":
 			var center := at + Vector2(sin(t * 9.0) * 2.0, -t * 26.0)
 			draw_circle(center, 3.0, Color(SOUL_COLOR, SOUL_COLOR.a * (1.0 - t)))

@@ -38,30 +38,30 @@ func _ready() -> void:
 
 func setup_debug(panel: DebugPanel) -> void:
 	panel.add_separator()
-	panel.add_label("Tap ground: move. Tap Hunter: select.")
+	panel.add_label(Loc.t("world.arena.help"))
 	panel.add_button_row([
-		["Hunter", spawn_warrior],
-		["Hit 25", func() -> void: _with_selected(func(h: Hunter) -> void: h.health.take_damage(25.0))],
-		["Revive", func() -> void: _with_selected(_heal_hunter)],
-		["Lv +1", func() -> void: _with_selected(func(h: Hunter) -> void: _hunters.set_level(h.runtime, h.runtime.level + 1))],
+		[Loc.t("world.arena.hunter"), spawn_warrior],
+		[Loc.t("world.arena.hit"), func() -> void: _with_selected(func(h: Hunter) -> void: h.health.take_damage(25.0))],
+		[Loc.t("world.arena.revive"), func() -> void: _with_selected(_heal_hunter)],
+		[Loc.t("world.arena.level_up"), func() -> void: _with_selected(func(h: Hunter) -> void: _hunters.set_level(h.runtime, h.runtime.level + 1))],
 	])
 	panel.add_button_row([
-		["Slime", func() -> void: spawn_enemy(&"slime")],
-		["Slime x3", _spawn_three_slimes],
-		["Slime x6", _spawn_six_slimes],
+		[Loc.t("world.arena.slime"), func() -> void: spawn_enemy(&"slime")],
+		[Loc.t("world.arena.slime_3"), _spawn_three_slimes],
+		[Loc.t("world.arena.slime_6"), _spawn_six_slimes],
 	])
 	panel.add_button_row([
-		["Skill", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.SKILL))],
-		["Pickup", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.PICKUP))],
-		["Loot", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.LOOT))],
-		["Use", func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.INTERACT))],
+		[Loc.t("world.arena.skill"), func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.SKILL))],
+		[Loc.t("world.arena.pickup"), func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.PICKUP))],
+		[Loc.t("world.arena.loot"), func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.LOOT))],
+		[Loc.t("world.arena.use"), func() -> void: _with_selected(func(h: Hunter) -> void: h.visual.play_action(ChibiAnimations.INTERACT))],
 	])
 	panel.add_button_row([
-		["Town", func() -> void: GameManager.request_world(&"town")],
-		["Heal all", _heal_all],
+		[Loc.t("world.arena.town"), func() -> void: GameManager.request_world(&"town")],
+		[Loc.t("world.arena.heal_all"), _heal_all],
 	])
 	_add_effect_buttons(panel)
-	_info_label = panel.add_label("No Hunter selected")
+	_info_label = panel.add_label(Loc.t("world.arena.no_selection"))
 	_refresh_info()
 	_log_label = panel.add_label("")
 
@@ -108,7 +108,7 @@ func spawn_warrior() -> Hunter:
 ## no Hunter is selected. Tap the selected Hunter again to deselect.
 func _add_effect_buttons(panel: DebugPanel) -> void:
 	panel.add_separator()
-	panel.add_label("Effects: selected Hunter, else all enemies")
+	panel.add_label(Loc.t("world.arena.effects_help"))
 	var row: Array = []
 	for definition in DataRegistry.get_all(DataRegistry.STATUS_EFFECT):
 		var effect := definition as StatusEffectDefinition
@@ -116,8 +116,8 @@ func _add_effect_buttons(panel: DebugPanel) -> void:
 		if row.size() == EFFECT_BUTTONS_PER_ROW:
 			panel.add_button_row(row)
 			row = []
-	row.append(["Cleanse", func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.DEBUFF))])
-	row.append(["Purge", func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.BUFF))])
+	row.append([Loc.t("world.arena.cleanse"), func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.DEBUFF))])
+	row.append([Loc.t("world.arena.purge"), func() -> void: _for_effect_targets(func(a: Actor) -> void: a.effects.dispel(StatusEffectDefinition.Kind.BUFF))])
 	panel.add_button_row(row)
 
 
@@ -150,7 +150,7 @@ func _spawn_actor(runtime: HunterRuntime) -> Hunter:
 	var hunter := HUNTER_SCENE.instantiate() as Hunter
 	_actors.add_child(hunter)
 	hunter.global_position = SPAWN_POINT + Vector2(randf_range(-60, 60), randf_range(-10, 10))
-	hunter.setup(runtime, _hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment)
+	hunter.setup(runtime, _hunters, GameManager.combat, DataRegistry.config.retarget_interval, GameManager.equipment, GameManager.class_skills)
 	hunter.health.health_changed.connect(func(_c: float, _m: float) -> void: _refresh_info())
 	hunter.state.state_changed.connect(func(_p: int, _c: int) -> void: _refresh_info())
 	_select(hunter)
@@ -191,7 +191,7 @@ func _deselect() -> void:
 		_selected.visual.selected = false
 	_selected = null
 	if _info_label != null:
-		_info_label.text = "No Hunter selected"
+		_info_label.text = Loc.t("world.arena.no_selection")
 
 
 func _with_selected(action: Callable) -> void:
@@ -219,27 +219,27 @@ func _refresh_info() -> void:
 	if _info_label == null or _selected == null:
 		return
 	var runtime := _selected.runtime
-	_info_label.text = "%s  Lv %d\nHP %d/%d  ATK %.1f  DEF %.1f\nSPD %d  CRIT %d%%  %s" % [
-		runtime.display_name,
-		runtime.level,
-		roundi(_selected.health.current_health),
-		roundi(_selected.health.max_health),
-		_hunters.get_stat(runtime, HunterService.ATTACK),
-		_hunters.get_stat(runtime, HunterService.DEFENSE),
-		roundi(_hunters.get_stat(runtime, HunterService.MOVE_SPEED)),
-		roundi(_hunters.get_stat(runtime, HunterService.CRITICAL_CHANCE) * 100.0),
-		StateController.State.keys()[_selected.state.current],
-	]
+	_info_label.text = Loc.t("world.arena.info", {
+		"name": runtime.display_name,
+		"level": runtime.level,
+		"hp": roundi(_selected.health.current_health),
+		"max_hp": roundi(_selected.health.max_health),
+		"atk": "%.1f" % _hunters.get_stat(runtime, HunterService.ATTACK),
+		"def": "%.1f" % _hunters.get_stat(runtime, HunterService.DEFENSE),
+		"spd": roundi(_hunters.get_stat(runtime, HunterService.MOVE_SPEED)),
+		"crit": roundi(_hunters.get_stat(runtime, HunterService.CRITICAL_CHANCE) * 100.0),
+		"state": StateController.State.keys()[_selected.state.current],
+	})
 
 
 func _on_damage_dealt(attacker: Actor, target: Actor, amount: float, is_critical: bool) -> void:
 	if is_critical:
-		_add_log("%s CRIT %s for %d" % [_actor_name(attacker), _actor_name(target), roundi(amount)])
+		_add_log(Loc.t("world.arena.log_crit", {"attacker": _actor_name(attacker), "target": _actor_name(target), "amount": roundi(amount)}))
 
 
 func _on_actor_defeated(actor: Actor, by: Actor) -> void:
-	var verb := "downed" if actor is Hunter else "killed"
-	_add_log("%s %s %s" % [_actor_name(by), verb, _actor_name(actor)])
+	var key := "world.arena.log_downed" if actor is Hunter else "world.arena.log_killed"
+	_add_log(Loc.t(key, {"by": _actor_name(by), "target": _actor_name(actor)}))
 
 
 func _add_log(line: String) -> void:

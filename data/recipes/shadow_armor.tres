@@ -16,7 +16,7 @@ quantity = 6
 [resource]
 script = ExtResource("1_recipe")
 id = &"shadow_armor"
-display_name = "Shadow Armor"
+display_name = "recipe.shadow_armor.name"
 result_item_id = &"shadow_armor"
 gold_cost = 420
 material_costs = Array[ExtResource("2_amount")]([SubResource("A0"), SubResource("A1")])

@@ -51,6 +51,7 @@ var _expedition_hud: ExpeditionHud
 
 
 func _ready() -> void:
+	add_to_group(&"ui_root")
 	theme = GameTheme.get_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -119,6 +120,22 @@ func open_sheet(sheet: Sheet) -> void:
 	_sheet_area.add_child(sheet)
 	_layout_sheet()
 	_highlight_nav()
+
+
+## Item details over everything (D64); the open sheet stays.
+func open_item_info(item: ItemDefinition, instance_id: StringName = &"") -> void:
+	if item == null:
+		return
+	var modal := ItemInfoModal.new().setup(item, instance_id)
+	modal.toast_requested.connect(toast)
+	add_child(modal)
+
+
+## What a Hunter can wear in one slot (D66), over everything; the open sheet stays.
+func open_equip_picker(hunter: HunterRuntime, slot: StringName) -> void:
+	if hunter == null or slot == &"":
+		return
+	add_child(EquipPickerModal.new().setup(hunter, slot))
 
 
 func close_sheet() -> void:
@@ -299,19 +316,25 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 	_chips[&"hunters"] = count_label
 	right.add_child(count_line)
 	var shortcuts := UIKit.hbox([], 2)
-	for entry in [[&"book", "Quests", open_quests], [&"trophy", "Portal", _open_portal_or_hint], [&"mail", "Recruit", open_recruit]]:
+	for entry in [[&"book", "ui.root.tip_quests", open_quests], [&"trophy", "ui.root.tip_portal", _open_portal_or_hint],
+			[&"mail", "ui.root.tip_recruit", open_recruit], [&"gear", "ui.settings.title", open_settings]]:
 		var button := UIKit.button("", entry[2], &"HudButton")
 		button.icon = PixelIcons.texture(entry[0], 2)
 		button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		button.tooltip_text = entry[1]
+		button.tooltip_text = Loc.t(entry[1])
 		button.custom_minimum_size = Vector2(30, 30)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
-		shortcuts.add_child(button)
+		# Settings sits beside the Hunter count so the header keeps three shortcuts per row.
+		if entry[0] == &"gear":
+			button.custom_minimum_size = Vector2(26, 26)
+			count_line.add_child(button)
+		else:
+			shortcuts.add_child(button)
 	right.add_child(shortcuts)
 	column.add_child(UIKit.hbox([_difficulty_button, resources, spacer, right], 6))
 	# Row 2: the active quest and the advisor's hint.
 	var quest_box := UIKit.vbox([], 2)
-	_quest_title = UIKit.label("Quest", &"HudAccentLabel", false)
+	_quest_title = UIKit.label(Loc.t("ui.root.quest_title"), &"HudAccentLabel", false)
 	_quest_title.visible = false
 	_quest_text = UIKit.label("", &"HudSmallLabel")
 	_quest_text.add_theme_font_size_override(&"font_size", 10)
@@ -337,14 +360,37 @@ func _open_portal_or_hint() -> void:
 	if GameManager.buildings.has_building(BuildingService.PORTAL):
 		open_building(BuildingService.PORTAL)
 	else:
-		toast("Build the Reincarnation Portal (Town Hall Lv 3) to change difficulty", true)
+		toast(Loc.t("toast.root.build_portal"), true)
 
 
 func open_recruit() -> void:
-	if GameManager.buildings.has_building(BuildingService.TAVERN):
-		open_building(BuildingService.TAVERN)
+	open_gate()
+
+
+## Settings (gear button): the language picker.
+func open_settings() -> void:
+	open_sheet(SettingsSheet.new())
+
+
+## The Hunter Gate sheet (D58): hire and expel.
+func open_gate() -> void:
+	open_sheet(GateSheet.new())
+
+
+## The Boss Arena sheet (D58).
+func open_arena() -> void:
+	var sheet := BossSheet.new()
+	sheet.focus_requested.connect(func(region_id: StringName) -> void: focus_region_requested.emit(region_id))
+	open_sheet(sheet)
+
+
+## The Hunter Gate or the arena altar was tapped in the world.
+func open_structure(region_id: StringName) -> void:
+	var region := DataRegistry.get_region(region_id)
+	if region != null and region.kind == RegionDefinition.Kind.BOSS:
+		open_arena()
 	else:
-		toast("Build a Tavern to recruit Hunters", true)
+		open_gate()
 
 
 func open_shop() -> void:
@@ -362,7 +408,7 @@ func _refresh_resources() -> void:
 	_refresh_quest_panel()
 	if _waiting_button != null:
 		var waiting := gm.recruitment.candidates.size()
-		_waiting_button.text = "Hunters\nWaiting" if waiting > 0 else "No\ncandidates"
+		_waiting_button.text = Loc.t("ui.root.hunters_waiting") if waiting > 0 else Loc.t("ui.root.no_candidates")
 		_waiting_button.visible = gm.buildings.has_building(BuildingService.TAVERN)
 
 
@@ -382,14 +428,15 @@ func _refresh_quest_panel() -> void:
 	var quests := GameManager.quests
 	var active := quests.get_active()
 	if active.is_empty():
-		_quest_title.text = "Quest"
-		_quest_text.text = "All quests done. Play on at your own pace."
+		_quest_title.text = Loc.t("ui.root.quest_title")
+		_quest_text.text = Loc.t("ui.root.all_quests_done")
 		_quest_bar.visible = false
 		return
 	var quest := active[0]
 	var progress := quests.get_progress(quest)
 	var done := quests.is_complete(quest)
-	_quest_text.text = "%s%s (%d/%d)" % ["Claim reward! " if done else "Quest: ", quest.description, progress.x, progress.y]
+	var quest_args := {"quest": quest.description, "progress": "%d" % progress.x, "goal": "%d" % progress.y}
+	_quest_text.text = Loc.t("ui.root.quest_claim" if done else "ui.root.quest_progress", quest_args)
 	_quest_bar.visible = true
 	_quest_bar.max_value = maxf(progress.y, 1)
 	_quest_bar.value = progress.x
@@ -398,7 +445,7 @@ func _refresh_quest_panel() -> void:
 ## Left: "Hunters Waiting" (Tavern candidates); right: Town / I / II / III region buttons; above
 ## them a small event feed, as in Evil Hunter Tycoon.
 func _build_overlays() -> void:
-	_waiting_button = UIKit.button("Hunters\nWaiting", open_recruit, &"HudButton")
+	_waiting_button = UIKit.button(Loc.t("ui.root.hunters_waiting"), open_recruit, &"HudButton")
 	_waiting_button.icon = PixelIcons.texture(&"hunters", 2)
 	_waiting_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_waiting_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
@@ -423,7 +470,7 @@ func _build_overlays() -> void:
 	hex.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	hex.offset_right = -4
 	hex.offset_bottom = -4
-	var entries: Array = [["Town", &""]]
+	var entries: Array = [[Loc.t("ui.root.town"), &""]]
 	var numerals := ["I", "II", "III", "IV", "V"]
 	var regions := GameManager.regions.get_hunting_regions()
 	for i in regions.size():
@@ -438,7 +485,7 @@ func _build_overlays() -> void:
 		button.custom_minimum_size = Vector2(38, 38)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
 		button.add_theme_font_size_override(&"font_size", 13)
-		button.tooltip_text = "Town" if entry[1] == &"" else GameManager.regions.get_duty_name(entry[1])
+		button.tooltip_text = Loc.t("ui.root.town") if entry[1] == &"" else GameManager.regions.get_duty_name(entry[1])
 		if entry[1] == &"":
 			button.text = ""
 			button.icon = PixelIcons.texture(&"town", 2)
@@ -477,10 +524,10 @@ func _build_placement_bar(layout: VBoxContainer) -> void:
 	_placement_bar = PanelContainer.new()
 	_placement_bar.theme_type_variation = &"TopBar"
 	_placement_label = UIKit.label("")
-	_placement_confirm = UIKit.button("Confirm", func() -> void: placement_confirmed.emit(), &"PrimaryButton")
+	_placement_confirm = UIKit.button(Loc.t("ui.common.confirm"), func() -> void: placement_confirmed.emit(), &"PrimaryButton")
 	_placement_confirm.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_placement_confirm.custom_minimum_size.x = 76
-	var cancel := UIKit.button("Cancel", func() -> void: placement_cancelled.emit())
+	var cancel := UIKit.button(Loc.t("ui.common.cancel"), func() -> void: placement_cancelled.emit())
 	cancel.size_flags_horizontal = Control.SIZE_SHRINK_END
 	cancel.custom_minimum_size.x = 68
 	_placement_bar.add_child(UIKit.hbox([_placement_label, _placement_confirm, cancel]))
@@ -493,9 +540,10 @@ func _build_nav(layout: VBoxContainer) -> void:
 	_nav = PanelContainer.new()
 	_nav.theme_type_variation = &"NavBar"
 	var buttons := UIKit.hbox([], 0)
-	for entry in [["Construct", open_build, &"build"], ["Dungeon", open_expedition.bind(&"dark_forest"), &"arch"],
-			["Hunters", open_hunters, &"hunters"], ["Storage", open_inventory, &"chest"], ["Shop", open_shop, &"shop"]]:
-		var button := UIKit.button(entry[0], entry[1], &"NavButton")
+	# [id, action, icon]; the label is the key ui.nav.<id>.
+	for entry in [[&"construct", open_build, &"build"], [&"dungeon", open_expedition.bind(&"dark_forest"), &"arch"],
+			[&"hunters", open_hunters, &"hunters"], [&"storage", open_inventory, &"chest"], [&"shop", open_shop, &"shop"]]:
+		var button := UIKit.button(Loc.t("ui.nav.%s" % entry[0]), entry[1], &"NavButton")
 		button.icon = PixelIcons.texture(entry[2], 3)
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
@@ -504,7 +552,7 @@ func _build_nav(layout: VBoxContainer) -> void:
 		button.add_theme_color_override(&"font_outline_color", GameTheme.INK)
 		button.add_theme_constant_override(&"outline_size", 3)
 		button.custom_minimum_size.y = 58
-		_nav_buttons[StringName(entry[0].to_lower())] = button
+		_nav_buttons[entry[0]] = button
 		buttons.add_child(button)
 	_nav.add_child(buttons)
 	layout.add_child(_nav)
@@ -540,37 +588,42 @@ func _connect_notifications() -> void:
 	gm.hunters.hunter_added.connect(func(_h: HunterRuntime) -> void: _refresh_resources())
 	gm.buildings.building_upgraded.connect(func(id: StringName, level: int) -> void:
 		_refresh_resources()
-		toast("%s reached Lv %d" % [gm.buildings.get_definition(id).display_name, level]))
+		toast(Loc.t("toast.root.reached_level", {"name": gm.buildings.get_definition(id).display_name, "level": level})))
 	gm.hunters.hunter_leveled_up.connect(func(hunter: HunterRuntime, level: int, _healed: float) -> void:
 		if mode == Mode.TOWN:
-			toast("%s reached Lv %d" % [hunter.display_name, level]))
+			toast(Loc.t("toast.root.reached_level", {"name": hunter.display_name, "level": level})))
 	gm.quests.quests_changed.connect(_refresh_quest_badge)
 	gm.regions.bag_deposited.connect(func(hunter: HunterRuntime, report: Dictionary) -> void:
 		var count := 0
 		for quantity in report["items"].values():
 			count += quantity
 		if count > 0:
-			feed("%s has sold %d items (+%d g)" % [hunter.display_name, count, report["village_gold"] + report["trader_gold"]]))
+			feed(Loc.t("ui.root.feed_sold", {"name": hunter.display_name, "count": count,
+				"gold": "%d" % (report["village_gold"] + report["trader_gold"])})))
+	gm.equipment.weapon_broken.connect(func(hunter: HunterRuntime, item: ItemDefinition) -> void:
+		feed(Loc.t("ui.root.feed_weapon_broken", {"name": hunter.display_name, "item": item.display_name})))
+	gm.equipment.weapon_repaired.connect(func(hunter: HunterRuntime, item: ItemDefinition, cost: int) -> void:
+		feed(Loc.t("ui.root.feed_weapon_repaired", {"name": hunter.display_name, "item": item.display_name, "gold": cost})))
 	gm.recruitment.candidates_changed.connect(_refresh_resources)
 	gm.quests.quest_completed.connect(func(quest: QuestDefinition) -> void:
-		toast("Quest done: %s — claim your reward" % quest.display_name))
+		toast(Loc.t("toast.root.quest_done", {"quest": quest.display_name})))
 	_refresh_quest_badge()
 	gm.reincarnation.difficulty_changed.connect(func(_d: int) -> void: _refresh_resources())
 	gm.reincarnation.reincarnated.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s was reborn (×%d)" % [hunter.display_name, hunter.reincarnations]))
+		toast(Loc.t("toast.root.reborn", {"name": hunter.display_name, "count": hunter.reincarnations})))
 	gm.trading.request_completed.connect(func(item_id: StringName, quantity: int) -> void:
-		toast("Request done: %d %s" % [quantity, DataRegistry.get_item(item_id).display_name]))
+		toast(Loc.t("toast.root.request_done", {"count": quantity, "item": DataRegistry.get_item(item_id).display_name})))
 	gm.recruitment.hunter_recruited.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s joined the roster" % hunter.display_name))
+		toast(Loc.t("toast.root.recruited", {"name": hunter.display_name})))
 	gm.temple.hunter_recovered.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s is back on their feet" % hunter.display_name))
+		toast(Loc.t("toast.root.recovered", {"name": hunter.display_name})))
 	gm.corpses.hunter_died.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s has fallen" % hunter.display_name, true))
+		toast(Loc.t("toast.root.fallen", {"name": hunter.display_name}), true))
 	gm.corpses.body_delivered.connect(func(hunter: HunterRuntime) -> void:
-		toast("%s was carried to the Temple" % hunter.display_name))
+		toast(Loc.t("toast.root.delivered", {"name": hunter.display_name})))
 	gm.bonds.bond_changed.connect(func(a: StringName, b: StringName, _value: float) -> void:
 		if gm.bonds.is_bonded(a, b):
-			toast("%s and %s are now bonded" % [gm.hunters.get_hunter(a).display_name, gm.hunters.get_hunter(b).display_name]))
+			toast(Loc.t("toast.root.bonded", {"a": gm.hunters.get_hunter(a).display_name, "b": gm.hunters.get_hunter(b).display_name})))
 
 
 func _apply_safe_area() -> void:

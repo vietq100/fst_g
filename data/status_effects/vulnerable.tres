@@ -12,7 +12,7 @@ value = 0.1
 [resource]
 script = ExtResource("1_effect")
 id = &"vulnerable"
-display_name = "Vulnerable"
+display_name = "status.vulnerable.name"
 kind = 1
 duration = 5.0
 stacking = 1

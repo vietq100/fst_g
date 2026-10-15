@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ClassSkillDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/class_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[sub_resource type="Resource" id="M0"]
+script = ExtResource("2_mod")
+stat = &"defense"
+type = 1
+value = 0.06
+
+[sub_resource type="Resource" id="M1"]
+script = ExtResource("2_mod")
+stat = &"max_hp"
+type = 1
+value = 0.03
+
+[resource]
+script = ExtResource("1_skill")
+id = &"gatekeeper"
+display_name = "class_skill.gatekeeper.name"
+class_id = &"guardian"
+order = 25
+kind = 1
+description = "class_skill.gatekeeper.desc"
+scale_stat = &"max_hp"
+ratings = Vector3i(3, 1, 1)
+modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])

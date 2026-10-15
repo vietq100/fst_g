@@ -36,6 +36,7 @@ func after_each() -> void:
 func _hunter() -> HunterRuntime:
 	var hunter := _hunters.create_hunter(&"warrior", _rng)
 	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
 	return hunter
 
 
@@ -116,8 +117,9 @@ func test_equip_best() -> void:
 
 
 func test_crafting_requirements_and_costs() -> void:
-	assert_eq(_crafting.get_recipes(&"blacksmith").size(), 7)
-	assert_eq(_crafting.get_recipes().size(), 11, "7 Blacksmith, 2 Tavern food, 2 Hospital medicine")
+	assert_eq(_crafting.get_recipes(&"blacksmith").size(), 26, "7 weapons / tops + 19 helmets, pants, boots, jewelry, charms (D59)")
+	assert_eq(_crafting.get_recipes(&"trading_post").size(), 9, "5 skins + 4 pets (D59)")
+	assert_eq(_crafting.get_recipes().size(), 39, "26 Blacksmith, 9 Trading Post, 2 Tavern food, 2 Hospital medicine")
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 50 gold")
 	_wallet.add(500)
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 5 Iron Ore")
@@ -157,3 +159,71 @@ func test_inventory_round_trip_with_equipped() -> void:
 	assert_eq(copy.count(&"iron_sword"), 1)
 	assert_true(copy.is_equipped(hunter.equipment[&"weapon"]))
 	assert_eq(copy.used_slots(), _inventory.used_slots())
+
+
+func test_every_slot_equips_and_dresses_the_figure() -> void:
+	var hunter := _hunters.create_hunter(&"warrior", _rng)
+	for item_id: StringName in [&"iron_helm", &"leather_pants", &"swift_boots", &"fang_necklace", &"ruby_ring", &"lucky_charm",
+			&"crimson_suit", &"pet_teddy"]:
+		assert_eq(_inventory.add_item(item_id, 1), 1, "stored %s" % item_id)
+		var instance: StringName = _inventory.get_instances_of(item_id)[0]
+		assert_eq(_equipment.equip(hunter, instance), "", String(item_id))
+	for slot: StringName in [&"helmet", &"pants", &"boots", &"necklace", &"ring", &"accessory", &"skin", &"pet"]:
+		assert_true(hunter.equipment.has(slot), "slot %s" % slot)
+	assert_eq(EquipmentService.SLOT_ORDER.size(), EquipmentService.SLOT_NAMES.size())
+	var dress := _equipment.get_dress(hunter)
+	assert_eq(dress.hat, &"helm")
+	assert_eq(dress.pet, &"teddy")
+	assert_eq(dress.outfit, &"warrior", "Crimson Suit uses the warrior pattern")
+	assert_true(dress.skin and dress.has_cloth and dress.has_pants and dress.has_boots)
+	var figure := ChibiBody.get_figure(hunter.appearance, dress)
+	assert_true(figure.get_height() >= 30 and figure.get_width() <= ChibiBody.CANVAS.x, "whole body, cropped")
+	assert_not_null(PetSprites.texture(dress.pet, dress.pet_tint, 1))
+	var styles := {}
+	for item_id: StringName in [&"wizard_hat", &"shadow_hood", &"leather_cap", &"golden_crown", &"steel_helm"]:
+		styles[ChibiBody.hat_style_for(_registry.find_def(&"item", item_id) as ItemDefinition)] = true
+	assert_eq(styles.size(), 5, "five hat styles")
+
+
+func test_weapon_durability_wears_breaks_and_repairs() -> void:
+	var hunter := _hunters.create_hunter(&"warrior", _rng)
+	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
+	_equipment.buildings = _buildings
+	_equipment.wallet = _wallet
+	_equipment.purses = PurseService.new(_wallet, _registry.config)
+	_inventory.add_item(&"iron_sword", 1)
+	var instance: StringName = _inventory.get_instances_of(&"iron_sword")[0]
+	assert_eq(_equipment.equip(hunter, instance), "")
+	var sword := _registry.find_def(&"item", &"iron_sword") as ItemDefinition
+	var full := EquipmentService.max_durability(sword)
+	assert_eq(full, EquipmentService.DURABILITY_BASE + EquipmentService.DURABILITY_PER_TIER * int(sword.rarity))
+	assert_eq(EquipmentService.max_durability(_registry.find_def(&"item", &"leather_armor") as ItemDefinition), 0, "only weapons wear")
+	var armed := _hunters.get_stat(hunter, HunterService.ATTACK)
+	_equipment.wear_weapon(hunter, 5)
+	assert_eq(_equipment.get_durability(instance), full - 5)
+	var broken := []
+	_equipment.weapon_broken.connect(func(_h: HunterRuntime, _i: ItemDefinition) -> void: broken.append(true))
+	_equipment.wear_weapon(hunter, full)
+	assert_true(_equipment.is_broken(instance))
+	assert_eq(broken.size(), 1)
+	assert_true(_hunters.get_stat(hunter, HunterService.ATTACK) < armed, "a broken weapon gives no bonus")
+	var cost := _equipment.get_repair_cost(instance)
+	assert_eq(cost, full * (EquipmentService.REPAIR_GOLD_PER_POINT + int(sword.rarity)))
+	_wallet.add(cost)
+	assert_eq(_equipment.repair(instance), "")
+	assert_eq(_equipment.get_durability(instance), full)
+	assert_almost_eq(_hunters.get_stat(hunter, HunterService.ATTACK), armed)
+	# The Hunter's own trip to the Blacksmith: worn below the threshold, paid from the purse.
+	_equipment.wear_weapon(hunter, full - 1)
+	hunter.purse = 10000
+	assert_true(_equipment.wants_repair(hunter))
+	assert_true(_equipment.repair_by_hunter(hunter))
+	assert_eq(_equipment.get_durability(instance), full)
+	assert_false(_equipment.wants_repair(hunter))
+	# Saved with the inventory.
+	_equipment.wear_weapon(hunter, 3)
+	var copy := InventoryService.new(_registry, _wallet)
+	copy.from_dict(_inventory.to_dict(), PackedStringArray())
+	assert_eq(copy.get_wear(instance), 3)
+

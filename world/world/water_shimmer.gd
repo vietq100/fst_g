@@ -14,7 +14,7 @@ var _frame_time := 0.0
 
 
 func setup(world: WorldService) -> void:
-	var area := world.get_bounds(WorldScenery.MARGIN)
+	var area := world.get_bounds(300.0)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	var tries := 0
@@ -25,7 +25,7 @@ func setup(world: WorldService) -> void:
 			continue
 		var on_bridge := false
 		for gate in world.get_gates():
-			if WorldService.rect_to_world(gate.tiles.grow(1)).has_point(point):
+			if WorldService.rect_has_point(gate.tiles.grow(1), point):
 				on_bridge = true
 				break
 		if not on_bridge:

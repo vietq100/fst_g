@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_item")
 id = &"meat_stew"
-display_name = "Meat Stew"
+display_name = "item.meat_stew.name"
 item_type = 4
 rarity = 0
 stackable = true

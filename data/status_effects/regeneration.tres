@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_effect")
 id = &"regeneration"
-display_name = "Regen"
+display_name = "status.regeneration.name"
 kind = 0
 duration = 8.0
 stacking = 0

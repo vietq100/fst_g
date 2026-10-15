@@ -18,7 +18,7 @@ value = 0.3
 [resource]
 script = ExtResource("1_effect")
 id = &"haste"
-display_name = "Haste"
+display_name = "status.haste.name"
 kind = 0
 duration = 6.0
 stacking = 0

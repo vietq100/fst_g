@@ -1,11 +1,9 @@
 class_name ItemIcons
 extends RefCounted
-## Pixel-art item icons drawn from text bitmaps (like PixelIcons: 24×24 texels laid out at
-## 12 × scale px, D56), picked by the item's type and id and tinted with its `tint` (T = tint,
-## t = tint shadow). Cached per kind, tint and scale.
+## 12×12 pixel-art item icons drawn from text bitmaps (like PixelIcons), picked by the item's type
+## and id and tinted with its `tint` (T = tint, t = tint shadow). Cached per kind, tint and scale.
 
-## Layout size of an icon at scale 1, in px.
-const SIZE := PixelIcons.SIZE
+const SIZE := 12
 
 const PALETTE := {
 	"k": Color("2a1c10"), "L": Color("ffffff"), "b": Color("8b5e3c"), "B": Color("5a3b22"), "y": Color("f2c94c"),
@@ -16,10 +14,67 @@ const PALETTE := {
 ## Default tint for kinds whose item has none (white = untinted).
 const KIND_TINT := {
 	&"sword": Color("c8d0d8"), &"dagger": Color("c8d0d8"), &"bow": Color("8b5e3c"), &"mace": Color("b8bcc4"),
-	&"armor": Color("b8bcc4"), &"potion": Color("ff6b7a"),
+	&"armor": Color("b8bcc4"), &"potion": Color("ff6b7a"), &"helmet": Color("b8bcc4"), &"pants": Color("8b5e3c"),
+	&"boots": Color("8b5e3c"), &"necklace": Color("5fa8ff"), &"charm": Color("a78bfa"), &"skin": Color("c9503f"), &"pet": Color("c8925a"),
 }
 
 const BITMAPS := {
+	&"helmet": [
+		"........................", "........................", ".........kkkkkk.........", ".......kkkkkkkkkk.......",
+		".....kkkkTTTLLTkkkk.....", "...kkkkTTTTTLLTTTkkkk...", "...kkTTTTTTTLLTTTTtkk...", "..kkTTTTTTTTLLTTTTttkk..",
+		"..kkTTTTTTTTTTTTTTttkk..", ".kkTTTTTTTTTTTTTTTTttkk.", ".kkTTTTTTTTTTTTTTTTttkk.", "kkTTTTTTTTTTTTTTTTTTttkk",
+		"kkTTTTTTTTTTTTTTTTTTttkk", "kkTTTTTTTTTTTTTTTTTTttkk", "kkyyyyyyyyyyyyyyyyyyyykk", "kkyyyyyyyyyyyyyyyyyyyykk",
+		"kkTTkk............kkttkk", "kkTTkk............kkttkk", "kkTTkk............kkttkk", ".kTTk..............kttk.",
+		".kkkk..............kkkk.", "..kk................kk..", "........................", "........................",
+	],
+	&"pants": [
+		"........................", "........................", "...kkkkkkkkkkkkkkkkkk...", "..kkkkkkkkkkkkkkkkkkkk..",
+		"..kkkyyyyyyyyyyyyyykkk..", "..kkyyyyyyyyyyyyyyyykk..", "..kkTTTTTTTTTTTTTTttkk..", "..kkTTTTTTTTTTTTTTttkk..",
+		"..kkTTTTTTTTTTTTTTttkk..", "..kkTTTTTTTTTTTTTTttkk..", "..kkTTTTTTTkkTTTTTttkk..", "..kkTTTTTkkkkkkTTTttkk..",
+		"..kkTTTTTkk..kkTTTttkk..", "..kkTTTTkk....kkTTttkk..", "..kkTTTTkk....kkTTttkk..", "..kkTTTTkk....kkTTttkk..",
+		"..kkTTTTkk....kkTTttkk..", "..kkTTTTkk....kkTTttkk..", "..kkTTTtkk....kkTTttkk..", "..kkkTtkkk....kkkTtkkk..",
+		"..kkkkkkkk....kkkkkkkk..", "...kkkkkk......kkkkkk...", "........................", "........................",
+	],
+	&"boots": [
+		"........................", "........................", ".....kkkk...............", "....kkkkkkk.............",
+		"....kkkTLkk.............", "....kkTTTLkk............", "....kkTTTTkk............", "....kkTTTTkk............",
+		"....kkTTTTkk...kkkk.....", "....kkTTTTkk..kkkkkkk...", "....kkTTTTkk..kkkTLkk...", "....kkTTTTkk..kkTTTLkk..",
+		"....kkTTTTkk..kkTTTTkk..", "...kkTTTTTkk..kkTTTTkk..", "...kkTTTTTkkkkkkTTTTkk..", ".kkTTTTTTTkkkkkTTTTTkk..",
+		".kkTTTTTTTkkkkkTTTTTkk..", "kkTTTTTTTTkkkkTTTTTTTkk.", "kkttttttttkkkkTTTTTTTkkk", "kkkttttttkkkkkTTTTTTTTkk",
+		"kkkkkkkkkk..kktttttttt..", ".kkkkkkkk...kkkttttttt..", "............kkkkkkkkkk..", ".............kkkkkkkk...",
+	],
+	&"necklace": [
+		"........................", "........................", ".....kk..........kk.....", "...kkkkk........kkkkk...",
+		"...kyykk........kkyyk...", "..kkyyk..........kyykk..", "..kkyy............yykk..", "...kkyy..........yykk...",
+		"...kkyy..........yykk...", "....kkyy........yykk....", "....kkyy........yykk....", ".....kkyy......yykk.....",
+		".....kkyy......yykk.....", ".......kkyy..yykk.......", "........kyyyyyyk........", "........kkyyyykk........",
+		".......kkkTTTTkkk.......", "......kkkTTTTTkkkk......", "......kkkTLLTTtkkk......", "......kkTTLLTTttkk......",
+		"......kkTTTTTTttkk......", ".......kkTTTTTtkk.......", ".......kkkkkkkkkk.......", ".........kkkkkk.........",
+	],
+	&"charm": [
+		".........kkkk...........", ".......kkkkkkkk.........", "......kkyyyyyykk........", "......kkyyyyyykk........",
+		"........kyyyyk..........", "........kkyykk..........", ".......kkkTTkkk.........", ".....kkkkkTTTkkkk.......",
+		".....kkTLLTTTTtkk.......", "...kkTTLLLTTTTTttkk.....", "...kkTLLLTTTTTTttkk.....", "..kkTTLLTTTTTTTTttkk....",
+		"..kkTTTTTTyyTTTTttkk....", "..kkTTTTTyyyyTTTttkk....", "..kkTTTTyyyyyyTTttkk....", "...kkTTTyyyyyyTttkk.....",
+		"...kkTTTTyyyyTTttkk.....", ".....kkTTTyyTttkk.......", ".....kkTTTTTTttkk.......", ".......kkTTttkk.........",
+		".......kkktttkk.........", ".........kttk...........", ".........kkkk...........", "..........kk............",
+	],
+	&"skin": [
+		"........................", "........................", ".....kkkk......kkkk.....", "...kkkkkkkk..kkkkkkkk...",
+		"...kkTTTTkkkkkkTTTTkk...", ".kkTTTTTTTTkkTTTTTTTTkk.", ".kkTLLTTTTTTTTTTTTttTkk.", "kkTTLLTTTTTTTTTTTTtttTkk",
+		"kkTTkkTTTTTyyTTTTTktttkk", ".kTTkkTTTTyyyyTTTTkkttk.", ".kkkkkTTTTyyyyTTTTkkkkk.", "...kkkTTTTTyyTTTTTkkk...",
+		"...kkkTTTTTTTTTTTTkkk...", "....kkTTTTTTTTTTTTkk....", "....kkTTTTyyyyTTttkk....", "....kkTTTTyyyyTTttkk....",
+		"....kkTTTTTTTTTTTTkk....", "....kkTTTTTTTTTTTTkk....", "....kkTTTTTyyTTTTtkk....", "....kkTTTTyyyyTtttkk....",
+		"....kkttttttttttttkk....", "....kkkttttttttttkkk....", "....kkkkkkkkkkkkkkkk....", ".....kkkkkkkkkkkkkk.....",
+	],
+	&"pet": [
+		"........................", "........................", ".....kk..........kk.....", "...kkkkkk......kkkkkk...",
+		"...kkTTkk......kkTTkk...", "..kkTTTTkk....kkTTTTkk..", "..kkTTTTkk....kkTTTTkk..", "...kkTTkk......kkTTkk...",
+		"....kkkkk......kkkkk....", "....kkk..........kkk....", "...kkk.....kk.....kkk...", ".kkkkk...kkkkkk...kkkkk.",
+		".kkTTkkkkkkTTkkkkkkTTkk.", "kkTTTTkkkTTTTTTkkkTTTTkk", "kkTTTTkkkTTTTTTkkkTTTTkk", ".kkTTkkkTTTTTTTTkkkTTkk.",
+		".kkkkkkkTTTTTTTTkkkkkkk.", "...kkkkkTTTTTTTTkkkkk...", ".....kkkTTTTTTTTtkkkk...", "......kkTTTTTTTTttkk....",
+		"......kkTTTTTTTTttkk....", ".......kkTTTTTTTtkk.....", ".......kkkkkkkkkkkk.....", ".........kkkkkkkk.......",
+	],
 	&"sword": [
 		"...................kk...", ".................kkkkkk.", ".................kkTLLkk", "...............kkTTLLLkk",
 		"...............kkTTLLkk.", ".............kkTTLLkk...", ".............kkTTLLkk...", "...........kkTTLLkk.....",
@@ -159,6 +214,23 @@ static func kind_of(item: ItemDefinition) -> StringName:
 	if item == null:
 		return &"ore"
 	var id := String(item.id)
+	match item.equipment_slot:
+		ItemDefinition.EquipmentSlot.HELMET:
+			return &"helmet"
+		ItemDefinition.EquipmentSlot.PANTS:
+			return &"pants"
+		ItemDefinition.EquipmentSlot.BOOTS:
+			return &"boots"
+		ItemDefinition.EquipmentSlot.NECKLACE:
+			return &"necklace"
+		ItemDefinition.EquipmentSlot.RING:
+			return &"ring"
+		ItemDefinition.EquipmentSlot.ACCESSORY:
+			return &"charm"
+		ItemDefinition.EquipmentSlot.SKIN:
+			return &"skin"
+		ItemDefinition.EquipmentSlot.PET:
+			return &"pet"
 	match item.item_type:
 		ItemDefinition.ItemType.WEAPON:
 			if id.contains("bow"):
@@ -203,6 +275,7 @@ static func texture_of(kind: StringName, tint: Color, scale: int = 2) -> Texture
 	var palette := PALETTE.duplicate()
 	palette["T"] = tint
 	palette["t"] = tint.darkened(0.35)
+	# 24×24 texels laid out at SIZE × scale px (D71, PixelIcons.build).
 	var result := PixelIcons.build(BITMAPS.get(kind, BITMAPS[&"ore"]), palette, scale)
 	_cache[key] = result
 	return result

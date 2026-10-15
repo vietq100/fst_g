@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_q")
 id = &"hard_mode"
-display_name = "Into the Fire"
-description = "Unlock and select the Normal difficulty."
+display_name = "quest.hard_mode.name"
+description = "quest.hard_mode.desc"
 order = 15
 kind = 5
 target_id = &""

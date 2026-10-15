@@ -55,17 +55,17 @@ func get_bounty(item_id: StringName) -> int:
 
 func can_order(item_id: StringName, quantity: int) -> String:
 	if not _buildings.has_building(BuildingService.TRADING_POST):
-		return "Needs a Trading Post"
+		return Loc.t("err.trading.no_post")
 	var item := _registry.find_def(&"item", item_id) as ItemDefinition
 	if item == null or item.item_type != ItemDefinition.ItemType.MATERIAL:
-		return "Cannot be requested"
+		return Loc.t("err.trading.not_requestable")
 	if quantity <= 0:
-		return "Nothing to request"
+		return Loc.t("err.trading.nothing")
 	if requests.size() >= get_slots():
-		return "All request slots are used (%d)" % get_slots()
+		return Loc.t("err.trading.slots_full", {"slots": get_slots()})
 	for request in requests:
 		if request["item_id"] == item_id:
-			return "Already requested"
+			return Loc.t("err.trading.already_requested")
 	return ""
 
 

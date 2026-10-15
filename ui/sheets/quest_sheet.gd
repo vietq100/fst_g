@@ -11,11 +11,11 @@ func _watch() -> Array:
 
 func _build(content: VBoxContainer) -> void:
 	var quests := GameManager.quests
-	set_title("Quests")
-	content.add_child(UIKit.label("Done: %d / %d" % [quests.get_claimed_count(), quests.get_all().size()], &"MutedLabel"))
+	set_title(Loc.t("ui.quest.title"))
+	content.add_child(UIKit.label(Loc.t("ui.quest.done", {"done": quests.get_claimed_count(), "total": quests.get_all().size()}), &"MutedLabel"))
 	var active := quests.get_active()
 	if active.is_empty():
-		content.add_child(UIKit.label("All quests are done. Play on at your own pace.", &"AccentLabel"))
+		content.add_child(UIKit.label(Loc.t("ui.quest.all_done"), &"AccentLabel"))
 	for quest in active:
 		var progress := quests.get_progress(quest)
 		var done := quests.is_complete(quest)
@@ -23,10 +23,10 @@ func _build(content: VBoxContainer) -> void:
 			UIKit.label(quest.display_name, &"AccentLabel" if done else &""),
 			UIKit.label(quest.description, &"MutedLabel"),
 			UIKit.bar(progress.x, progress.y, &"XpBar" if not done else &"HpBar", "%d / %d" % [progress.x, progress.y]),
-			UIKit.label("Reward: %s" % quests.describe_reward(quest), &"MutedLabel"),
+			UIKit.label(Loc.t("ui.quest.reward", {"reward": quests.describe_reward(quest)}), &"MutedLabel"),
 		], 3)
-		var claim := UIKit.button("Claim", func() -> void:
-			run_action("" if quests.claim(quest) else quests.can_claim(quest), "Reward claimed: %s" % quests.describe_reward(quest)),
+		var claim := UIKit.button(Loc.t("ui.quest.claim"), func() -> void:
+			run_action("" if quests.claim(quest) else quests.can_claim(quest), Loc.t("ui.quest.claimed", {"reward": quests.describe_reward(quest)})),
 			&"PrimaryButton", quests.can_claim(quest))
 		claim.size_flags_horizontal = Control.SIZE_SHRINK_END
 		claim.custom_minimum_size.x = 64

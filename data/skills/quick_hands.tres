@@ -12,8 +12,8 @@ value = 0.04
 [resource]
 script = ExtResource("1_skill")
 id = &"quick_hands"
-display_name = "Quick Hands"
-description = "+4% attack speed per level."
+display_name = "skill.quick_hands.name"
+description = "skill.quick_hands.desc"
 max_level = 4
 gold_per_level = 200
 required_academy_level = 2

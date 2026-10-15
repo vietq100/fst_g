@@ -44,6 +44,7 @@ func after_each() -> void:
 func _hunter(trait_ids: Array[StringName] = []) -> HunterRuntime:
 	var hunter := _hunters.create_hunter(&"warrior", _rng)
 	hunter.stat_rolls.clear()
+	hunter.tier = Tier.Level.C
 	hunter.trait_ids = trait_ids
 	hunter.current_hp = _hunters.get_stat(hunter, HunterService.MAX_HP)
 	return hunter
