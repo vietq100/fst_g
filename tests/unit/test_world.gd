@@ -50,8 +50,10 @@ func test_tile_world_round_trip() -> void:
 func test_region_shapes_are_soft_but_keep_gates_entrances_and_pond() -> void:
 	var town := _world.get_town()
 	var tiles: Dictionary = _world.region_tiles(town.id)
-	assert_true(tiles.size() < town.tile_rect.get_area(), "corners and edges are cut")
-	assert_true(tiles.size() > town.tile_rect.get_area() * 0.8, "most of the rectangle remains")
+	# Sealed borders add a row of ground outside the rectangle; count only what is inside it.
+	var inside_rect := tiles.keys().filter(func(t: Vector2i) -> bool: return town.tile_rect.has_point(t))
+	assert_true(inside_rect.size() < town.tile_rect.get_area(), "corners and edges are cut")
+	assert_true(inside_rect.size() > town.tile_rect.get_area() * 0.8, "most of the rectangle remains")
 	assert_false(tiles.has(town.tile_rect.position), "the top corner is cut")
 	for gate in _world.gates_of(town.id):
 		for tile: Vector2i in [gate.tiles.position, gate.tiles.end - Vector2i.ONE]:
@@ -77,21 +79,25 @@ func test_four_regions_and_four_gates() -> void:
 	for gate in _world.get_gates():
 		var ids := [String(gate.region_a), String(gate.region_b)]
 		ids.sort()
-		pairs.append("-".join(ids))
+		var pair := "-".join(ids)
+		if not pairs.has(pair):
+			pairs.append(pair)
 	pairs.sort()
 	assert_eq(pairs, ["ancient_ruins-boss_arena", "ancient_ruins-goblin_cave", "ancient_ruins-town", "dark_forest-goblin_cave",
 		"dark_forest-town", "hunter_gate-town"])
 	assert_eq(_world.gates_of(&"town").size(), 3)
+	var forest_cave := _world.gates_of(&"dark_forest").filter(func(g: WorldService.Gate) -> bool: return g.region_a == &"dark_forest" and g.region_b == &"goblin_cave" or g.region_b == &"dark_forest" and g.region_a == &"goblin_cave")
+	assert_eq(forest_cave.size(), 3, "a long border has three bridges")
 	assert_eq(_world.get_region(&"hunter_gate").kind, RegionDefinition.Kind.GATE)
 	assert_eq(_world.get_region(&"boss_arena").kind, RegionDefinition.Kind.BOSS)
 
 
 func test_region_lookup() -> void:
 	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(4, 4))).id, &"town")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(45, 3))).id, &"ancient_ruins")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(3, 45))).id, &"dark_forest")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(50, 50))).id, &"goblin_cave")
-	assert_null(_world.region_at(WorldService.tile_center(Vector2i(36, 3))), "gap between regions")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(78, -4))).id, &"ancient_ruins")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(-4, 78))).id, &"dark_forest")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(78, 78))).id, &"goblin_cave")
+	assert_null(_world.region_at(WorldService.tile_center(Vector2i(-6, -6))), "open water")
 
 
 func test_dungeon_entrances_sit_outside_their_region() -> void:
@@ -202,3 +208,20 @@ func test_pond_blocks_building() -> void:
 	var pond := _world.get_town_pond()
 	assert_true(pond.size != Vector2i.ZERO)
 	assert_eq(_buildings.can_place(&"house", pond.position), "The pond is in the way")
+
+
+func test_baked_ground_matches_the_region_shapes() -> void:
+	# Re-bake with `godot --headless --script tools/bake_ground.gd` when a region's shape changes.
+	for region in _world.get_regions():
+		var path := "res://assets/ground/%s.png" % region.id
+		assert_true(ResourceLoader.exists(path), "%s has baked ground" % region.id)
+		var texture := load(path) as Texture2D
+		var box := GroundPainter.layout(_world, region)
+		assert_eq(Vector2i(texture.get_size()), box["size"], "%s ground is current" % region.id)
+
+
+func test_baked_water_matches_the_world_bounds() -> void:
+	var texture := load("res://assets/ground/water.png") as Texture2D
+	assert_not_null(texture, "water is baked")
+	if texture != null:
+		assert_eq(Vector2i(texture.get_size()), WaterPainter.layout(_world)["size"], "water is current")

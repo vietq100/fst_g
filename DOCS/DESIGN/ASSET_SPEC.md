@@ -71,3 +71,13 @@ Examples:
 Keep generated/source assets outside runtime folders when appropriate.
 
 Runtime assets should have predictable paths.
+
+## Character Forge export (D73)
+
+The Hunter art comes from the HTML tool `tools/character_forge/pixel-character.html`. After changing it, re-export the data and the golden test fixtures (Node 18+, dev tool only):
+
+```bash
+node tools/character_forge/export_forge.js
+```
+
+It writes `actors/hunter/forge/forge_data.json` (parts, items, animations, effects, constants) and `tests/fixtures/forge_golden/*.json` (reference output of the original engine: `compose.json` for 31 configurations, `ramp.json`, `weapons.json`). Weapons and glasses are shapes in the HTML; glasses are exported already rasterised at 2.5x, weapons are ported by hand (`forge_shapes.gd`) and checked against `weapons.json`.

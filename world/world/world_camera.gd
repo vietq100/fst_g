@@ -3,11 +3,15 @@ extends Camera2D
 ## The screen as a window onto the world (D28): drag to pan, pinch / wheel to zoom, follow an
 ## actor until the player drags. Clamped to the world bounds.
 
-const MIN_ZOOM := 0.22
+const MIN_ZOOM := 0.14
 const MAX_ZOOM := 2.0
 const WHEEL_STEP := 1.12
 
 var bounds := Rect2(-1300, -100, 2600, 1400)
+## Screen pixels covered by the HUD at the top and the navigation bar at the bottom: the map may
+## scroll until its edges sit just clear of them, so every part of it can be reached.
+var inset_top := 0.0
+var inset_bottom := 0.0
 var follow_target: Node2D
 ## Follows the centre of these actors' standing members (a dungeon party).
 var follow_group: Array[Actor] = []
@@ -81,7 +85,10 @@ func clamp_to_bounds() -> void:
 	var lo := bounds.position + half
 	var hi := bounds.end - half
 	global_position.x = clampf(global_position.x, minf(lo.x, bounds.get_center().x), maxf(hi.x, bounds.get_center().x))
-	global_position.y = clampf(global_position.y, minf(lo.y, bounds.get_center().y), maxf(hi.y, bounds.get_center().y))
+	# Vertically the map may slide under the HUD's insets by their size (in world px).
+	var lo_y := bounds.position.y + half.y - inset_top / zoom.y
+	var hi_y := bounds.end.y - half.y + inset_bottom / zoom.y
+	global_position.y = clampf(global_position.y, minf(lo_y, bounds.get_center().y), maxf(hi_y, bounds.get_center().y))
 
 
 func _screen_to_world(screen_point: Vector2) -> Vector2:

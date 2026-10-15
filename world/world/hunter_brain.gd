@@ -19,6 +19,8 @@ const COOKING := &"cooking"
 const BREWING := &"brewing"
 ## Close enough to a body to pick it up.
 const PICK_UP_DISTANCE := 18.0
+## Hunters look for loot on the ground this far around them.
+const LOOT_SEEK_RANGE := 260.0
 ## Stopped this close to a door counts as arrived (the exact point may be hard to reach).
 const STOPPED_ARRIVE_DISTANCE := 64.0
 
@@ -201,6 +203,14 @@ func _go_home(in_town: bool) -> void:
 func _hunt(region: RegionDefinition) -> void:
 	_set_task(HunterRuntime.HUNTING)
 	if hunter.combat.target != null:
+		return
+	# Loot left by slain monsters comes first: walk over and pick it up.
+	var drop := map.get_nearest_drop(hunter, LOOT_SEEK_RANGE)
+	if drop != null and map.world.region_at(drop.global_position) == region:
+		if hunter.global_position.distance_to(drop.global_position) <= PICK_UP_DISTANCE:
+			map.collect_drop(drop, hunter)
+		else:
+			hunter.travel_target = drop.global_position
 		return
 	# Walk towards the nearest monster of the duty region; it is engaged once in range.
 	var best: Enemy = null

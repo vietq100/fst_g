@@ -149,7 +149,7 @@ func _difficulty_value(values: Array[float]) -> float:
 ## The killer gets gold (×gold_find) into its purse and items into its bag (what does not fit is
 ## left behind); the killer and every helper get the XP. Returns the reward for popups.
 func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: EnemyDefinition, level: int,
-		tier: int = -1) -> KillReward:
+		tier: int = -1, loadout: MonsterLoadout = null) -> KillReward:
 	var reward := KillReward.new()
 	if killer == null or enemy == null:
 		return reward
@@ -158,6 +158,13 @@ func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: En
 	if weapon_wear.is_valid():
 		weapon_wear.call(killer)
 	var scale := get_reward_scale(level) * Tier.reward_scale(monster_tier)
+	if loadout != null:
+		# What the monster carried falls to the ground; Hunters walk over and pick it up.
+		reward.on_ground = true
+		reward.gold = roundi(loadout.gold * _hunters.get_stat(killer, HunterService.GOLD_FIND))
+		reward.items = get_drops(loadout, monster_tier)
+		_credit_xp(killer, helpers, roundi(enemy.xp_reward * scale))
+		return reward
 	reward.gold = roundi(_rng.randi_range(enemy.gold_min, enemy.gold_max) * scale * _hunters.get_stat(killer, HunterService.GOLD_FIND))
 	_purses.earn(killer, reward.gold)
 	var rolled: Dictionary[StringName, int] = {}
@@ -171,7 +178,11 @@ func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: En
 		var added := add_to_bag(killer, item_id, rolled[item_id])
 		if added > 0:
 			reward.items[item_id] = added
-	var xp := roundi(enemy.xp_reward * scale)
+	_credit_xp(killer, helpers, roundi(enemy.xp_reward * scale))
+	return reward
+
+
+func _credit_xp(killer: HunterRuntime, helpers: Array[HunterRuntime], xp: int) -> void:
 	var cap := _stats.level_cap(_progress.town_level)
 	var credited: Array[HunterRuntime] = [killer]
 	for helper in helpers:
@@ -179,7 +190,95 @@ func record_kill(killer: HunterRuntime, helpers: Array[HunterRuntime], enemy: En
 			credited.append(helper)
 	for hunter in credited:
 		_hunters.add_xp(hunter, xp, cap)
-	return reward
+
+
+# --- Monster loadouts (gear, gold, materials, skills, meat) ---------------------------------------------
+
+const MEAT_ITEM := &"monster_meat"
+## Chance each worn item drops on death: base + per tier step.
+const GEAR_DROP_BASE := 0.5
+const GEAR_DROP_PER_TIER := 0.05
+const WEAPON_CHANCE := 0.7
+const ARMOR_CHANCE := 0.6
+const ACCESSORY_CHANCE := 0.4
+
+
+## Rolls what a freshly spawned monster carries.
+func roll_loadout(enemy: EnemyDefinition, level: int, tier: int) -> MonsterLoadout:
+	var loadout := MonsterLoadout.new()
+	var scale := get_reward_scale(level) * Tier.reward_scale(tier)
+	loadout.gold = roundi(_rng.randi_range(enemy.gold_min, enemy.gold_max) * scale)
+	if enemy.loot_table_id != &"":
+		loadout.resources = _loot.roll(enemy.loot_table_id)
+		for i in maxi(tier - Tier.Level.R, 0):
+			var extra := _loot.roll(enemy.loot_table_id)
+			for item_id in extra:
+				loadout.resources[item_id] = loadout.resources.get(item_id, 0) + extra[item_id]
+	if enemy.can_equip:
+		# Bosses are always fully equipped.
+		loadout.weapon = _pick_gear(enemy.weapon_pool, 1.0 if enemy.is_boss else WEAPON_CHANCE, tier)
+		loadout.armor = _pick_gear(enemy.armor_pool, 1.0 if enemy.is_boss else ARMOR_CHANCE, tier)
+		loadout.accessory = _pick_gear(enemy.accessory_pool, 1.0 if enemy.is_boss else ACCESSORY_CHANCE, tier)
+	loadout.skills = roll_skills(enemy)
+	if enemy.meat_max > 0:
+		loadout.meat = _rng.randi_range(enemy.meat_min, enemy.meat_max)
+	return loadout
+
+
+## The type's skill pool (up to 10), in id order.
+func get_monster_skills(enemy_id: StringName) -> Array[MonsterSkillDefinition]:
+	var result: Array[MonsterSkillDefinition] = []
+	for definition in _registry.get_all(&"monster_skill"):
+		var skill := definition as MonsterSkillDefinition
+		if skill.enemy_id == enemy_id:
+			result.append(skill)
+	result.sort_custom(func(a: MonsterSkillDefinition, b: MonsterSkillDefinition) -> bool: return String(a.id) < String(b.id))
+	return result
+
+
+## `skill_slots` distinct random skills of the type.
+func roll_skills(enemy: EnemyDefinition) -> Array[StringName]:
+	var pool := get_monster_skills(enemy.id)
+	var chosen: Array[StringName] = []
+	for i in mini(enemy.skill_slots, pool.size()):
+		var index := _rng.randi_range(0, pool.size() - 1)
+		chosen.append(pool[index].id)
+		pool.remove_at(index)
+	return chosen
+
+
+## Pools are ordered weakest to strongest: higher tiers lean towards the end.
+func _pick_gear(pool: Array[StringName], chance: float, tier: int) -> StringName:
+	if pool.is_empty() or _rng.randf() >= chance:
+		return &""
+	var bias := pow(_rng.randf(), 1.0 / (1.0 + tier * 0.6))
+	return pool[clampi(floori(bias * pool.size()), 0, pool.size() - 1)]
+
+
+## What falls when the monster dies: carried materials, meat and part of its gear.
+func get_drops(loadout: MonsterLoadout, tier: int) -> Dictionary[StringName, int]:
+	var drops: Dictionary[StringName, int] = {}
+	for item_id in loadout.resources:
+		drops[item_id] = drops.get(item_id, 0) + loadout.resources[item_id]
+	if loadout.meat > 0:
+		drops[MEAT_ITEM] = drops.get(MEAT_ITEM, 0) + loadout.meat
+	var chance := GEAR_DROP_BASE + GEAR_DROP_PER_TIER * tier
+	for item_id in loadout.get_gear():
+		if _rng.randf() < chance:
+			drops[item_id] = drops.get(item_id, 0) + 1
+	return drops
+
+
+## A Hunter picks up gold (always) and items (as far as the bag holds). Returns the items left.
+func collect_drop(hunter: HunterRuntime, gold: int, items: Dictionary[StringName, int]) -> Dictionary[StringName, int]:
+	if gold > 0:
+		_purses.earn(hunter, gold)
+	var left: Dictionary[StringName, int] = {}
+	for item_id in items:
+		var added := add_to_bag(hunter, item_id, items[item_id])
+		if added < items[item_id]:
+			left[item_id] = items[item_id] - added
+	return left
 
 
 func get_bag_count(hunter: HunterRuntime) -> int:

@@ -1,6 +1,6 @@
 # ARENA SYSTEM (Đấu Trường)
 
-Status: **design, not implemented** (D68). Hunter-versus-Hunter fights in three formats: **1vs1, 4vs4, 6vs6**.
+Status: **phase 1 implemented** (D72): the Colosseum building, safe 1vs1 matches (rivals or a friendly match with one of your own Hunters), a replay view and the result. Ranking, tickets, rewards, 4vs4 / 6vs6, class skills in fights and the Token shop are not built yet. The rest of this file is the full design (D68). Hunter-versus-Hunter fights in three formats: **1vs1, 4vs4, 6vs6**.
 
 Naming: the in-game name is **Đấu Trường**. The English id is `colosseum` (English UI "Colosseum") so it never clashes with the weekly-boss **Boss Arena** (`boss_arena`, D58).
 
@@ -111,3 +111,13 @@ New section `colosseum`: per format rank points, tickets, teams (Hunter ids + fo
 
 - Should Colosseum fights be watchable on the world map (spectators at the building) or only in the match view?
 - Do pets and talents (Cook, Herbalist) take part in arena fights? Proposal: pets yes, field crafting no.
+
+
+## 14. Phase 1 as built (2026-10-16)
+
+- **Building**: `colosseum` (3×3, unique, needs Town Hall Lv 2, 400 gold; levels 2 and 3 are defined for the later formats). Panel: BuildingSheet → "Enter the Colosseum" (`ColosseumSheet`); also listed in the Shop sheet.
+- **Rules**: `ArenaService` — eligibility (level ≥ `colosseum_min_level` = 5, alive, not hurt, not on an expedition, stamina ≥ 25), three generated rivals (power × 0.85 / 1.0 / 1.15, level chosen by search so HP×0.2 + ATK×2 + DEF×1.5 matches), friendly matches against another own Hunter.
+- **The fight** is a **simulation** from the real stats (level, gear, traits, mood, skill stat bonuses), not an actor fight in a scene: opening delay 0.8 s, then each fighter strikes every 1/attack-speed s; damage = `calculate_damage` × crit × dealt × taken × **0.8**; dodge capped at 25 %, crit at 75 %; 60 s limit, then higher HP % wins (within 0.5 % = draw). Deterministic for a seed. Class skills, mana, status effects and movement are **not** simulated yet.
+- **Consequences** (`apply_result`): stamina −10, mood +5 / +1 / −3, history counters `arena_wins` / `arena_draws` / `arena_losses`. HP, XP, injuries and gear are untouched. The match is applied when the player closes the result screen.
+- **Replay** (`ColosseumMatchView`): full-screen over the UI (takes every tap): both Hunters' figures on a sand arena, lunge and flash on each hit, floating damage / crit / miss, live HP bars and clock, speed ×1/×2, skip, then the result.
+- Texts are keys (`ui.arena.*`, `err.arena.*`, `building.colosseum.name`) in English and Vietnamese. Tests: `tests/unit/test_arena.gd` and two UI tests.

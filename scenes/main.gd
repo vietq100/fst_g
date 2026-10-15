@@ -64,6 +64,9 @@ func _ready() -> void:
 	_ui.focus_region_requested.connect(func(region_id: StringName) -> void:
 		if _world is WorldMap and not _world.is_in_dungeon():
 			_world.focus_region(region_id))
+	_ui.view_insets_changed.connect(func(top: float, bottom: float) -> void:
+		if _world is WorldMap:
+			_world.set_view_insets(top, bottom))
 	_ui.party_picker = func() -> Array:
 		return _world.pick_party() if _world is WorldMap else []
 	_banner.visible = false
@@ -171,6 +174,9 @@ func _show_world(next_world: Node) -> void:
 	_world = next_world
 	_world_container.add_child(_world)
 	if _world is WorldMap:
+		var insets := _ui.get_view_insets()
+		_world.set_view_insets.call_deferred(insets.x, insets.y)
+	if _world is WorldMap:
 		_ui.set_mode(UIRoot.Mode.TOWN)
 		var map := _world as WorldMap
 		map.input_blocker = func(point: Vector2) -> bool:
@@ -179,6 +185,7 @@ func _show_world(next_world: Node) -> void:
 		map.hunter_tapped.connect(_ui.open_hunter)
 		map.entrance_tapped.connect(_ui.open_entrance)
 		map.structure_tapped.connect(_ui.open_structure)
+		map.monster_tapped.connect(_ui.open_monster)
 		map.placement_changed.connect(_ui.set_placement)
 		map.depart_failed.connect(func(reason: String) -> void: _ui.toast(reason, true))
 		if _pending_result != null:

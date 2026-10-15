@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MonsterSkillDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/monster_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"weekly_boss_soul_rend"
+display_name = "monster_skill.weekly_boss_soul_rend.name"
+enemy_id = &"weekly_boss"
+kind = 0
+description = "monster_skill.weekly_boss_soul_rend.desc"
+cooldown = 9.0
+cast_range = 0.0
+attack_ratio = 1.6
+hits = 1
+trigger_hp_below = 0.0
+heal_ratio = 0.0
+target_effects = Array[ExtResource("3_chance")]([])
+self_effects = Array[ExtResource("3_chance")]([])
+modifiers = Array[ExtResource("2_mod")]([])

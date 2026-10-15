@@ -14,6 +14,12 @@ var level := 1
 var stat_scale := 1.0
 ## Tier of this monster (D60): the boss's fixed tier or a roll.
 var tier: int = Tier.Level.C
+## Gear, gold, materials, skills and meat this monster carries (region monsters only).
+var loadout: MonsterLoadout
+## Passive skill bonuses (fractions) and gear modifiers, read by the combat stats.
+var _percent: Dictionary[StringName, float] = {}
+var _flat: Dictionary[StringName, float] = {}
+var _caster: MonsterSkillCaster
 
 
 ## Call after the node is in the tree.
@@ -39,12 +45,43 @@ func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, ret
 	plate.name_color = Tier.color(tier) if tier > Tier.Level.C else ActorNameplate.NAME_COLOR
 
 
+## Gives the monster its gear and skills: gear adds flat / percent stats, passive skills add
+## percent stats, active skills are cast by a MonsterSkillCaster. Call after `setup`.
+func apply_loadout(monster_loadout: MonsterLoadout) -> void:
+	loadout = monster_loadout
+	_percent.clear()
+	_flat.clear()
+	var skills: Array[MonsterSkillDefinition] = []
+	for item_id in loadout.get_gear():
+		var item := DataRegistry.find_def(&"item", item_id) as ItemDefinition
+		if item == null:
+			continue
+		for modifier in item.modifiers:
+			var bucket := _percent if modifier.type == StatModifier.Type.PERCENT else _flat
+			bucket[modifier.stat] = bucket.get(modifier.stat, 0.0) + modifier.value
+	for skill_id in loadout.skills:
+		var skill := DataRegistry.find_def(&"monster_skill", skill_id) as MonsterSkillDefinition
+		if skill == null:
+			continue
+		skills.append(skill)
+		for modifier in skill.modifiers:
+			_percent[modifier.stat] = _percent.get(modifier.stat, 0.0) + modifier.value
+	health.setup((definition.hp * stat_scale + _flat.get(&"max_hp", 0.0)) * (1.0 + _percent.get(&"max_hp", 0.0)))
+	if _caster != null:
+		_caster.queue_free()
+		_caster = null
+	_caster = MonsterSkillCaster.new()
+	_caster.name = "MonsterSkillCaster"
+	add_child(_caster)
+	_caster.setup(self, combat.get_service(), skills)
+
+
 func get_team_group() -> StringName:
 	return GROUP
 
 
 func get_move_speed() -> float:
-	return definition.move_speed if definition != null else 0.0
+	return definition.move_speed * (1.0 + _percent.get(&"move_speed", 0.0)) if definition != null else 0.0
 
 
 func get_hit_radius() -> float:
@@ -53,10 +90,10 @@ func get_hit_radius() -> float:
 
 func get_combat_stats(_against: Actor = null) -> CombatStats:
 	var stats := CombatStats.new()
-	stats.attack = definition.attack * stat_scale
-	stats.defense = definition.defense * stat_scale
-	stats.attack_speed = definition.attack_speed
-	stats.critical_chance = definition.critical_chance
+	stats.attack = (definition.attack * stat_scale + _flat.get(&"attack", 0.0)) * (1.0 + _percent.get(&"attack", 0.0))
+	stats.defense = maxf((definition.defense * stat_scale + _flat.get(&"defense", 0.0)) * (1.0 + _percent.get(&"defense", 0.0)), 0.0)
+	stats.attack_speed = definition.attack_speed * (1.0 + _percent.get(&"attack_speed", 0.0))
+	stats.critical_chance = clampf(definition.critical_chance + _flat.get(&"critical_chance", 0.0), 0.0, 1.0)
 	stats.critical_damage = definition.critical_damage
 	return stats
 

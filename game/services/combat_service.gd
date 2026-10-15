@@ -5,6 +5,8 @@ extends RefCounted
 ## Status effects (D48) hook in here: invulnerability, shields, thorns, lifesteal, on-hit effects
 ## and damage over time.
 
+## A monster cast one of its skills (effects, popups).
+signal monster_skill_cast(monster: Actor, skill: MonsterSkillDefinition)
 signal damage_dealt(attacker: Actor, target: Actor, amount: float, is_critical: bool)
 ## Damage from a status effect: damage over time, or thorns reflecting a hit (`effect` = the
 ## thorns effect). `source` may be null.

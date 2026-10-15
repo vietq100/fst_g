@@ -23,6 +23,10 @@
   "en": "Blacksmith",
   "vi": "Thợ Rèn"
  },
+ "building.colosseum.name": {
+  "en": "Colosseum",
+  "vi": "Đấu Trường"
+ },
  "building.forge.name": {
   "en": "Enhancement Forge",
   "vi": "Lò Cường Hóa"
@@ -1303,6 +1307,30 @@
   "en": "Cannot assign '{activity}'",
   "vi": "Không thể giao '{activity}'"
  },
+ "err.arena.busy": {
+  "en": "{name} is on an expedition",
+  "vi": "{name} đang đi thám hiểm"
+ },
+ "err.arena.hurt": {
+  "en": "{name} is hurt",
+  "vi": "{name} đang bị thương"
+ },
+ "err.arena.level": {
+  "en": "Needs level {level}",
+  "vi": "Cần cấp {level}"
+ },
+ "err.arena.no_colosseum": {
+  "en": "Build a Colosseum first",
+  "vi": "Cần xây Đấu Trường trước"
+ },
+ "err.arena.tired": {
+  "en": "{name} is too tired",
+  "vi": "{name} quá mệt"
+ },
+ "err.arena.unknown": {
+  "en": "Unknown Hunter",
+  "vi": "Không rõ Hunter"
+ },
  "err.building.already_built": {
   "en": "Already built",
   "vi": "Đã xây rồi"
@@ -1787,6 +1815,14 @@
   "en": "Meat Stew",
   "vi": "Thịt Hầm"
  },
+ "item.monster_meat.name": {
+  "en": "Monster Meat",
+  "vi": "Thịt Quái"
+ },
+ "item.monster_steak.name": {
+  "en": "Monster Steak",
+  "vi": "Bít Tết Thịt Quái"
+ },
  "item.night_garb.name": {
   "en": "Night Garb",
   "vi": "Y Phục Bóng Đêm"
@@ -1918,6 +1954,486 @@
  "loot.wolf.name": {
   "en": "Wolf",
   "vi": "Sói"
+ },
+ "monster_skill.forest_guardian_ancient_might.desc": {
+  "en": "Ancient strength: +20% attack.",
+  "vi": "Sức mạnh cổ xưa: +20% tấn công."
+ },
+ "monster_skill.forest_guardian_ancient_might.name": {
+  "en": "Ancient Might",
+  "vi": "Sức Mạnh Cổ Xưa"
+ },
+ "monster_skill.forest_guardian_bark_armor.desc": {
+  "en": "Bark skin: +30% defense.",
+  "vi": "Da vỏ cây: +30% phòng thủ."
+ },
+ "monster_skill.forest_guardian_bark_armor.name": {
+  "en": "Bark Armor",
+  "vi": "Giáp Vỏ Cây"
+ },
+ "monster_skill.forest_guardian_earth_shatter.desc": {
+  "en": "A crushing blow that stuns.",
+  "vi": "Cú đập nghiền nát gây choáng."
+ },
+ "monster_skill.forest_guardian_earth_shatter.name": {
+  "en": "Earth Shatter",
+  "vi": "Nứt Đất"
+ },
+ "monster_skill.forest_guardian_entangle.desc": {
+  "en": "Vines slow the target.",
+  "vi": "Dây leo làm chậm mục tiêu."
+ },
+ "monster_skill.forest_guardian_entangle.name": {
+  "en": "Entangle",
+  "vi": "Quấn Chặt"
+ },
+ "monster_skill.forest_guardian_natures_wrath.desc": {
+  "en": "Below 50% HP: stronger and faster.",
+  "vi": "Dưới 50% HP: mạnh và nhanh hơn."
+ },
+ "monster_skill.forest_guardian_natures_wrath.name": {
+  "en": "Nature's Wrath",
+  "vi": "Cơn Thịnh Nộ Thiên Nhiên"
+ },
+ "monster_skill.forest_guardian_poison_spores.desc": {
+  "en": "Spores that poison and weaken.",
+  "vi": "Bào tử gây độc và làm yếu."
+ },
+ "monster_skill.forest_guardian_poison_spores.name": {
+  "en": "Poison Spores",
+  "vi": "Bào Tử Độc"
+ },
+ "monster_skill.forest_guardian_regrowth.desc": {
+  "en": "Heals and regenerates.",
+  "vi": "Hồi máu và tái tạo dần."
+ },
+ "monster_skill.forest_guardian_regrowth.name": {
+  "en": "Regrowth",
+  "vi": "Mọc Lại"
+ },
+ "monster_skill.forest_guardian_root_slam.desc": {
+  "en": "Slams the ground; roots grab the target.",
+  "vi": "Đập xuống đất, rễ cây trói chặt mục tiêu."
+ },
+ "monster_skill.forest_guardian_root_slam.name": {
+  "en": "Root Slam",
+  "vi": "Đập Rễ"
+ },
+ "monster_skill.forest_guardian_stonehide.desc": {
+  "en": "Hardens into a shield.",
+  "vi": "Hóa cứng thành khiên."
+ },
+ "monster_skill.forest_guardian_stonehide.name": {
+  "en": "Stonehide",
+  "vi": "Da Đá"
+ },
+ "monster_skill.forest_guardian_thorn_barrage.desc": {
+  "en": "Fires a volley of thorns.",
+  "vi": "Bắn một loạt gai nhọn."
+ },
+ "monster_skill.forest_guardian_thorn_barrage.name": {
+  "en": "Thorn Barrage",
+  "vi": "Mưa Gai"
+ },
+ "monster_skill.goblin_cheap_shot.desc": {
+  "en": "A dirty hit that stuns.",
+  "vi": "Đòn hèn gây choáng."
+ },
+ "monster_skill.goblin_cheap_shot.name": {
+  "en": "Cheap Shot",
+  "vi": "Đòn Hèn"
+ },
+ "monster_skill.goblin_cowardly_dodge.desc": {
+  "en": "Below 40% HP: speeds away.",
+  "vi": "Dưới 40% HP: tăng tốc bỏ chạy."
+ },
+ "monster_skill.goblin_cowardly_dodge.name": {
+  "en": "Cowardly Dodge",
+  "vi": "Né Tránh Hèn Nhát"
+ },
+ "monster_skill.goblin_dirty_trick.desc": {
+  "en": "Knocks the weapon away.",
+  "vi": "Hất văng vũ khí đối thủ."
+ },
+ "monster_skill.goblin_dirty_trick.name": {
+  "en": "Dirty Trick",
+  "vi": "Mánh Bẩn"
+ },
+ "monster_skill.goblin_greed.desc": {
+  "en": "Fights for loot: +10% attack, +10% defense.",
+  "vi": "Chiến đấu vì chiến lợi phẩm: +10% tấn công, +10% phòng thủ."
+ },
+ "monster_skill.goblin_greed.name": {
+  "en": "Greed",
+  "vi": "Tham Lam"
+ },
+ "monster_skill.goblin_nimble.desc": {
+  "en": "Quick on its feet: +15% move speed.",
+  "vi": "Nhanh chân: +15% tốc chạy."
+ },
+ "monster_skill.goblin_nimble.name": {
+  "en": "Nimble",
+  "vi": "Nhanh Nhẹn"
+ },
+ "monster_skill.goblin_poisoned_blade.desc": {
+  "en": "A blade coated with poison.",
+  "vi": "Lưỡi dao tẩm độc."
+ },
+ "monster_skill.goblin_poisoned_blade.name": {
+  "en": "Poisoned Blade",
+  "vi": "Lưỡi Dao Độc"
+ },
+ "monster_skill.goblin_shield_bash.desc": {
+  "en": "Bashes with its shield.",
+  "vi": "Dùng khiên đập mạnh."
+ },
+ "monster_skill.goblin_shield_bash.name": {
+  "en": "Shield Bash",
+  "vi": "Đập Khiên"
+ },
+ "monster_skill.goblin_stab.desc": {
+  "en": "A quick hard stab.",
+  "vi": "Cú đâm nhanh và mạnh."
+ },
+ "monster_skill.goblin_stab.name": {
+  "en": "Stab",
+  "vi": "Đâm Lén"
+ },
+ "monster_skill.goblin_throw_dagger.desc": {
+  "en": "Throws a dagger from a distance.",
+  "vi": "Phi dao từ xa."
+ },
+ "monster_skill.goblin_throw_dagger.name": {
+  "en": "Throw Dagger",
+  "vi": "Phi Dao"
+ },
+ "monster_skill.goblin_war_cry.desc": {
+  "en": "Shouts: stronger and faster.",
+  "vi": "Hét lên: mạnh và nhanh hơn."
+ },
+ "monster_skill.goblin_war_cry.name": {
+  "en": "War Cry",
+  "vi": "Tiếng Hét Chiến"
+ },
+ "monster_skill.skeleton_bone_shield.desc": {
+  "en": "Raises a shield of bone.",
+  "vi": "Dựng khiên bằng xương."
+ },
+ "monster_skill.skeleton_bone_shield.name": {
+  "en": "Bone Shield",
+  "vi": "Khiên Xương"
+ },
+ "monster_skill.skeleton_bone_spear.desc": {
+  "en": "Hurls a spear of bone.",
+  "vi": "Phóng ngọn giáo bằng xương."
+ },
+ "monster_skill.skeleton_bone_spear.name": {
+  "en": "Bone Spear",
+  "vi": "Giáo Xương"
+ },
+ "monster_skill.skeleton_bone_strike.desc": {
+  "en": "A heavy bone blow.",
+  "vi": "Cú đập xương nặng nề."
+ },
+ "monster_skill.skeleton_bone_strike.name": {
+  "en": "Bone Strike",
+  "vi": "Đập Xương"
+ },
+ "monster_skill.skeleton_brittle_rage.desc": {
+  "en": "Hits harder, guards less: +25% attack, −10% defense.",
+  "vi": "Đánh mạnh hơn nhưng thủ kém: +25% tấn công, −10% phòng thủ."
+ },
+ "monster_skill.skeleton_brittle_rage.name": {
+  "en": "Brittle Rage",
+  "vi": "Cuồng Nộ Mong Manh"
+ },
+ "monster_skill.skeleton_curse.desc": {
+  "en": "Curses the target: weaker and more fragile.",
+  "vi": "Nguyền rủa mục tiêu: yếu và dễ tổn thương."
+ },
+ "monster_skill.skeleton_curse.name": {
+  "en": "Curse",
+  "vi": "Lời Nguyền"
+ },
+ "monster_skill.skeleton_dark_aura.desc": {
+  "en": "A dark aura: stronger and reflects damage.",
+  "vi": "Hắc khí: mạnh hơn và phản sát thương."
+ },
+ "monster_skill.skeleton_dark_aura.name": {
+  "en": "Dark Aura",
+  "vi": "Hắc Khí"
+ },
+ "monster_skill.skeleton_grave_chill.desc": {
+  "en": "A grave chill that freezes.",
+  "vi": "Hơi lạnh nấm mồ làm đóng băng."
+ },
+ "monster_skill.skeleton_grave_chill.name": {
+  "en": "Grave Chill",
+  "vi": "Hơi Lạnh Mộ"
+ },
+ "monster_skill.skeleton_life_drain.desc": {
+  "en": "Drains life from the target.",
+  "vi": "Hút sinh lực của mục tiêu."
+ },
+ "monster_skill.skeleton_life_drain.name": {
+  "en": "Life Drain",
+  "vi": "Hút Sinh Lực"
+ },
+ "monster_skill.skeleton_rattle.desc": {
+  "en": "Rattles its bones: tougher for a while.",
+  "vi": "Rung xương: cứng cáp hơn một lúc."
+ },
+ "monster_skill.skeleton_rattle.name": {
+  "en": "Rattle",
+  "vi": "Rung Xương"
+ },
+ "monster_skill.skeleton_undead_resilience.desc": {
+  "en": "Undead body: +30% defense, +20% max HP.",
+  "vi": "Thân xác bất tử: +30% phòng thủ, +20% HP tối đa."
+ },
+ "monster_skill.skeleton_undead_resilience.name": {
+  "en": "Undead Resilience",
+  "vi": "Kiên Cường Bất Tử"
+ },
+ "monster_skill.slime_absorb.desc": {
+  "en": "Hits and heals itself a little.",
+  "vi": "Đánh và tự hồi một ít máu."
+ },
+ "monster_skill.slime_absorb.name": {
+  "en": "Absorb",
+  "vi": "Hấp Thụ"
+ },
+ "monster_skill.slime_acid_spit.desc": {
+  "en": "Spits acid that burns for a while.",
+  "vi": "Phun axit gây độc trong một lúc."
+ },
+ "monster_skill.slime_acid_spit.name": {
+  "en": "Acid Spit",
+  "vi": "Phun Axit"
+ },
+ "monster_skill.slime_bounce.desc": {
+  "en": "Slams into the target.",
+  "vi": "Lao vào mục tiêu."
+ },
+ "monster_skill.slime_bounce.name": {
+  "en": "Bounce",
+  "vi": "Nảy Mạnh"
+ },
+ "monster_skill.slime_corrosive_touch.desc": {
+  "en": "Eats the target's armor.",
+  "vi": "Ăn mòn giáp mục tiêu."
+ },
+ "monster_skill.slime_corrosive_touch.name": {
+  "en": "Corrosive Touch",
+  "vi": "Chạm Ăn Mòn"
+ },
+ "monster_skill.slime_gel_body.desc": {
+  "en": "Thick gel: +25% defense.",
+  "vi": "Thân gel dày: +25% phòng thủ."
+ },
+ "monster_skill.slime_gel_body.name": {
+  "en": "Gel Body",
+  "vi": "Thân Gel"
+ },
+ "monster_skill.slime_jelly_skin.desc": {
+  "en": "Reflects damage for a while.",
+  "vi": "Phản lại sát thương trong một lúc."
+ },
+ "monster_skill.slime_jelly_skin.name": {
+  "en": "Jelly Skin",
+  "vi": "Da Thạch"
+ },
+ "monster_skill.slime_regrow.desc": {
+  "en": "Slowly regenerates health.",
+  "vi": "Từ từ hồi máu."
+ },
+ "monster_skill.slime_regrow.name": {
+  "en": "Regrow",
+  "vi": "Tái Sinh Gel"
+ },
+ "monster_skill.slime_slime_shield.desc": {
+  "en": "Wraps itself in a shield.",
+  "vi": "Tự bọc mình bằng khiên."
+ },
+ "monster_skill.slime_slime_shield.name": {
+  "en": "Slime Shield",
+  "vi": "Khiên Nhầy"
+ },
+ "monster_skill.slime_sticky_goo.desc": {
+  "en": "Slows its target.",
+  "vi": "Làm chậm mục tiêu."
+ },
+ "monster_skill.slime_sticky_goo.name": {
+  "en": "Sticky Goo",
+  "vi": "Chất Nhờn Dính"
+ },
+ "monster_skill.slime_swollen.desc": {
+  "en": "A fat body: +30% max HP.",
+  "vi": "Thân hình phình to: +30% HP tối đa."
+ },
+ "monster_skill.slime_swollen.name": {
+  "en": "Swollen",
+  "vi": "Phình To"
+ },
+ "monster_skill.weekly_boss_bone_storm.desc": {
+  "en": "A storm of bone shards.",
+  "vi": "Cơn bão mảnh xương."
+ },
+ "monster_skill.weekly_boss_bone_storm.name": {
+  "en": "Bone Storm",
+  "vi": "Bão Xương"
+ },
+ "monster_skill.weekly_boss_dark_shield.desc": {
+  "en": "Wraps itself in dark energy.",
+  "vi": "Bọc mình trong năng lượng hắc ám."
+ },
+ "monster_skill.weekly_boss_dark_shield.name": {
+  "en": "Dark Shield",
+  "vi": "Khiên Hắc Ám"
+ },
+ "monster_skill.weekly_boss_death_curse.desc": {
+  "en": "Curses: weaker and more fragile.",
+  "vi": "Nguyền rủa: yếu và dễ tổn thương."
+ },
+ "monster_skill.weekly_boss_death_curse.name": {
+  "en": "Death Curse",
+  "vi": "Lời Nguyền Tử Thần"
+ },
+ "monster_skill.weekly_boss_drain_soul.desc": {
+  "en": "Drains life from the target.",
+  "vi": "Hút sinh lực của mục tiêu."
+ },
+ "monster_skill.weekly_boss_drain_soul.name": {
+  "en": "Drain Soul",
+  "vi": "Hút Linh Hồn"
+ },
+ "monster_skill.weekly_boss_frost_nova.desc": {
+  "en": "A nova of cold that freezes.",
+  "vi": "Vụ nổ băng giá làm đóng băng."
+ },
+ "monster_skill.weekly_boss_frost_nova.name": {
+  "en": "Frost Nova",
+  "vi": "Bão Băng"
+ },
+ "monster_skill.weekly_boss_grave_silence.desc": {
+  "en": "Disarms and slows the target.",
+  "vi": "Tước vũ khí và làm chậm mục tiêu."
+ },
+ "monster_skill.weekly_boss_grave_silence.name": {
+  "en": "Grave Silence",
+  "vi": "Câm Lặng Nấm Mồ"
+ },
+ "monster_skill.weekly_boss_necrotic_aura.desc": {
+  "en": "Necrotic power: +25% attack.",
+  "vi": "Sức mạnh tử khí: +25% tấn công."
+ },
+ "monster_skill.weekly_boss_necrotic_aura.name": {
+  "en": "Necrotic Aura",
+  "vi": "Hào Quang Tử Khí"
+ },
+ "monster_skill.weekly_boss_rage_of_the_fallen.desc": {
+  "en": "Below 40% HP: stronger and faster.",
+  "vi": "Dưới 40% HP: mạnh và nhanh hơn."
+ },
+ "monster_skill.weekly_boss_rage_of_the_fallen.name": {
+  "en": "Rage of the Fallen",
+  "vi": "Thịnh Nộ Kẻ Sa Ngã"
+ },
+ "monster_skill.weekly_boss_soul_rend.desc": {
+  "en": "A brutal strike at the soul.",
+  "vi": "Cú đánh tàn bạo vào linh hồn."
+ },
+ "monster_skill.weekly_boss_soul_rend.name": {
+  "en": "Soul Rend",
+  "vi": "Xé Linh Hồn"
+ },
+ "monster_skill.weekly_boss_unholy_resilience.desc": {
+  "en": "+20% defense, +15% max HP.",
+  "vi": "+20% phòng thủ, +15% HP tối đa."
+ },
+ "monster_skill.weekly_boss_unholy_resilience.name": {
+  "en": "Unholy Resilience",
+  "vi": "Kiên Cường Tà Ác"
+ },
+ "monster_skill.wolf_bite_frenzy.desc": {
+  "en": "A flurry of bites.",
+  "vi": "Một loạt cú cắn liên tiếp."
+ },
+ "monster_skill.wolf_bite_frenzy.name": {
+  "en": "Bite Frenzy",
+  "vi": "Cắn Điên Cuồng"
+ },
+ "monster_skill.wolf_blood_scent.desc": {
+  "en": "Frenzied: +20% attack speed.",
+  "vi": "Hưng phấn: +20% tốc đánh."
+ },
+ "monster_skill.wolf_blood_scent.name": {
+  "en": "Blood Scent",
+  "vi": "Mùi Máu"
+ },
+ "monster_skill.wolf_howl.desc": {
+  "en": "Howls: faster and stronger for a while.",
+  "vi": "Tru lên: nhanh và mạnh hơn một lúc."
+ },
+ "monster_skill.wolf_howl.name": {
+  "en": "Howl",
+  "vi": "Tru Lên"
+ },
+ "monster_skill.wolf_last_stand.desc": {
+  "en": "Below 35% HP: stronger and regenerating.",
+  "vi": "Dưới 35% HP: mạnh hơn và hồi máu."
+ },
+ "monster_skill.wolf_last_stand.name": {
+  "en": "Last Stand",
+  "vi": "Đường Cùng"
+ },
+ "monster_skill.wolf_lunge.desc": {
+  "en": "A fast lunge that slows.",
+  "vi": "Cú phóng nhanh gây chậm."
+ },
+ "monster_skill.wolf_lunge.name": {
+  "en": "Lunge",
+  "vi": "Phóng Tới"
+ },
+ "monster_skill.wolf_pack_hunter.desc": {
+  "en": "Hunts better: +15% attack.",
+  "vi": "Săn mồi tốt hơn: +15% tấn công."
+ },
+ "monster_skill.wolf_pack_hunter.name": {
+  "en": "Pack Hunter",
+  "vi": "Thợ Săn Bầy Đàn"
+ },
+ "monster_skill.wolf_pounce.desc": {
+  "en": "Jumps on the target and pins it.",
+  "vi": "Vồ lên mục tiêu và giữ chặt."
+ },
+ "monster_skill.wolf_pounce.name": {
+  "en": "Pounce",
+  "vi": "Vồ Mồi"
+ },
+ "monster_skill.wolf_rending_claws.desc": {
+  "en": "Claws that cause bleeding.",
+  "vi": "Móng vuốt gây chảy máu."
+ },
+ "monster_skill.wolf_rending_claws.name": {
+  "en": "Rending Claws",
+  "vi": "Vuốt Xé Toạc"
+ },
+ "monster_skill.wolf_savage_bite.desc": {
+  "en": "A bite that weakens.",
+  "vi": "Cú cắn làm yếu mục tiêu."
+ },
+ "monster_skill.wolf_savage_bite.name": {
+  "en": "Savage Bite",
+  "vi": "Cắn Hung Tàn"
+ },
+ "monster_skill.wolf_thick_fur.desc": {
+  "en": "Thick fur: +15% defense.",
+  "vi": "Lông dày: +15% phòng thủ."
+ },
+ "monster_skill.wolf_thick_fur.name": {
+  "en": "Thick Fur",
+  "vi": "Lông Dày"
  },
  "quest.academy.desc": {
   "en": "Build an Academy.",
@@ -2126,6 +2642,10 @@
  "recipe.meat_stew.name": {
   "en": "Meat Stew",
   "vi": "Thịt Hầm"
+ },
+ "recipe.monster_steak.name": {
+  "en": "Monster Steak",
+  "vi": "Bít Tết Thịt Quái"
  },
  "recipe.night_garb.name": {
   "en": "Night Garb",
@@ -2703,6 +3223,106 @@
   "en": "Swift",
   "vi": "Nhanh Nhẹn"
  },
+ "ui.arena.close": {
+  "en": "Back to town",
+  "vi": "Về thị trấn"
+ },
+ "ui.arena.fight": {
+  "en": "Fight",
+  "vi": "Đấu"
+ },
+ "ui.arena.fighter_line": {
+  "en": "{name} · Lv {level} · {class} · power {power}",
+  "vi": "{name} · Cấp {level} · {class} · sức mạnh {power}"
+ },
+ "ui.arena.friendly": {
+  "en": "Friendly match",
+  "vi": "Đấu giao hữu"
+ },
+ "ui.arena.friendly_hint": {
+  "en": "Spar with one of your own Hunters:",
+  "vi": "Đấu tập với một Hunter của bạn:"
+ },
+ "ui.arena.miss": {
+  "en": "Miss",
+  "vi": "Trượt"
+ },
+ "ui.arena.no_fighters": {
+  "en": "No Hunter can fight right now.",
+  "vi": "Hiện không có Hunter nào đủ điều kiện."
+ },
+ "ui.arena.no_partner": {
+  "en": "You need another Hunter for a friendly match.",
+  "vi": "Cần thêm một Hunter khác để đấu giao hữu."
+ },
+ "ui.arena.refresh": {
+  "en": "New rivals",
+  "vi": "Đổi đối thủ"
+ },
+ "ui.arena.result_draw": {
+  "en": "A draw",
+  "vi": "Hòa"
+ },
+ "ui.arena.result_mood": {
+  "en": "{name}: mood {delta}",
+  "vi": "{name}: tâm trạng {delta}"
+ },
+ "ui.arena.result_stats": {
+  "en": "HP left: {a}% — {b}%  ·  {seconds}s{timeout}",
+  "vi": "Máu còn lại: {a}% — {b}%  ·  {seconds} giây{timeout}"
+ },
+ "ui.arena.result_timeout": {
+  "en": "  (time ran out)",
+  "vi": "  (hết giờ)"
+ },
+ "ui.arena.result_win": {
+  "en": "{name} wins!",
+  "vi": "{name} thắng!"
+ },
+ "ui.arena.rival_even": {
+  "en": "Even",
+  "vi": "Ngang sức"
+ },
+ "ui.arena.rival_line": {
+  "en": "{name} · Lv {level} · {class}\n{tier} · power {power}",
+  "vi": "{name} · Cấp {level} · {class}\n{tier} · sức mạnh {power}"
+ },
+ "ui.arena.rival_stronger": {
+  "en": "Stronger",
+  "vi": "Mạnh hơn"
+ },
+ "ui.arena.rival_weaker": {
+  "en": "Weaker",
+  "vi": "Yếu hơn"
+ },
+ "ui.arena.rivals": {
+  "en": "Rival fighters",
+  "vi": "Đối thủ"
+ },
+ "ui.arena.safe_note": {
+  "en": "Arena fights are safe: nobody is hurt, nothing is lost. A fight costs stamina; the result changes mood.",
+  "vi": "Trận đấu trường an toàn: không ai bị thương, không mất gì. Mỗi trận tốn thể lực; kết quả ảnh hưởng tâm trạng."
+ },
+ "ui.arena.skip": {
+  "en": "Skip",
+  "vi": "Bỏ qua"
+ },
+ "ui.arena.speed": {
+  "en": "×{speed}",
+  "vi": "×{speed}"
+ },
+ "ui.arena.timer": {
+  "en": "{seconds}s",
+  "vi": "{seconds} giây"
+ },
+ "ui.arena.title": {
+  "en": "Colosseum",
+  "vi": "Đấu Trường"
+ },
+ "ui.arena.your_fighter": {
+  "en": "Your fighter",
+  "vi": "Chiến binh của bạn"
+ },
  "ui.boss.assigned": {
   "en": "Hunters assigned: {count}",
   "vi": "Hunter được giao: {count}"
@@ -2819,6 +3439,14 @@
   "en": "{name} is now a {class}",
   "vi": "{name} giờ là {class}"
  },
+ "ui.building.colosseum_enter": {
+  "en": "Enter the Colosseum",
+  "vi": "Vào Đấu Trường"
+ },
+ "ui.building.colosseum_formats": {
+  "en": "Unlocked: up to {size}vs{size}",
+  "vi": "Đã mở: tối đa {size}vs{size}"
+ },
  "ui.building.consumable_price": {
   "en": "Hunters pay {gold} g · in stock {stock}",
   "vi": "Hunter trả {gold} g · còn {stock}"
@@ -2838,6 +3466,10 @@
  "ui.building.desc.blacksmith": {
   "en": "Forges better weapons and armor from materials.",
   "vi": "Rèn vũ khí và giáp tốt hơn từ nguyên liệu."
+ },
+ "ui.building.desc.colosseum": {
+  "en": "Hunters fight each other here in safe, automatic duels. Nobody is hurt and nothing is lost.",
+  "vi": "Hunter đấu với nhau tại đây trong các trận tự động an toàn. Không ai bị thương và không mất gì."
  },
  "ui.building.desc.forge": {
   "en": "Enhance weapons and armor. Each level makes the item stronger; the Forge's level sets the limit.",
@@ -4255,6 +4887,130 @@
   "en": "XP {xp} per Hunter · {levels} level-ups",
   "vi": "XP {xp} mỗi Hunter · {levels} lần lên cấp"
  },
+ "ui.monster.boss": {
+  "en": "Boss",
+  "vi": "Trùm"
+ },
+ "ui.monster.carried": {
+  "en": "Carried loot (dropped on death)",
+  "vi": "Đồ mang theo (rơi khi chết)"
+ },
+ "ui.monster.defeated": {
+  "en": "Defeated",
+  "vi": "Đã bị hạ"
+ },
+ "ui.monster.difficulty": {
+  "en": "Difficulty {name}: stats ×{stat}, rewards ×{reward}",
+  "vi": "Độ khó {name}: chỉ số ×{stat}, thưởng ×{reward}"
+ },
+ "ui.monster.dps": {
+  "en": "DPS",
+  "vi": "DPS"
+ },
+ "ui.monster.drop_line": {
+  "en": "{name} ×{qty} — {chance}%",
+  "vi": "{name} ×{qty} — {chance}%"
+ },
+ "ui.monster.drop_line_range": {
+  "en": "{name} ×{min}–{max} — {chance}%",
+  "vi": "{name} ×{min}–{max} — {chance}%"
+ },
+ "ui.monster.drops": {
+  "en": "Drops",
+  "vi": "Vật phẩm rơi"
+ },
+ "ui.monster.gear": {
+  "en": "Equipment",
+  "vi": "Trang bị"
+ },
+ "ui.monster.gear_drop": {
+  "en": "Each worn item drops with {chance}% chance.",
+  "vi": "Mỗi món đang mang rơi với xác suất {chance}%."
+ },
+ "ui.monster.gold": {
+  "en": "Carries {gold} gold",
+  "vi": "Mang theo {gold} vàng"
+ },
+ "ui.monster.hits": {
+  "en": "Hits may apply: {effects}",
+  "vi": "Đòn đánh có thể gây: {effects}"
+ },
+ "ui.monster.hp": {
+  "en": "HP {current} / {max}",
+  "vi": "HP {current} / {max}"
+ },
+ "ui.monster.level_tier": {
+  "en": "Lv {level} · {tier}",
+  "vi": "Cấp {level} · {tier}"
+ },
+ "ui.monster.meat": {
+  "en": "Meat when slain: {min}–{max}",
+  "vi": "Thịt khi bị hạ: {min}–{max}"
+ },
+ "ui.monster.no_drops": {
+  "en": "Drops nothing.",
+  "vi": "Không rơi vật phẩm."
+ },
+ "ui.monster.no_gear": {
+  "en": "Wild beasts carry no gear.",
+  "vi": "Thú hoang không mang trang bị."
+ },
+ "ui.monster.no_skills": {
+  "en": "No skills.",
+  "vi": "Không có kỹ năng."
+ },
+ "ui.monster.region": {
+  "en": "Found in: {region}",
+  "vi": "Xuất hiện ở: {region}"
+ },
+ "ui.monster.resources": {
+  "en": "Carries materials",
+  "vi": "Mang theo nguyên liệu"
+ },
+ "ui.monster.rewards": {
+  "en": "Rewards: {xp} XP · {gold_min}–{gold_max} gold",
+  "vi": "Phần thưởng: {xp} XP · {gold_min}–{gold_max} vàng"
+ },
+ "ui.monster.skill_active": {
+  "en": "Active · cooldown {seconds}s",
+  "vi": "Chủ động · hồi chiêu {seconds}s"
+ },
+ "ui.monster.skill_line": {
+  "en": "{name} — {desc}",
+  "vi": "{name} — {desc}"
+ },
+ "ui.monster.skill_passive": {
+  "en": "(passive)",
+  "vi": "(nội tại)"
+ },
+ "ui.monster.skills": {
+  "en": "Skills",
+  "vi": "Kỹ năng"
+ },
+ "ui.monster.slot_accessory": {
+  "en": "Jewelry",
+  "vi": "Trang sức"
+ },
+ "ui.monster.slot_armor": {
+  "en": "Armor",
+  "vi": "Giáp"
+ },
+ "ui.monster.slot_empty": {
+  "en": "—",
+  "vi": "—"
+ },
+ "ui.monster.slot_weapon": {
+  "en": "Weapon",
+  "vi": "Vũ khí"
+ },
+ "ui.monster.tab.items": {
+  "en": "Items",
+  "vi": "Vật phẩm"
+ },
+ "ui.monster.tab.skills": {
+  "en": "Skills",
+  "vi": "Kỹ năng"
+ },
  "ui.nav.construct": {
   "en": "Construct",
   "vi": "Xây dựng"
@@ -4606,6 +5362,10 @@
  "world.placement.nothing": {
   "en": "Nothing to place",
   "vi": "Không có gì để đặt"
+ },
+ "world.popup.drop": {
+  "en": "Dropped",
+  "vi": "Rơi đồ"
  },
  "world.popup.effect_stacks": {
   "en": "{name} x{stacks}",

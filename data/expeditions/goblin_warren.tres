@@ -9,5 +9,5 @@ display_name = "expedition.goblin_warren.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"goblin_cave"
-entrance_tile = Vector2i(56, 74)
+entrance_tile = Vector2i(78, 118)
 locked = true

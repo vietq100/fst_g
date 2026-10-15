@@ -29,6 +29,8 @@ const PORTAL := &"portal"
 const RESTAURANT := &"restaurant"
 ## Buys Hunters' loot into the Warehouse (D63).
 const MARKET := &"market"
+## Hunter versus Hunter fights (ARENA_SYSTEM.md); effect `colosseum_format` = team size unlocked.
+const COLOSSEUM := &"colosseum"
 
 ## Effect keys used by code. Values live in data.
 const HUNTER_CAPACITY := &"hunter_capacity"
@@ -44,6 +46,7 @@ const MAX_ENHANCE := &"max_enhance"
 const SKILL_LEVEL := &"skill_level"
 const MAX_TRAITS := &"max_traits"
 const FOOD_BONUS := &"food_bonus"
+const COLOSSEUM_FORMAT := &"colosseum_format"
 ## Market: share of an item's price the treasury pays when it buys loot (D63).
 const BUY_PRICE := &"buy_price"
 

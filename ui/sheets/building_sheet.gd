@@ -20,6 +20,7 @@ const DESCRIPTIONS := {
 	&"house": "ui.building.desc.house",
 	&"trading_post": "ui.building.desc.trading_post",
 	&"restaurant": "ui.building.desc.restaurant",
+	&"colosseum": "ui.building.desc.colosseum",
 	&"inn": "ui.building.desc.inn",
 	&"academy": "ui.building.desc.academy",
 	&"forge": "ui.building.desc.forge",
@@ -107,6 +108,9 @@ func _build(content: VBoxContainer) -> void:
 			_build_warehouse(content)
 		BuildingService.HOUSE, BuildingService.INN:
 			_build_house(content, placed)
+		BuildingService.COLOSSEUM:
+			content.add_child(UIKit.label(Loc.t("ui.building.colosseum_formats", {"size": int(GameManager.buildings.get_effect(BuildingService.COLOSSEUM, BuildingService.COLOSSEUM_FORMAT, 1.0))})))
+			content.add_child(UIKit.button(Loc.t("ui.building.colosseum_enter"), func() -> void: open_requested.emit(ColosseumSheet.new()), &"PrimaryButton"))
 		BuildingService.RESTAURANT:
 			content.add_child(UIKit.label(Loc.t("ui.building.restaurant_bonus", {"percent": roundi(GameManager.supply.get_food_bonus() * 100.0)})))
 		BuildingService.MARKET:

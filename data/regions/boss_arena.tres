@@ -6,7 +6,7 @@
 script = ExtResource("1_region")
 id = &"boss_arena"
 display_name = "region.boss_arena.name"
-tile_rect = Rect2i(46, -14, 12, 12)
+tile_rect = Rect2i(84, -58, 12, 12)
 is_town = false
 kind = 3
 min_hunter_level = 12

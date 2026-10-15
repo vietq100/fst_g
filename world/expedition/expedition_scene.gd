@@ -86,6 +86,15 @@ func start(service: ExpeditionService, party: Array[Hunter] = []) -> void:
 	_go_to_section(0)
 
 
+## Living monsters of the dungeon (tap to inspect).
+func get_enemies() -> Array[Enemy]:
+	var result: Array[Enemy] = []
+	for enemy in _enemies:
+		if is_instance_valid(enemy) and enemy.is_targetable():
+			result.append(enemy)
+	return result
+
+
 func get_party() -> Array[Hunter]:
 	return _party
 
@@ -172,6 +181,8 @@ func _spawn_enemy(enemy_id: StringName, at: Vector2) -> void:
 	_actors.add_child(enemy)
 	enemy.global_position = at
 	enemy.setup(definition, GameManager.combat, DataRegistry.config.retarget_interval)
+	# Dungeon monsters carry gear, gold, skills and meat too; it falls into the stash when they die.
+	enemy.apply_loadout(GameManager.regions.roll_loadout(definition, enemy.level, enemy.tier))
 	if embedded:
 		enemy.combat.acquire_filter = is_inside
 		enemy.combat.keep_filter = is_inside
@@ -180,7 +191,7 @@ func _spawn_enemy(enemy_id: StringName, at: Vector2) -> void:
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
-	var reward := _service.record_kill(enemy.definition)
+	var reward := _service.record_kill(enemy.definition, enemy.loadout, enemy.tier)
 	_show_loot(reward, enemy.global_position)
 	_refresh_status()
 

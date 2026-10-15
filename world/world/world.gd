@@ -9,6 +9,8 @@ extends Node2D
 ## A placed building / a Hunter / a dungeon entrance was tapped; Main opens the matching sheet.
 signal building_tapped(instance_id: StringName)
 signal hunter_tapped(hunter: HunterRuntime)
+## A monster in a hunting region was tapped (opens its info).
+signal monster_tapped(monster: Enemy)
 signal entrance_tapped(expedition_id: StringName)
 ## The Hunter Gate or the Boss Arena altar was tapped (D58): the region's id.
 signal structure_tapped(region_id: StringName)
@@ -53,6 +55,9 @@ var _entrances: Array[DungeonEntrance] = []
 ## Hunter Gate and Boss Arena altar (D58): region id → node with `hit_test`.
 var _structures: Dictionary[StringName, Node2D] = {}
 var _spawners: Dictionary[StringName, RegionSpawner] = {}
+var _drops: Array[LootDrop] = []
+## Town decorations (lamps, fountain, benches…), hidden while a building stands on them.
+var _decor: Array[TownDecor] = []
 var _staff: Dictionary[StringName, StaffWorker] = {}
 ## Gate centres and dungeon entrances: monsters do not spawn next to them.
 var _keep_clear_points: Array[Vector2] = []
@@ -106,6 +111,7 @@ func _ready() -> void:
 	GameManager.hunters.hunter_changed.connect(_on_hunter_changed)
 	GameManager.activities.activity_changed.connect(_on_activity_changed)
 	GameManager.corpses.body_delivered.connect(_on_body_delivered)
+	GameManager.combat.monster_skill_cast.connect(_on_monster_skill_cast)
 
 
 func _build_scene() -> void:
@@ -120,11 +126,16 @@ func _build_scene() -> void:
 		if expedition.region_id != &"":
 			ledges.append(expedition.entrance_tile)
 	_ground.setup(world, _town_roads(plaza), plaza, world.get_town_pond(), ledges)
+	# Mountains behind the north-west (top-left) coast.
+	var mountains := MountainRange.new()
+	mountains.name = "MountainRange"
+	mountains.setup(world)
+	add_child(mountains)
 	var shimmer := WaterShimmer.new()
 	shimmer.name = "WaterShimmer"
 	shimmer.setup(world)
 	add_child(shimmer)
-	RenderingServer.set_default_clear_color(Color("1b3d4a"))
+	RenderingServer.set_default_clear_color(Color("12394a"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"
 	var polygon := NavigationPolygon.new()
@@ -290,6 +301,11 @@ func _on_tap(world_position: Vector2) -> void:
 		follow_hunter(hunter.runtime.unique_id)
 		hunter_tapped.emit(hunter.runtime)
 		return
+	var monster := _monster_at(world_position)
+	if monster != null:
+		select_building(&"")
+		monster_tapped.emit(monster)
+		return
 	for entrance in _entrances:
 		if entrance.hit_test(world_position):
 			select_building(&"")
@@ -337,6 +353,13 @@ func follow_hunter(unique_id: StringName) -> bool:
 	return true
 
 
+## The HUD covers `top` px above and `bottom` px below the map: the camera may scroll that far.
+func set_view_insets(top: float, bottom: float) -> void:
+	_camera.inset_top = top
+	_camera.inset_bottom = bottom
+	_camera.clamp_to_bounds()
+
+
 ## Navigation "Town": camera back over the Town at normal zoom.
 func recenter_on_town() -> void:
 	_camera.zoom = Vector2(START_ZOOM, START_ZOOM)
@@ -366,6 +389,26 @@ func _set_selected_hunter(hunter: Hunter) -> void:
 	_selected_hunter = hunter
 	if hunter != null:
 		hunter.visual.selected = true
+
+
+## Nearest living region monster under the tap (hit radius in screen terms, like Hunters).
+func _monster_at(world_position: Vector2) -> Enemy:
+	var best: Enemy = null
+	var best_distance := SELECT_RADIUS / _camera.zoom.x * 0.7
+	for spawner: RegionSpawner in _spawners.values():
+		for enemy in spawner.get_monsters():
+			var distance := world_position.distance_to(enemy.global_position + Vector2(0, -12))
+			if distance < best_distance:
+				best = enemy
+				best_distance = distance
+	# Monsters inside a running dungeon can be inspected too.
+	if _dungeon != null:
+		for enemy in _dungeon.get_enemies():
+			var distance := world_position.distance_to(enemy.global_position + Vector2(0, -12))
+			if distance < best_distance:
+				best = enemy
+				best_distance = distance
+	return best
 
 
 func _hunter_at(world_position: Vector2) -> Hunter:
@@ -423,6 +466,7 @@ func _on_building_upgraded(building_id: StringName, _level: int) -> void:
 
 
 func _on_layout_changed() -> void:
+	_refresh_decor()
 	# Removed nodes leave the tree at the end of the frame; bake after that.
 	if not _bake_queued:
 		_bake_queued = true
@@ -575,6 +619,7 @@ func _spawn_props() -> void:
 	var placed: Array[Vector2] = []
 	_spawn_pond_obstacle(props)
 	_spawn_town_border(props, rng, placed)
+	_spawn_town_decor(props)
 	for region in world.get_regions():
 		if region.props == RegionDefinition.Props.NONE or region.prop_density <= 0.0:
 			continue
@@ -625,6 +670,61 @@ func _spawn_pond_obstacle(props: Node2D) -> void:
 	shape.polygon = WorldService.rect_polygon(pond, 0.1)
 	body.add_child(shape)
 	props.add_child(body)
+
+
+## Lamp posts at the plaza corners, a fountain, well, statue, benches, flower beds, barrels, hay
+## and a signpost, placed around the Town Hall. They never block: they only hide under buildings.
+func _spawn_town_decor(props: Node2D) -> void:
+	var town := world.get_town()
+	var hall: BuildingDefinition = DataRegistry.get_building(BuildingService.TOWN_HALL)
+	if town == null or hall == null or hall.default_tiles.is_empty():
+		return
+	var origin := hall.default_tiles[0]
+	var plaza := _town_plaza()
+	var roads := _town_roads(plaza)
+	var pond := world.get_town_pond().grow(1)
+	var ground := world.region_tiles(town.id)
+	var plan: Array = [
+		[TownDecor.Kind.LAMP, Vector2i(-2, -2)], [TownDecor.Kind.LAMP, Vector2i(5, -2)],
+		[TownDecor.Kind.LAMP, Vector2i(-2, 5)], [TownDecor.Kind.LAMP, Vector2i(5, 5)],
+		[TownDecor.Kind.FOUNTAIN, Vector2i(6, 6)], [TownDecor.Kind.WELL, Vector2i(-6, -3)],
+		[TownDecor.Kind.STATUE, Vector2i(3, -5)], [TownDecor.Kind.BENCH, Vector2i(-3, 1)],
+		[TownDecor.Kind.BENCH, Vector2i(6, 1)], [TownDecor.Kind.FLOWERBED, Vector2i(-4, -5)],
+		[TownDecor.Kind.FLOWERBED, Vector2i(-4, 4)], [TownDecor.Kind.FLOWERBED, Vector2i(7, -4)],
+		[TownDecor.Kind.FLOWERBED, Vector2i(8, 3)], [TownDecor.Kind.BARRELS, Vector2i(-7, 1)],
+		[TownDecor.Kind.BARRELS, Vector2i(9, 7)], [TownDecor.Kind.HAY, Vector2i(-8, 6)],
+		[TownDecor.Kind.SIGN, Vector2i(1, 8)],
+	]
+	var index := 0
+	for entry: Array in plan:
+		index += 1
+		var tile: Vector2i = origin + entry[1]
+		if not ground.has(tile) or pond.has_point(tile):
+			continue
+		# Lamps stand on the plaza corners; everything else keeps off the paved ground.
+		if entry[0] != TownDecor.Kind.LAMP and (plaza.has(tile) or roads.has(tile)):
+			continue
+		var decor := TownDecor.new()
+		decor.kind = entry[0]
+		decor.tile = tile
+		decor.variant = index
+		decor.position = WorldService.tile_to_world(Vector2(tile) + Vector2(0.5, 0.5))
+		props.add_child(decor)
+		_decor.append(decor)
+	_refresh_decor()
+
+
+## Decorations disappear while a building (or its top-left overhang) covers their tile.
+func _refresh_decor() -> void:
+	for decor in _decor:
+		if not is_instance_valid(decor):
+			continue
+		var covered := false
+		for placed in GameManager.buildings.get_instances():
+			if GameManager.buildings.get_footprint_rect(placed).grow(1).has_point(decor.tile):
+				covered = true
+				break
+		decor.visible = not covered
 
 
 ## Trees along the Town's back (top) edge, behind the fence, so it feels enclosed.
@@ -770,8 +870,17 @@ func get_door(building_id: StringName) -> Vector2:
 	return node.get_door_point() if node != null else Vector2.INF
 
 
+## A monster casts a skill: its name floats up over it.
+func _on_monster_skill_cast(monster: Actor, skill: MonsterSkillDefinition) -> void:
+	if not is_instance_valid(monster):
+		return
+	_popup(skill.display_name, Color("ffb347") if skill.is_active() else Color("8ab4f8"), monster.global_position + Vector2(0, -44), 0.0)
+
+
 func _on_monster_killed(enemy: Enemy, killer: Hunter, reward: KillReward) -> void:
-	if is_instance_valid(killer) and not reward.items.is_empty():
+	if reward.on_ground:
+		_spawn_drop(enemy.global_position, reward)
+	elif is_instance_valid(killer) and not reward.items.is_empty():
 		killer.visual.play_action(ChibiAnimations.LOOT)
 	var at := enemy.global_position + Vector2(0, -30)
 	var line := 0
@@ -783,6 +892,64 @@ func _on_monster_killed(enemy: Enemy, killer: Hunter, reward: KillReward) -> voi
 		if item != null:
 			_popup(Loc.t("world.popup.item", {"count": reward.items[item_id], "name": item.display_name}), RarityColors.of(item.rarity), at + Vector2(0, -12.0 * line), 0.15 * line)
 			line += 1
+
+
+## Loot of a slain monster lies on the ground until a Hunter picks it up.
+func _spawn_drop(at: Vector2, reward: KillReward) -> void:
+	if reward.gold <= 0 and reward.items.is_empty():
+		return
+	var drop := LootDrop.new()
+	_entities.add_child(drop)
+	drop.global_position = at
+	drop.setup(reward.gold, reward.items)
+	_drops.append(drop)
+
+
+func get_drops() -> Array[LootDrop]:
+	_drops.assign(_drops.filter(func(drop: LootDrop) -> bool: return is_instance_valid(drop) and not drop.is_queued_for_deletion()))
+	return _drops
+
+
+## Nearest loot on the ground within `radius` that `hunter` can use (items need bag room; gold
+## always).
+func get_nearest_drop(hunter: Hunter, radius: float) -> LootDrop:
+	var best: LootDrop = null
+	var best_distance := radius
+	var bag_full := GameManager.regions.is_bag_full(hunter.runtime)
+	for drop in get_drops():
+		if bag_full and drop.gold <= 0:
+			continue
+		var distance := hunter.global_position.distance_to(drop.global_position)
+		if distance < best_distance:
+			best = drop
+			best_distance = distance
+	return best
+
+
+## A Hunter picks the drop up: gold into its purse, items into its bag as far as they fit.
+func collect_drop(drop: LootDrop, hunter: Hunter) -> void:
+	if not is_instance_valid(drop) or drop.is_empty():
+		return
+	var gold := drop.gold
+	var before := drop.get_item_count()
+	var picked := drop.items.duplicate()
+	var left := GameManager.regions.collect_drop(hunter.runtime, gold, drop.items)
+	drop.gold = 0
+	drop.items = left
+	hunter.visual.play_action(ChibiAnimations.LOOT)
+	var at := hunter.global_position + Vector2(0, -34)
+	var line := 0
+	if gold > 0:
+		_popup(Loc.t("world.popup.gold", {"gold": gold}), RarityColors.GOLD, at, 0.0)
+		line += 1
+	for item_id in picked:
+		var taken: int = picked[item_id] - left.get(item_id, 0)
+		var item := DataRegistry.get_item(item_id)
+		if taken > 0 and item != null:
+			_popup(Loc.t("world.popup.item", {"count": taken, "name": item.display_name}), RarityColors.of(item.rarity), at + Vector2(0, -12.0 * line), 0.15 * line)
+			line += 1
+	if before > 0 or gold > 0:
+		drop.queue_redraw()
 
 
 func _popup(text: String, color: Color, at: Vector2, delay: float) -> void:

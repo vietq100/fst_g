@@ -14,6 +14,8 @@ signal autosave_requested(reason: StringName)
 ## `func(hunter: HunterRuntime, expedition_id: StringName)` for party members who fell: in the
 ## world they come out of the dungeon as bodies at its entrance (D30, D35). Unset: injured (D4).
 var downed_handler: Callable
+## Monster loadout rolls and drops (set by GameManager).
+var regions: RegionService
 var current_run: ExpeditionRun
 
 var _registry: Node
@@ -121,12 +123,18 @@ func begin_return() -> void:
 
 ## Gold and items go to the stash; every party member (downed included) gets the full XP (D5).
 ## The boss drops from the expedition's first-clear / repeat loot table instead of its own.
-func record_kill(enemy: EnemyDefinition) -> KillReward:
+func record_kill(enemy: EnemyDefinition, loadout: MonsterLoadout = null, tier: int = -1) -> KillReward:
 	var reward := KillReward.new()
 	if not is_running() or enemy == null:
 		return reward
 	current_run.kills += 1
 	reward.gold = _rng.randi_range(enemy.gold_min, enemy.gold_max)
+	# A monster that carried a loadout drops what it carried (stash, collected automatically, D5).
+	var carried: Dictionary[StringName, int] = {}
+	if loadout != null and regions != null:
+		carried = regions.get_drops(loadout, enemy.tier if tier < 0 else tier)
+		if not enemy.is_boss:
+			reward.gold = loadout.gold
 	var table_id := enemy.loot_table_id
 	if enemy.is_boss:
 		var definition := get_current_definition()
@@ -135,7 +143,15 @@ func record_kill(enemy: EnemyDefinition) -> KillReward:
 		else:
 			reward.gold = floori(reward.gold * 0.5)
 			table_id = definition.repeat_clear_loot_table_id
-	reward.items = _loot.roll(table_id)
+	if loadout != null and regions != null and not enemy.is_boss:
+		reward.items = carried
+	else:
+		reward.items = _loot.roll(table_id)
+		# Bosses keep their special loot tables and add their worn gear on top.
+		if loadout != null and regions != null:
+			for item_id in loadout.get_gear():
+				if carried.has(item_id):
+					reward.items[item_id] = reward.items.get(item_id, 0) + carried[item_id]
 	reward.gold = roundi(reward.gold * _party_gold_multiplier())
 	current_run.stash_gold += reward.gold
 	for item_id in reward.items:

@@ -21,6 +21,7 @@ const TALENT := &"talent"
 const STATUS_EFFECT := &"status_effect"
 const SKILL := &"skill"
 const QUEST := &"quest"
+const MONSTER_SKILL := &"monster_skill"
 const CLASS_SKILL := &"class_skill"
 
 ## Category -> [folder under the data root, expected definition class].
@@ -39,6 +40,7 @@ const CATEGORIES := {
 	STATUS_EFFECT: ["status_effects", &"StatusEffectDefinition"],
 	SKILL: ["skills", &"SkillDefinition"],
 	QUEST: ["quests", &"QuestDefinition"],
+	MONSTER_SKILL: ["monster_skills", &"MonsterSkillDefinition"],
 	CLASS_SKILL: ["class_skills", &"ClassSkillDefinition"],
 }
 

@@ -18,7 +18,7 @@ const WALL := Color("4b4b55")
 const WALL_LIGHT := Color("5e5e6a")
 const WALL_CAP := Color("7a7a84")
 const EDGE := Color(0, 0, 0, 0.35)
-const CLIFF_DEPTH := 26.0
+const CLIFF_DEPTH := 40.0
 const CLIFF := Color("5a4430")
 const CLIFF_GRASS := Color("3f6a36")
 const COBBLE := Color("bdb6a4")
@@ -44,6 +44,10 @@ var plaza_tiles: Dictionary[Vector2i, bool] = {}
 var pond: Rect2i = Rect2i()
 ## Dungeon entrance tiles (outside the regions): each gets a rock ledge.
 var ledges: Array[Vector2i] = []
+## Baked pixel-art ground per region (GroundPainter, tools/bake_ground.gd): id -> {texture, origin}.
+var _ground_art: Dictionary = {}
+## Baked water around the plateaus (WaterPainter): {texture, origin}, empty when missing or stale.
+var _water_art: Dictionary = {}
 
 
 func setup(world_service: WorldService, town_roads: Dictionary[Vector2i, bool], town_plaza: Dictionary[Vector2i, bool] = {},
@@ -53,7 +57,30 @@ func setup(world_service: WorldService, town_roads: Dictionary[Vector2i, bool], 
 	plaza_tiles = town_plaza
 	pond = town_pond
 	ledges = entrance_tiles
+	_load_ground_art()
 	queue_redraw()
+
+
+## Loads the baked textures whose size matches the region's current shape (else the region keeps
+## the flat per-tile ground).
+func _load_ground_art() -> void:
+	_ground_art.clear()
+	_water_art.clear()
+	var water_path := "res://assets/ground/water.png"
+	if ResourceLoader.exists(water_path):
+		var water_texture := load(water_path) as Texture2D
+		var water_box := WaterPainter.layout(world)
+		if water_texture != null and Vector2i(water_texture.get_size()) == water_box["size"]:
+			_water_art = {"texture": water_texture, "origin": water_box["origin"]}
+	for region in world.get_regions():
+		var path := "res://assets/ground/%s.png" % region.id
+		if not ResourceLoader.exists(path):
+			continue
+		var texture := load(path) as Texture2D
+		var box := GroundPainter.layout(world, region)
+		if texture == null or box.is_empty() or Vector2i(texture.get_size()) != box["size"]:
+			continue
+		_ground_art[region.id] = {"texture": texture, "origin": box["origin"]}
 
 
 func _draw() -> void:
@@ -67,8 +94,12 @@ func _draw() -> void:
 		_ledge(tile)
 	for region in world.get_regions():
 		var ground := world.region_tiles(region.id)
+		var art: Dictionary = _ground_art.get(region.id, {})
+		if not art.is_empty():
+			var texture: Texture2D = art["texture"]
+			draw_texture_rect(texture, Rect2(art["origin"], texture.get_size() * GroundPainter.SCALE), false)
 		for tile: Vector2i in world.region_tile_list(region.id):
-			_ground_tile(region, ground, tile)
+			_ground_tile(region, ground, tile, not art.is_empty())
 		_rims(region, ground)
 		if region.is_town:
 			_town_edges(region, ground)
@@ -82,6 +113,10 @@ func _draw() -> void:
 
 ## Gentle wave marks on the water around the plateaus (the clear colour is the water).
 func _draw_water() -> void:
+	if not _water_art.is_empty():
+		var texture: Texture2D = _water_art["texture"]
+		draw_texture_rect(texture, Rect2(_water_art["origin"], texture.get_size() * WaterPainter.SCALE), false)
+		return
 	var area := world.get_bounds(360.0)
 	var step := 34.0
 	for ix in int(area.size.x / step):
@@ -105,9 +140,10 @@ func _cliffs(region: RegionDefinition) -> void:
 	tiles.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y < b.x + b.y)
 	for tile: Vector2i in tiles:
 		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
-		if not ground.has(tile + Vector2i(0, 1)):
+		# Land of any region next door (only across a bridge) would be level: no cliff there.
+		if not world.is_land(tile + Vector2i(0, 1)):
 			_cliff_face(corners[3], corners[2], false, region.is_town)
-		if not ground.has(tile + Vector2i(1, 0)):
+		if not world.is_land(tile + Vector2i(1, 0)):
 			_cliff_face(corners[2], corners[1], true, region.is_town)
 
 
@@ -138,7 +174,7 @@ func _rims(region: RegionDefinition, ground: Dictionary) -> void:
 		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
 		var steps := [[Vector2i(0, -1), 0, 1], [Vector2i(1, 0), 1, 2], [Vector2i(0, 1), 2, 3], [Vector2i(-1, 0), 3, 0]]
 		for step: Array in steps:
-			if ground.has(tile + step[0]):
+			if world.is_land(tile + step[0]):
 				continue
 			draw_line(corners[step[1]], corners[step[2]], EDGE, 2.0)
 			if not region.is_town and (step[0] == Vector2i(0, -1) or step[0] == Vector2i(-1, 0)):
@@ -308,7 +344,7 @@ func _ledge(tile: Vector2i) -> void:
 
 # --- Ground ----------------------------------------------------------------------------------------
 
-func _ground_tile(region: RegionDefinition, ground: Dictionary, tile: Vector2i) -> void:
+func _ground_tile(region: RegionDefinition, ground: Dictionary, tile: Vector2i, painted: bool = false) -> void:
 	var variation := _hash(tile.x, tile.y, 1) % 100
 	var color := region.ground_color
 	if variation < 26:
@@ -316,7 +352,9 @@ func _ground_tile(region: RegionDefinition, ground: Dictionary, tile: Vector2i) 
 	elif variation > 88:
 		color = region.ground_color.darkened(0.06)
 	if region.is_town:
-		_town_tile(ground, tile, color)
+		_town_tile(ground, tile, color, painted)
+		return
+	if painted:
 		return
 	_tile(tile, color)
 	match region.props:
@@ -336,7 +374,7 @@ func _ground_tile(region: RegionDefinition, ground: Dictionary, tile: Vector2i) 
 				_blob(tile, Color("5f7a4a", 0.55), 0.35)
 
 
-func _town_tile(ground: Dictionary, tile: Vector2i, color: Color) -> void:
+func _town_tile(ground: Dictionary, tile: Vector2i, color: Color, painted: bool = false) -> void:
 	if pond.has_point(tile):
 		_tile(tile, SHORE)
 		return
@@ -350,6 +388,11 @@ func _town_tile(ground: Dictionary, tile: Vector2i, color: Color) -> void:
 		for step in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
 			if not road_tiles.has(tile + step) and not plaza_tiles.has(tile + step) and ground.has(tile + step):
 				_edge(tile, step, ROAD_EDGE)
+		return
+	if painted:
+		# The baked grass already has tufts and flowers; only bushes stay as objects.
+		if _hash(tile.x, tile.y, 5) % 100 > 95:
+			_bush(tile, color)
 		return
 	_tile(tile, color)
 	var roll := _hash(tile.x, tile.y, 5) % 100

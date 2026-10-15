@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="MonsterSkillDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/monster_skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://game/definitions/stat_modifier.gd" id="2_mod"]
+[ext_resource type="Script" path="res://game/definitions/status_effect_chance.gd" id="3_chance"]
+[ext_resource type="Resource" path="res://data/status_effects/strength.tres" id="e_strength"]
+[ext_resource type="Resource" path="res://data/status_effects/thorns.tres" id="e_thorns"]
+
+[sub_resource type="Resource" id="C0"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_strength")
+chance = 1.0
+stacks = 1
+
+[sub_resource type="Resource" id="C1"]
+script = ExtResource("3_chance")
+effect = ExtResource("e_thorns")
+chance = 1.0
+stacks = 1
+
+[resource]
+script = ExtResource("1_skill")
+id = &"skeleton_dark_aura"
+display_name = "monster_skill.skeleton_dark_aura.name"
+enemy_id = &"skeleton"
+kind = 0
+description = "monster_skill.skeleton_dark_aura.desc"
+cooldown = 20.0
+cast_range = 0.0
+attack_ratio = 0.0
+hits = 1
+trigger_hp_below = 0.0
+heal_ratio = 0.0
+target_effects = Array[ExtResource("3_chance")]([])
+self_effects = Array[ExtResource("3_chance")]([SubResource("C0"), SubResource("C1")])
+modifiers = Array[ExtResource("2_mod")]([])

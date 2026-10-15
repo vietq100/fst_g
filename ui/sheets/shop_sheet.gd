@@ -3,7 +3,7 @@ extends Sheet
 ## Town services (the "Shop" tab of Evil Hunter Tycoon): one list of every service building with
 ## a shortcut to its panel, or what is needed to unlock it.
 
-const SERVICES: Array[StringName] = [&"tavern", &"trading_post", &"academy", &"forge", &"portal", &"restaurant",
+const SERVICES: Array[StringName] = [&"tavern", &"trading_post", &"academy", &"forge", &"portal", &"restaurant", &"colosseum",
 	&"blacksmith", &"hospital", &"temple", &"warehouse", &"town_hall", &"inn"]
 
 

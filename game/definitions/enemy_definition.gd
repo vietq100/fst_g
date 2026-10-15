@@ -31,6 +31,19 @@ extends GameDefinition
 @export var gold_max: int = 0
 @export var loot_table_id: StringName
 
+@export_group("Loadout")
+## Monsters of this type may carry gear (weapon, armor, accessory) from these pools; beasts and
+## slimes do not.
+@export var can_equip: bool = false
+@export var weapon_pool: Array[StringName] = []
+@export var armor_pool: Array[StringName] = []
+@export var accessory_pool: Array[StringName] = []
+## Skills rolled per monster out of this type's pool of 10.
+@export var skill_slots: int = 2
+## Meat dropped on death (item `monster_meat`).
+@export var meat_min: int = 0
+@export var meat_max: int = 0
+
 @export_group("Visuals")
 ## Scene with an Enemy root (components + visual) spawned for this definition.
 @export var actor_scene: PackedScene

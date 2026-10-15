@@ -137,3 +137,11 @@ Tapping Info on a Hunter card opens `HunterDialog` (full-screen dialog, HUD hidd
 
 - Theme colours follow the reference game: deep navy panels (`GameTheme.PANEL`), gold rims, green Primary (confirm) and red Danger (cancel / close) buttons, white numbers with a dark outline over the map, resource pills in the header, 36 px nav icons with a gold bar over the selected tab, round gold-rimmed Town / I / II / III buttons.
 - The map is 2:1 isometric (diamond tiles, bridges over water, buildings as isometric boxes with roof emblems, D55) so the HUD reads like the reference screenshots.
+
+## Monster info (2026-10-15)
+
+Tapping a monster in a hunting region opens `MonsterDialog`: name in its tier colour, level and tier, live HP bar, ATK / DEF / attack speed / move speed / crit, rewards (same scaling as `RegionService.record_kill`), difficulty multipliers, region, drop list with chances and on-hit effects. All texts are `ui.monster.*` keys (EN / VI).
+
+## Map scroll limits (2026-10-15)
+
+The camera may scroll past the map's top and bottom by the height of the HUD header and of the navigation bar (`WorldCamera.inset_top / inset_bottom`, set from `UIRoot.view_insets_changed`), so the top and bottom of the map can always be brought clear of them, also when zoomed in. The insets are 0 while a dialog hides the HUD.

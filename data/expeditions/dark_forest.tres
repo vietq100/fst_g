@@ -73,5 +73,5 @@ repeat_clear_loot_table_id = &"forest_guardian_repeat"
 first_clear_flags = Array[StringName]([&"first_boss_clear"])
 scene = ExtResource("4_scene")
 region_id = &"dark_forest"
-entrance_tile = Vector2i(-1, 56)
+entrance_tile = Vector2i(-45, 78)
 locked = false

@@ -9,5 +9,5 @@ display_name = "expedition.sunken_crypt.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"ancient_ruins"
-entrance_tile = Vector2i(56, -1)
+entrance_tile = Vector2i(62, -45)
 locked = true

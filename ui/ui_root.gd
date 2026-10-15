@@ -15,6 +15,8 @@ signal placement_cancelled
 ## Hunter sheet "Follow" / navigation "Town" (recenter the camera on the Town).
 signal follow_requested(unique_id: StringName)
 signal recenter_requested
+## Height of the HUD at the top / navigation bar at the bottom (the map scrolls under them).
+signal view_insets_changed(top: float, bottom: float)
 ## Hex buttons I / II / III: look at a hunting region.
 signal focus_region_requested(region_id: StringName)
 
@@ -55,6 +57,8 @@ func _ready() -> void:
 	theme = GameTheme.get_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Ambient lighting over the map, under every HUD element.
+	add_child(Vignette.new())
 	_safe = MarginContainer.new()
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -76,6 +80,10 @@ func _ready() -> void:
 	_build_placement_bar(layout)
 	_build_nav(layout)
 	_connect_notifications()
+	for bar: Control in [_top_bar, _nav]:
+		bar.resized.connect(_emit_insets)
+		bar.visibility_changed.connect(_emit_insets)
+	_emit_insets.call_deferred()
 	get_viewport().size_changed.connect(_apply_safe_area)
 	_apply_safe_area()
 	_refresh_resources()
@@ -102,6 +110,13 @@ func set_mode(new_mode: Mode) -> void:
 
 ## True if a screen point is covered by UI that should not let taps reach the world.
 func blocks_point(point: Vector2) -> bool:
+	# A modal over the screen (item details, equip picker) or a full-screen dialog (Hunter,
+	# monster) takes every tap, not only the ones on its own rectangle.
+	if _sheet is HunterDialog or _sheet is MonsterDialog:
+		return true
+	for child in get_children():
+		if (child is ItemInfoModal or child is EquipPickerModal or child is ColosseumMatchView) and (child as Control).is_visible_in_tree():
+			return true
 	for control: Control in [_top_bar, _nav, _sheet, _placement_bar] + _overlays:
 		if control != null and is_instance_valid(control) and control.is_visible_in_tree() and control.get_global_rect().has_point(point):
 			return true
@@ -160,9 +175,20 @@ func _highlight_nav() -> void:
 		active = &"shop"
 	# The Hunter dialog takes the whole screen above the nav bar.
 	if mode != Mode.EXPEDITION:
-		_top_bar.visible = not (_sheet is HunterDialog)
+		_top_bar.visible = not (_sheet is HunterDialog or _sheet is MonsterDialog)
 	for key in _nav_buttons:
 		_nav_buttons[key].theme_type_variation = &"NavSelected" if key == active else &"NavButton"
+
+
+func get_view_insets() -> Vector2:
+	var top := _top_bar.size.y if _top_bar.visible else 0.0
+	var bottom := _nav.size.y if _nav.visible else 0.0
+	return Vector2(top, bottom)
+
+
+func _emit_insets() -> void:
+	var insets := get_view_insets()
+	view_insets_changed.emit(insets.x, insets.y)
 
 
 func has_sheet() -> bool:
@@ -229,6 +255,11 @@ func _refresh_quest_badge() -> void:
 	_refresh_resources()
 
 
+func open_monster(monster: Enemy) -> void:
+	if is_instance_valid(monster):
+		open_sheet(MonsterDialog.new(monster))
+
+
 func open_inventory() -> void:
 	open_sheet(InventorySheet.new())
 
@@ -250,7 +281,7 @@ func show_message(sheet: MessageSheet) -> void:
 func _layout_sheet() -> void:
 	if not has_sheet():
 		return
-	if _sheet is HunterDialog:
+	if _sheet is HunterDialog or _sheet is MonsterDialog:
 		# Centered dialog over the map: nearly full width, as tall as the area allows.
 		_sheet.set_anchors_preset(Control.PRESET_FULL_RECT)
 		_sheet.offset_left = 12
@@ -361,6 +392,19 @@ func _open_portal_or_hint() -> void:
 		open_building(BuildingService.PORTAL)
 	else:
 		toast(Loc.t("toast.root.build_portal"), true)
+
+
+func open_colosseum() -> void:
+	if not GameManager.buildings.has_building(BuildingService.COLOSSEUM):
+		toast(Loc.t("err.arena.no_colosseum"), true)
+		return
+	var sheet := ColosseumSheet.new()
+	sheet.match_requested.connect(func(first: HunterRuntime, second: HunterRuntime, result: ArenaResult) -> void:
+		close_sheet()
+		var view := ColosseumMatchView.new().setup(first, second, result)
+		view.finished.connect(open_colosseum)
+		add_child(view))
+	open_sheet(sheet)
 
 
 func open_recruit() -> void:

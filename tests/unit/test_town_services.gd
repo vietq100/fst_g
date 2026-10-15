@@ -37,7 +37,7 @@ func after_each() -> void:
 
 
 func test_buildings_start_at_level_one_with_effects() -> void:
-	assert_eq(_buildings.get_ids().size(), 14, "six core buildings + House + Market + six Town Hall unlocks")
+	assert_eq(_buildings.get_ids().size(), 15, "six core buildings + House + Market + seven Town Hall unlocks")
 	for building_id in _buildings.get_ids():
 		# The starting layout: every building with a default tile; the rest (Town Hall unlocks, the Market, D63) are built later.
 		var starts_built := not _buildings.get_definition(building_id).default_tiles.is_empty()

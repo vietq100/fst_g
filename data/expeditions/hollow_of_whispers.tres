@@ -9,5 +9,5 @@ display_name = "expedition.hollow_of_whispers.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"dark_forest"
-entrance_tile = Vector2i(17, 74)
+entrance_tile = Vector2i(-4, 118)
 locked = true

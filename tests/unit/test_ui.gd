@@ -166,3 +166,54 @@ func test_item_modal_and_picker_build_and_fit() -> void:
 				frame.get_combined_minimum_size().x])
 	Loc.set_locale("en", false)
 
+
+
+func test_monster_sheet_shows_stats_rewards_and_drops() -> void:
+	var definition := DataRegistry.get_enemy(&"wolf")
+	var enemy := definition.actor_scene.instantiate() as Enemy
+	(Engine.get_main_loop() as SceneTree).root.add_child(enemy)
+	_nodes.append(enemy)
+	enemy.setup(definition, _game.combat, 0.5, 3, 1.2, Tier.Level.R)
+	var sheet := _show(MonsterDialog.new(enemy))
+	assert_true(sheet._content.get_child_count() >= 6, "monster sheet has content")
+	var text := _all_text(sheet)
+	assert_true(text.contains(Loc.t("stat.attack")), "stats shown")
+	assert_true(text.contains("3"), "level shown")
+
+
+func _all_text(node: Node) -> String:
+	var text := ""
+	if node is Label:
+		text += (node as Label).text + "\n"
+	for child in node.get_children():
+		text += _all_text(child)
+	return text
+
+
+func test_open_modal_blocks_taps_to_the_map() -> void:
+	var ui := UIRoot.new()
+	(Engine.get_main_loop() as SceneTree).root.add_child(ui)
+	_nodes.append(ui)
+	var corner := Vector2(2, 2)
+	ui.open_building(&"town_hall")
+	assert_false(ui.blocks_point(Vector2(1.0e5, 1.0e5)), "a normal sheet only blocks its own area")
+	ui.open_hunter(_game.hunters.get_all()[0])
+	assert_true(ui.blocks_point(Vector2(1.0e5, 1.0e5)), "a full-screen dialog blocks every tap")
+	ui.close_sheet()
+	var item := DataRegistry.get_item(&"iron_sword")
+	ui.open_item_info(item)
+	assert_true(ui.blocks_point(corner), "an item modal blocks every tap")
+
+
+func test_colosseum_sheet_and_replay_build() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var sheet := _show(ColosseumSheet.new())
+	assert_true(sheet._content.get_child_count() > 0, "sheet has content")
+	var rival: HunterRuntime = _game.arena.make_rival(_game.arena.get_power(hunter))
+	var result: ArenaResult = _game.arena.simulate(hunter, rival, 7)
+	var view := ColosseumMatchView.new().setup(hunter, rival, result)
+	(Engine.get_main_loop() as SceneTree).root.add_child(view)
+	_nodes.append(view)
+	view._skip()
+	assert_true(view._ended, "skip jumps to the result")
+	assert_true(view._next_event >= result.events.size(), "every blow was replayed")

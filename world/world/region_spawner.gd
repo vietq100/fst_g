@@ -114,6 +114,7 @@ func _spawn(at: Vector2 = Vector2.INF) -> Enemy:
 	# Regular monsters roll a tier (never below their own); bosses keep theirs (D60).
 	var tier := definition.tier if definition.is_boss else maxi(definition.tier, Tier.roll(_rng, Tier.MONSTER_WEIGHTS))
 	enemy.setup(definition, GameManager.combat, DataRegistry.config.retarget_interval, level, GameManager.regions.get_stat_scale(level), tier)
+	enemy.apply_loadout(GameManager.regions.roll_loadout(definition, level, tier))
 	var monster := Monster.new()
 	monster.enemy = enemy
 	monster.home = at
@@ -208,5 +209,6 @@ func _on_actor_defeated(actor: Actor, by: Actor) -> void:
 	for hunter in monster.attackers:
 		if is_instance_valid(hunter) and hunter != killer:
 			helpers.append(hunter.runtime)
-	var reward := GameManager.regions.record_kill(killer.runtime, helpers, monster.enemy.definition, monster.enemy.level, monster.enemy.tier)
+	var reward := GameManager.regions.record_kill(killer.runtime, helpers, monster.enemy.definition, monster.enemy.level,
+		monster.enemy.tier, monster.enemy.loadout)
 	monster_killed.emit(monster.enemy, killer, reward)

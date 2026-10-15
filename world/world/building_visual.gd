@@ -54,6 +54,7 @@ const STYLES := {
 	&"academy": {"wall": Color("c4bfd2"), "roof": Color("5a3f8c"), "trim": Color("9fd6ff"), "height": 46.0, "wall_type": Wall.STONE},
 	&"forge": {"wall": Color("55555c"), "roof": Color("8a3b24"), "trim": Color("ff7a2e"), "height": 34.0, "wall_type": Wall.STONE},
 	&"market": {"wall": Color("d9b98a"), "roof": Color("c2453a"), "trim": Color("f2d16b"), "height": 30.0, "wall_type": Wall.WOOD},
+	&"colosseum": {"wall": Color("c9bfa6"), "roof": Color("8a4b3a"), "trim": Color("e2c46b"), "height": 44.0, "wall_type": Wall.STONE},
 	&"portal": {"wall": Color("3a3458"), "roof": Color("6a3fb8"), "trim": Color("c79bff"), "height": 30.0, "wall_type": Wall.STONE},
 }
 
@@ -421,6 +422,9 @@ func _draw_emblem(at: Vector2, trim: Color) -> void:
 		&"inn":
 			draw_rect(Rect2(at + Vector2(-5, -1), Vector2(10, 4)), glyph)
 			draw_rect(Rect2(at + Vector2(-5, -4), Vector2(3, 3)), Color("e8c35a"))
+		&"colosseum":
+			draw_line(at + Vector2(-5, 5), at + Vector2(5, -5), glyph, 2.0)
+			draw_line(at + Vector2(5, 5), at + Vector2(-5, -5), glyph, 2.0)
 		&"academy":
 			draw_rect(Rect2(at + Vector2(-5, -4), Vector2(10, 8)), glyph)
 			draw_line(at + Vector2(0, -4), at + Vector2(0, 4), trim, 1.0)

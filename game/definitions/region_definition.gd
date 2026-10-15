@@ -9,11 +9,16 @@ enum Props { NONE, TREES, ROCKS, COLUMNS }
 ## Hunter Gate island (no monsters, no duty). BOSS: the weekly boss arena (a duty choice, never
 ## picked by Auto).
 enum Kind { HUNTING, TOWN, GATE, BOSS }
+## Outline of the region inside `tile_rect`. ROUNDED: the rectangle with rounded corners (Town,
+## gate island, arena). WINDING: a meandering woodland of overlapping glades. LOBED: an irregular
+## blob with peninsulas and bays. CROSS: a plus-shaped plaza with a court at each corner.
+enum Shape { ROUNDED, WINDING, LOBED, CROSS }
 
 ## Tiles covered (gx, gy, width, height).
 @export var tile_rect: Rect2i
 @export var is_town: bool = false
 @export var kind: Kind = Kind.HUNTING
+@export var shape: Shape = Shape.ROUNDED
 
 @export_group("Hunting")
 ## Auto duty sends Hunters of at least this level here (the hardest such region wins).

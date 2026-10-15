@@ -190,3 +190,21 @@ extends Resource
 @export_group("Trading Post")
 ## Bounty paid to the Hunter on top of the village price, as a share of the price.
 @export var bounty_ratio: float = 0.5
+
+@export_group("Colosseum")
+## Hunters below this level cannot enter (ARENA_SYSTEM.md says 10; lower so early games can try it).
+@export var colosseum_min_level: int = 5
+## Match length limit (seconds), 1vs1.
+@export var arena_time_limit: float = 60.0
+## Damage dealt between Hunters (PvP dampening).
+@export var pvp_damage_scale: float = 0.8
+## PvP caps on dodge and crit chance.
+@export var pvp_dodge_cap: float = 0.25
+@export var pvp_crit_cap: float = 0.75
+## Stamina spent per match; below `arena_min_stamina` a Hunter cannot enter.
+@export var arena_stamina_cost: float = 10.0
+@export var arena_min_stamina: float = 25.0
+## Mood change after a match.
+@export var arena_mood_win: float = 5.0
+@export var arena_mood_draw: float = 1.0
+@export var arena_mood_loss: float = -3.0

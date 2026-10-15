@@ -9,5 +9,5 @@ display_name = "expedition.ruined_sanctum.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"ancient_ruins"
-entrance_tile = Vector2i(74, 17)
+entrance_tile = Vector2i(118, -4)
 locked = true

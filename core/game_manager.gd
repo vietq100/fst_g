@@ -42,6 +42,7 @@ var academy: AcademyService
 var forge: ForgeService
 var trading: TradingService
 var quests: QuestService
+var arena: ArenaService
 var weekly_boss: WeeklyBossService
 var class_skills: ClassSkillService
 
@@ -85,10 +86,12 @@ func build(data_registry: Node) -> void:
 	talents = TalentService.new(registry, hunters, regions, config, rng)
 	needs.talents = talents
 	expeditions = ExpeditionService.new(registry, hunters, wallet, progress, inventory, loot, stats, config, rng)
+	expeditions.regions = regions
 	reincarnation = ReincarnationService.new(hunters, buildings, progress, config)
 	academy = AcademyService.new(registry, hunters, buildings, wallet)
 	forge = ForgeService.new(registry, buildings, wallet, inventory, hunters, config)
 	trading = TradingService.new(registry, buildings, wallet, purses, config)
+	arena = ArenaService.new(registry, hunters, traits, buildings, stats, config, rng)
 	quests = QuestService.new(registry, buildings, hunters, progress, wallet, inventory)
 	weekly_boss = WeeklyBossService.new(registry, world, hunters, wallet, inventory)
 	class_skills = ClassSkillService.new(registry, hunters, config, rng)

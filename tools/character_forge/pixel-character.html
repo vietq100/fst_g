@@ -1,0 +1,1648 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel Hero Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14121c; --panel:#1c1928; --panel2:#252134; --line:#352f49;
+  --text:#ece8f6; --muted:#9a93b3; --accent:#ffb347; --accent-ink:#2a1a05;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Be Vietnam Pro',system-ui,sans-serif}
+button,input{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:18px 24px;border-bottom:1px solid var(--line)}
+.logo{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--accent);letter-spacing:1px}
+header p{margin:0;color:var(--muted);font-size:14px}
+.app{display:grid;grid-template-columns:minmax(300px,520px) 1fr;gap:24px;padding:24px;max-width:1280px;margin:0 auto}
+@media (max-width:900px){.app{grid-template-columns:1fr;padding:16px;gap:16px}}
+
+/* stage */
+.stage{position:relative;border-radius:14px;border:1px solid var(--line);aspect-ratio:560/588;overflow:hidden}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.bg-dusk{background:linear-gradient(165deg,#465275 0%,#675d8a 45%,#a6789c 100%)}
+.bg-check{background-color:#2a2638;background-image:conic-gradient(#342e47 25%,transparent 0 50%,#342e47 0 75%,transparent 0);background-size:24px 24px}
+.bg-grass{background:linear-gradient(#8ccdf5 0 86%,#5a9e46 86% 100%)}
+.bg-dark{background:#0c0a12}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--accent)}
+.bgchip{width:26px;height:26px;border-radius:7px;border:2px solid transparent;cursor:pointer;padding:0}
+.bgchip.on{border-color:var(--accent)}
+.summary{margin-top:14px;font-size:13px;color:var(--muted);line-height:1.7}
+.summary b{color:var(--text);font-weight:600}
+
+/* panel */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.tab{flex:0 0 auto;background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted)}
+.tab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.section-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 10px;font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.opt{background:var(--panel2);border:2px solid transparent;border-radius:12px;padding:8px 6px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.opt:hover{border-color:var(--line)}
+.opt.sel{border-color:var(--accent)}
+.opt canvas{width:84px;height:84px;image-rendering:pixelated;border-radius:8px;background-color:#2c2840;background-image:conic-gradient(#322d46 25%,transparent 0 50%,#322d46 0 75%,transparent 0);background-size:12px 12px}
+.opt span{font-size:13px;font-weight:600}
+.crow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}
+.crow label{width:110px;font-size:14px;color:var(--muted)}
+.crow input[type=color]{width:38px;height:30px;border:1px solid var(--line);border-radius:7px;background:none;padding:2px;cursor:pointer}
+.sw{width:24px;height:24px;border-radius:6px;border:2px solid rgba(255,255,255,.08);cursor:pointer;padding:0}
+.sw:hover{border-color:#fff}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.btn.atk{background:#c8432f;border-color:#c8432f;color:#fff}
+.btn.atk:hover{background:#d9523d}
+kbd{font:600 11px/1 ui-monospace,monospace;background:rgba(0,0,0,.25);border-radius:4px;padding:2px 5px;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:2px solid transparent;border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer;font-size:14px;font-weight:600}
+.chip.sel{border-color:var(--accent)}
+.chip i{width:14px;height:14px;border-radius:50%;display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">PIXEL HERO FORGE</div>
+  <p>Xưởng thiết kế nhân vật pixel · core: đầu trọc, áo ba lỗ, quần đùi</p>
+</header>
+
+<main class="app">
+  <section>
+    <div class="stage bg-dusk" id="stage"><canvas id="view"></canvas></div>
+    <div class="row">
+      <button class="btn primary" id="rnd">🎲 Ngẫu nhiên</button>
+      <button class="btn" id="core">Về core</button>
+      <button class="btn" id="preset">Mẫu gốc</button>
+      <button class="btn" id="png">⬇ Xuất PNG</button>
+    </div>
+    <div class="row">
+      <button class="btn atk" id="atk">⚔ Tấn công <kbd>Space</kbd></button>
+      <label class="toggle"><input type="checkbox" id="loopAtk"> Lặp đòn đánh</label>
+    </div>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="anim" checked> Hoạt ảnh</label>
+      <label class="toggle"><input type="checkbox" id="black"> Viền đen</label>
+      <label class="toggle"><input type="checkbox" id="grid"> Lưới pixel</label>
+      <span style="flex:1"></span>
+      <button class="bgchip bg-dusk on" data-bg="bg-dusk" title="Hoàng hôn"></button>
+      <button class="bgchip bg-check" data-bg="bg-check" title="Trong suốt"></button>
+      <button class="bgchip bg-grass" data-bg="bg-grass" title="Đồng cỏ"></button>
+      <button class="bgchip bg-dark" data-bg="bg-dark" title="Tối"></button>
+    </div>
+    <div class="summary" id="summary"></div>
+  </section>
+
+  <section class="panel">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="tabBody"></div>
+  </section>
+</main>
+
+<script>
+/* ============================================================
+   ENGINE — lưới 32×46, mỗi item là các "part" vẽ bằng ký tự
+   b=nền  h=sáng  s=tối  d=tối sâu  a/A=màu phụ (sáng/tối)
+   w=trắng  g/G=kim loại  L=kính đen  l=kính trong (màu phụ)
+   c/C=sừng  y=vàng  e/E=mắt  k=má hồng  m=miệng  p=bóng đổ
+   Viền tự sinh quanh mỗi part (4 hướng).
+   ============================================================ */
+const W = 40, H = 42, OX = 14, OY = 4, S = 30;   // S = UNIT: mọi lớp đồ ra số điểm ảnh nguyên
+const P = (x, y, rows, o = {}) => ({ x, y, rows, ...o });
+const NO = { outline: false };
+const BLACK = [27, 22, 34];
+
+/* ---------- màu ---------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function hexToRgb(hex) { let h = hex.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function rgbToHex(c) { return '#' + c.map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join(''); }
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0; const l = (mx + mn) / 2;
+  if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+    h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+  return [h, s * 100, l * 100];
+}
+function hslToRgb(h, s, l) {
+  s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0) * 255, f(8) * 255, f(4) * 255].map(Math.round);
+}
+function hueToward(h, t, amt) { const d = ((t - h + 540) % 360) - 180; return (h + Math.sign(d) * Math.min(Math.abs(d), amt) + 360) % 360; }
+function tone(rgb, dl, ds, toward, amt) {
+  let [h, s, l] = rgbToHsl(...rgb);
+  if (s > 4) h = hueToward(h, toward, amt);
+  return hslToRgb(h, clamp(s + ds, 0, 100), clamp(l + dl, 3, 97));
+}
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+// ramp màu kiểu pixel art: bóng ngả lạnh (tím xanh), sáng ngả ấm (vàng)
+function ramp(hex) {
+  const b = hexToRgb(hex), [h, s, l] = rgbToHsl(...b);
+  return {
+    h: tone(b, l > 85 ? 5 : 11, -4, 55, 8),
+    b,
+    s: tone(b, -12, 4, 250, 10),
+    d: tone(b, -22, 6, 250, 16),
+    o: hslToRgb(s > 4 ? hueToward(h, 250, 18) : h, clamp(s * .7 + 8, 0, 70), clamp(l * .28, 5, 20)),
+    i: hslToRgb(s > 4 ? hueToward(h, 250, 14) : h, clamp(s * .8 + 10, 0, 75), clamp(l * .38, 10, 28)), // nét trong
+  };
+}
+const FIXED = {
+  w: { c: [245, 242, 234] }, g: { c: [201, 206, 214] }, G: { c: [139, 147, 163] },
+  L: { c: [28, 33, 48] }, c: { c: [239, 226, 192] }, C: { c: [196, 176, 134] },
+  y: { c: [242, 193, 78] }, p: { c: [20, 10, 30], a: .22 }, W: { c: [255, 255, 255], a: .6 },
+  r: { c: [214, 66, 66] }, R: { c: [150, 38, 50] }, Y: { c: [190, 138, 48] },
+};
+function makePal(color, accent) {
+  const r = ramp(color), a = ramp(accent || color);
+  return { ...FIXED, b: { c: r.b }, h: { c: r.h }, s: { c: r.s }, d: { c: r.d },
+    a: { c: a.b }, A: { c: a.s }, l: { c: a.h, a: .45 }, o: r.o, i: r.i };
+}
+function bodyPal(cfg, blink) {
+  const p = makePal(cfg.skin), eye = { c: hexToRgb(cfg.eyes) };
+  p.e = eye; p.E = blink ? p.b : eye;
+  p.k = { c: mix(p.b.c, [255, 105, 120], .4) };
+  p.m = { c: mix(p.s.c, [150, 45, 60], .55) };
+  return p;
+}
+
+/* ---------- vẽ ---------- */
+/* ---------- vẽ: danh sách ô vuông, toạ độ theo đơn vị UNIT = 30 phần mỗi pixel nhân vật ----------
+   Nhân vật: ô 30 · áo/mũ 1.5× → ô 20 · vũ khí 2× → ô 15 · kính 2.5× → ô 12 (đều là số nguyên → pixel sắc nét) */
+const UNIT = 30, OCC = 10;              // occ: lưới chiếm chỗ (10 ô / pixel nhân vật) để biết viền trong/ngoài, bóng đổ
+const RES = { weapon: 2, shirt: 1.5, hat: 1.5, glasses: 2.5 };
+const DIR4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const newGrid = () => ({ ops: [], occ: new Uint8Array(W * OCC * H * OCC) });
+function occAt(g, ux, uy) {              // 0 trống · 1 viền ngoài · 2 đã tô · 3 ngoài khung
+  const x = Math.floor(ux * OCC / UNIT), y = Math.floor(uy * OCC / UNIT);
+  return x < 0 || y < 0 || x >= W * OCC || y >= H * OCC ? 3 : g.occ[y * W * OCC + x];
+}
+function addRect(g, ux, uy, s, c, a = 1, kind = 2) {
+  if (ux >= W * UNIT || uy >= H * UNIT || ux + s <= 0 || uy + s <= 0) return;
+  g.ops.push({ x: ux, y: uy, s, c, a: a >= 1 ? 1 : a });
+  if (!kind) return;
+  const k = OCC / UNIT, OW = W * OCC;
+  const x0 = Math.max(0, Math.round(ux * k)), x1 = Math.min(OW, Math.round((ux + s) * k));
+  const y0 = Math.max(0, Math.round(uy * k)), y1 = Math.min(H * OCC, Math.round((uy + s) * k));
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+    const i = y * OW + x; if (kind === 2) g.occ[i] = 2; else if (g.occ[i] < 2) g.occ[i] = 1;
+  }
+}
+const putC = (g, X, Y, c, a = 1, kind = 2) => addRect(g, X * UNIT, Y * UNIT, UNIT, c, a, kind);  // 1 pixel nhân vật
+const SHADE = [38, 22, 60];
+const KEY = (x, y) => (x + 4096) * 16384 + (y + 4096);
+const partBase = (part, dx, dy) => [(part.res ? part.ox : part.x * UNIT) + (OX + dx) * UNIT, (part.res ? part.oy : part.y * UNIT) + (OY + dy) * UNIT];
+function drawPart(g, part, pal, { dx = 0, dy = 0, clip = null, outline = 'color', cast = false, inner = true }) {
+  const f = part.res || 1, U = UNIT / f, inn = part.inner ?? inner;   // part.res: độ phân giải riêng (đồ chi tiết)
+  const [bx, by] = partBase(part, dx, dy), ux = x => bx + x * U, uy = y => by + y * U;
+  const kindAt = (x, y) => occAt(g, ux(x) + U / 2, uy(y) + U / 2);
+  const cells = [], set = new Set();
+  part.rows.forEach((row, ry) => {
+    if (clip !== null && !part.res && part.y + ry < clip) return;
+    for (let rx = 0; rx < row.length; rx++) {
+      const ch = row[rx]; if (ch === '.' || ch === ' ') continue;
+      cells.push([rx, ry, ch]); set.add(KEY(rx, ry));
+    }
+  });
+  if (part.outline !== false) {
+    // viền ngoài silhouette: đen (hoặc màu đậm); viền nằm đè lên chi tiết khác: tông tối của chính nó.
+    // Đồ chi tiết có cờ thick: viền ngoài dày ≈ 1 pixel nhân vật, nét trong chỉ 1 ô của chính nó.
+    const outer = outline === 'black' ? BLACK : pal.o, T = part.thick ? Math.round(f) : 1, seen = new Set(set);
+    let front = cells;
+    for (let d = 1; d <= T; d++) {
+      const next = [];
+      for (const [x, y] of front)
+        for (const [ax, ay] of DIR4) {
+          const nx = x + ax, ny = y + ay, k = KEY(nx, ny);
+          if (seen.has(k)) continue; seen.add(k);
+          const kd = kindAt(nx, ny); if (kd === 3) continue;
+          if (kd === 2) { if (d === 1 && inn) addRect(g, ux(nx), uy(ny), U, pal.i, 1, 2); continue; } // tóc (inn=false): chỉ đổ bóng
+          addRect(g, ux(nx), uy(ny), U, outer, 1, 1); next.push([nx, ny]);
+        }
+      front = next;
+    }
+  }
+  for (const [x, y, ch] of cells) { const e = pal[ch]; if (e) addRect(g, ux(x), uy(y), U, e.c, e.a ?? 1, ch === 'p' ? 0 : 2); }
+  if (cast) { // bóng đổ (ánh sáng từ trên-trái): tóc lên trán, cằm lên cổ áo, mũ lên tóc...
+    const done = new Set(), n = Math.round(f);
+    for (const [x, y] of cells)
+      for (const [nx, ny] of inn ? Array.from({ length: n }, (_, i) => [x, y + 2 + i]) : [[x, y + 1], [x + 1, y]]) {
+        const k = KEY(nx, ny);
+        if (done.has(k) || set.has(k) || kindAt(nx, ny) !== 2) continue;
+        if (inn && set.has(KEY(x, y + 1))) continue;
+        done.add(k); addRect(g, ux(nx), uy(ny), U, SHADE, .2, 0);
+      }
+  }
+}
+
+const rep = (s, n) => Array(n).fill(s);
+/* ============================================================
+   CORE — tỉ lệ lấy từ ảnh mẫu (≈16×35 px, nhìn 3/4 sang trái)
+   Toạ độ thiết kế: đầu x4..15 / y3..17, thân x6..11 / y18..27,
+   tay xa x3..4, tay gần x12..15, chân xa x6..7, chân gần x11..12
+   ============================================================ */
+const HEAD = [
+  "..hhbbbb....", // 3
+  ".hhbbbbbbs..",
+  "hhbbbbbbbbs.",
+  "hbbbbbbbbbs.",
+  "hbbbbbbbbbss", // 7
+  "hbbbbbbbbbss",
+  "bbbbbbbbbbss",
+  "bbbbbbbbbbss",
+  "bbbbbbbbbbss", // 11
+  "bEbbbbEbbbss", // 12 mắt xa x5, mắt gần x10
+  "bebbbbebbss.",
+  "bkkbbbkkbs..", // 14 má
+  "skkbbbkkbs..",
+  ".sbbmmbbs...", // 16 miệng
+  "..sbbbbs....", // 17 cằm
+];
+const BODY = {
+  legs: [
+    P(5, 28, [...rep(".bb", 5), ".bs", "bbs"]),                     // chân xa (bàn chân y34)
+    P(10, 28, [...rep(".bb", 6), ".bs", "bbs"]),                    // chân gần (bàn chân y35)
+  ],
+  upper: [
+    P(3, 19, [...rep("ss", 8), "sb", "bb"]),                        // tay xa
+    P(5, 18, [".bbbbbb.", ".hbbbbbs", ".hbbbbs.", ".hbbbbs.", ".hbbbbs.", // thân: vai xuôi,
+      "..hbbbbs", "..hbbbbs", ".hbbbbbs", "hbbbbbbs", "ssssssss"]),         // eo lệch về phía gần
+    P(12, 18, ["hbbs", "bbbs", ...rep("..bs", 8), "..bb", "..ss"]), // vai + tay gần
+  ],
+  head: [P(4, 3, HEAD)],
+};
+const SHADOW = [P(3, 35, [".pppppppppp.", "..pppppppp.."], NO)];
+const UNDER = {
+  tank: [P(5, 18, [".bb..bb.", ".hbbbbs.", ".hbbbbs.", ".hbbsbs.", ".hbbbbs.", "..hbbbbs", "..hbsbbs", ".sssssss"])],
+  shorts: [P(6, 26, ["dddddd.", "hbbbbbs", "hbbbbbs", "hbs.hbs", "sss.sss"])],
+};
+
+/* ============================================================
+   ITEMS
+   ============================================================ */
+// tay áo: vai tròn, bắp tay rộng hơn cổ tay, nếp gấp ở khuỷu
+const SLEEVE_S = { far: P(3, 19, ["ss", "dd"]), near: P(12, 18, [".hb.", "hbbs", "hbbs", ".dds"]) };
+const SLEEVE_L = {
+  far: P(3, 19, ["ss", "ss", "ds", "ss", "sd", "ss", "dd"]),
+  near: P(12, 18, [".hb.", "hbbs", "hbbs", ".hbs", ".hbs", "..bs", "..sb", "..bs", "..dd"]),
+};
+const mkShirt = (sl, torso) => [sl.far, P(5, 18, torso), sl.near];
+
+// tóc ngắn — chép theo ảnh mẫu; K = pixel tai (màu da) lộ giữa tóc mai
+const SHORT_HAIR = [
+  "....hhbbbbbb....", // 3
+  "...hbbbbbbbbbs..",
+  "..bbhbhhhbhbbbs.",
+  ".bbbbbbbbbbbbbbs",
+  "dssssssssssssssd", // 7
+  ".dss......dsbbs.", // 8 trán lộ ra
+  "..d........dbbs.",
+  "..d.........bbs.",
+  "..d.........bbs.",
+  "..d.........bKs.", // 12 tai
+  "............bKs.",
+  ".............s..",
+];
+const BOB_TOP = [
+  "....hhbbbbbb....", // 3
+  "...hbbbbbbbbbs..",
+  "..bbhbhhhbhbbbs.",
+  ".bbbbbbbbbbbbbbs",
+  ".bbbbbbbbbbbbbbs", // 7
+  ".bbbbbbbbbbbbbbs",
+  ".bbsbbsbbsbbbbbs", // 9 mái
+];
+const SIDE_SHORT = ["..b.........bbs.", "..b.........bKs.", "............bKs.", ".............s.."]; // y10..13
+const PIXIE_TOP = [  // mái vuốt lệch về phía mặt, y3..9
+  "....hhbbbbbb....",
+  "...hbbhbbbbbbs..",
+  "..hbbbbbhbbbbbs.",
+  ".hbbbbbbbbbbbbbs",
+  ".bbbbbbbbbbbbbbs",
+  ".bbbbbbbbsbbbbs.",
+  ".bbbbbs...sbbbs.",
+];
+// tóc dài chảy ra sau gáy, xuống sau vai gần (bên phải) — vẽ sau lưng nhân vật
+const LONG_BACK = P(11, 6, [
+  "..ssss...", ".ssssss..", "sssssss..", "ssssssss.", "ssdsssss.", "ssdssdss.", "ssdssdss.",
+  ...rep("ssdssdsss", 4), ...rep("ssdssdsds", 5), ".sdssdsds", ".sdssdsd.", "..dssdsd.", "...sdsd..", "....dd..."]);
+const WAVY_BACK = P(11, 6, [
+  "..ssss...", ".ssssss..", "sssssss..", "ssssssss.", "ssdsssss.", "ssssssss.", "ssdssss..", "sssssssss",
+  "sssssdss.", "ssssssss.", "ssssdsss.", "sssssssss", "sssssdsss", "ssssssss.", "ssdsssss.", "sssssssss",
+  ".ssssssds", "..ssssss.", "...sssd..", "....ss...", ".....d..."]);
+const TIED = { inner: true }; // phần tóc buộc riêng: có nét tối tách khỏi tóc chính
+
+function nonLa() {
+  const hws = [1, 2.4, 3.8, 5.2, 6.6, 8, 9.4, 10.8, 11.8], rows = [];
+  hws.forEach((hw, i) => {
+    let r = '';
+    for (let x = -3; x <= 20; x++) {
+      const dc = x + .5 - 9;
+      if (Math.abs(dc) >= hw) { r += '.'; continue; }
+      let ch = 'b';
+      if (i === hws.length - 1) ch = 'd';
+      else if (i % 3 === 2) ch = 's';
+      else if (dc < -hw * .4) ch = 'h';
+      else if (dc > hw * .5) ch = 's';
+      r += ch;
+    }
+    rows.push(r);
+  });
+  return [P(-3, -4, rows)];
+}
+
+const ITEMS = {
+  hair: [
+    { id: 'none', name: 'Trọc' },
+    // ---------- kiểu nam ----------
+    { id: 'short', name: 'Ngắn', parts: [P(1, 3, SHORT_HAIR)] },
+    { id: 'spiky', name: 'Dựng', parts: [P(1, 0, [
+      ".....b...b......",
+      "....bb..bb...b..",
+      "...hbbbhbbb.bb..",
+      "..hbbbbbbbbbbs..",
+      ...SHORT_HAIR.slice(1)])] },
+    { id: 'buzz', name: 'Đầu đinh', parts: [P(1, 3, [
+      ".....hbbbbb.....",
+      "....hbbbbbbbs...",
+      "...hbbbbbbbbbs..",
+      "...bbbbbbbbbbs..",
+      "...ss......sbbs.",
+      "...s........bbs.",
+      "...s........bbs.",
+      "............bbs.",
+      "............bbs.",
+      "............bKs.",
+      "............bKs.",
+      ".............s.."])] },
+    { id: 'sweep', name: 'Mái lệch', parts: [P(1, 2, [
+      ".....hhbbbbb....",
+      "...hhhbbbbbbbb..",
+      "..hhbbhhbbbbbbs.",
+      ".hbbhbbbbhbbbbbs",
+      "hbbbbbbbbbbbbbbs",
+      "bbbbbbbbbbbbbbbs",
+      "bbbbbbbbbsbbbbbs",
+      "bbbbbbbs..sbbbs.",  // mái vuốt chéo sang phía mặt
+      ".bbbbbs.....bbs.",
+      "..bs........bbs.",
+      "..b.........bKs.",
+      "............bKs.",
+      ".............s.."])] },
+    { id: 'quiff', name: 'Vuốt ngược', parts: [P(1, 0, [
+      "...hhbbb........",
+      "..hhbbbbbbb.....",
+      "..hbbhbbbbbbb...",
+      "..hbhbbbbbbbbbs.",
+      "...bbbbbbbbbbbbs",
+      "...sbbbbbbbbbbbs",
+      "...ddsbbbbbbbbs.",
+      "...dd.....sbbbs.",  // chân tóc cao, hai bên cạo (d)
+      "...d.......dbbs.",
+      "...d........dds.",
+      "............dds.",
+      "............dds.",
+      "............dK..",
+      "............dK.."])] },
+    { id: 'hero', name: 'Lãng tử', parts: [P(1, 2, [
+      "....hbbbbbb.....",
+      "..hhbbbbbbbbb...",
+      ".hbbhbbbbhbbbbs.",
+      "hbbhbbbbhbbbbbbs",
+      "bbbbbbbbbbbbbbbs",
+      "bbbbbbbbbbbbbbbs",
+      ".bbsbbbsbbbsbbbs",
+      ".bb.bbs.bbs.sbbs",  // mái nhọn rủ xuống trán
+      ".bs..b...s...bbs",
+      ".bs..........bbs",
+      "..b..........bbs",  // lọn tóc ôm mặt
+      "..b..........bbs",
+      "..s..........bs.",
+      "..............s."])] },
+    { id: 'mohawk', name: 'Mohawk', parts: [P(7, -1, [".bb.", "hbbs", "hbbs", "hbbs", "hbbs", "hbbs", "sbbs"])] },
+    { id: 'afro', name: 'Xoăn', parts: [P(1, 0, [   // khối tóc lệch ra sau gáy (bên phải)
+      "......bbbbbbb......",
+      "....bbbhbbbbbhb....",
+      "..bbbhbbbbhbbbbbb..",
+      ".bbhbbbbbbbbbhbbhb.",
+      ".bbbbbbhbbbbbbbbbbs",
+      "bbbhbbbbbbbbhbbbbbs",
+      "bhbbbbbbbhbbbbbbhbs",
+      "bbbbbhbbbbbbbbhbbbs",
+      "bbbbbbbbbbbhbbbbbbs",
+      "bbsbbsbbsbbbbbbhbbs",  // mái xoăn
+      "bbs.........bbbbbbs",
+      "bhs.........bbbhbbs",
+      ".bs.........bbbbbbs",
+      ".s..........bhbbbbs",
+      "............bbbbbs.",
+      "............bbbhbs.",
+      ".............bbss..",
+      "..............ss..."])] },
+    // ---------- kiểu nữ ----------
+    { id: 'pixie', name: 'Pixie', parts: [P(1, 3, PIXIE_TOP.concat([
+      "..bbs.......bbs.",
+      "..bs........bbs.",
+      "..b.........bKs.",
+      "............bKs.",
+      ".............s.."]))] },
+    { id: 'bob', name: 'Bob', parts: [P(1, 3, [...BOB_TOP, ...rep("..bb........bbbs", 6), "..ss........sss."])] },
+    { id: 'hime', name: 'Hime', back: [LONG_BACK], parts: [P(1, 3, [
+      ...BOB_TOP.slice(0, 6),
+      ".bbsssssssssbbbs",  // mái bằng
+      ".bb.........bbbs", ".bb.........bhbs", ".bb.........bhbs",
+      ".bb.........bbbs", ".bb.........bhss", ".bb.........bbss",
+      ".ss.........bbss",  // lọn ôm má cắt ngang (phía mặt)
+      "............bs..",
+      "............s..."])] },
+    { id: 'long', name: 'Dài', back: [LONG_BACK], parts: [P(1, 3, [
+      "....hhbbbbbb....",
+      "...hbbhbbbbbbs..",
+      "..hbbbhbbbhbbbs.",
+      ".hbbbbbbbbbbbbbs",
+      ".bbbbbbbbbbbbbbs",
+      ".bbbbbbbbbbhbbbs",
+      ".bbsbbsbbsbbbbbs",
+      ".bs.........bbbs", ".bb.........bhbs", ".bh.........bhbs", ".bb.........bbbs",
+      ".bs.........bhss", ".bb..........bss", ".bs..........bs.",
+      ".bb.............",  // lọn mảnh rủ trước vai xa
+      ".bs.............",
+      "..s............."])] },
+    { id: 'wavy', name: 'Gợn sóng', back: [WAVY_BACK], parts: [P(1, 3, PIXIE_TOP.concat(
+      ".bb.........bbbs", ".bh.........bbbs", "bb...........bbs", "bs...........bhs",
+      ".bb.........bbbs", ".hb.........bbbs", "bb...........bbs", "bs...........bbs",
+      ".bb..........bs.", ".bs.............", "bb..............", "s..............."))] },
+    { id: 'pony', name: 'Đuôi ngựa', accent: '#e0507a', parts: [
+      P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
+      P(15, 4, [".aa.", "bbbb", "bbbs", ".bbs", ".bbs", "..bs", "..bs", "..bs", ".bs.", ".bs.", ".s.."], TIED)] },
+    { id: 'twin', name: 'Hai bím', accent: '#e0507a',
+      back: [P(-1, 7, [".aa", "bbb", "bbs", "bhs", "bbs", ".bs", ".bb", "bbs", "bs.", "s.."], TIED)],
+      parts: [
+        P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
+        P(15, 7, ["aa.", "bbb", "bhs", "bbs", "bbs", "bs.", "bb.", "bbs", ".bs", "..s"], TIED)] },
+    { id: 'braid', name: 'Bím tết', accent: '#e0507a', parts: [
+      P(1, 3, [...BOB_TOP, "..b.........bbs.", "..b.........bbs."]),
+      P(10, 12, [               // bím từ gáy vắt qua vai gần ra trước ngực
+        "...hbs", "...sbb", "..bhs.", "..sbb.", ".bhs..", ".sbb..", "bhs...",
+        "sbb...", "bhs...", "sbb...", "bhs...", ".aa...", ".bs...", ".s...."], TIED)] },
+    { id: 'bun', name: 'Búi', accent: '#e0507a', parts: [
+      P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
+      P(10, -1, [".hb.", "hbbs", "hbbs", ".aa."], TIED)] },
+    { id: 'buns', name: 'Hai búi', accent: '#e0507a', parts: [
+      P(1, 3, [...PIXIE_TOP, "..bbs.......bbs.", "..b.........bKs.", "............bKs.", ".............s.."]),
+      P(2, 0, [".hb.", "hbbs", "bbbs", ".aa."], TIED),
+      P(11, -1, [".hb.", "hbbs", "bbbs", ".aa."], TIED)] },
+  ],
+  shirt: [
+    { id: 'none', name: 'Ba lỗ' },
+    { id: 'tee', name: 'Áo phông', color: '#d24a43', accent: '#f2efe6', sleeve: 'short', parts: mkShirt(SLEEVE_S, [
+      ".bbssbb.",
+      ".hbbbbbs",
+      ".hbbbbs.",
+      ".hbaabs.",   // hình in trước ngực
+      ".hbbsbs.",
+      "..hbbbbs",
+      "..hbsbbs",   // nếp gấp
+      ".hbbbbbs",
+      "hbbbbbbd",
+      "sssssssd"]) },
+    { id: 'hoodie', name: 'Hoodie', color: '#4e6fae',
+      back: [P(10, 15, ["...hb", "..bbb", "bbbbs", "ssss."])],
+      parts: mkShirt(SLEEVE_L, [
+      ".bbbbbb.",
+      ".hwbbwbs",   // dây mũ
+      ".hwbbws.",
+      ".hbbbbs.",
+      ".hbbsbs.",
+      "..hdddds",   // túi kangaroo
+      "..hdbbds",
+      ".hbdddds",
+      "sdsdsdsd",   // bo gấu
+      "dddddddd"]) },
+    { id: 'shirt', name: 'Sơ mi', color: '#e6edf5', accent: '#b8323a', parts: mkShirt(SLEEVE_L, [
+      ".hwaawh.",
+      ".hhaahbs",   // cổ áo + nút cà vạt
+      ".hbaabs.",
+      ".hbaabs.",
+      ".hbAAbs.",
+      "..hbAbbs",
+      "..hbbbbs",
+      ".hbbbbbs",
+      "dddddddd"]) }, // sơ vin + thắt lưng
+    { id: 'vest', name: 'Vest', color: '#2d3142', accent: '#b8323a', parts: [
+      SLEEVE_L.far,
+      P(5, 18, [
+        ".bwwwwb.",
+        ".hbwawbs",   // ve áo + sơ mi trắng + cà vạt
+        ".hhwabs.",
+        ".hhbAbs.",
+        ".hbbgbs.",   // cúc
+        "..hbbbbs",
+        "..hbgbbs",
+        ".hbbbbbs",
+        "hbbsbbbd",
+        "sssdssdd"]),
+      P(12, 18, [".hb.", "hbbs", "hbbs", ".hbs", ".hbs", "..bs", "..sb", "..bs", "..ww"])] },
+    { id: 'jacket', name: 'Áo khoác', color: '#2f6b5a', accent: '#f2efe6', parts: mkShirt(SLEEVE_L, [
+      ".bbaabb.",
+      ".hbaabbs",
+      ".hdaads.",   // vạt áo mở, lộ áo trong
+      ".hdaads.",
+      ".hdaads.",
+      "..hdaads",
+      "..hdaads",
+      ".hbdaads",
+      "hbbdaadd",
+      "ssdAAdsd"]) },
+    { id: 'leather', name: 'Áo da', color: '#3a2a26', parts: [
+      SLEEVE_L.far,
+      P(5, 18, [
+        ".hbbbhb.",
+        ".hhgbbbs",   // khoá kéo chéo kiểu biker
+        ".hbgbhs.",
+        ".hbbgbs.",
+        ".hhbgbs.",
+        "..hbbgbs",
+        "..hbbgbs",
+        ".hbbbgbs",
+        "dddddgdd"]),
+      P(12, 18, [".hb.", "hbbs", "hhbs", ".hbs", ".hbs", "..hs", "..sb", "..hs", "..dd"])] },
+    { id: 'flannel', name: 'Sơ mi caro', color: '#b8433a', accent: '#2a1d24', parts: [
+      P(3, 19, ["ss", "aA", "ss", "ss", "aA", "ss", "AA"]),
+      P(5, 18, [
+        ".bbbbbb.",
+        ".habbass",
+        ".aAaaAa.",
+        ".habbas.",
+        ".habbas.",
+        "..AaaAaa",
+        "..abbass",
+        ".habbass",
+        "aaAaaAaa",
+        "ssAssAss"]),
+      P(12, 18, [".ha.", "habs", "aAaA", ".hbs", ".abs", "..AA", "..bs", "..as", "..AA"])] },
+    { id: 'sweater', name: 'Áo len', color: '#e0b84a', accent: '#b5452f', parts: [
+      P(3, 19, ["ss", "AA", "ss", "AA", "ss", "AA", "dd"]),
+      P(5, 18, [
+        ".bbbbbb.",
+        ".hbbbbbs",
+        ".aaaaaA.",   // sọc ngang
+        ".hbbbbs.",
+        ".aaaaaA.",
+        "..hbbbbs",
+        "..aaaaaA",
+        ".hbbbbbs",
+        "sdsdsdsd",
+        "dddddddd"]),
+      P(12, 18, [".hb.", "hbbs", "aaaA", ".hbs", ".aaA", "..bs", "..aA", "..bs", "..dd"])] },
+    { id: 'gi', name: 'Võ phục', color: '#eeeae2', accent: '#2a2230', parts: [
+      P(3, 19, ["ss", "ss", "ss", "ss", "dd"]),
+      P(5, 18, [
+        ".bbssbb.",
+        ".hbdsbbs",   // vạt áo bắt chéo
+        ".hbsbbs.",
+        ".hsbbbs.",
+        ".sbbbbs.",
+        "..hbbbbs",
+        "..hbbbbs",
+        ".aaaaaaa",   // đai
+        "hbbaAbbs",
+        "sssaAsss"]),
+      P(12, 18, [".hb.", "hbbs", "hbbs", "hbbs", ".bbs", ".bbs", ".dds"])] },
+    { id: 'sailor', name: 'Thủy thủ', color: '#f4f2ec', accent: '#2f3f78', sleeve: 'short', parts: [
+      P(3, 19, ["ss", "aA"]),
+      P(5, 18, [
+        ".aaaaaa.",
+        ".aarraas",   // cổ thủy thủ + nơ đỏ
+        ".haRRas.",
+        ".hbrRbs.",
+        ".hbbbbs.",
+        "..hbbbbs",
+        "..hbbbbs",
+        ".hbbbbbs",
+        "hbbbbbbs",
+        "aaaaaaaA"]),
+      P(12, 18, [".hb.", "hbbs", "hbbs", ".aaA"])] },
+    { id: 'aodai', name: 'Áo dài', color: '#d8344f', accent: '#f2c14e',
+      back: [P(11, 24, ["ssss", ...rep("ssds", 8), "dddd"])],    // vạt sau
+      parts: [
+        SLEEVE_L.far,
+        P(5, 18, [
+          ".bhhhhb.",   // cổ đứng
+          ".hbbbsbs",
+          ".hbabbs.",   // hoa văn
+          ".hbbbas.",
+          ".hbbbbs.",
+          "..hbbbbs",   // eo ôm
+          "..hbbbbs",
+          ".hbbbbbs"]),
+        P(5, 26, ["hbbabs", "hbbbbs", "hbabbs", "hbbbbs", "hbbbas", "hbbbbs", "hbbbbs", "sbbbbd"]), // vạt trước
+        P(12, 18, [".hb.", "hbbs", "hbbs", ".hbs", ".hbs", "..bs", "..bs", "..bs", "..ss"])] },
+    { id: 'robe', name: 'Áo choàng', color: '#3d5a9e', accent: '#f2c14e',
+      back: [P(10, 15, ["...hb", "..bbb", "bbbbs", "ssss."])],
+      parts: [
+        P(2, 19, [".ss", "sss", "sss", "sss", "ddd", "aaa"]),
+        P(4, 18, [
+          "..bbbabb..",
+          "..hbbabbs.",
+          "..hbbabs..",
+          "..hbbabs..",
+          "..hbbabs..",
+          "...hbabbs.",
+          "...AAAAAd.",   // đai lưng
+          "..hbbabbs.",
+          ".hbbbabbss",
+          ".hbbbabbbs",
+          "hbbsbabsbs",
+          "hbbsbabsbs",
+          "hbbsbabsbs",
+          "hbbsbabsbs",
+          "aaaaaaaaaa"]),
+        P(12, 18, [".hb..", "hbbs.", "hbbs.", ".hbs.", ".hbbs", ".hbbs", "..bbs", "..aaa"])] },
+    { id: 'knight', name: 'Hiệp sĩ', color: '#3a5fa8', accent: '#f2c14e', sleeveColor: '#b9c0ca', parts: [
+      P(3, 19, ["GG", "Gg", "GG", "gG", "GG", "Gg", "GG"]),
+      P(5, 18, [
+        ".gggggg.",
+        ".gbbbbbg",
+        ".gbbabG.",   // huy hiệu chữ thập
+        ".gbaaas.",
+        ".gbbabs.",
+        "..hbabbs",
+        "..hbbbbs",
+        ".dddgddd",
+        "GhbbbbsG",
+        "gsbbbbsg"]),
+      P(12, 18, [".gG.", "gGgG", "GgGG", ".gGg", ".Ggg", "..gG", "..Gg", "..gG", "..GG"])] },
+    { id: 'armor', name: 'Áo giáp', color: '#57585e', accent: '#a8401c', parts: [   // chép theo ảnh mẫu
+      P(3, 18, [".a", "Aa", "Aa", "Aa", ".A", ".A"]),          // tay áo xa màu cam
+      P(3, 24, ["b", "b", "s", "s"]),                          // giáp tay xa
+      P(4, 28, [".A", "AA"]),                                  // găng xa
+      P(6, 19, ["dbhbdd.", "sddds..", "bbdbb..", "bbdbbs.", ".ddddds", ".sbbbbs"]),
+      P(5, 25, ["dddddddd", "ssssssss", "dddddddd"]),          // thắt lưng
+      P(14, 22, ["bb", "bb", "dd", "bb", "bb", "sb", "bb"]),   // tay gần
+      P(12, 18, ["..bb.", ".sbbb", "hdsbb", "hd..."], { keep: true })] }, // giáp vai gần
+  ],
+  pants: [
+    { id: 'none', name: 'Quần đùi' },
+    { id: 'jeans', name: 'Quần dài', color: '#3b5c9e', parts: [P(6, 27, [
+      "ddddddd", "hbbbbbs", "hbbbbbs", "hb...bs", "hb...bs", "hb...bs", "ss...bs", ".....ss"])] },
+    { id: 'capri', name: 'Quần lửng', color: '#c9a26b', parts: [P(6, 27, [
+      "ddddddd", "hbbbbbs", "hbbbbbs", "hb...bs", "ss...bs", ".....ss"])] },
+    { id: 'cargo', name: 'Túi hộp', color: '#6b7a3c', parts: [P(6, 27, [
+      "ddddddd", "hbbbbbs", "hbbbbbs", "hb...bs", "db...bd", "db...bd", "ss...bs", ".....ss"])] },
+    { id: 'skirt', name: 'Váy', color: '#c2456b', parts: [P(5, 27, [
+      ".ddddddd.", ".hbbbbbs.", "hbsbbsbss", "hbsbbsbss", "sssssssss"])] },
+    { id: 'armor', name: 'Quần giáp', color: '#e4e7ec', accent: '#55565a', parts: [P(6, 27, [
+      "ddddddd", ".aaaA.b", ".aaaA.b", "bA...hb", "Ab...bb", "bb...Ab", "ss...bb", ".....ss"])] },
+  ],
+
+  shoes: [
+    { id: 'none', name: 'Chân trần' },
+    { id: 'sneaker', name: 'Thể thao', color: '#e04848', parts: [
+      P(4, 33, ["..bs", "bbbs", "wwww"]), P(9, 34, ["..bs", "bbbs", "wwww"])] },
+    { id: 'boots', name: 'Bốt', color: '#6b4127', accent: '#9a6440', parts: [
+      P(4, 31, ["..aa", "..bs", "..bs", "bbbs", "dddd"]), P(9, 32, ["..aa", "..bs", "..bs", "bbbs", "dddd"])] },
+    { id: 'sandal', name: 'Dép', color: '#8a5a32', accent: '#d39a5c', parts: [
+      P(4, 35, ["bbbb"]), P(5, 34, ["aa"], NO), P(9, 36, ["bbbb"]), P(10, 35, ["aa"], NO)] },
+    { id: 'leather', name: 'Giày tây', color: '#2b2630', parts: [
+      P(4, 33, ["..bs", "bhbs", "dddd"]), P(9, 34, ["..bs", "bhbs", "dddd"])] },
+    { id: 'armor', name: 'Giày giáp', color: '#5c6068', accent: '#3e414a', parts: [
+      P(4, 33, ["..bs", "bbbs"]), P(9, 34, ["..bs", "bbbs"])] },
+  ],
+
+  glasses: [
+    { id: 'none', name: 'Không' },
+    { id: 'round', name: 'Kính tròn', color: '#2b2b35', accent: '#bfe6ff', parts: [
+      P(4, 11, [".b.", "blb", "blb", ".b."], NO), P(9, 11, [".b.", "blb", "blb", ".b."], NO),
+      P(7, 12, ["bb"], NO), P(12, 12, ["bb"], NO)] },
+    { id: 'square', name: 'Kính vuông', color: '#5a3a28', accent: '#bfe6ff', parts: [
+      P(4, 11, ["bbb", "blb", "blb", "bbb"], NO), P(9, 11, ["bbb", "blb", "blb", "bbb"], NO),
+      P(7, 12, ["bb"], NO), P(12, 12, ["bb"], NO)] },
+    { id: 'sun', name: 'Kính râm', color: '#1f1f27', parts: [
+      P(4, 11, ["bbb", "bLb", "bLb", ".b."], NO), P(9, 11, ["bbb", "bwb", "bLb", ".b."], NO),
+      P(7, 11, ["bb"], NO), P(12, 11, ["bb"], NO)] },
+    { id: 'goggle', name: 'Bảo hộ', color: '#c8923c', accent: '#5fd3c4', parts: [
+      P(12, 12, ["aaaa"], NO), P(3, 12, ["a"], NO),
+      P(4, 11, ["bbb", "blb", "blb", "bbb"]), P(9, 11, ["bbb", "blb", "blb", "bbb"]), P(7, 12, ["bb"], NO)] },
+    { id: 'patch', name: 'Bịt mắt', color: '#2a2230', parts: [
+      P(4, 9, ["bb...", "..bbb"], NO), P(12, 11, ["bb"], NO), P(9, 11, ["bbb", "bbb", "sbs"])] },
+  ],
+
+  hat: [
+    { id: 'none', name: 'Không' },
+    { id: 'cap', name: 'Lưỡi trai', color: '#d24a43', accent: '#f5f2ea', clip: 7, parts: [
+      P(2, 0, [".....hbbbbb....", "...hhbbbbbbbb..", "..hbaabbbbbbbs.", ".hbaaaabbbbbbbs",
+        "hbbbaabbbbbbbbs", "hbbbbbbbbbbbbss", "ddddddddddddddd"]),
+      P(-1, 7, ["hbbbbbbbbbs", "..sssssss.."])] },
+    { id: 'beanie', name: 'Mũ len', color: '#3d8f6e', accent: '#2f7459', clip: 8, parts: [
+      P(2, 0, [".....hbbbbb....", "...hhbbbbbbbb..", "..hbbbbbbbbbbs.", ".hbbbbbbbbbbbbs",
+        "hbbbbbbbbbbbbbs", "aAaAaAaAaAaAaAa", "aAaAaAaAaAaAaAa"]),
+      P(8, -3, [".hb.", "hbbs", ".ss."])] },
+    { id: 'wizard', name: 'Phù thủy', color: '#5b3fa0', accent: '#f2c14e', clip: 7, parts: [
+      P(3, -4, ["..........bb.", ".........bbs.", "........hbbs.", ".......hbbbs.", "......hbybbs.",
+        "....hhbbbbbs.", "..hhbbbbbbbbs", ".aaaaaaaaaaaA", ".bbbbbbbbbbbs"]),
+      P(-1, 5, [".hbbbbbbbbbbbbbbbbs.", "ssssssssssssssssssss"])] },
+    { id: 'cowboy', name: 'Cao bồi', color: '#8a5a32', accent: '#3b2a1e', clip: 7, parts: [
+      P(-2, 4, ["hb..................bs", "hbbbbbbbbbbbbbbbbbbbbs", ".ssssssssssssssssssss."]),
+      P(4, 0, ["..hbssbs..", ".hbbbbbbs.", ".hbbbbbbs.", ".aaaaaaaa.", ".bbbbbbbb."])] },
+    { id: 'viking', name: 'Viking', color: '#9aa2ad', accent: '#c9973c', clip: 7, parts: [
+      P(-1, 0, ["c..", "cc.", ".cC"]),
+      P(16, -3, ["...c", "..cc", "..cc", ".cCc", "cCC.", "CC.."]),
+      P(2, 0, [".....hhbbbb....", "...hhbbbbbbbs..", "..hbbbbbbbbbbs.", ".hbbbbbbbbbbbbs",
+        "hbbbbbbbbbbbbbs", "aawaaaaawaaaaAA", "AAAAAAAAAAAAAAA"]),
+      P(7, 7, ["bb", "bb", "bb", "bs"])] },
+    { id: 'crown', name: 'Vương miện', color: '#f2c14e', accent: '#d2384a', clip: 4, parts: [
+      P(5, -1, ["h...hb...s", "hb.hbbs.bs", "hbbbaabbbs", "hbabbbbabs", "ssssssssss"])] },
+    { id: 'nonla', name: 'Nón lá', color: '#e3c98b', clip: 7, parts: nonLa() },
+  ],
+};
+/* ============================================================
+   VŨ KHÍ — vẽ theo hình học (u = dọc thân vũ khí, v = ngang),
+   nên xoay được ở mọi góc mà vẫn ra pixel sạch.
+   Góc: 0° = phải, 90° = xuống, 180° = trái (hướng mặt), -90° = lên
+   ============================================================ */
+/* ============================================================
+   ĐỒ ĐỘ PHÂN GIẢI CAO (áo, mũ, kính) — nhân vật vẫn giữ lưới gốc
+   Áo/mũ: phóng bằng Scale2x/Scale3x (bo tròn bậc thang chéo) + viền sáng/tối 1 ô mịn.
+   Kính: vẽ lại bằng hình học để gọng mảnh, tròng có vệt phản chiếu.
+   ============================================================ */
+function scale2(rows) {
+  const h = rows.length, w = Math.max(...rows.map(r => r.length));
+  const at = (x, y) => (y < 0 || y >= h || x < 0 || x >= w) ? '.' : rows[y][x] || '.';
+  const out = [];
+  for (let y = 0; y < h; y++) {
+    let r0 = '', r1 = '';
+    for (let x = 0; x < w; x++) {
+      const P = at(x, y), A = at(x, y - 1), B = at(x + 1, y), C = at(x - 1, y), D = at(x, y + 1);
+      r0 += (C === A && C !== D && A !== B ? A : P) + (A === B && A !== C && B !== D ? B : P);
+      r1 += (D === C && D !== B && C !== A ? C : P) + (B === D && B !== A && D !== C ? D : P);
+    }
+    out.push(r0, r1);
+  }
+  return out;
+}
+function scale3(rows) {
+  const h = rows.length, w = Math.max(...rows.map(r => r.length));
+  const at = (x, y) => (y < 0 || y >= h || x < 0 || x >= w) ? '.' : rows[y][x] || '.';
+  const out = [];
+  for (let y = 0; y < h; y++) {
+    let r0 = '', r1 = '', r2 = '';
+    for (let x = 0; x < w; x++) {
+      const A = at(x - 1, y - 1), B = at(x, y - 1), C = at(x + 1, y - 1), D = at(x - 1, y), E = at(x, y), F = at(x + 1, y),
+        G = at(x - 1, y + 1), H2 = at(x, y + 1), I = at(x + 1, y + 1);
+      if (B !== H2 && D !== F) {
+        r0 += (D === B ? D : E) + ((D === B && E !== C) || (B === F && E !== A) ? B : E) + (B === F ? F : E);
+        r1 += ((D === B && E !== G) || (D === H2 && E !== A) ? D : E) + E + ((B === F && E !== I) || (H2 === F && E !== C) ? F : E);
+        r2 += (D === H2 ? D : E) + ((D === H2 && E !== I) || (H2 === F && E !== G) ? H2 : E) + (H2 === F ? F : E);
+      } else { r0 += E + E + E; r1 += E + E + E; r2 += E + E + E; }
+    }
+    out.push(r0, r1, r2);
+  }
+  return out;
+}
+const scaleRows = (rows, K) => K === 2 ? scale2(rows) : K === 3 ? scale3(rows) : K === 4 ? scale2(scale2(rows)) : rows;
+// viền sáng 1 ô mịn ở mép trên-trái, tối ở mép dưới-phải
+function bevel(rows) {
+  const at = (x, y) => (rows[y] && rows[y][x]) || '.';
+  return rows.map((r, y) => [...r].map((c, x) => {
+    if (c === '.') return c;
+    const tl = at(x, y - 1) === '.' || at(x - 1, y) === '.', br = at(x, y + 1) === '.' || at(x + 1, y) === '.';
+    if (tl && !br) return { b: 'h', s: 'b', d: 's', A: 'a' }[c] || c;
+    if (br && !tl) return { b: 's', h: 'b', a: 'A' }[c] || c;
+    return c;
+  }).join(''));
+}
+const FINE_CACHE = new Map();
+function fineOf(p, f) {
+  if (f === 1) return p;
+  let m = FINE_CACHE.get(p); if (!m) FINE_CACHE.set(p, m = {});
+  if (m[f]) return m[f];
+  const N = Number.isInteger(f) ? f : 3;                        // phóng mượt ×N rồi lấy mẫu ở tâm từng ô ×f
+  const big = p.pattern ? p.rows.flatMap(r => Array(N).fill([...r].map(c => c.repeat(N)).join(''))) : scaleRows(p.rows, N);
+  const w = Math.max(...p.rows.map(r => r.length)), rows = [];
+  for (let j = 0; j < Math.ceil(p.rows.length * f); j++) {
+    let r = ''; const src = big[Math.floor((j + .5) / f * N)] || '';
+    for (let i = 0; i < Math.ceil(w * f); i++) r += src[Math.floor((i + .5) / f * N)] || '.';
+    rows.push(r);
+  }
+  return (m[f] = { ...p, ox: p.x * UNIT, oy: p.y * UNIT, rows: bevel(rows), res: f, thick: true });
+}
+// hoa văn kẻ ô: phóng nguyên khối để không bị nhoè thành hình thoi
+ITEMS.shirt.find(it => it.id === 'flannel').parts.forEach(q => { q.pattern = true; });
+
+// ---- kính hình học (toạ độ thiết kế; mắt xa x5, mắt gần x10, hàng 12–13) ----
+const EYE_F = [5.5, 13], EYE_N = [10.55, 13];
+const ellD = (x, y, cx, cy, rx, ry) => (Math.hypot((x - cx) / rx, (y - cy) / ry) - 1) * Math.min(rx, ry);
+const rrectD = (x, y, cx, cy, hx, hy, r) => {
+  const qx = Math.abs(x - cx) - hx + r, qy = Math.abs(y - cy) - hy + r;
+  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r;
+};
+const glint = (x, y, cx, cy) => Math.abs((x - cx) + (y - cy) + .55) < .28 && y < cy + .2;   // vệt phản chiếu chéo
+const lensShape = (dF, dN, t, lens, x, y) => {
+  for (const [d, c] of [[dF, EYE_F], [dN, EYE_N]]) {
+    if (Math.abs(d) <= t) return d < 0 && y < c[1] ? 'h' : 'b';     // gọng: nửa trên ánh sáng
+    if (d < 0) return glint(x, y, c[0], c[1]) ? 'W' : lens;
+  }
+  return null;
+};
+const GLASS_FINE = {
+  round: K => { const t = Math.max(.32, .9 / K); return (x, y) =>
+    lensShape(ellD(x, y, ...EYE_F, 1.45, 1.7), ellD(x, y, ...EYE_N, 1.85, 1.85), t, 'l', x, y)
+    || (segDist(x, y, 6.9, 12.7, 7.8, 12.3) <= t || segDist(x, y, 7.8, 12.3, 8.7, 12.7) <= t || segDist(x, y, 12.4, 12.7, 14.3, 12.4) <= t ? 'b' : null); },
+  square: K => { const t = Math.max(.38, 1.1 / K); return (x, y) =>
+    lensShape(rrectD(x, y, ...EYE_F, 1.45, 1.45, .45), rrectD(x, y, ...EYE_N, 1.9, 1.5, .5), t, 'l', x, y)
+    || (segDist(x, y, 6.9, 12.5, 8.6, 12.5) <= t || segDist(x, y, 12.4, 12.6, 14.3, 12.4) <= t ? 'b' : null); },
+  sun: K => { const t = Math.max(.3, .8 / K), drop = (x, y, c, rx) => ellD(x, y, c[0], c[1], rx, y < c[1] ? 1.35 : 1.95);
+    return (x, y) => lensShape(drop(x, y, EYE_F, 1.5), drop(x, y, EYE_N, 1.95), t, 'L', x, y)
+      || (segDist(x, y, 6.9, 11.8, 8.6, 11.8) <= t || segDist(x, y, 12.4, 12, 14.3, 12) <= t ? 'b' : null); },
+  goggle: K => (x, y) => {
+    for (const [c, r] of [[EYE_F, 1.75], [EYE_N, 2.15]]) {
+      const d = Math.hypot(x - c[0], y - c[1]);
+      if (d < r - .75) return glint(x, y, c[0], c[1]) ? 'W' : 'l';
+      if (d <= r) { const a = Math.atan2(y - c[1], x - c[0]); return Math.abs(Math.sin(a * 2)) > .96 ? 'y' : y < c[1] ? 'h' : 's'; }
+    }
+    if (segDist(x, y, 7, 13, 8.4, 13) <= .45) return 'b';
+    if (y >= 12.4 && y <= 13.6 && ((x >= 2.6 && x <= 3.9) || (x >= 12.4 && x <= 15))) return y < 12.75 ? 'G' : 'L';   // dây đeo da
+    return null;
+  },
+  patch: K => (x, y) => {
+    const d = ellD(x, y, 10.6, 13.1, 1.95, 1.75);
+    if (d <= 0) return Math.abs(d + .45) < .14 && (Math.floor(Math.atan2(y - 13.1, x - 10.6) * 4) & 1) ? 'Y' : y < 12.6 ? 'h' : 'b';
+    if (segDist(x, y, 3.8, 10.2, 9.2, 11.7) <= .4 || segDist(x, y, 12.4, 12.4, 14.4, 11.9) <= .4) return 's';
+    return null;
+  },
+};
+
+const SHOULDER = [13.5, 19.5], ARM_LEN = 9, IDLE_HAND = [14.5, 28.5];
+const rad = d => d * Math.PI / 180;
+function rasterize(cx, cy, R, fn, opts) {
+  const x0 = Math.floor(cx - R), y0 = Math.floor(cy - R), rows = [];
+  for (let y = y0; y <= Math.ceil(cy + R); y++) {
+    let r = '';
+    for (let x = x0; x <= Math.ceil(cx + R); x++) r += fn(x + .5, y + .5) || '.';
+    rows.push(r);
+  }
+  return P(x0, y0, rows, opts);
+}
+// lấy mẫu ở tâm từng ô mịn (1/K pixel nhân vật) → part có cờ fine
+function rasterizeFine(K, cx, cy, R, fn, opts) {     // K có thể lẻ (1.5, 2.5): ô = UNIT/K
+  const i0 = Math.floor((cx - R) * K), j0 = Math.floor((cy - R) * K), i1 = Math.ceil((cx + R) * K), j1 = Math.ceil((cy + R) * K), rows = [];
+  for (let j = j0; j <= j1; j++) { let r = ''; for (let i = i0; i <= i1; i++) r += fn((i + .5) / K, (j + .5) / K) || '.'; rows.push(r); }
+  return { ox: i0 * UNIT / K, oy: j0 * UNIT / K, rows, res: K, ...opts };
+}
+const local = (gx, gy, ang, shape) => {
+  const c = Math.cos(rad(ang)), s = Math.sin(rad(ang));
+  return (px, py) => { const dx = px - gx, dy = py - gy; return shape(dx * c + dy * s, -dx * s + dy * c); };
+};
+function segDist(u, v, a, b, c, d) {
+  const ex = c - a, ey = d - b, l2 = ex * ex + ey * ey;
+  const t = l2 ? Math.max(0, Math.min(1, ((u - a) * ex + (v - b) * ey) / l2)) : 0;
+  return Math.hypot(u - a - ex * t, v - b - ey * t);
+}
+const shade3 = (v, hw) => v < -0.2 * hw ? 'h' : v > 0.45 * hw ? 's' : 'b';
+
+// Các hình vũ khí nhận st.K (độ mịn). q = kích thước 1 ô mịn tính theo pixel nhân vật;
+// chi tiết mảnh (cạnh sáng, rãnh máu, vân gỗ...) chỉ hiện khi q < 1.
+const Q = st => 1 / ((st && st.K) || 1);
+const wood = (u, v, q, lo = 'a', hi = 'A', hw = .6) => q >= 1 ? (v < 0 ? lo : hi)
+  : v > hw - q * 1.01 ? hi : (Math.floor(u * 1.6 + Math.sin(u * 2.1) * .7) & 3) === 0 ? hi : lo;
+
+// kiếm/dao: chuôi quấn chéo, chắn tay vàng có ngọc, lưỡi có cạnh sáng + rãnh máu
+const blade = ({ len, hw, guard, grip, pommel = true, curve = 0, tsuba = false, fuller = true }) => (u, v, st) => {
+  const q = Q(st), fine = q < 1, av = Math.abs(v);
+  if (pommel) { const d = Math.hypot(u + grip + .5, v); if (d <= .95) return fine && d < .42 ? 'r' : v < -.1 ? 'y' : 'Y'; }
+  if (u >= -grip && u < .6 && av <= .62)
+    return fine ? ((Math.floor((u - v * .9) * 2.4) & 1) ? 'a' : 'A') : (Math.floor(u * 1.4) % 2 ? 'a' : 'A');
+  if (tsuba) {
+    const d = Math.hypot(u - 1, v);
+    if (d <= 1.45 && u < 1.6) return fine && d > 1.45 - q * 1.1 ? 'Y' : fine && d < .4 ? 'G' : v < 0 ? 'y' : 'Y';
+  } else if (u >= .6 && u < 1.5 && av <= guard) {
+    if (fine && av < .38 && Math.abs(u - 1.05) < .32) return 'r';                         // ngọc giữa chắn tay
+    if (fine && (u > 1.5 - q * 1.01 || av > guard - q * 1.01)) return 'Y';
+    return v < 0 ? 'y' : 'Y';
+  }
+  if (u >= 1.5 && u <= len) {
+    const vv = v - curve * ((u - 1.5) / (len - 1.5)) ** 2, t = len - u, h = Math.max(t < 2 ? hw * t / 2 : hw, .32);
+    if (Math.abs(vv) <= h) {
+      if (!fine) return shade3(vv, hw);
+      if (vv < -h + q * 1.01) return 'w';                                                   // lưỡi sắc phản sáng
+      if (vv > h - q * 1.01) return 's';
+      if (fuller && u > 2.3 && t > 2.6 && Math.abs(vv) < q * .55 + .06) return 's';          // rãnh máu
+      if (curve && Math.abs(vv - h * .35) < q * .5 && (Math.floor(u * 2) & 1)) return 'w'; // vân hamon katana
+      return vv < 0 ? 'h' : 'b';
+    }
+  }
+  return null;
+};
+const axe = (u, v, st) => {
+  const q = Q(st), fine = q < 1, edge = -4.6 + .35 * (u - 8.3) ** 2;
+  if (u >= 6.2 && u <= 10.4 && v >= edge && v <= .7 && (v < -1.6 || (u >= 7.3 && u <= 9.3))) {
+    if (!fine) return v < edge + .9 ? 'h' : u > 9.2 ? 's' : 'b';
+    if (v < edge + q * 1.01) return 'w';                                   // lưỡi mài
+    if (v < edge + .85) return 'h';
+    if (Math.hypot(u - 8.3, v + .8) < .4) return 'G';                      // đinh tán
+    if (u > 10.4 - q * 1.01 || (v > -1.6 && u > 9.3 - q * 1.01) || v > .7 - q * 1.01) return 'd';
+    return u > 9.2 ? 's' : 'b';
+  }
+  if (u >= 7.7 && u <= 8.9 && v > .6 && v <= 2.2) return fine && v > 2.2 - q * 1.01 ? 'd' : 's';
+  if (u >= -2.5 && u <= 10.6 && Math.abs(v) <= .6) return fine && u < -1.8 ? 'Y' : wood(u, v, q);
+  return null;
+};
+const hammer = (u, v, st) => {
+  const q = Q(st), fine = q < 1, av = Math.abs(v);
+  if (u >= 8 && u <= 11.3 && av <= 3) {
+    if (!fine) return av >= 1.1 && av <= 1.6 ? 'Y' : u < 8.7 ? 'h' : u > 10.5 ? 's' : 'b';
+    if (av >= 1.1 && av <= 1.6) return Math.abs(u - 9.65) < .4 ? 'w' : 'Y';          // đai đồng + đinh
+    if (u < 8 + q * 1.01 || v < -3 + q * 1.01) return 'w';
+    if (u > 11.3 - q * 1.01 || v > 3 - q * 1.01) return 'd';
+    if (av > 2.2 && Math.abs(u - 9.65) < .9) return 's';                             // mặt búa vát
+    return u < 8.8 ? 'h' : u > 10.5 ? 's' : 'b';
+  }
+  if (u >= -2.5 && u <= 9 && av <= .6) return fine && u < -1.8 ? 'Y' : wood(u, v, q);
+  return null;
+};
+const spear = (u, v, st) => {
+  const q = Q(st), fine = q < 1, av = Math.abs(v);
+  if (u >= 12 && u <= 16) {
+    const h = Math.max(1.5 * Math.min(1, (16 - u) / 3), .32);
+    if (av <= h) {
+      if (!fine) return v < 0 ? 'h' : 'b';
+      if (av < q * .6) return 'w';                                          // gờ giữa mũi giáo
+      if (av > h - q * 1.01) return v < 0 ? 'w' : 's';
+      return v < 0 ? 'h' : 'b';
+    }
+  }
+  if (u >= 11.4 && u < 12 && av <= .8) return fine && u < 11.4 + q * 1.01 ? 'Y' : 'G';
+  if (u >= 10.2 && u < 11.4 && av <= 1.4) return fine ? ((Math.floor(v * 3.2) & 1) ? 'r' : 'R') : v < 0 ? 'r' : 'R';
+  if (u >= -6 && u <= 12 && av <= .58) return fine && u < -5.3 ? 'G' : wood(u, v, q, 'a', 'A', .58);
+  return null;
+};
+const staff = (u, v, st) => {
+  const q = Q(st), fine = q < 1, d = Math.hypot(u - 10.6, v);
+  if (d <= 1.6) {
+    if (!fine) return u > 10.9 && v < -.2 ? 'w' : d > 1.1 ? 'A' : 'a';
+    if (Math.hypot(u - 11.15, v + .55) < .42 || Math.hypot(u - 10, v - .7) < .2) return 'w';   // ánh phản chiếu
+    return d > 1.6 - q * 1.01 || (u < 10.1 && v > .3) ? 'A' : 'a';
+  }
+  if (d <= 2.4 && u < 11.4) return fine && d > 2.4 - q * 1.01 ? 'Y' : 'y';          // vấu giữ ngọc
+  if (u >= -6 && u <= 9 && Math.abs(v) <= .62) {
+    if (fine && (Math.abs(u - 8) < .35 || Math.abs(u - .2) < .3 || Math.abs(u + .8) < .3)) return 'y'; // đai vàng
+    return wood(u, v, q, v < 0 ? 'h' : 'b', 's', .62);
+  }
+  return null;
+};
+const bow = (u, v, st = {}) => {
+  const q = Q(st), fine = q < 1;
+  const R = 7.5, A = rad(58), ex = -R + R * Math.cos(A), ey = R * Math.sin(A), pu = ex - (st.pull || 0);
+  const du = u + R, d = Math.hypot(du, v), a = Math.atan2(v, du);
+  if (Math.abs(a) <= A + .05) {
+    const grip = Math.abs(v) < 1.1, th = grip ? .75 : .62 - Math.abs(a) / A * .2;        // cánh cung thon dần
+    if (Math.abs(d - R) <= th) {
+      if (grip) return fine && (Math.floor(v * 3) & 1) ? 'A' : 'a';                      // tay cầm quấn
+      if (fine && Math.abs(a) > A - .1) return 'y';                                     // đầu móc dây
+      if (fine) return d - R > th - q * 1.01 ? 'h' : d - R < -th + q * 1.01 ? 's' : 'b';
+      return v < 0 ? 'h' : 'b';
+    }
+  }
+  if (st.arrow) { const r = arrowShape(u - 3.6, v, st, pu - 3.6); if (r) return r; }
+  const sw = fine ? Math.max(q * .75, .2) : .48;                                        // dây cung mảnh
+  if (segDist(u, v, ex, -ey, pu, 0) <= sw || segDist(u, v, ex, ey, pu, 0) <= sw) return 'w';
+  return null;
+};
+// mũi tên: u = 0 ở chân mũi nhọn; tail = vị trí đuôi tên (âm)
+const arrowShape = (u, v, st, tail = -5) => {
+  const q = Q(st), fine = q < 1, av = Math.abs(v);
+  if (u > 0 && u <= 1.8 && av <= .95 * (1.8 - u) / 1.8 + .2) return fine && v < -.95 * (1.8 - u) / 1.8 - .2 + q * 1.01 ? 'w' : 'g';
+  const sw = fine ? Math.max(q * .6, .2) : .5;
+  if (u >= tail - .3 && u <= 0) {
+    if (u < tail + 1.4) { const fw = fine ? .2 + (tail + 1.4 - u) * .45 : .5; if (av <= fw) return fine && av < sw ? 'C' : (Math.floor(u * 3) & 1) ? 'r' : 'w'; }
+    if (av <= sw) return 'C';
+  }
+  return null;
+};
+
+ITEMS.weapon = [
+  { id: 'none', name: 'Không' },
+  { id: 'sword', name: 'Kiếm', anim: 'slash', hold: [15.6, 28, 50], tip: 10.5, color: '#d5dbe3', accent: '#6b4127',
+    shape: blade({ len: 10.5, hw: 1, guard: 2.3, grip: 1.8 }) },
+  { id: 'great', name: 'Đại kiếm', anim: 'heavy', hold: [18, 21.5, 90], tip: 14, color: '#c4cad4', accent: '#3b2a1e',
+    shape: blade({ len: 14, hw: 1.5, guard: 3.2, grip: 2.8 }) },
+  { id: 'katana', name: 'Katana', anim: 'slash', hold: [15.6, 28, 47], tip: 12, color: '#e6ebf0', accent: '#2a2230',
+    shape: blade({ len: 12, hw: 0.75, guard: 0, grip: 3, pommel: false, curve: 0.9, tsuba: true }) },
+  { id: 'dagger', name: 'Dao găm', anim: 'stab', hold: [15.2, 28.5, 78], tip: 5.5, color: '#d5dbe3', accent: '#7a2f2f',
+    shape: blade({ len: 5.5, hw: 0.85, guard: 1.6, grip: 1.5 }) },
+  { id: 'axe', name: 'Rìu', anim: 'smash', hold: [18, 25.2, 90], tip: 10, color: '#c4cad4', accent: '#7a4a2a', shape: axe },
+  { id: 'hammer', name: 'Búa chiến', anim: 'smash', hold: [18, 24.3, 90], tip: 11, color: '#9aa2ad', accent: '#5a3a24', shape: hammer },
+  { id: 'spear', name: 'Giáo', anim: 'thrust', hold: [17, 28.5, -90], tip: 16, color: '#d5dbe3', accent: '#7a4a2a', shape: spear },
+  { id: 'staff', name: 'Gậy phép', anim: 'cast', hold: [17, 26, -90], tip: 10.6, color: '#7a4a2a', accent: '#5fd3ff', shape: staff },
+  { id: 'bow', name: 'Cung', anim: 'shoot', hold: [16.4, 27.5, 180], tip: 5.4, color: '#8a5a32', accent: '#3b2a1e', shape: bow },
+];
+ITEMS.weapon.forEach(w => { if (w.shape) w.reach = w.id === 'bow' ? 18 : w.tip + 3; });
+// ống tên đeo sau lưng (chỉ với cung)
+function quiverParts(oy, K) {
+  const a = [17.6, 14 + oy], b = [21, 23.5 + oy], ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI, len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const q = 1 / K, fine = q < 1;
+  return [rasterizeFine(K, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 2, len / 2 + 5, local(a[0], a[1], ang, (u, v) => {
+    if (u < 0) {                                       // ba mũi tên ló khỏi miệng ống
+      for (const [vi, col] of [[-.75, 'w'], [0, 'r'], [.75, 'w']]) {
+        const dv = Math.abs(v - vi);
+        if (u >= -1.4 && dv <= (fine ? Math.max(q * .6, .2) : .4)) return 'C';
+        if (u >= -3.2 && u < -1.4 && dv <= .2 + (u + 3.2) * .17) return col;
+      }
+      return null;
+    }
+    if (u > len || Math.abs(v) > 1.4) return null;
+    if (u < 1.3 || len - u < 1) return 'Y';           // viền đồng
+    if (fine && Math.abs(v - .75) < q * .6 && (Math.floor(u * 2.5) & 1)) return 'Y';   // đường chỉ khâu
+    return v < -.3 ? 'h' : v > .5 ? 's' : 'b';
+  }))];
+}
+// dây đeo ống tên chéo qua ngực
+const quiverStrap = (oy, K) => rasterizeFine(K, 9.5, 22.5 + oy, 6, (px, py) => {
+  const d = segDist(px, py, 12.5, 18.6 + oy, 6.4, 26 + oy);
+  return d <= .55 ? (K > 1 && d > .55 - 1 / K ? 'A' : 'a') : null;
+}, NO);
+const BOW_HAND = [-3.5, 19.5], FAR_SHOULDER = [4.5, 19.5];
+
+// tay áo phía gần được thay bằng tay xoay khi ra đòn
+ITEMS.shirt.forEach(it => (it.parts || []).forEach(p => {
+  if (!p.keep && ((p.x === 12 && p.y === 18) || (p.x === 14 && p.y === 22))) p.near = true;
+}));
+
+/* ============================================================
+   CHUỖI ĐÒN ĐÁNH — mỗi khung: d (ms), arm/wpn (góc), dx/dy (nghiêng người),
+   ext (đẩy vũ khí theo trục), behind (vũ khí sau lưng), arc [bắt đầu, hiện tại],
+   hit / shock / circle / charge / strike / proj ... cho hiệu ứng
+   ============================================================ */
+const ANIMS = {
+  slash: [
+    { d: 90, arm: -60, wpn: -20, dx: 1, behind: true },
+    { d: 55, arm: -80, wpn: -100, behind: true },
+    { d: 45, arm: -140, wpn: -175, dx: -1, arc: [-20, -175] },
+    { d: 75, arm: 165, wpn: 150, dx: -1, arc: [-20, -210], hit: true },
+    { d: 90, arm: 125, wpn: 115, arc: [-60, -245], fade: .55 },
+    { d: 130, arm: 100, wpn: 85, arc: [-140, -275], fade: .2 },
+  ],
+  heavy: [
+    { d: 150, arm: -55, wpn: -10, dx: 1, dy: -1, behind: true },
+    { d: 70, arm: -85, wpn: -110, behind: true, arc: [-10, -110], fade: .4 },
+    { d: 55, arm: -150, wpn: 180, dx: -1, arc: [-10, -180] },
+    { d: 90, arm: 160, wpn: 135, dx: -1, dy: 1, arc: [-10, -225], hit: true, shake: 3, shock: 0 },
+    { d: 120, arm: 150, wpn: 125, dx: -1, dy: 1, arc: [-80, -235], fade: .5, shock: 1, shake: 1 },
+    { d: 170, arm: 105, wpn: 80, fade: .2, shock: 2 },
+  ],
+  stab: [
+    { d: 60, arm: 115, wpn: 175, ext: -1, dx: 1 },
+    { d: 45, arm: 170, wpn: 180, ext: 1, dx: -1, lines: true, mark: 0 },
+    { d: 60, arm: 125, wpn: 175, ext: -1 },
+    { d: 45, arm: 175, wpn: 185, ext: 1, dx: -1, lines: true, mark: 1 },
+    { d: 110, arm: 175, wpn: 185, ext: 1, dx: -1, mark: 2, hit: true },
+    { d: 120, arm: 110, wpn: 90, fade: .4 },
+  ],
+  thrust: [
+    { d: 120, arm: 110, wpn: 180, ext: -3, dx: 1 },
+    { d: 50, arm: 172, wpn: 180, ext: 2, dx: -1, lines: true },
+    { d: 110, arm: 172, wpn: 180, ext: 2, dx: -1, lines: true, hit: true },
+    { d: 140, arm: 130, wpn: 200, fade: .4 },
+  ],
+  smash: [
+    { d: 130, arm: -70, wpn: -30, dx: 1, dy: -1, behind: true },
+    { d: 60, arm: -100, wpn: -125, behind: true, arc: [-30, -125], fade: .4 },
+    { d: 55, arm: 155, wpn: 125, dx: -1, dy: 1, arc: [-30, -235], hit: true, shake: 3, shock: 0 },
+    { d: 110, arm: 155, wpn: 125, dx: -1, dy: 1, fade: .6, shock: 1, shake: 1 },
+    { d: 130, arm: 150, wpn: 120, dx: -1, shock: 2, fade: .3 },
+    { d: 150, arm: 100, wpn: 70, fade: .15 },
+  ],
+  cast: [
+    { d: 170, arm: -78, wpn: -95, circle: 0, charge: 0 },
+    { d: 170, arm: -78, wpn: -95, circle: 1, charge: 1 },
+    { d: 110, arm: -78, wpn: -95, circle: 2, charge: 2, strike: 0 },
+    { d: 120, arm: -78, wpn: -95, circle: 2, strike: 1, shake: 2, hit: true },
+    { d: 170, arm: -78, wpn: -95, circle: 1, strike: 2, fade: .55 },
+    { d: 160, arm: 92, wpn: -95, strike: 3, fade: .25 },
+  ],
+  shoot: [
+    // tay xa đẩy cung về phía trước, tay gần kéo dây về má (draw = vị trí tay kéo, elbow = khuỷu)
+    { d: 130, draw: [5, 19.5], elbow: [14.5, 21.5], arrow: true },
+    { d: 240, draw: [11, 19], elbow: [18, 18], arrow: true, charge: 0 },
+    { d: 50, draw: [18, 16.5], elbow: [19, 20.5], proj: 0 },   // buông dây: tay bật ra sau tai
+    { d: 50, draw: [18, 16.5], elbow: [19, 20.5], proj: 1 },
+    { d: 130, draw: [18, 17], elbow: [19, 21], hit: true },
+    { d: 150, draw: [16, 25.5], elbow: [17.5, 23], fade: .4 },
+  ],
+};
+const CAST_X = -6, BOW_X = -11, GROUND = 35.6;
+
+/* ============================================================
+   HIỆU ỨNG — vẽ trực tiếp vào lưới với độ trong suốt
+   ============================================================ */
+const FX = {
+  none: { name: 'Thường', c: ['#ffffff', '#d6ecff', '#8fb4e0'] },
+  fire: { name: 'Lửa', c: ['#fff4b8', '#ff9a3c', '#e0452b'] },
+  ice: { name: 'Băng', c: ['#f2ffff', '#8fe3ff', '#3c8fd8'] },
+  thunder: { name: 'Sét', c: ['#ffffe6', '#ffe14d', '#c9961a'] },
+  poison: { name: 'Độc', c: ['#f0ffd6', '#8fe05a', '#3f8f3a'] },
+  shadow: { name: 'Bóng tối', c: ['#f3e0ff', '#b07cff', '#5a2f9e'] },
+};
+const fput = (g, x, y, c, a) => { if (a > 0.04) putC(g, Math.floor(x) + OX, Math.floor(y) + OY, c, Math.min(1, a), 0); };
+function fline(g, x0, y0, x1, y1, c, a) {
+  const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 2));
+  for (let i = 0; i <= n; i++) fput(g, x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, c, a);
+}
+function rng32(a) {
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+// vệt chém hình lưỡi liềm quanh vai
+function fxArc(g, S, r0, r1, start, end, c, fade) {
+  for (let y = Math.floor(S[1] - r1 - 1); y <= S[1] + r1 + 1; y++)
+    for (let x = Math.floor(S[0] - r1 - 1); x <= S[0] + r1 + 1; x++) {
+      const dx = x + .5 - S[0], dy = y + .5 - S[1], r = Math.hypot(dx, dy);
+      if (r < r0 || r > r1) continue;
+      let th = Math.atan2(dy, dx) * 180 / Math.PI;
+      th = end + (((th - end) % 360) + 360) % 360;
+      if (th > start) continue;
+      const k = 1 - (th - end) / (start - end), edge = r1 - r < 1.4;
+      fput(g, x, y, edge ? c[0] : mix(c[2], c[1], k), fade * (edge ? Math.min(1, k * 1.6) : k * k * .85));
+    }
+}
+function fxRing(g, cx, cy, rx, ry, c, a, fill = 0) {
+  for (let y = Math.floor(cy - ry - 2); y <= cy + ry + 2; y++)
+    for (let x = Math.floor(cx - rx - 2); x <= cx + rx + 2; x++) {
+      const e = Math.hypot((x + .5 - cx) / rx, (y + .5 - cy) / ry);
+      if (e > 0.8 && e < 1.12) fput(g, x, y, c, a); else if (e <= 0.8 && fill) fput(g, x, y, c, a * fill);
+    }
+}
+function fxBurst(g, cx, cy, r, c, fade) {
+  for (let k = 0; k < 8; k++) {
+    const a = k * Math.PI / 4, L = k % 2 ? r * .55 : r;
+    for (let s = 0; s <= L; s += .5) fput(g, cx + Math.cos(a) * s, cy + Math.sin(a) * s, s < L * .45 ? c[0] : c[1], fade * (1 - s / (L + 1)));
+  }
+  fxGlow(g, cx, cy, r * .45, c, fade);
+}
+function fxGlow(g, cx, cy, r, c, fade) {
+  for (let y = Math.floor(cy - r - 2); y <= cy + r + 2; y++)
+    for (let x = Math.floor(cx - r - 2); x <= cx + r + 2; x++) {
+      const d = Math.hypot(x + .5 - cx, y + .5 - cy);
+      if (d <= r * .55) fput(g, x, y, c[0], fade);
+      else if (d <= r) fput(g, x, y, c[1], fade * .85);
+      else if (d <= r + 1.3) fput(g, x, y, c[2], fade * .35);
+    }
+}
+function fxCross(g, cx, cy, s, c, fade) { // dấu chém chữ X
+  fline(g, cx - s, cy - s, cx + s, cy + s, c[0], fade); fline(g, cx - s, cy + s, cx + s, cy - s, c[1], fade);
+}
+function fxParticles(g, el, cx, cy, spread, n, t, seed, c, fade) {
+  const rnd = rng32(seed);
+  for (let i = 0; i < n; i++) {
+    const ox = (rnd() - .5) * spread * 2, oy = (rnd() - .5) * spread, q = (t * .0025 + rnd()) % 1, x = cx + ox, y = cy + oy;
+    const flick = rnd();
+    if (el === 'fire') {            // tàn lửa bay lên
+      fput(g, x + Math.sin(q * 9 + i) * .8, y - q * 7, mix(c[1], c[2], q), fade * (1 - q));
+      if (flick < .4) fput(g, x + 1, y - q * 7, c[0], fade * (1 - q) * .8);
+    } else if (el === 'ice') {      // tinh thể lấp lánh hình chữ thập
+      const s = Math.sin(q * Math.PI);
+      fput(g, x, y, c[0], fade * s);
+      if (s > .5) for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) fput(g, x + a, y + b, c[1], fade * s * .7);
+    } else if (el === 'thunder') {  // tia sét nhỏ chớp tắt
+      if (((t / 70 | 0) + i) % 3 === 0) {
+        let px = x, py = y - 3; const r2 = rng32(seed + i + (t / 70 | 0));
+        for (let k = 0; k < 4; k++) { const nx = px + (r2() - .5) * 2.6, ny = py + 1.6; fline(g, px, py, nx, ny, k % 2 ? c[1] : c[0], fade); px = nx; py = ny; }
+      }
+    } else if (el === 'poison') {   // bong bóng độc nổi lên
+      const yy = y - q * 5, a = fade * (1 - q);
+      fput(g, x, yy, c[1], a); fput(g, x + 1, yy, c[1], a); fput(g, x, yy - 1, c[0], a * .8); fput(g, x + 1, yy + 1, c[2], a * .6);
+    } else if (el === 'shadow') {   // làn khói tím trôi
+      fput(g, x + q * 3, y - q * 4, mix(c[2], c[1], q), fade * (1 - q) * .85);
+      fput(g, x + q * 3 + 1, y - q * 4, c[2], fade * (1 - q) * .5);
+    } else {                        // tia sáng trắng
+      const s = Math.sin(q * Math.PI);
+      if (s > .3) { fput(g, x, y, c[0], fade * s); if (s > .75) for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) fput(g, x + a, y + b, c[1], fade * .6); }
+    }
+  }
+}
+// đòn phép: cột năng lượng giáng xuống mục tiêu
+function fxStrike(g, el, tx, lvl, p, t, seed, c, fade) {
+  const top = -4, len = GROUND - top;
+  if (lvl === 0) {
+    const yEnd = top + len * p;
+    if (el === 'thunder') boltPath(g, tx, top, yEnd, seed, c, 1);
+    else for (let y = top; y < yEnd; y++) { fput(g, tx, y, c[0], 1); fput(g, tx - 1, y, c[1], .6); fput(g, tx + 1, y, c[1], .6); }
+    return;
+  }
+  if (lvl <= 2) {
+    const w = lvl === 1 ? 2.5 : 1.5, a = lvl === 1 ? 1 : fade;
+    if (el === 'thunder') { boltPath(g, tx, top, GROUND, seed + (t / 50 | 0), c, a); boltPath(g, tx + 1, top, GROUND, seed + 7 + (t / 50 | 0), c, a * .5); }
+    else for (let y = top; y < GROUND; y++)
+      for (let x = Math.floor(tx - w - 1); x <= tx + w + 1; x++) {
+        const d = Math.abs(x + .5 - tx);
+        fput(g, x, y, d < w * .45 ? c[0] : d < w ? c[1] : c[2], a * (d < w ? 1 : .4));
+      }
+    fxRing(g, tx, GROUND, 3 + lvl * 3 + p * 2, (3 + lvl * 3 + p * 2) * .32, c[lvl === 1 ? 0 : 1], a);
+    if (el === 'ice') for (const [o, h] of [[-3, 3], [-1.5, 5], [1.5, 4], [3.2, 2.5]])
+      for (let k = 0; k < h; k++) { fput(g, tx + o, GROUND - k, k > h - 2 ? c[0] : c[1], a); if (k < h - 2) fput(g, tx + o + (o < 0 ? -1 : 1), GROUND - k, c[2], a * .8); }
+    if (el === 'poison') for (let k = 0; k < 6; k++) fxGlow(g, tx + (k - 2.5) * 1.6, GROUND - 2 - (k % 2) * 1.5, 1.6, c, a * .6);
+    if (el === 'shadow') fxGlow(g, tx, GROUND - 4, 3.5 - lvl, [c[2], c[2], c[1]], a * .9);
+  }
+}
+function boltPath(g, x, y0, y1, seed, c, a) {
+  const r = rng32(seed); let px = x, py = y0;
+  while (py < y1) { const ny = Math.min(y1, py + 2 + r() * 2), nx = x + (r() - .5) * 4; fline(g, px, py, nx, ny, c[0], a); fline(g, px + 1, py, nx + 1, ny, c[1], a * .7); px = nx; py = ny; }
+}
+// hào quang quanh vũ khí khi có nguyên tố
+function aura(g, part, c, a) {          // quầng sáng quanh vũ khí (theo ô của chính vũ khí)
+  const f = part.res || 1, U = UNIT / f, R = Math.round(f) + 1, [bx, by] = partBase(part, 0, 0), set = new Set(), cells = [];
+  part.rows.forEach((r, ry) => { for (let rx = 0; rx < r.length; rx++) if (r[rx] !== '.') { cells.push([rx, ry]); set.add(KEY(rx, ry)); } });
+  const best = new Map();
+  for (const [x, y] of cells)
+    for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) {
+      const d = Math.max(Math.abs(dx), Math.abs(dy)); if (d < 2) continue;
+      const k = KEY(x + dx, y + dy); if (set.has(k)) continue;
+      if (!best.has(k) || best.get(k) > d) best.set(k, d);
+    }
+  for (const [k, d] of best) {
+    const x = Math.floor(k / 16384) - 4096, y = k % 16384 - 4096, X = bx + x * U, Y = by + y * U;
+    if (occAt(g, X + U / 2, Y + U / 2) === 0) addRect(g, X, Y, U, c, a * (1 - (d - 2) / R), 0);
+  }
+}
+function poseGeom(pose, ox, oy, wp) {
+  const S = [SHOULDER[0] + ox, SHOULDER[1] + oy], a = rad(pose.arm), w = rad(pose.wpn), e = pose.ext || 0;
+  const H2 = [S[0] + ARM_LEN * Math.cos(a), S[1] + ARM_LEN * Math.sin(a)];
+  const G = [H2[0] + e * Math.cos(w), H2[1] + e * Math.sin(w)];
+  return { S, H: H2, G, T: [G[0] + wp.tip * Math.cos(w), G[1] + wp.tip * Math.sin(w)] };
+}
+function impactPoint(frames, wp) {
+  const hf = frames.find(f => f.hit);
+  if (wp.anim === 'shoot') return [BOW_X, BOW_HAND[1] + (hf.dy || 0)];
+  const gm = poseGeom(hf, hf.dx || 0, hf.dy || 0, wp);
+  if (wp.anim === 'smash' || wp.anim === 'heavy') return [gm.T[0], wp.anim === 'smash' ? GROUND - 1 : gm.T[1]];
+  if (wp.anim === 'cast') return [CAST_X, GROUND - 3];
+  if (wp.anim === 'shoot') return [BOW_X, gm.G[1]];
+  return gm.T;
+}
+function armParts(S, ang, kind, sp, kp, L = ARM_LEN, K = 1) {
+  const cap = (len, r, k = 1) => {          // k > 1: tay áo vẽ ở ô mịn (vải), da tay giữ lưới nhân vật
+    const fn = local(S[0], S[1], ang, (u, v) =>
+      (u >= 0 && u <= len && Math.abs(v) <= r) || Math.hypot(u, v) <= r || Math.hypot(u - len, v) <= r
+        ? (k > 1 && u > len - .6 && u <= len + r ? 'd' : shade3(v, r)) : null);
+    const cx = S[0] + Math.cos(rad(ang)) * len / 2, cy = S[1] + Math.sin(rad(ang)) * len / 2;
+    return k > 1 ? rasterizeFine(k, cx, cy, len / 2 + r + 1, fn, { thick: true }) : rasterize(cx, cy, len / 2 + r + 1, fn);
+  };
+  const out = [];
+  if (kind !== 'long') out.push([cap(L - 0.6, 0.95), kp]);
+  if (kind === 'long') out.push([cap(L - 1.6, 1.15, K), sp]);
+  if (kind === 'short') out.push([cap(3.4, 1.2, K), sp]);
+  return out;
+}
+
+/* ---------- ghép nhân vật ---------- */
+const usesAccent = it => !!it.shape || [...(it.parts || []), ...(it.back || [])].some(p => p.rows.some(r => /[aAl]/.test(r)));
+const OPT_CATS = ['hair', 'shirt', 'pants', 'shoes', 'glasses', 'hat', 'weapon'];
+const findItem = (k, id) => ITEMS[k].find(o => o.id === id) || ITEMS[k][0];
+
+function compose(cfg, st = {}) {
+  const { bob = 0, blink = false, pose = null, frames = null, fi = 0, p = 0, t = 0, seed = 1 } = st;
+  const g = newGrid(), outline = cfg.black ? 'black' : 'color';
+  const KW = RES.weapon, KS = RES.shirt;   // độ phân giải cố định: vũ khí 2×, áo 1.5×, mũ 1.5×, kính 2.5×
+  const it = {}; OPT_CATS.forEach(k => it[k] = findItem(k, (cfg[k] || {}).id));
+  const pal = k => makePal(cfg[k].color, cfg[k].accent);
+  const skin = bodyPal(cfg, blink), clip = it.hat.clip ?? null;
+  const D = (parts, pl, o = {}) => (parts || []).forEach(pt => drawPart(g, pt, pl, { outline, ...o }));
+  const ox = pose ? pose.dx || 0 : 0, oy = pose ? pose.dy || 0 : bob, up = { dx: ox, dy: oy };
+  const wp = it.weapon, wpal = wp.shape ? pal('weapon') : null;
+  const el = cfg.fx || 'none', fc = FX[el].c.map(hexToRgb), fade = pose ? pose.fade ?? 1 : 1;
+
+  // vị trí tay + vũ khí
+  let gm = null, wPart = null;
+  const archer = !!(pose && wp.anim === 'shoot');
+  const sh = it.shirt, kind = !sh.parts ? 'none' : sh.sleeve || 'long';
+  const sp = sh.sleeveColor ? makePal(sh.sleeveColor) : pal('shirt');
+  if (archer) {
+    const BH = [BOW_HAND[0] + ox, BOW_HAND[1] + oy];
+    gm = { S: [SHOULDER[0] + ox, SHOULDER[1] + oy], H: [pose.draw[0] + ox, pose.draw[1] + oy], G: BH,
+      E: [pose.elbow[0] + ox, pose.elbow[1] + oy], FS: [FAR_SHOULDER[0] + ox, FAR_SHOULDER[1] + oy], T: [BH[0] - 5.4, BH[1]] };
+  } else if (pose) gm = poseGeom(pose, ox, oy, wp);
+  else if (wp.shape) {           // tư thế nghỉ: tay vươn tới chuôi, vũ khí không nhún theo nhịp thở
+    const S = [SHOULDER[0], SHOULDER[1] + oy], H2 = wp.hold.slice(0, 2);
+    gm = { S, H: H2, G: H2, arm: Math.atan2(H2[1] - S[1], H2[0] - S[0]) * 180 / Math.PI, len: Math.hypot(H2[0] - S[0], H2[1] - S[1]) };
+  }
+  const posed = !!gm;
+  if (wp.shape) {
+    const G = gm.G, ang = archer ? 180 : pose ? pose.wpn : wp.hold[2];
+    const wst = archer ? { K: KW, arrow: !!pose.arrow, pull: pose.arrow ? Math.max(0, gm.H[0] - G[0] - 3.53) : 0 }
+      : { K: KW, pull: pose ? pose.pull || 0 : 0, arrow: pose ? !!pose.arrow : false };
+    wPart = rasterizeFine(KW, G[0], G[1], wp.reach, local(G[0], G[1], ang, (u, v) => wp.shape(u, v, wst)));
+  }
+  const drawWeapon = () => {
+    if (!wPart) return;
+    drawPart(g, wPart, wpal, { outline });
+    if (el !== 'none') aura(g, wPart, fc[1], pose ? .55 : .25 + .15 * Math.sin(t / 140));
+  };
+
+  D(SHADOW, FIXED);
+  // lớp mặt đất: vòng phép, sóng chấn động
+  if (pose && pose.circle != null) {
+    const rx = 6.5 + pose.circle, a = .5 + pose.circle * .2;
+    fxRing(g, 9.5, GROUND, rx, rx * .3, fc[1], a, .12);
+    fxRing(g, 9.5, GROUND, rx * .62, rx * .62 * .3, fc[2], a * .8);
+    for (let k = 0; k < 6; k++) { const an = t * .004 + k * Math.PI / 3; fput(g, 9.5 + Math.cos(an) * rx * .82, GROUND + Math.sin(an) * rx * .82 * .3, fc[0], a); }
+  }
+  const hit = frames && wp.anim ? impactPoint(frames, wp) : null;
+  if (pose && pose.shock != null) {
+    const rx = 3 + pose.shock * 3.5 + p * 3;
+    fxRing(g, hit[0], GROUND, rx, rx * .32, fc[pose.shock ? 1 : 0], fade, .15);
+  }
+  const hairPal = { ...pal('hair'), K: skin.s };
+  D(it.hair.back, hairPal, { ...up, clip });
+  const FK = (parts, f) => parts && parts.map(q => fineOf(q, f));   // áo, mũ: phóng lên độ phân giải riêng
+  D(FK(it.shirt.back, KS), pal('shirt'), up);
+  if (pose && pose.behind) drawWeapon();
+  if (wp.id === 'bow') D(quiverParts(oy, KW), wpal);
+  D(BODY.legs, skin);
+  D(archer ? BODY.upper.slice(1, 2) : posed ? BODY.upper.slice(0, 2) : BODY.upper, skin, up);
+  if (it.pants.parts) D(it.pants.parts, pal('pants')); else D(UNDER.shorts, makePal(cfg.shorts));
+  D(it.shoes.parts, pal('shoes'));
+  const isFar = q => q.x <= 4 && q.rows[0].length <= 3;   // tay áo phía xa
+  const shirtParts = it.shirt.parts && (posed ? it.shirt.parts.filter(q => !q.near && !(archer && isFar(q))) : it.shirt.parts);
+  if (it.shirt.parts) D(FK(shirtParts, KS), pal('shirt'), up); else D(UNDER.tank, makePal(cfg.tank), up);
+  if (wp.id === 'bow') drawPart(g, quiverStrap(oy, KW), wpal, { outline, dx: ox });
+  const fist = (hx, hy) => drawPart(g, rasterize(hx, hy, 2.5, (px, py) =>
+    Math.hypot(px - hx, py - hy) <= 1.25 ? (py - hy > .35 || px - hx > .5 ? 's' : 'b') : null), skin, { outline });
+  if (archer) {                    // tay xa duỗi thẳng cầm cung (sau đầu, trước thân)
+    armParts(gm.FS, 180, kind, sp, skin, gm.FS[0] - gm.G[0], KS).forEach(([pt, pl]) => drawPart(g, pt, pl, { outline }));
+    drawWeapon(); fist(gm.G[0], gm.G[1]);
+  }
+  D(BODY.head, skin, { ...up, cast: true });
+  D(it.hair.parts, hairPal, { ...up, clip, cast: true, inner: false });
+  if (GLASS_FINE[it.glasses.id]) {
+    const outlined = it.glasses.id === 'goggle' || it.glasses.id === 'patch';
+    drawPart(g, rasterizeFine(RES.glasses, 9, 12.5, 7, GLASS_FINE[it.glasses.id](RES.glasses), { outline: outlined }), pal('glasses'), { outline, ...up });
+  } else D(it.glasses.parts, pal('glasses'), up);
+  D(FK(it.hat.parts, RES.hat), pal('hat'), { ...up, cast: true });
+
+  if (!posed) return g;
+  // ---- tay cầm vũ khí (nghỉ hoặc đang ra đòn) ----
+  if (pose && pose.arc) fxArc(g, gm.S, ARM_LEN + wp.tip - 4, ARM_LEN + wp.tip + .5, pose.arc[0], pose.arc[1], fc, fade);
+  if (archer) {                    // tay gần: khuỷu nâng ra sau, cẳng tay kéo dây về má
+    const seg = (A, B, k) => armParts(A, Math.atan2(B[1] - A[1], B[0] - A[0]) * 180 / Math.PI, k, sp, skin, Math.hypot(B[0] - A[0], B[1] - A[1]), KS);
+    [...seg(gm.S, gm.E, kind), ...seg(gm.E, gm.H, kind === 'long' ? 'long' : 'none')].forEach(([pt, pl]) => drawPart(g, pt, pl, { outline }));
+  } else {
+    if (!(pose && pose.behind)) drawWeapon();
+    armParts(gm.S, pose ? pose.arm : gm.arm, kind, sp, skin, pose ? ARM_LEN : gm.len, KS).forEach(([pt, pl]) => drawPart(g, pt, pl, { outline }));
+  }
+  fist(gm.H[0], gm.H[1]);          // nắm tay đè lên chuôi / dây cung
+  if (!pose) return g;
+  // ---- hiệu ứng đòn đánh ----
+
+  const [tx, ty] = gm.T;
+  if (pose.lines) for (let i = -2; i <= 2; i++) {        // vệt tốc độ sau mũi đâm
+    const len = 3 + ((i + 5) * 7 + seed) % 4;
+    fline(g, tx + 2 + Math.abs(i), ty + i * 1.3, tx + 2 + Math.abs(i) + len, ty + i * 1.3, fc[i ? 1 : 0], fade * .7);
+  }
+  if (pose.mark != null) fxCross(g, tx - 1 + pose.mark * .5, ty - pose.mark * .5, 1.5 + pose.mark * .5, fc, fade);
+  if (pose.charge != null) {                              // tụ lực
+    const o = wp.anim === 'cast' ? [gm.G[0] + wp.tip * Math.cos(rad(pose.wpn)), gm.G[1] + wp.tip * Math.sin(rad(pose.wpn))] : [tx, ty];
+    fxGlow(g, o[0], o[1], 1.4 + pose.charge + .4 * Math.sin(t / 50), fc, .85);
+    const r = rng32(seed);
+    for (let i = 0; i < 10; i++) { const an = r() * Math.PI * 2, q = (t * .003 + r()) % 1, d = 7 * (1 - q); fput(g, o[0] + Math.cos(an) * d, o[1] + Math.sin(an) * d, fc[q > .6 ? 0 : 1], .9); }
+  }
+  if (pose.strike != null) fxStrike(g, el, CAST_X, pose.strike, p, t, seed, fc, fade);
+  if (pose.proj != null) {                                // mũi tên bay
+    const ax = gm.G[0] - 7.5 - 3.5 * (pose.proj + p), ay = gm.G[1];
+    fline(g, ax + 1, ay, ax + 9, ay, fc[1], .7); fline(g, ax + 3, ay - 1, ax + 7, ay - 1, fc[2], .4);
+    drawPart(g, rasterizeFine(KW, ax, ay, 6, local(ax, ay, 180, (u, v) => arrowShape(u, v, { K: KW }))), wpal, { outline });
+  }
+  const fi0 = frames.findIndex(f => f.hit);
+  if (pose.hit) fxBurst(g, hit[0], hit[1], 2.5 + p * 2.5, fc, 1 - p * .4);
+  if (fi >= fi0) fxParticles(g, el, hit[0], hit[1], 3.5, 12, t, seed, fc, fade);
+  return g;
+}
+
+function paint(ctx, g, scale, sx = 0, sy = 0, w = W, h = H) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const k = scale / UNIT, X0 = sx * UNIT, Y0 = sy * UNIT, X1 = (sx + w) * UNIT, Y1 = (sy + h) * UNIT;
+  for (const o of g.ops) {
+    if (o.x + o.s <= X0 || o.y + o.s <= Y0 || o.x >= X1 || o.y >= Y1) continue;
+    const x0 = Math.round((o.x - X0) * k), y0 = Math.round((o.y - Y0) * k);
+    ctx.fillStyle = `rgba(${o.c[0] | 0},${o.c[1] | 0},${o.c[2] | 0},${o.a})`;
+    ctx.fillRect(x0, y0, Math.round((o.x + o.s - X0) * k) - x0, Math.round((o.y + o.s - Y0) * k) - y0);
+  }
+}
+
+/* ============================================================
+   STATE + UI
+   ============================================================ */
+const SKIN_SW = ['#fbe0c8', '#f6cfa9', '#e7b48a', '#c98b5e', '#9c6644', '#6b4330'];
+const EYE_SW = ['#1e1726', '#3b5bb5', '#3f8f50', '#7a4a2a', '#a03a3a'];
+const HAIR_SW = ['#1f1a1c', '#4a3022', '#8a5a32', '#d9a441', '#f1e3b3', '#c0472f', '#e8e8ee', '#6b5ac9', '#3f8f74', '#e070a8'];
+const CLOTH_SW = ['#d24a43', '#e58a3a', '#f2c14e', '#5aa65a', '#3f8f74', '#3f6db3', '#5b3fa0', '#c2456b', '#ecebe4', '#4c505c', '#2b2630', '#8a5a32'];
+const CATS = [
+  { key: 'body', label: 'Cơ thể' }, { key: 'hair', label: 'Tóc' }, { key: 'shirt', label: 'Áo' },
+  { key: 'pants', label: 'Quần' }, { key: 'shoes', label: 'Giày' }, { key: 'glasses', label: 'Kính' }, { key: 'hat', label: 'Mũ' },
+  { key: 'weapon', label: 'Vũ khí' },
+];
+const THUMB = { hair: [12, 1, 21], hat: [12, 0, 21], glasses: [15, 9, 14], shirt: [12, 17, 21], pants: [12, 21, 21], shoes: [15, 28, 14], weapon: [12, 8, 28] };
+function paintThumb(cv, g, k) {
+  const [sx, sy, sz] = THUMB[k], sc = Math.floor(84 / sz), off = (84 - sz * sc) / 2, ctx = cv.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 84, 84); ctx.translate(off, off);
+  paint(ctx, g, sc, sx, sy, sz, sz);
+}
+
+const sel = (k, id) => { const o = findItem(k, id); return { id, color: o.color || '#888888', accent: o.accent || o.color || '#888888' }; };
+const coreCfg = () => ({
+  skin: '#f4c4a3', eyes: '#3a1a0c', tank: '#ecebe4', shorts: '#3f6db3', black: true,
+  hair: { id: 'none', color: '#4a3022', accent: '#e0507a' },
+  shirt: sel('shirt', 'none'), pants: sel('pants', 'none'), shoes: sel('shoes', 'none'),
+  glasses: sel('glasses', 'none'), hat: sel('hat', 'none'), weapon: sel('weapon', 'none'), fx: 'none', wres: 3,
+});
+const presetCfg = () => ({
+  ...coreCfg(),
+  hair: { id: 'short', color: '#47352e', accent: '#e0507a' },
+  shirt: sel('shirt', 'armor'), pants: sel('pants', 'armor'),
+  shoes: sel('shoes', 'armor'), weapon: sel('weapon', 'sword'),
+});
+
+let cfg = presetCfg(), tab = 'hair';
+try { const s = JSON.parse(localStorage.getItem('pixelforge.ref.v1')); if (s && s.hair) cfg = { ...cfg, ...s }; } catch (e) {}
+const save = () => { try { localStorage.setItem('pixelforge.ref.v1', JSON.stringify(cfg)); } catch (e) {} };
+
+const view = document.getElementById('view');
+view.width = W * S; view.height = H * S;
+const vctx = view.getContext('2d');
+let anim = { bob: 0, blink: false };
+
+function renderView(st = anim) {
+  const g = compose(cfg, st);
+  paint(vctx, g, S);
+  const sh = st.pose && st.pose.shake;   // rung màn hình khi đòn nặng trúng đích
+  view.style.transform = sh ? `translate(${(Math.random() - .5) * sh * .9}%, ${(Math.random() - .5) * sh * .6}%)` : '';
+  if (document.getElementById('grid').checked) {
+    vctx.strokeStyle = 'rgba(255,255,255,.07)'; vctx.lineWidth = 1; vctx.beginPath();
+    for (let x = 1; x < W; x++) { vctx.moveTo(x * S + .5, 0); vctx.lineTo(x * S + .5, H * S); }
+    for (let y = 1; y < H; y++) { vctx.moveTo(0, y * S + .5); vctx.lineTo(W * S, y * S + .5); }
+    vctx.stroke();
+  }
+}
+function renderSummary() {
+  const label = { hair: 'Tóc', shirt: 'Áo', pants: 'Quần', shoes: 'Giày', glasses: 'Kính', hat: 'Mũ', weapon: 'Vũ khí' };
+  document.getElementById('summary').innerHTML = OPT_CATS
+    .map(k => `${label[k]}: <b>${findItem(k, cfg[k].id).name}</b>`).join(' · ') + ` · Hiệu ứng: <b>${FX[cfg.fx || 'none'].name}</b>`;
+}
+function refresh() { renderView(); renderSummary(); save(); }
+
+/* ---------- panel ---------- */
+const tabsEl = document.getElementById('tabs'), bodyEl = document.getElementById('tabBody');
+function renderTabs() {
+  tabsEl.innerHTML = CATS.map(c => `<button class="tab ${c.key === tab ? 'on' : ''}" data-k="${c.key}">${c.label}</button>`).join('');
+}
+tabsEl.addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; tab = b.dataset.k; renderTabs(); renderPanel(); });
+
+function colorRow(label, value, swatches, onChange) {
+  const row = document.createElement('div'); row.className = 'crow';
+  row.innerHTML = `<label>${label}</label><input type="color" value="${value}">` +
+    swatches.map(c => `<button class="sw" style="background:${c}" data-c="${c}" title="${c}"></button>`).join('');
+  const inp = row.querySelector('input');
+  inp.addEventListener('input', () => onChange(inp.value));
+  row.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => { inp.value = b.dataset.c; onChange(b.dataset.c); }));
+  return row;
+}
+function title(t) { const d = document.createElement('div'); d.className = 'section-title'; d.textContent = t; return d; }
+
+function renderPanel() {
+  bodyEl.innerHTML = '';
+  if (tab === 'body') {
+    bodyEl.append(title('Core'));
+    bodyEl.append(colorRow('Màu da', cfg.skin, SKIN_SW, v => { cfg.skin = v; refresh(); }));
+    bodyEl.append(colorRow('Màu mắt', cfg.eyes, EYE_SW, v => { cfg.eyes = v; refresh(); }));
+    bodyEl.append(colorRow('Áo ba lỗ', cfg.tank, CLOTH_SW, v => { cfg.tank = v; refresh(); }));
+    bodyEl.append(colorRow('Quần đùi', cfg.shorts, CLOTH_SW, v => { cfg.shorts = v; refresh(); }));
+    const p = document.createElement('p'); p.className = 'hint';
+    p.textContent = 'Áo ba lỗ và quần đùi là lớp core — tự hiện khi chọn “Ba lỗ” ở tab Áo và “Quần đùi” ở tab Quần.';
+    bodyEl.append(p);
+    return;
+  }
+  const k = tab, cur = findItem(k, cfg[k].id);
+  bodyEl.append(title('Mẫu'));
+  const grid = document.createElement('div'); grid.className = 'opts';
+  ITEMS[k].forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'opt' + (o.id === cfg[k].id ? ' sel' : '');
+    const cv = document.createElement('canvas'); cv.width = cv.height = 84;
+    b.append(cv); const sp = document.createElement('span'); sp.textContent = o.name; b.append(sp);
+    const keepColor = k === 'hair' || o.id === cfg[k].id;
+    const t = { ...cfg, [k]: keepColor ? { ...cfg[k], id: o.id } : sel(k, o.id) };
+    paintThumb(cv, compose(t), k);
+    b.addEventListener('click', () => {
+      cfg[k] = k === 'hair' ? { ...cfg.hair, id: o.id } : sel(k, o.id);
+      refresh(); renderPanel();
+    });
+    grid.append(b);
+  });
+  bodyEl.append(grid);
+  if (k === 'weapon') weaponExtras();
+  if (!cur.parts && !cur.shape) return;
+  bodyEl.append(title('Màu'));
+  const sw = k === 'hair' ? HAIR_SW : CLOTH_SW;
+  const thumbs = () => { refresh(); refreshThumbs(); };
+  bodyEl.append(colorRow('Màu chính', cfg[k].color, sw, v => { cfg[k].color = v; thumbs(); }));
+  if (usesAccent(cur)) bodyEl.append(colorRow('Màu phụ', cfg[k].accent, CLOTH_SW, v => { cfg[k].accent = v; thumbs(); }));
+}
+function weaponExtras() {
+  bodyEl.append(title('Hiệu ứng nguyên tố'));
+  const box = document.createElement('div'); box.className = 'chips';
+  Object.entries(FX).forEach(([id, f]) => {
+    const b = document.createElement('button'); b.className = 'chip' + ((cfg.fx || 'none') === id ? ' sel' : '');
+    b.innerHTML = `<i style="background:radial-gradient(circle at 35% 35%, ${f.c[0]}, ${f.c[1]} 55%, ${f.c[2]})"></i>${f.name}`;
+    b.onclick = () => { cfg.fx = id; refresh(); renderPanel(); startAttack(); };
+    box.append(b);
+  });
+  bodyEl.append(box);
+  const p = document.createElement('p'); p.className = 'hint';
+  const w = findItem('weapon', cfg.weapon.id);
+  const desc = { slash: 'chém vòng cung', heavy: 'chém nặng + chấn động', stab: 'đâm nhanh hai nhát', thrust: 'đâm thẳng',
+    smash: 'bổ xuống + sóng chấn động', cast: 'vòng phép + cột năng lượng', shoot: 'giương cung bắn tên' };
+  p.textContent = w.anim ? `Đòn đánh: ${desc[w.anim]}. Bấm “Tấn công” hoặc phím Space để xem.` : 'Chọn một vũ khí để có đòn đánh.';
+  bodyEl.append(p);
+}
+function refreshThumbs() {
+  const k = tab; if (k === 'body') return;
+  bodyEl.querySelectorAll('.opt').forEach((b, i) => {
+    const o = ITEMS[k][i], keep = k === 'hair' || o.id === cfg[k].id;
+    paintThumb(b.querySelector('canvas'), compose({ ...cfg, [k]: keep ? { ...cfg[k], id: o.id } : sel(k, o.id) }), k);
+  });
+}
+
+/* ---------- actions ---------- */
+const pick = a => a[Math.floor(Math.random() * a.length)];
+document.getElementById('rnd').onclick = () => {
+  const c = coreCfg(); c.skin = pick(SKIN_SW); c.eyes = pick(EYE_SW); c.black = cfg.black;
+  c.hair = { id: pick(ITEMS.hair).id, color: pick(HAIR_SW), accent: pick(CLOTH_SW) };
+  for (const k of ['shirt', 'pants', 'shoes', 'glasses', 'hat']) {
+    const pool = ITEMS[k].slice(1), none = { glasses: .55, hat: .4, shoes: .1 }[k] || .12;
+    const o = Math.random() < none ? ITEMS[k][0] : pick(pool);
+    c[k] = { id: o.id, color: Math.random() < .5 && o.color ? o.color : pick(CLOTH_SW), accent: o.accent ? (Math.random() < .5 ? o.accent : pick(CLOTH_SW)) : undefined };
+    if (!o.accent) c[k].accent = c[k].color;
+  }
+  c.tank = pick(CLOTH_SW); c.shorts = pick(CLOTH_SW);
+  c.weapon = Math.random() < .2 ? sel('weapon', 'none') : sel('weapon', pick(ITEMS.weapon.slice(1)).id);
+  c.fx = pick(Object.keys(FX));
+  c.wres = cfg.wres; cfg = c; refresh(); renderPanel();
+};
+document.getElementById('core').onclick = () => { const { black, wres } = cfg; cfg = { ...coreCfg(), black, wres }; refresh(); renderPanel(); };
+document.getElementById('preset').onclick = () => { const { black, wres } = cfg; cfg = { ...presetCfg(), black, wres }; refresh(); renderPanel(); };
+document.getElementById('png').onclick = () => {
+  const c = document.createElement('canvas'), sc = 30; c.width = W * sc; c.height = H * sc;   // 30 điểm ảnh / pixel nhân vật
+  paint(c.getContext('2d'), compose(cfg), sc);
+  const a = document.createElement('a'); a.download = 'nhan-vat-pixel.png'; a.href = c.toDataURL('image/png'); a.click();
+};
+const blackEl = document.getElementById('black');
+blackEl.checked = !!cfg.black;
+blackEl.onchange = () => { cfg.black = blackEl.checked; refresh(); refreshThumbs(); };
+document.getElementById('grid').onchange = renderView;
+document.querySelectorAll('.bgchip').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.bgchip').forEach(x => x.classList.toggle('on', x === b));
+  document.getElementById('stage').className = 'stage ' + b.dataset.bg;
+});
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input')) return;
+  if (e.key === 'r') document.getElementById('rnd').click();
+  if (e.code === 'Space') { e.preventDefault(); startAttack(); }
+});
+
+/* ---------- idle animation: thở + chớp mắt ---------- */
+const animEl = document.getElementById('anim');
+let attack = null, nextAuto = 0;
+function startAttack() {
+  if (attack) return;
+  if (!findItem('weapon', cfg.weapon.id).anim) { cfg.weapon = sel('weapon', 'sword'); refresh(); if (tab === 'weapon') renderPanel(); }
+  const w = findItem('weapon', cfg.weapon.id);
+  attack = { start: performance.now(), frames: ANIMS[w.anim], seed: Math.random() * 1e9 | 0 };
+}
+document.getElementById('atk').onclick = startAttack;
+const loopEl = document.getElementById('loopAtk');
+function loop(t) {
+  if (attack) {                              // phát chuỗi khung đòn đánh
+    const el = t - attack.start; let acc = 0, fi = -1;
+    for (let i = 0; i < attack.frames.length; i++) { if (el < acc + attack.frames[i].d) { fi = i; break; } acc += attack.frames[i].d; }
+    if (fi < 0) { attack = null; nextAuto = t + 650; renderView(anim); }
+    else {
+      const f = attack.frames[fi];
+      renderView({ pose: f, frames: attack.frames, fi, p: (el - acc) / f.d, t: el, seed: attack.seed });
+    }
+    requestAnimationFrame(loop); return;
+  }
+  if (loopEl.checked && t > nextAuto && findItem('weapon', cfg.weapon.id).anim) { startAttack(); requestAnimationFrame(loop); return; }
+  const on = animEl.checked;
+  const next = { bob: on ? Math.floor(t / 520) % 2 : 0, blink: on && (t % 3400) < 140, t };
+  const glow = cfg.fx && cfg.fx !== 'none' && findItem('weapon', cfg.weapon.id).shape;  // hào quang nhấp nháy
+  if (next.bob !== anim.bob || next.blink !== anim.blink || (glow && t - (anim.t || 0) > 90)) { anim = next; renderView(); }
+  requestAnimationFrame(loop);
+}
+
+renderTabs(); renderPanel(); refresh(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

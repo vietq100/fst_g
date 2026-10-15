@@ -119,7 +119,7 @@ func test_equip_best() -> void:
 func test_crafting_requirements_and_costs() -> void:
 	assert_eq(_crafting.get_recipes(&"blacksmith").size(), 26, "7 weapons / tops + 19 helmets, pants, boots, jewelry, charms (D59)")
 	assert_eq(_crafting.get_recipes(&"trading_post").size(), 9, "5 skins + 4 pets (D59)")
-	assert_eq(_crafting.get_recipes().size(), 39, "26 Blacksmith, 9 Trading Post, 2 Tavern food, 2 Hospital medicine")
+	assert_eq(_crafting.get_recipes().size(), 40, "26 Blacksmith, 9 Trading Post, 3 Tavern food, 2 Hospital medicine")
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 50 gold")
 	_wallet.add(500)
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 5 Iron Ore")

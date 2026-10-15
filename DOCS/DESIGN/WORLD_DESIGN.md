@@ -57,3 +57,31 @@ Pale stone, broken columns, magical remnants.
 - Every region and gate is a raised plateau with cliff faces and a grass lip; the void around them is a dark teal.
 - Town: cobbled plaza around the Town Hall, dirt roads with kerbs (one to each gate plus a "main street" west and north), flowers and grass tufts, a pond in the north corner (blocks building and walking: `WorldService.get_town_pond`), a wooden fence and a tree line along the two back edges.
 - Dark Forest: mossy patches and leaf litter; Goblin Cave: cracked rock; Ancient Ruins: pale paving with moss. Layout, gates and navigation are unchanged.
+
+## Pixel-art ground (2026-10-15)
+
+Each region's ground is a baked texture (`assets/ground/<region id>.png`, 1 texel = 1 world px (matches the Hunters' sprites)) painted by `GroundPainter` and drawn by `WorldGround` under the objects; regions without a matching texture fall back to flat tiles. One look per theme: Dark Forest — dark mud patches with dithered rims, moss, pebbles, branches and spiky leaf bushes; Goblin Cave — flagstones split by dark cracks with glowing lava veins; Ancient Ruins — pale paving with joints, cracks, broken slabs and moss; Town — grass patches with tufts, flowers and dirt; boss arena — obsidian slabs with violet veins; gate — pebbled path. Re-bake after changing a region's shape or the painter: `godot --headless --path . --script tools/bake_ground.gd`, then `--import`.
+
+## Map polish (2026-10-15)
+
+- **Water** is one baked image (`WaterPainter` → `assets/ground/water.png`): turquoise lagoon at the shore, shallow and deep bands towards the open sea, caustic streaks, foam at the cliff foot, lily pads, reeds, rocks and wave crests; the clear colour matches the deep water. Re-bake with the ground (`tools/bake_ground.gd`).
+- **Region rims**: every ground texture gets a dark outline and a dithered shade on its outermost texels so each plateau reads as a solid piece. The cave is warmer with fewer lava veins.
+- **Town decor** (`TownDecor`): lamp posts at the plaza corners, a fountain, well, statue, benches, flower beds, barrels, hay, signpost. No collision; hidden while a building stands on or next to them.
+- **Vignette** (`Vignette`): soft dark corners over the map, under the HUD.
+- **Shores**: ground textures reach `GroundPainter.PAD` px past the tiles with a noise-shaped, ragged outline (lips of grass / rock over the water) instead of straight diamond edges; the cliff faces are 40 px deep (`CLIFF_DEPTH`).
+
+## Three larger, free-form hunting maps (2026-10-16)
+
+Only the Town stays a 36×36 square. Dark Forest, Goblin Cave and Ancient Ruins are 64×64-tile areas (about 3× the old ground each) with their own outline (`RegionDefinition.Shape`, `WorldService._build_free_shape`):
+- **Dark Forest** (WINDING): four overlapping glades along an S-shaped path, west/south-west of the Town.
+- **Goblin Cave** (LOBED): a radial blob whose reach changes with the angle: peninsulas and bays.
+- **Ancient Ruins** (CROSS): a plus-shaped plaza with a court at each corner, east of the Town; the boss arena sits north of it.
+Every gate and dungeon entrance gets a 5-tile corridor to the region's centre (and the centre a disc) so bridges and ledges always connect; tiles not connected to the centre are dropped. Outline merging keeps pieces that only join in later rows. Dungeon entrances moved to the new outer edges; population caps raised to 30–32; the camera can zoom out to 0.14. Re-bake after changing a region (`tools/bake_ground.gd`, then `--import`).
+
+## Bigger maps, close together (2026-10-16)
+
+- The three hunting regions are 80×80 tiles. Neighbours stay **2 tiles apart (a narrow water channel)** and face each other with **straight, square coasts**: the side that looks at a neighbour is a band of ground `BORDER_BAND` (16) tiles deep along the whole shared border; only the outer coast is free-form (ragged) and the Town stays square.
+- A long shared border gets **several bridges** across the channel: one per `BRIDGE_SPACING` (24) tiles of overlap, 1 to 3 (`WorldService._gates_between`). Town borders have one each, the 80-tile borders three.
+- Ground textures are 1 texel = 2 world px and the water 4 (about 26 MB of textures in total). Dungeon entrances sit on the new outer edges.
+- **Tidier map (2026-10-16)**: free shapes get gentler edge noise, a majority filter that removes single-tile spurs and nicks, and filled inner pockets (no lakes inside a region); the ragged lip over the water is 6 px (was 12); the water has far fewer rocks, wave marks, lily pads, reeds and blotches, and a cleaner foam line; the forest has fewer props.
+- **Mountains on the upper-left (2026-10-16)**: `MountainRange` fills the water behind the Town's west coast and the forest's north and west coasts (tiles left of column `NORTH_LIMIT`) with a band of rock blocks up to 9 tiles wide: foothills with pines at the shore, rising to snow-capped peaks (height from noise). Scenery only (no collision, only water tiles, never over land); the Hunter Gate island is left clear. Drawn once, back to front, between the ground and the entities.
