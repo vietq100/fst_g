@@ -9,6 +9,8 @@ extends Node
 const HEAL_BELOW := 0.7
 ## Effect applied to bosses instead of hard crowd control (D69).
 const STAGGER := &"stagger"
+## Most allies glowing from one support skill (D77).
+const MAX_AURAS := 4
 
 var _hunter: Hunter
 var _service: ClassSkillService
@@ -112,6 +114,12 @@ func try_cast(skill: ClassSkillDefinition, level: int) -> bool:
 	if skill.targets_enemies():
 		_hunter.face_towards(enemies[0].global_position)
 		_hunter.visual.play_attack_lunge(enemies[0].global_position - _hunter.global_position)
+	var element := ForgeLook.element_for_skill(skill)
+	var look := _hunter.visual as ChibiVisual
+	if look != null:
+		# Attack effects in the skill's element (D73 / Q5).
+		look.play_skill(element, skill.targets_enemies())
+	_play_effects(skill, element, enemies, allies)
 	_casting = skill
 	for enemy in enemies:
 		_hit(skill, power, enemy)
@@ -122,6 +130,30 @@ func try_cast(skill: ClassSkillDefinition, level: int) -> bool:
 		for enemy in _enemies_within(_hunter.global_position, skill.radius):
 			enemy.combat.force_target(_hunter)
 	return true
+
+
+## Pixel effects of a cast skill in its element (D77): a shock wave where an area skill lands (around the
+## caster or its target, and around a taunting caster), a burst on a single target (a spell column when the
+## skill only debuffs it), and an aura on everyone a heal, shield or buff helps (at most MAX_AURAS).
+func _play_effects(skill: ClassSkillDefinition, element: String, enemies: Array[Actor], allies: Array[Actor]) -> void:
+	var world := _hunter.get_parent()
+	if world == null:
+		return
+	match skill.target:
+		ClassSkillDefinition.Target.ENEMIES_AROUND_SELF:
+			SkillEffect.play(world, _hunter.global_position, SkillEffect.Kind.SLAM, element)
+		ClassSkillDefinition.Target.ENEMIES_AROUND_TARGET:
+			if not enemies.is_empty():
+				SkillEffect.play(world, _hunter.combat.target.global_position, SkillEffect.Kind.SLAM, element)
+		ClassSkillDefinition.Target.ENEMY:
+			var kind := SkillEffect.Kind.STRIKE if skill.deals_damage() else SkillEffect.Kind.SPELL
+			for enemy in enemies:
+				SkillEffect.play(world, enemy.global_position, kind, element)
+	if skill.taunt and skill.target != ClassSkillDefinition.Target.ENEMIES_AROUND_SELF:
+		SkillEffect.play(world, _hunter.global_position, SkillEffect.Kind.SLAM, element)
+	for ally in allies.slice(0, MAX_AURAS):
+		# On the ally, so the glow follows it.
+		SkillEffect.play(ally, ally.global_position, SkillEffect.Kind.AURA, element)
 
 
 func _hit(skill: ClassSkillDefinition, power: float, enemy: Actor) -> void:

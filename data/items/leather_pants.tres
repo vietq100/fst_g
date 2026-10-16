@@ -20,3 +20,4 @@ sell_price = 5
 equipment_slot = 5
 modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0")])
 tint = Color(0.45, 0.3, 0.2, 1)
+look_id = &"cargo"

@@ -25,3 +25,4 @@ sell_price = 150
 equipment_slot = 1
 modifiers = Array[ExtResource("2_mod")]([SubResource("M0"), SubResource("M1")])
 tint = Color(0.55, 0.3, 0.8, 1)
+look_id = &"sword_shadow"

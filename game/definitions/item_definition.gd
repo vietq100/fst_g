@@ -19,11 +19,14 @@ enum EquipmentSlot { NONE, WEAPON, ARMOR, ACCESSORY, HELMET, PANTS, BOOTS, NECKL
 @export var icon: Texture2D
 ## Colour of the item on placeholder characters (weapon blade / armor body).
 @export var tint: Color = Color.WHITE
-## Skin only: ChibiBody outfit pattern worn (warrior / ranger / rogue / guardian, D59); the cloth
-## takes `tint`. Empty or unknown = the wearer's class pattern.
+## Skin: class outfit pattern worn (warrior / ranger / rogue / guardian, D59); the cloth takes `tint`.
+## Skin or top: a Forge top (D73: tee, hoodie, armor, robe... or the aliases iron_plate, light_leather).
+## Empty or unknown = the wearer's class pattern.
 @export var outfit_id: StringName
-## Helmet: ChibiBody hat style (helm, cap, hood, wizard, crown). Pet: PetSprites kind (pup,
-## chick, slime, teddy, wisp). Empty = picked from words in the id.
+## Helmet: hat style (helm, cap, hood, wizard, crown, beanie, cowboy, viking, nonla). Pet: PetSprites kind
+## (pup, chick, slime, teddy, wisp). Top / pants / boots: Forge style (D73). Accessory: glasses_<round|square|
+## sun|goggle|patch>. Weapon: Forge weapon, optionally with an effect element suffix (sword_fire). Empty =
+## picked from words in the id.
 @export var look_id: StringName
 
 @export_group("Consumable")

@@ -29,6 +29,13 @@ static func find_item(category: String, id: String) -> Dictionary:
 	return list[0]
 
 
+static func has_item(category: String, id: String) -> bool:
+	for item: Dictionary in data()["items"][category]:
+		if item["id"] == id:
+			return true
+	return false
+
+
 static func item_ids(category: String) -> Array[String]:
 	var ids: Array[String] = []
 	for item: Dictionary in data()["items"][category]:

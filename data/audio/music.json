@@ -1,0 +1,106 @@
+{
+ "_doc": "Music loops (AUDIO_DESIGN.md, D78), rendered by SoundSynth. A track: bpm, kit (drum name -> sound layer), channels. A channel: wave, vol, duty, attack, decay (s, to the sustain level), sustain (0..1), release (s), lowpass, vibrato, and bars: one string of 16 steps (16th notes) per bar: a note (C4, F#3, Bb2) starts, '-' holds it, '.' rests. Drum channels (drums: true) use the kit's names instead of notes. Every channel has the same number of bars; the track loops seamlessly.",
+ "town": {"bpm": 84,
+  "kit": {
+   "k": {"wave": "sine", "dur": 0.14, "freq": 110, "freq_end": 45, "vol": 0.8, "curve": 1.5},
+   "h": {"wave": "noise", "dur": 0.03, "freq": 9000, "vol": 0.25, "lowpass": 9000, "seed": 3},
+   "s": {"wave": "noise", "dur": 0.1, "freq": 4000, "vol": 0.45, "lowpass": 5000, "seed": 4}
+  },
+  "channels": [
+   {"name": "bass", "wave": "triangle", "vol": 0.42, "attack": 0.01, "decay": 0.2, "sustain": 0.75, "release": 0.12, "bars": [
+    "C3 - - - - - - - G2 - - - - - - -", "A2 - - - - - - - E3 - - - - - - -",
+    "F2 - - - - - - - C3 - - - - - - -", "G2 - - - - - - - D3 - - - - - - -",
+    "C3 - - - - - - - G2 - - - - - - -", "A2 - - - - - - - E3 - - - - - - -",
+    "F2 - - - - - - - C3 - - - - - - -", "G2 - - - - - - - B2 - - - D3 - - -"]},
+   {"name": "arp", "wave": "square", "duty": 0.25, "vol": 0.12, "attack": 0.005, "decay": 0.12, "sustain": 0.4, "release": 0.08, "lowpass": 2500, "bars": [
+    "C4 . E4 . G4 . C5 . G4 . E4 . C4 . E4 .", "A3 . C4 . E4 . A4 . E4 . C4 . A3 . C4 .",
+    "F3 . A3 . C4 . F4 . C4 . A3 . F3 . A3 .", "G3 . B3 . D4 . G4 . D4 . B3 . G3 . B3 .",
+    "C4 . E4 . G4 . C5 . G4 . E4 . C4 . E4 .", "A3 . C4 . E4 . A4 . E4 . C4 . A3 . C4 .",
+    "F3 . A3 . C4 . F4 . C4 . A3 . F3 . A3 .", "G3 . B3 . D4 . G4 . D4 . B3 . G3 . B3 ."]},
+   {"name": "lead", "wave": "triangle", "vol": 0.26, "attack": 0.02, "decay": 0.3, "sustain": 0.65, "release": 0.22, "vibrato": [5, 0.15], "bars": [
+    "E5 - - - D5 - C5 - D5 - - - E5 - - -", "A4 - - - - - - - C5 - - - D5 - - -",
+    "C5 - - - A4 - - - G4 - A4 - C5 - - -", "D5 - - - - - - - . . . . . . . .",
+    "E5 - - - G5 - - - E5 - D5 - C5 - - -", "D5 - - - E5 - - - A4 - - - - - - -",
+    "C5 - - - D5 - - - E5 - - - G5 - - -", "D5 - - - - - - - - - - - . . . ."]},
+   {"name": "drums", "drums": true, "vol": 0.32, "bars": [
+    "k . h . . . h . k . h . . . h .", "k . h . . . h . k . h . . . h .",
+    "k . h . . . h . k . h . . . h .", "k . h . . . h . k . h . s . h .",
+    "k . h . . . h . k . h . . . h .", "k . h . . . h . k . h . . . h .",
+    "k . h . . . h . k . h . . . h .", "k . h . s . h . k . h . s . s ."]}
+  ]},
+ "night": {"bpm": 66,
+  "kit": {},
+  "channels": [
+   {"name": "pad_low", "wave": "triangle", "vol": 0.3, "attack": 0.4, "decay": 0.5, "sustain": 0.7, "release": 0.6, "bars": [
+    "A2 - - - - - - - - - - - - - - -", "E2 - - - - - - - - - - - - - - -",
+    "F2 - - - - - - - - - - - - - - -", "G2 - - - - - - - - - - - - - - -",
+    "A2 - - - - - - - - - - - - - - -", "E2 - - - - - - - - - - - - - - -",
+    "F2 - - - - - - - - - - - - - - -", "G2 - - - - - - - - - - - - - - -"]},
+   {"name": "pad_high", "wave": "triangle", "vol": 0.13, "attack": 0.5, "decay": 0.5, "sustain": 0.7, "release": 0.6, "lowpass": 1800, "bars": [
+    "C4 - - - - - - - E4 - - - - - - -", "B3 - - - - - - - G3 - - - - - - -",
+    "A3 - - - - - - - C4 - - - - - - -", "B3 - - - - - - - D4 - - - - - - -",
+    "C4 - - - - - - - E4 - - - - - - -", "B3 - - - - - - - G3 - - - - - - -",
+    "A3 - - - - - - - C4 - - - - - - -", "B3 - - - - - - - D4 - - - - - - -"]},
+   {"name": "bell", "wave": "sine", "vol": 0.24, "attack": 0.005, "decay": 0.9, "sustain": 0.0, "release": 0.3, "bars": [
+    "E5 . . . . . . . C5 . . . . . . .", "B4 . . . . . . . G4 . . . . . . .",
+    "A4 . . . . . . . C5 . . . . . . .", "D5 . . . . . . . B4 . . . . . . .",
+    "E5 . . . A5 . . . G5 . . . E5 . . .", "D5 . . . . . . . B4 . . . G4 . . .",
+    "C5 . . . . . . . A4 . . . . . . .", "B4 . . . . . . . . . . . . . . ."]}
+  ]},
+ "wild": {"bpm": 100,
+  "kit": {
+   "k": {"wave": "sine", "dur": 0.15, "freq": 100, "freq_end": 40, "vol": 0.85, "curve": 1.5},
+   "s": {"wave": "noise", "dur": 0.12, "freq": 3500, "vol": 0.5, "lowpass": 4500, "seed": 5},
+   "h": {"wave": "noise", "dur": 0.03, "freq": 9000, "vol": 0.2, "lowpass": 9000, "seed": 6}
+  },
+  "channels": [
+   {"name": "bass", "wave": "saw", "vol": 0.26, "attack": 0.005, "decay": 0.08, "sustain": 0.6, "release": 0.05, "lowpass": 700, "bars": [
+    "D2 . D2 . D2 . D2 . D2 . D2 . D2 . F2 .", "D2 . D2 . D2 . D2 . D2 . D2 . D2 . C2 .",
+    "Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . D2 .", "C2 . C2 . C2 . C2 . C2 . C2 . C2 . E2 .",
+    "D2 . D2 . D2 . D2 . D2 . D2 . D2 . F2 .", "D2 . D2 . D2 . D2 . D2 . D2 . D2 . C2 .",
+    "Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . Bb1 . D2 .", "A1 . A1 . A1 . A1 . A1 . A1 . C#2 . E2 ."]},
+   {"name": "ostinato", "wave": "square", "duty": 0.5, "vol": 0.09, "attack": 0.003, "decay": 0.08, "sustain": 0.3, "release": 0.04, "lowpass": 1800, "bars": [
+    "D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4", "D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4",
+    "Bb3 D4 F4 D4 Bb3 D4 F4 D4 Bb3 D4 F4 D4 Bb3 D4 F4 D4", "C4 E4 G4 E4 C4 E4 G4 E4 C4 E4 G4 E4 C4 E4 G4 E4",
+    "D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4", "D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4 D4 F4 A4 F4",
+    "Bb3 D4 F4 D4 Bb3 D4 F4 D4 Bb3 D4 F4 D4 Bb3 D4 F4 D4", "A3 C#4 E4 C#4 A3 C#4 E4 C#4 A3 C#4 E4 C#4 A3 C#4 E4 C#4"]},
+   {"name": "lead", "wave": "triangle", "vol": 0.22, "attack": 0.02, "decay": 0.3, "sustain": 0.6, "release": 0.2, "vibrato": [5.5, 0.2], "bars": [
+    ". . . . . . . . A4 - - - G4 - F4 -", "E4 - - - - - - - . . . . . . . .",
+    ". . . . . . . . F4 - - - G4 - A4 -", "G4 - - - - - - - . . . . . . . .",
+    ". . . . . . . . A4 - - - C5 - A4 -", "F4 - - - - - - - E4 - - - D4 - - -",
+    "D5 - - - C5 - Bb4 - A4 - - - G4 - - -", "A4 - - - - - - - . . . . . . . ."]},
+   {"name": "drums", "drums": true, "vol": 0.34, "bars": [
+    "k . h . s . h . k . k . s . h h", "k . h . s . h . k . k . s . h h",
+    "k . h . s . h . k . k . s . h h", "k . h . s . h . k . k . s . s s",
+    "k . h . s . h . k . k . s . h h", "k . h . s . h . k . k . s . h h",
+    "k . h . s . h . k . k . s . h h", "k . h . s . h . k . s . s s s s"]}
+  ]},
+ "boss": {"bpm": 140,
+  "kit": {
+   "k": {"wave": "sine", "dur": 0.13, "freq": 120, "freq_end": 40, "vol": 0.9, "curve": 1.4},
+   "s": {"wave": "noise", "dur": 0.12, "freq": 3000, "vol": 0.55, "lowpass": 5000, "seed": 7},
+   "h": {"wave": "noise", "dur": 0.025, "freq": 9000, "vol": 0.22, "lowpass": 9000, "seed": 8}
+  },
+  "channels": [
+   {"name": "bass", "wave": "saw", "vol": 0.28, "attack": 0.003, "decay": 0.06, "sustain": 0.55, "release": 0.03, "lowpass": 900, "bars": [
+    "E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2", "E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2 G2 G2 F#2 F#2",
+    "C2 C2 C3 C2 C2 C2 C3 C2 C2 C2 C3 C2 C2 C2 C3 C2", "D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2",
+    "E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2", "E2 E2 E3 E2 E2 E2 E3 E2 E2 E2 E3 E2 G2 G2 F#2 F#2",
+    "C2 C2 C3 C2 C2 C2 C3 C2 C2 C2 C3 C2 C2 C2 C3 C2", "B1 B1 B2 B1 B1 B1 B2 B1 B1 B1 B2 B1 D#2 D#2 F#2 F#2"]},
+   {"name": "stabs", "wave": "square", "duty": 0.25, "vol": 0.13, "attack": 0.003, "decay": 0.1, "sustain": 0.35, "release": 0.05, "lowpass": 3000, "bars": [
+    "E4 . . E4 . . E4 . . . E4 . G4 . F#4 .", "E4 . . E4 . . E4 . . . E4 . G4 . F#4 .",
+    "C4 . . C4 . . C4 . . . C4 . E4 . D4 .", "D4 . . D4 . . D4 . . . D4 . F#4 . E4 .",
+    "E4 . . E4 . . E4 . . . E4 . G4 . F#4 .", "E4 . . E4 . . E4 . . . E4 . G4 . F#4 .",
+    "C4 . . C4 . . C4 . . . C4 . E4 . D4 .", "B3 . . B3 . . B3 . . . B3 . D#4 . F#4 ."]},
+   {"name": "lead", "wave": "square", "duty": 0.5, "vol": 0.11, "attack": 0.01, "decay": 0.2, "sustain": 0.6, "release": 0.12, "lowpass": 2600, "vibrato": [6, 0.2], "bars": [
+    "B4 - - - - - - - G4 - - - A4 - B4 -", "E5 - - - - - - - D5 - - - B4 - - -",
+    "C5 - - - - - - - E5 - - - G5 - - -", "F#5 - - - - - - - D5 - - - A4 - - -",
+    "B4 - - - - - - - G4 - - - A4 - B4 -", "E5 - - - - - - - D5 - - - B4 - - -",
+    "C5 - E5 - G5 - E5 - C5 - - - E5 - - -", "D#5 - - - - - - - F#5 - - - B4 - - -"]},
+   {"name": "drums", "drums": true, "vol": 0.36, "bars": [
+    "k . h k s . h . k . h k s . h s", "k . h k s . h . k . h k s . h s",
+    "k . h k s . h . k . h k s . h s", "k . h k s . h . k . h k s s s s",
+    "k . h k s . h . k . h k s . h s", "k . h k s . h . k . h k s . h s",
+    "k . h k s . h . k . h k s . h s", "k k s k s s k s k k s k s s s s"]}
+  ]}
+}

@@ -117,9 +117,10 @@ func test_equip_best() -> void:
 
 
 func test_crafting_requirements_and_costs() -> void:
-	assert_eq(_crafting.get_recipes(&"blacksmith").size(), 26, "7 weapons / tops + 19 helmets, pants, boots, jewelry, charms (D59)")
+	assert_eq(_crafting.get_recipes(&"blacksmith").size(), 36,
+		"7 weapons / tops + 19 helmets, pants, boots, jewelry, charms (D59) + 10 Forge weapons, glasses, hats (D75)")
 	assert_eq(_crafting.get_recipes(&"trading_post").size(), 9, "5 skins + 4 pets (D59)")
-	assert_eq(_crafting.get_recipes().size(), 40, "26 Blacksmith, 9 Trading Post, 3 Tavern food, 2 Hospital medicine")
+	assert_eq(_crafting.get_recipes().size(), 50, "36 Blacksmith, 9 Trading Post, 3 Tavern food, 2 Hospital medicine")
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 50 gold")
 	_wallet.add(500)
 	assert_eq(_crafting.can_craft(&"iron_sword"), "Needs 5 Iron Ore")
@@ -176,13 +177,33 @@ func test_every_slot_equips_and_dresses_the_figure() -> void:
 	assert_eq(dress.pet, &"teddy")
 	assert_eq(dress.outfit, &"warrior", "Crimson Suit uses the warrior pattern")
 	assert_true(dress.skin and dress.has_cloth and dress.has_pants and dress.has_boots)
-	var figure := ChibiBody.get_figure(hunter.appearance, dress)
-	assert_true(figure.get_height() >= 30 and figure.get_width() <= ChibiBody.CANVAS.x, "whole body, cropped")
+	var figure := ForgeLook.figure(hunter.appearance, dress)
+	assert_true(figure.rect.size.y >= 30.0 and figure.rect.size.x <= 40.0, "whole body")
 	assert_not_null(PetSprites.texture(dress.pet, dress.pet_tint, 1))
 	var styles := {}
 	for item_id: StringName in [&"wizard_hat", &"shadow_hood", &"leather_cap", &"golden_crown", &"steel_helm"]:
 		styles[ChibiBody.hat_style_for(_registry.find_def(&"item", item_id) as ItemDefinition)] = true
 	assert_eq(styles.size(), 5, "five hat styles")
+	# Forge gear (D73, D75): the item's look shows on the sprite.
+	for pair: Array in [[&"straw_hat", &"nonla"], [&"cowboy_hat", &"cowboy"], [&"viking_helm", &"viking"]]:
+		assert_eq(ChibiBody.hat_style_for(_registry.find_def(&"item", pair[0]) as ItemDefinition), pair[1])
+	var looks := {&"iron_greaves": &"pants", &"swift_boots": &"boots", &"round_glasses": &"accessory", &"snow_robe": &"skin"}
+	for item_id: StringName in looks:
+		var item := _registry.find_def(&"item", item_id) as ItemDefinition
+		var gear := EquipmentService.dress_for(hunter, null, func(slot: StringName) -> ItemDefinition:
+			return item if slot == looks[item_id] else null)
+		match item_id:
+			&"iron_greaves":
+				assert_eq(gear.pants_style, &"armor")
+			&"swift_boots":
+				assert_eq(gear.boots_style, &"sneaker")
+			&"round_glasses":
+				assert_eq(gear.glasses, &"round")
+			&"snow_robe":
+				assert_eq(gear.top, &"robe")
+	assert_eq(ForgeLook.weapon_for(_registry.find_def(&"item", &"ember_staff") as ItemDefinition, &"warrior"), "staff")
+	assert_eq(ForgeLook.element_for(_registry.find_def(&"item", &"ember_staff") as ItemDefinition), "fire")
+	assert_eq(ForgeLook.element_for(_registry.find_def(&"item", &"shadow_blade") as ItemDefinition), "shadow")
 
 
 func test_weapon_durability_wears_breaks_and_repairs() -> void:

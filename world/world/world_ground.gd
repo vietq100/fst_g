@@ -6,6 +6,10 @@ extends Node2D
 ## planks cross the gaps; small rock ledges carry the dungeon entrances. The Town has a cobbled
 ## plaza, dirt roads with pebbles and kerbs, grass tufts, flowers, bushes and a pond; the hunting
 ## regions have their own ground patterns (moss and leaves, cracked rock, pale paving).
+## The root node draws nothing itself: it spreads the drawing over child nodes of the same script (D75),
+## the water, each region's cliffs, tiles and rims in horizontal strips (STRIP tile diagonals, back to
+## front), bridges and the pond, so the parts off screen are culled. One big drawing of everything was
+## re-rendered every frame (the lag of D74).
 
 const ROAD := Color("9c8566")
 const ROAD_EDGE := Color("6f5d45")
@@ -35,6 +39,8 @@ const FLOWERS: Array[Color] = [Color("f4f1ea"), Color("f2c94c"), Color("e8789a")
 const PARAPET := 0.18
 ## Tiny overlap between neighbouring tile diamonds so no hairline gaps show.
 const SEAM := 0.015
+## Tile diagonals (x + y) per strip: one screen band of STRIP × HALF_HEIGHT px.
+const STRIP := 8
 
 var world: WorldService
 ## Tiles drawn as road inside the Town.
@@ -48,6 +54,8 @@ var ledges: Array[Vector2i] = []
 var _ground_art: Dictionary = {}
 ## Baked water around the plateaus (WaterPainter): {texture, origin}, empty when missing or stale.
 var _water_art: Dictionary = {}
+## What this node draws: {kind, region, tiles}; empty on the root (which only holds the parts).
+var _part: Dictionary = {}
 
 
 func setup(world_service: WorldService, town_roads: Dictionary[Vector2i, bool], town_plaza: Dictionary[Vector2i, bool] = {},
@@ -58,7 +66,7 @@ func setup(world_service: WorldService, town_roads: Dictionary[Vector2i, bool], 
 	pond = town_pond
 	ledges = entrance_tiles
 	_load_ground_art()
-	queue_redraw()
+	_build_parts()
 
 
 ## Loads the baked textures whose size matches the region's current shape (else the region keeps
@@ -83,30 +91,103 @@ func _load_ground_art() -> void:
 		_ground_art[region.id] = {"texture": texture, "origin": box["origin"]}
 
 
-func _draw() -> void:
-	if world == null:
-		return
-	_draw_water()
+## Child nodes in drawing order (the old single drawing's order): water; every region's cliffs;
+## ledges; per region its baked art, tiles, rims and Town edges; bridges; pond.
+func _build_parts() -> void:
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
+	_add_part({"kind": "water"})
+	var strips := {}
+	for region in world.get_regions():
+		strips[region.id] = _strips(region)
 	# Cliffs first: bridges and ledges are drawn over their overlaps.
 	for region in world.get_regions():
-		_cliffs(region)
-	for tile in ledges:
-		_ledge(tile)
+		for strip: Array in strips[region.id]:
+			_add_part({"kind": "cliffs", "region": region, "tiles": strip})
+	if not ledges.is_empty():
+		_add_part({"kind": "ledges"})
 	for region in world.get_regions():
-		var ground := world.region_tiles(region.id)
-		var art: Dictionary = _ground_art.get(region.id, {})
-		if not art.is_empty():
+		var painted := _ground_art.has(region.id)
+		if painted:
+			_add_part({"kind": "art", "region": region})
+		# Baked hunting grounds draw nothing per tile.
+		if region.is_town or not painted:
+			for strip: Array in strips[region.id]:
+				_add_part({"kind": "tiles", "region": region, "tiles": strip})
+		for strip: Array in strips[region.id]:
+			_add_part({"kind": "rims", "region": region, "tiles": strip})
+		if region.is_town:
+			_add_part({"kind": "town_edges", "region": region})
+	_add_part({"kind": "bridges"})
+	if pond.size != Vector2i.ZERO:
+		_add_part({"kind": "pond"})
+
+
+## A region's tiles in strips of STRIP diagonals, back to front (sorted by x + y inside each strip).
+func _strips(region: RegionDefinition) -> Array:
+	var bands := {}
+	for tile: Vector2i in world.region_tile_list(region.id):
+		var band := floori(float(tile.x + tile.y) / STRIP)
+		if not bands.has(band):
+			bands[band] = []
+		(bands[band] as Array).append(tile)
+	var keys := bands.keys()
+	keys.sort()
+	var strips: Array = []
+	for band: int in keys:
+		var tiles: Array = bands[band]
+		tiles.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y < b.x + b.y)
+		strips.append(tiles)
+	return strips
+
+
+func _add_part(part: Dictionary) -> void:
+	var node := Node2D.new()
+	node.set_script(get_script())
+	node.world = world
+	node.road_tiles = road_tiles
+	node.plaza_tiles = plaza_tiles
+	node.pond = pond
+	node.ledges = ledges
+	node._ground_art = _ground_art
+	node._water_art = _water_art
+	node._part = part
+	node.name = "%s%d" % [String(part["kind"]).capitalize().replace(" ", ""), get_child_count()]
+	add_child(node)
+
+
+func _draw() -> void:
+	if world == null or _part.is_empty():
+		return
+	var region: RegionDefinition = _part.get("region")
+	var tiles: Array = _part.get("tiles", [])
+	match _part["kind"]:
+		"water":
+			_draw_water()
+		"cliffs":
+			_cliffs(region, tiles)
+		"ledges":
+			for tile in ledges:
+				_ledge(tile)
+		"art":
+			var art: Dictionary = _ground_art[region.id]
 			var texture: Texture2D = art["texture"]
 			draw_texture_rect(texture, Rect2(art["origin"], texture.get_size() * GroundPainter.SCALE), false)
-		for tile: Vector2i in world.region_tile_list(region.id):
-			_ground_tile(region, ground, tile, not art.is_empty())
-		_rims(region, ground)
-		if region.is_town:
-			_town_edges(region, ground)
-	for gate in world.get_gates():
-		_bridge(gate)
-	if pond.size != Vector2i.ZERO:
-		_draw_pond()
+		"tiles":
+			var ground := world.region_tiles(region.id)
+			var painted := _ground_art.has(region.id)
+			for tile: Vector2i in tiles:
+				_ground_tile(region, ground, tile, painted)
+		"rims":
+			_rims(region, tiles)
+		"town_edges":
+			_town_edges(region, world.region_tiles(region.id))
+		"bridges":
+			for gate in world.get_gates():
+				_bridge(gate)
+		"pond":
+			_draw_pond()
 
 
 # --- Water, cliffs, bridges ------------------------------------------------------------------------
@@ -134,10 +215,8 @@ func _draw_water() -> void:
 ## neighbour is water, its south-east edge when the +x neighbour is): earth with strata and
 ## hanging grass, or (Town) a stone retaining wall. Foam where they meet the water. Drawn back to
 ## front so nearer faces cover farther ones.
-func _cliffs(region: RegionDefinition) -> void:
-	var ground := world.region_tiles(region.id)
-	var tiles: Array = world.region_tile_list(region.id).duplicate()
-	tiles.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y < b.x + b.y)
+## `tiles`: one strip of the region, sorted back to front.
+func _cliffs(region: RegionDefinition, tiles: Array) -> void:
 	for tile: Vector2i in tiles:
 		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
 		# Land of any region next door (only across a bridge) would be level: no cliff there.
@@ -169,8 +248,8 @@ func _cliff_face(a: Vector2, b: Vector2, shaded: bool, stone: bool) -> void:
 
 ## Dark line along every boundary edge of the shape, and a lit rim along the back edges of the
 ## hunting regions.
-func _rims(region: RegionDefinition, ground: Dictionary) -> void:
-	for tile: Vector2i in world.region_tile_list(region.id):
+func _rims(region: RegionDefinition, tiles: Array) -> void:
+	for tile: Vector2i in tiles:
 		var corners := WorldService.rect_polygon(Rect2i(tile, Vector2i.ONE))
 		var steps := [[Vector2i(0, -1), 0, 1], [Vector2i(1, 0), 1, 2], [Vector2i(0, 1), 2, 3], [Vector2i(-1, 0), 3, 0]]
 		for step: Array in steps:

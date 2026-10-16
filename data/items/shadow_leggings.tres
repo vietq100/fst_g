@@ -25,3 +25,4 @@ sell_price = 140
 equipment_slot = 5
 modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0"), SubResource("StatModifier_1")])
 tint = Color(0.25, 0.2, 0.34, 1)
+look_id = &"jeans"

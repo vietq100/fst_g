@@ -61,6 +61,8 @@ Order:
 - left
 - right
 
+Implemented (D73): Hunters are two-direction sprites (Pixel Hero Forge, 3/4 view facing left; right is the mirror; up and down keep the last side). Facing up shows the rear view (D76: generated in the Forge tool from the same parts: hair over the head, no face, weapon behind).
+
 ## 5. Warrior visual design
 
 Silhouette:
@@ -126,6 +128,8 @@ Portrait size can be larger, but:
 
 Implemented (D47): the portrait is a 40×40 crop around the face of the 2x composed sprite, drawn at an integer scale.
 
+Implemented (D73): the portrait is the `ForgeLook.PORTRAIT` crop (27×29 px: hair, face, shoulders) of the standing Forge figure, drawn layer by layer at an integer scale (`HunterPortrait`).
+
 ## 10. Equipment visibility
 
 Where practical, equipment changes should be visually noticeable.
@@ -133,6 +137,11 @@ Where practical, equipment changes should be visually noticeable.
 MVP can use equipment icons instead of dynamic sprite composition.
 
 Implemented (D47): Hunters are composed from two reference bodies (male, female; 3/4 view facing right). The equipped armor picks one of 30 outfits (5 armor classes × 6: cloth, leather, chain, plate, robe); the Hunter's dye colour recolours the cloth parts. The weapon is still a tinted line. Visual reference: `DESIGN/character_wardrobe_preview.html`.
+
+Implemented (D73, PHASE_13): the Forge body (`actors/hunter/forge/`). `ForgeLook` maps the look and dress:
+- class outfit: warrior armor (top, pants, shoes); ranger green jacket, cargo, boots; rogue dark hoodie, dark jeans, leather shoes; guardian knight top, armor pants and shoes; no class: tank top, shorts in the dye colour.
+- gear: tint recolours the top / pants / shoes / hat; a top or skin `outfit_id` / `look_id` may name a Forge top (aliases `iron_plate` → armor, `light_leather` → leather); pants / boots `look_id` name a Forge style; hats: cap, wizard, crown, beanie, cowboy, viking, nonla, plus `helm` (viking without horns) and `hood` (beanie for now); glasses from an accessory `look_id = glasses_<round|square|sun|goggle|patch>`.
+- weapons: the item's `look_id` (sword, great, katana, dagger, axe, hammer, spear, staff, bow; optional element suffix `_fire`, `_ice`, `_thunder`, `_poison`, `_shadow`), else words in its id, else its WeaponSprites kind, else the class weapon (warrior sword, ranger bow, rogue dagger, guardian hammer). The weapon is drawn in the hand; ATTACK plays the weapon's Forge sequence.
 
 ## 11. Personality
 

@@ -45,6 +45,7 @@ var quests: QuestService
 var arena: ArenaService
 var weekly_boss: WeeklyBossService
 var class_skills: ClassSkillService
+var barber: BarberService
 
 
 func _ready() -> void:
@@ -95,6 +96,7 @@ func build(data_registry: Node) -> void:
 	quests = QuestService.new(registry, buildings, hunters, progress, wallet, inventory)
 	weekly_boss = WeeklyBossService.new(registry, world, hunters, wallet, inventory)
 	class_skills = ClassSkillService.new(registry, hunters, config, rng)
+	barber = BarberService.new(hunters, wallet, config)
 	recruitment.corpses = corpses
 	equipment.buildings = buildings
 	equipment.purses = purses
@@ -140,7 +142,8 @@ func _connect_services() -> void:
 	academy.skill_learned.connect(refresh_quests)
 	reincarnation.reincarnated.connect(refresh_quests)
 	reincarnation.difficulty_changed.connect(refresh_quests)
-	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests, class_skills]:
+	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests, class_skills,
+			barber]:
 		service.autosave_requested.connect(autosave_requested.emit)
 
 

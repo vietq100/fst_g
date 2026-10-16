@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
 [ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
@@ -17,8 +17,36 @@ quantity_min = 1
 quantity_max = 1
 chance = 0.35
 
+[sub_resource type="Resource" id="LootEntry_2"]
+script = ExtResource("2_entry")
+item_id = &"straw_hat"
+quantity_min = 1
+quantity_max = 1
+chance = 0.03
+
+[sub_resource type="Resource" id="LootEntry_3"]
+script = ExtResource("2_entry")
+item_id = &"eye_patch"
+quantity_min = 1
+quantity_max = 1
+chance = 0.02
+
+[sub_resource type="Resource" id="LootEntry_4"]
+script = ExtResource("2_entry")
+item_id = &"cowboy_hat"
+quantity_min = 1
+quantity_max = 1
+chance = 0.015
+
+[sub_resource type="Resource" id="LootEntry_5"]
+script = ExtResource("2_entry")
+item_id = &"battle_axe"
+quantity_min = 1
+quantity_max = 1
+chance = 0.015
+
 [resource]
 script = ExtResource("1_table")
 id = &"goblin"
 display_name = "loot.goblin.name"
-entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1")])
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1"), SubResource("LootEntry_2"), SubResource("LootEntry_3"), SubResource("LootEntry_4"), SubResource("LootEntry_5")])

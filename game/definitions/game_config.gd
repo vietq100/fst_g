@@ -191,6 +191,10 @@ extends Resource
 ## Bounty paid to the Hunter on top of the village price, as a share of the price.
 @export var bounty_ratio: float = 0.5
 
+@export_group("Barber")
+## Gold to change a Hunter's hair style and colour (D77).
+@export var restyle_cost: int = 100
+
 @export_group("Colosseum")
 ## Hunters below this level cannot enter (ARENA_SYSTEM.md says 10; lower so early games can try it).
 @export var colosseum_min_level: int = 5

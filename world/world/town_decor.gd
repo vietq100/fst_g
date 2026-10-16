@@ -14,17 +14,35 @@ const STONE_DARK := Color("6e6a60")
 const STONE_LIGHT := Color("c4c0b2")
 const IRON := Color("3a3d46")
 const FLOWERS: Array[Color] = [Color("f4f1ea"), Color("f2c94c"), Color("e8789a"), Color("a78bfa"), Color("ff7a5a")]
+## Lamp flicker and fountain water are redrawn at this rate, and only on screen (D75).
+const ANIMATION_FPS := 12.0
 
 var kind: Kind = Kind.LAMP
 var tile := Vector2i.ZERO
 ## Distinguishes copies of the same kind (flower colours, barrel layout).
 var variant := 0
 var _time := 0.0
+var _frame_time := 0.0
+
+
+func _ready() -> void:
+	if kind == Kind.LAMP:
+		# Lit at night (DayNight, D77).
+		add_to_group(DayNight.LIGHT_GROUP)
+		set_meta(&"light_radius", 34.0)
+		set_meta(&"light_offset", Vector2(0, -35))
 
 
 func _process(delta: float) -> void:
-	if kind == Kind.LAMP or kind == Kind.FOUNTAIN:
-		_time += delta
+	if kind != Kind.LAMP and kind != Kind.FOUNTAIN:
+		set_process(false)
+		return
+	_time += delta
+	_frame_time += delta
+	if _frame_time < 1.0 / ANIMATION_FPS:
+		return
+	_frame_time = fmod(_frame_time, 1.0 / ANIMATION_FPS)
+	if is_visible_in_tree() and get_viewport_rect().grow(64.0).has_point(get_global_transform_with_canvas().origin):
 		queue_redraw()
 
 

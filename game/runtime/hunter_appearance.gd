@@ -1,14 +1,15 @@
 class_name HunterAppearance
 extends RefCounted
 ## Look of one Hunter (CHARACTER_DESIGN.md §12, DECISIONS.md D47). Plain values only.
-## The chibi body (D49, D51) draws skin, dye, hair style and hair colour; gender is kept in saves
-## for a future body-type layer. The outfit is not stored here: the sprite follows the Hunter's
+## The Forge body (D73) draws skin, dye (shorts), hair style and hair colour (eyes follow it); gender is
+## kept in saves for a future body-type layer. The outfit is not stored here: the sprite follows the Hunter's
 ## base class (ChibiBody.outfit_for).
 
 const MALE := &"male"
 const FEMALE := &"female"
-## Catalog sizes (skins match ChibiBody.SKINS, dyes the accent palette).
-const HAIR_STYLE_COUNT := 10
+## Catalog sizes (skins match ChibiBody.SKINS, dyes the accent palette, hair styles ForgeLook.HAIR_IDS:
+## 0–9 the D51 styles, 10–17 added by the Forge, D73).
+const HAIR_STYLE_COUNT := 18
 const HAIR_COLOR_COUNT := 10
 const SKIN_COUNT := 4
 const DYE_COUNT := 8

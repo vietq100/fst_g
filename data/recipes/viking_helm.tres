@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/recipe_definition.gd" id="1_recipe"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amount"]
+
+[sub_resource type="Resource" id="ItemAmount_0"]
+script = ExtResource("2_amount")
+item_id = &"iron_ore"
+quantity = 6
+
+[sub_resource type="Resource" id="ItemAmount_1"]
+script = ExtResource("2_amount")
+item_id = &"bone_dust"
+quantity = 3
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"viking_helm"
+display_name = "recipe.viking_helm.name"
+result_item_id = &"viking_helm"
+gold_cost = 110
+material_costs = Array[ExtResource("2_amount")]([SubResource("ItemAmount_0"), SubResource("ItemAmount_1")])
+building_id = &"blacksmith"
+required_level = 2

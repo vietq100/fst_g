@@ -1,0 +1,112 @@
+{
+ "_doc": "Sound effects (AUDIO_DESIGN.md, D78), rendered by SoundSynth. A sound: volume_db, cooldown (s, minimum replay interval), layers. A layer: wave (square|triangle|saw|sine|noise), start, dur (s), freq [, freq_end] (Hz, exponential sweep; for noise the rate the random value changes), vol, attack (s), curve (decay power), duty (square), arp (semitones) + arp_rate (Hz), vibrato [rate Hz, depth semitones], lowpass (Hz), seed (noise).",
+ "click": {"volume_db": -12, "cooldown": 0.04, "layers": [
+  {"wave": "square", "dur": 0.035, "freq": 1800, "freq_end": 1200, "vol": 0.5, "duty": 0.5},
+  {"wave": "triangle", "dur": 0.03, "freq": 900, "vol": 0.4}
+ ]},
+ "error": {"volume_db": -10, "cooldown": 0.2, "layers": [
+  {"wave": "square", "dur": 0.08, "freq": 220, "vol": 0.5, "duty": 0.25, "lowpass": 2500},
+  {"wave": "square", "start": 0.09, "dur": 0.13, "freq": 165, "vol": 0.5, "duty": 0.25, "lowpass": 2500}
+ ]},
+ "hit": {"volume_db": -16, "cooldown": 0.05, "layers": [
+  {"wave": "noise", "dur": 0.07, "freq": 4000, "vol": 0.6, "lowpass": 3000, "seed": 11},
+  {"wave": "square", "dur": 0.06, "freq": 300, "freq_end": 120, "vol": 0.5, "lowpass": 1500}
+ ]},
+ "crit": {"volume_db": -11, "cooldown": 0.06, "layers": [
+  {"wave": "noise", "dur": 0.09, "freq": 5000, "vol": 0.6, "lowpass": 4000, "seed": 12},
+  {"wave": "square", "dur": 0.08, "freq": 320, "freq_end": 110, "vol": 0.5, "lowpass": 1500},
+  {"wave": "saw", "dur": 0.12, "freq": 1200, "freq_end": 400, "vol": 0.35, "lowpass": 3500}
+ ]},
+ "dodge": {"volume_db": -16, "cooldown": 0.08, "layers": [
+  {"wave": "noise", "dur": 0.13, "freq": 6000, "freq_end": 1500, "vol": 0.5, "attack": 0.03, "lowpass": 4000, "seed": 13}
+ ]},
+ "enemy_death": {"volume_db": -9, "cooldown": 0.08, "layers": [
+  {"wave": "square", "dur": 0.35, "freq": 400, "freq_end": 60, "vol": 0.45, "duty": 0.5, "lowpass": 2200},
+  {"wave": "noise", "dur": 0.25, "freq": 3000, "vol": 0.45, "lowpass": 1500, "seed": 14}
+ ]},
+ "hunter_fall": {"volume_db": -6, "cooldown": 0.3, "layers": [
+  {"wave": "triangle", "dur": 0.6, "freq": 330, "freq_end": 110, "vol": 0.6, "curve": 1.4},
+  {"wave": "sine", "dur": 0.6, "freq": 165, "freq_end": 82, "vol": 0.5, "curve": 1.4}
+ ]},
+ "loot": {"volume_db": -12, "cooldown": 0.06, "layers": [
+  {"wave": "square", "dur": 0.18, "freq": 880, "vol": 0.4, "duty": 0.25, "arp": [0, 5, 12], "arp_rate": 25, "curve": 1.2},
+  {"wave": "sine", "start": 0.06, "dur": 0.16, "freq": 1760, "vol": 0.3}
+ ]},
+ "coins": {"volume_db": -11, "cooldown": 0.1, "layers": [
+  {"wave": "square", "dur": 0.05, "freq": 1318, "vol": 0.4, "duty": 0.5},
+  {"wave": "square", "start": 0.06, "dur": 0.14, "freq": 1760, "vol": 0.4, "duty": 0.5, "curve": 1.5}
+ ]},
+ "level_up": {"volume_db": -5, "cooldown": 0.3, "layers": [
+  {"wave": "triangle", "dur": 0.45, "freq": 523, "vol": 0.55, "arp": [0, 4, 7, 12], "arp_rate": 12, "curve": 1.0},
+  {"wave": "square", "dur": 0.45, "freq": 523, "vol": 0.18, "duty": 0.125, "arp": [0, 4, 7, 12], "arp_rate": 12, "curve": 1.0},
+  {"wave": "sine", "start": 0.3, "dur": 0.45, "freq": 1046, "vol": 0.4, "vibrato": [6, 0.2]}
+ ]},
+ "build": {"volume_db": -8, "cooldown": 0.2, "layers": [
+  {"wave": "noise", "dur": 0.06, "freq": 1500, "vol": 0.5, "lowpass": 800, "seed": 21},
+  {"wave": "square", "dur": 0.05, "freq": 196, "vol": 0.35, "lowpass": 1200},
+  {"wave": "noise", "start": 0.14, "dur": 0.06, "freq": 1500, "vol": 0.5, "lowpass": 800, "seed": 22},
+  {"wave": "square", "start": 0.14, "dur": 0.05, "freq": 220, "vol": 0.35, "lowpass": 1200},
+  {"wave": "noise", "start": 0.28, "dur": 0.08, "freq": 1500, "vol": 0.55, "lowpass": 800, "seed": 23},
+  {"wave": "square", "start": 0.28, "dur": 0.07, "freq": 247, "vol": 0.35, "lowpass": 1200}
+ ]},
+ "upgrade": {"volume_db": -6, "cooldown": 0.3, "layers": [
+  {"wave": "noise", "dur": 0.06, "freq": 1500, "vol": 0.5, "lowpass": 800, "seed": 24},
+  {"wave": "square", "dur": 0.05, "freq": 196, "vol": 0.35, "lowpass": 1200},
+  {"wave": "triangle", "start": 0.12, "dur": 0.42, "freq": 392, "vol": 0.55, "arp": [0, 7, 12], "arp_rate": 10, "curve": 1.0},
+  {"wave": "sine", "start": 0.36, "dur": 0.4, "freq": 784, "vol": 0.35}
+ ]},
+ "craft": {"volume_db": -9, "cooldown": 0.2, "layers": [
+  {"wave": "square", "dur": 0.25, "freq": 1568, "vol": 0.3, "duty": 0.5, "curve": 3},
+  {"wave": "sine", "dur": 0.3, "freq": 2093, "vol": 0.35, "curve": 2.5},
+  {"wave": "noise", "dur": 0.03, "freq": 8000, "vol": 0.4, "lowpass": 6000, "seed": 31},
+  {"wave": "square", "start": 0.18, "dur": 0.25, "freq": 1568, "vol": 0.25, "duty": 0.5, "curve": 3},
+  {"wave": "sine", "start": 0.18, "dur": 0.35, "freq": 2093, "vol": 0.3, "curve": 2.5}
+ ]},
+ "recruit": {"volume_db": -7, "cooldown": 0.3, "layers": [
+  {"wave": "triangle", "dur": 0.3, "freq": 659, "vol": 0.55, "arp": [0, 4, 7], "arp_rate": 10, "curve": 1.0},
+  {"wave": "sine", "start": 0.25, "dur": 0.35, "freq": 1318, "vol": 0.4}
+ ]},
+ "expedition_start": {"volume_db": -4, "cooldown": 1.0, "layers": [
+  {"wave": "saw", "dur": 0.6, "freq": 196, "freq_end": 220, "vol": 0.45, "attack": 0.05, "lowpass": 1200, "curve": 0.8},
+  {"wave": "saw", "start": 0.2, "dur": 0.55, "freq": 293, "vol": 0.4, "attack": 0.04, "lowpass": 1200, "curve": 0.8},
+  {"wave": "noise", "dur": 0.1, "freq": 900, "vol": 0.3, "lowpass": 500, "seed": 41}
+ ]},
+ "expedition_complete": {"volume_db": -4, "cooldown": 1.0, "layers": [
+  {"wave": "square", "dur": 0.75, "freq": 523, "vol": 0.3, "duty": 0.25, "arp": [0, 4, 7, 12, 7, 12], "arp_rate": 8, "curve": 0.8},
+  {"wave": "triangle", "dur": 0.75, "freq": 261, "vol": 0.45, "curve": 0.8}
+ ]},
+ "victory": {"volume_db": -3, "cooldown": 1.0, "layers": [
+  {"wave": "triangle", "dur": 1.0, "freq": 392, "vol": 0.5, "arp": [0, 4, 7, 12, 16, 19, 24], "arp_rate": 9, "curve": 0.7},
+  {"wave": "square", "dur": 1.0, "freq": 392, "vol": 0.2, "duty": 0.25, "arp": [0, 4, 7, 12, 16, 19, 24], "arp_rate": 9, "curve": 0.7},
+  {"wave": "sine", "dur": 1.0, "freq": 196, "vol": 0.4, "curve": 0.7}
+ ]},
+ "skill_none": {"volume_db": -10, "cooldown": 0.12, "layers": [
+  {"wave": "sine", "dur": 0.25, "freq": 880, "freq_end": 1760, "vol": 0.45},
+  {"wave": "noise", "dur": 0.15, "freq": 8000, "vol": 0.2, "lowpass": 6000, "seed": 51}
+ ]},
+ "skill_fire": {"volume_db": -9, "cooldown": 0.12, "layers": [
+  {"wave": "noise", "dur": 0.4, "freq": 2000, "freq_end": 600, "vol": 0.55, "attack": 0.02, "lowpass": 2500, "seed": 52},
+  {"wave": "saw", "dur": 0.3, "freq": 150, "freq_end": 90, "vol": 0.35, "lowpass": 800}
+ ]},
+ "skill_ice": {"volume_db": -10, "cooldown": 0.12, "layers": [
+  {"wave": "sine", "dur": 0.3, "freq": 2637, "vol": 0.35, "curve": 2.5},
+  {"wave": "sine", "start": 0.05, "dur": 0.3, "freq": 3520, "vol": 0.3, "curve": 2.5},
+  {"wave": "triangle", "dur": 0.2, "freq": 1760, "freq_end": 2637, "vol": 0.3}
+ ]},
+ "skill_thunder": {"volume_db": -8, "cooldown": 0.12, "layers": [
+  {"wave": "noise", "dur": 0.5, "freq": 8000, "freq_end": 800, "vol": 0.55, "curve": 2.5, "seed": 53},
+  {"wave": "square", "dur": 0.4, "freq": 80, "freq_end": 40, "vol": 0.4, "duty": 0.5, "lowpass": 600}
+ ]},
+ "skill_poison": {"volume_db": -10, "cooldown": 0.12, "layers": [
+  {"wave": "square", "dur": 0.35, "freq": 220, "vol": 0.35, "duty": 0.5, "arp": [0, 3, 7, 3], "arp_rate": 30, "lowpass": 1200},
+  {"wave": "noise", "dur": 0.2, "freq": 1200, "vol": 0.3, "lowpass": 900, "seed": 54}
+ ]},
+ "skill_shadow": {"volume_db": -9, "cooldown": 0.12, "layers": [
+  {"wave": "saw", "dur": 0.5, "freq": 110, "freq_end": 55, "vol": 0.45, "lowpass": 600, "curve": 1.2},
+  {"wave": "sine", "dur": 0.5, "freq": 220, "freq_end": 110, "vol": 0.35, "vibrato": [7, 0.5], "curve": 1.2}
+ ]},
+ "heal": {"volume_db": -10, "cooldown": 0.2, "layers": [
+  {"wave": "sine", "dur": 0.45, "freq": 784, "vol": 0.45, "arp": [0, 4, 7, 12], "arp_rate": 14, "curve": 1.2},
+  {"wave": "triangle", "start": 0.2, "dur": 0.3, "freq": 1568, "vol": 0.3}
+ ]}
+}

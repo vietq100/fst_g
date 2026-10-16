@@ -1331,6 +1331,18 @@
   "en": "Unknown Hunter",
   "vi": "Không rõ Hunter"
  },
+ "err.barber.away": {
+  "en": "{name} is away on an expedition",
+  "vi": "{name} đang đi thám hiểm"
+ },
+ "err.barber.dead": {
+  "en": "{name} has fallen",
+  "vi": "{name} đã ngã xuống"
+ },
+ "err.barber.same": {
+  "en": "Pick another hair style or colour",
+  "vi": "Hãy chọn kiểu hoặc màu tóc khác"
+ },
  "err.building.already_built": {
   "en": "Already built",
   "vi": "Đã xây rồi"
@@ -1715,6 +1727,10 @@
   "en": "Bandage",
   "vi": "Băng Gạc"
  },
+ "item.battle_axe.name": {
+  "en": "Battle Axe",
+  "vi": "Rìu Chiến"
+ },
  "item.beast_fang.name": {
   "en": "Beast Fang",
   "vi": "Nanh Thú"
@@ -1727,6 +1743,10 @@
   "en": "Bone Dust",
   "vi": "Bột Xương"
  },
+ "item.cowboy_hat.name": {
+  "en": "Cowboy Hat",
+  "vi": "Mũ Cao Bồi"
+ },
  "item.crimson_suit.name": {
   "en": "Crimson Suit",
   "vi": "Bộ Đồ Đỏ Thẫm"
@@ -1734,6 +1754,14 @@
  "item.dark_essence.name": {
   "en": "Dark Essence",
   "vi": "Tinh Chất Bóng Tối"
+ },
+ "item.ember_staff.name": {
+  "en": "Ember Staff",
+  "vi": "Gậy Tàn Lửa"
+ },
+ "item.eye_patch.name": {
+  "en": "Eye Patch",
+  "vi": "Bịt Mắt"
  },
  "item.fang_blade.name": {
   "en": "Fang Blade",
@@ -1758,6 +1786,10 @@
  "item.herb_soup.name": {
   "en": "Herb Soup",
   "vi": "Súp Thảo Dược"
+ },
+ "item.hunter_goggles.name": {
+  "en": "Hunter Goggles",
+  "vi": "Kính Bảo Hộ Thợ Săn"
  },
  "item.hunters_badge.name": {
   "en": "Hunter's Badge",
@@ -1786,6 +1818,10 @@
  "item.iron_ring.name": {
   "en": "Iron Ring",
   "vi": "Nhẫn Sắt"
+ },
+ "item.iron_spear.name": {
+  "en": "Iron Spear",
+  "vi": "Giáo Sắt"
  },
  "item.iron_sword.name": {
   "en": "Iron Sword",
@@ -1827,6 +1863,10 @@
   "en": "Night Garb",
   "vi": "Y Phục Bóng Đêm"
  },
+ "item.oak_staff.name": {
+  "en": "Oak Staff",
+  "vi": "Gậy Sồi"
+ },
  "item.pet_chick.name": {
   "en": "Chick",
   "vi": "Gà Con"
@@ -1850,6 +1890,10 @@
  "item.raw_meat.name": {
   "en": "Raw Meat",
   "vi": "Thịt Sống"
+ },
+ "item.round_glasses.name": {
+  "en": "Round Glasses",
+  "vi": "Kính Tròn"
  },
  "item.royal_garb.name": {
   "en": "Royal Garb",
@@ -1915,9 +1959,17 @@
   "en": "Steel Sword",
   "vi": "Kiếm Thép"
  },
+ "item.straw_hat.name": {
+  "en": "Straw Hat",
+  "vi": "Nón Lá"
+ },
  "item.swift_boots.name": {
   "en": "Swift Boots",
   "vi": "Giày Tốc Hành"
+ },
+ "item.viking_helm.name": {
+  "en": "Viking Helm",
+  "vi": "Mũ Viking"
  },
  "item.wild_herb.name": {
   "en": "Wild Herb",
@@ -2567,13 +2619,29 @@
   "en": "Bandage",
   "vi": "Băng Gạc"
  },
+ "recipe.battle_axe.name": {
+  "en": "Battle Axe",
+  "vi": "Rìu Chiến"
+ },
  "recipe.bone_amulet.name": {
   "en": "Bone Amulet",
   "vi": "Bùa Xương"
  },
+ "recipe.cowboy_hat.name": {
+  "en": "Cowboy Hat",
+  "vi": "Mũ Cao Bồi"
+ },
  "recipe.crimson_suit.name": {
   "en": "Crimson Suit",
   "vi": "Bộ Đồ Đỏ Thẫm"
+ },
+ "recipe.ember_staff.name": {
+  "en": "Ember Staff",
+  "vi": "Gậy Tàn Lửa"
+ },
+ "recipe.eye_patch.name": {
+  "en": "Eye Patch",
+  "vi": "Bịt Mắt"
  },
  "recipe.fang_blade.name": {
   "en": "Fang Blade",
@@ -2594,6 +2662,10 @@
  "recipe.herb_soup.name": {
   "en": "Herb Soup",
   "vi": "Súp Thảo Dược"
+ },
+ "recipe.hunter_goggles.name": {
+  "en": "Hunter Goggles",
+  "vi": "Kính Bảo Hộ Thợ Săn"
  },
  "recipe.hunters_badge.name": {
   "en": "Hunter's Badge",
@@ -2618,6 +2690,10 @@
  "recipe.iron_ring.name": {
   "en": "Iron Ring",
   "vi": "Nhẫn Sắt"
+ },
+ "recipe.iron_spear.name": {
+  "en": "Iron Spear",
+  "vi": "Giáo Sắt"
  },
  "recipe.iron_sword.name": {
   "en": "Iron Sword",
@@ -2651,6 +2727,10 @@
   "en": "Night Garb",
   "vi": "Y Phục Bóng Đêm"
  },
+ "recipe.oak_staff.name": {
+  "en": "Oak Staff",
+  "vi": "Gậy Sồi"
+ },
  "recipe.pet_chick.name": {
   "en": "Chick",
   "vi": "Gà Con"
@@ -2666,6 +2746,10 @@
  "recipe.pet_teddy.name": {
   "en": "Teddy",
   "vi": "Gấu Bông"
+ },
+ "recipe.round_glasses.name": {
+  "en": "Round Glasses",
+  "vi": "Kính Tròn"
  },
  "recipe.royal_garb.name": {
   "en": "Royal Garb",
@@ -2715,9 +2799,17 @@
   "en": "Steel Sword",
   "vi": "Kiếm Thép"
  },
+ "recipe.straw_hat.name": {
+  "en": "Straw Hat",
+  "vi": "Nón Lá"
+ },
  "recipe.swift_boots.name": {
   "en": "Swift Boots",
   "vi": "Giày Tốc Hành"
+ },
+ "recipe.viking_helm.name": {
+  "en": "Viking Helm",
+  "vi": "Mũ Viking"
  },
  "recipe.wizard_hat.name": {
   "en": "Wizard Hat",
@@ -3959,6 +4051,10 @@
   "en": "Needs {gold} gold",
   "vi": "Cần {gold} vàng"
  },
+ "ui.common.next": {
+  "en": ">",
+  "vi": ">"
+ },
  "ui.common.no": {
   "en": "No",
   "vi": "Không"
@@ -3966,6 +4062,10 @@
  "ui.common.ok": {
   "en": "OK",
   "vi": "OK"
+ },
+ "ui.common.previous": {
+  "en": "<",
+  "vi": "<"
  },
  "ui.common.remove": {
   "en": "Remove",
@@ -4339,6 +4439,14 @@
   "en": "Give {amount}\n(+{received})",
   "vi": "Cho {amount}\n(+{received})"
  },
+ "ui.hunter.hair_color": {
+  "en": "Hair colour {index}/{total}",
+  "vi": "Màu tóc {index}/{total}"
+ },
+ "ui.hunter.hair_style": {
+  "en": "Hair style {index}/{total}",
+  "vi": "Kiểu tóc {index}/{total}"
+ },
  "ui.hunter.header": {
   "en": "{class} · Lv {level}",
   "vi": "{class} · Lv {level}"
@@ -4366,6 +4474,10 @@
  "ui.hunter.hp_short": {
   "en": "HP {current}/{max}",
   "vi": "HP {current}/{max}"
+ },
+ "ui.hunter.look": {
+  "en": "Barber",
+  "vi": "Tiệm cắt tóc"
  },
  "ui.hunter.loot_bag": {
   "en": "Loot bag {count} / {max}",
@@ -4454,6 +4566,14 @@
  "ui.hunter.reincarnation": {
   "en": "Reincarnation {count}",
   "vi": "Tái sinh {count}"
+ },
+ "ui.hunter.restyle": {
+  "en": "New look ({gold} gold)",
+  "vi": "Đổi kiểu ({gold} vàng)"
+ },
+ "ui.hunter.restyled": {
+  "en": "{name} has a new look!",
+  "vi": "{name} có diện mạo mới!"
  },
  "ui.hunter.satiety_short": {
   "en": "Satiety {current}/{max}",
@@ -5123,6 +5243,10 @@
   "en": "Town",
   "vi": "Thị trấn"
  },
+ "ui.settings.audio": {
+  "en": "Sound",
+  "vi": "Âm thanh"
+ },
  "ui.settings.busy_dungeon": {
   "en": "Finish the dungeon run first",
   "vi": "Hãy hoàn thành lượt dungeon trước"
@@ -5138,6 +5262,14 @@
  "ui.settings.language_note": {
   "en": "The game reloads the screen in the new language. Your progress is kept.",
   "vi": "Game sẽ tải lại màn hình bằng ngôn ngữ mới. Tiến trình của bạn được giữ nguyên."
+ },
+ "ui.settings.music": {
+  "en": "Music",
+  "vi": "Nhạc"
+ },
+ "ui.settings.sounds": {
+  "en": "Effects",
+  "vi": "Hiệu ứng"
  },
  "ui.settings.title": {
   "en": "Settings",

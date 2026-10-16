@@ -45,6 +45,8 @@ var world: WorldService
 
 var _navigation: NavigationRegion2D
 var _ground: Node2D
+var _day_night: DayNight
+var _audio: AudioFeedback
 var _entities: Node2D
 var _buildings_root: Node2D
 var _actors: Node2D
@@ -126,15 +128,14 @@ func _build_scene() -> void:
 		if expedition.region_id != &"":
 			ledges.append(expedition.entrance_tile)
 	_ground.setup(world, _town_roads(plaza), plaza, world.get_town_pond(), ledges)
-	# Mountains behind the north-west (top-left) coast.
-	var mountains := MountainRange.new()
-	mountains.name = "MountainRange"
-	mountains.setup(world)
-	add_child(mountains)
 	var shimmer := WaterShimmer.new()
 	shimmer.name = "WaterShimmer"
 	shimmer.setup(world)
 	add_child(shimmer)
+	_day_night = DayNight.new()
+	_day_night.name = "DayNight"
+	add_child(_day_night)
+	_day_night.setup(world)
 	RenderingServer.set_default_clear_color(Color("12394a"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"
@@ -151,6 +152,10 @@ func _build_scene() -> void:
 	var feedback := CombatFeedback.new()
 	feedback.name = "CombatFeedback"
 	add_child(feedback)
+	_audio = AudioFeedback.new()
+	_audio.name = "AudioFeedback"
+	_audio.setup(world)
+	add_child(_audio)
 	_buildings_root = _y_sorted("Buildings", _entities)
 	var props := _y_sorted("Props", _entities)
 	props.add_to_group(&"world_props")
@@ -620,6 +625,8 @@ func _spawn_props() -> void:
 	_spawn_pond_obstacle(props)
 	_spawn_town_border(props, rng, placed)
 	_spawn_town_decor(props)
+	_spawn_landmarks(props, keep_clear, placed)
+	_spawn_ambience(_spawn_scenery(props))
 	for region in world.get_regions():
 		if region.props == RegionDefinition.Props.NONE or region.prop_density <= 0.0:
 			continue
@@ -655,6 +662,205 @@ func _spawn_props() -> void:
 						prop.kind = WorldProp.Kind.COLUMN
 						prop.tint = Color("b9b4a3").lerp(Color("cfcab8"), rng.randf())
 				props.add_child(prop)
+
+
+## Landmarks inside the hunting regions (D62 on the isometric map, D75), by biome: [kind, position as
+## a fraction of the region's tile rect, tile offset]. Goblin camps are tents around a campfire.
+const LANDMARKS := {
+	RegionDefinition.Props.TREES: [
+		[WorldLandmark.Kind.SHRINE, Vector2(0.5, 0.45), Vector2.ZERO],
+		[WorldLandmark.Kind.STUMP, Vector2(0.3, 0.7), Vector2.ZERO], [WorldLandmark.Kind.STUMP, Vector2(0.72, 0.35), Vector2.ZERO],
+		[WorldLandmark.Kind.STUMP, Vector2(0.2, 0.3), Vector2.ZERO], [WorldLandmark.Kind.STUMP, Vector2(0.6, 0.8), Vector2.ZERO],
+		[WorldLandmark.Kind.LOG, Vector2(0.4, 0.25), Vector2.ZERO], [WorldLandmark.Kind.LOG, Vector2(0.78, 0.65), Vector2.ZERO],
+		[WorldLandmark.Kind.LOG, Vector2(0.25, 0.5), Vector2.ZERO],
+	],
+	RegionDefinition.Props.ROCKS: [
+		[WorldLandmark.Kind.CAMPFIRE, Vector2(0.35, 0.35), Vector2.ZERO],
+		[WorldLandmark.Kind.TENT, Vector2(0.35, 0.35), Vector2(-2.5, -1.5)], [WorldLandmark.Kind.TENT, Vector2(0.35, 0.35), Vector2(1.5, -2.5)],
+		[WorldLandmark.Kind.TENT, Vector2(0.35, 0.35), Vector2(-2.0, 2.0)], [WorldLandmark.Kind.TOTEM, Vector2(0.35, 0.35), Vector2(3.0, 1.0)],
+		[WorldLandmark.Kind.CAMPFIRE, Vector2(0.68, 0.66), Vector2.ZERO],
+		[WorldLandmark.Kind.TENT, Vector2(0.68, 0.66), Vector2(-2.0, -2.0)], [WorldLandmark.Kind.TENT, Vector2(0.68, 0.66), Vector2(2.0, -1.5)],
+		[WorldLandmark.Kind.TOTEM, Vector2(0.55, 0.2), Vector2.ZERO], [WorldLandmark.Kind.TOTEM, Vector2(0.2, 0.75), Vector2.ZERO],
+	],
+	RegionDefinition.Props.COLUMNS: [
+		[WorldLandmark.Kind.OBELISK, Vector2(0.5, 0.5), Vector2.ZERO],
+		[WorldLandmark.Kind.ARCH, Vector2(0.3, 0.3), Vector2.ZERO], [WorldLandmark.Kind.ARCH, Vector2(0.7, 0.7), Vector2.ZERO],
+		[WorldLandmark.Kind.STATUE, Vector2(0.25, 0.65), Vector2.ZERO], [WorldLandmark.Kind.STATUE, Vector2(0.7, 0.28), Vector2.ZERO],
+		[WorldLandmark.Kind.STATUE, Vector2(0.55, 0.75), Vector2.ZERO], [WorldLandmark.Kind.STATUE, Vector2(0.4, 0.42), Vector2.ZERO],
+	],
+}
+const TENT_TINTS: Array[Color] = [Color("8a6a44"), Color("6a5a44"), Color("7a5a3a")]
+## Regions narrower than this (tiles) get no landmarks (the boss arena).
+const LANDMARK_MIN_SIZE := 24
+## How far (tiles) a landmark may move to find free ground.
+const LANDMARK_SEARCH := 4
+## Wide landmarks keep scattered props this far to their sides (world px).
+const LANDMARK_WIDTH := {WorldLandmark.Kind.TENT: 16.0, WorldLandmark.Kind.LOG: 18.0, WorldLandmark.Kind.SHRINE: 16.0,
+	WorldLandmark.Kind.ARCH: 20.0}
+
+
+func _spawn_landmarks(props: Node2D, keep_clear: Array[Rect2i], placed: Array[Vector2]) -> void:
+	for region in world.get_regions():
+		if region.tile_rect.size.x < LANDMARK_MIN_SIZE:
+			continue
+		var entries: Array = LANDMARKS.get(region.props, [])
+		var ground := world.region_tiles(region.id)
+		for i in entries.size():
+			var entry: Array = entries[i]
+			var spot: Vector2 = Vector2(region.tile_rect.position) + Vector2(region.tile_rect.size) * (entry[1] as Vector2) + entry[2]
+			var tile := _free_landmark_tile(Vector2i(spot.floor()), ground, keep_clear, placed)
+			if tile == Vector2i(-99999, -99999):
+				continue
+			var at := WorldService.tile_to_world(Vector2(tile) + Vector2(0.5, 0.5))
+			var landmark := WorldLandmark.new().setup(entry[0], TENT_TINTS[i % TENT_TINTS.size()])
+			landmark.position = at
+			props.add_child(landmark)
+			placed.append(at)
+			var half: float = LANDMARK_WIDTH.get(entry[0], 0.0)
+			if half > 0.0:
+				placed.append(at + Vector2(-half, 0))
+				placed.append(at + Vector2(half, 0))
+
+
+## Nearest region ground tile to `start` that is clear of gates / entrances and other landmarks;
+## (-99999, -99999) when there is none close by.
+func _free_landmark_tile(start: Vector2i, ground: Dictionary, keep_clear: Array[Rect2i], placed: Array[Vector2]) -> Vector2i:
+	for radius in LANDMARK_SEARCH + 1:
+		for dx in range(-radius, radius + 1):
+			for dy in range(-radius, radius + 1):
+				if maxi(absi(dx), absi(dy)) != radius:
+					continue
+				var tile := start + Vector2i(dx, dy)
+				if not ground.has(tile) or not ground.has(tile + Vector2i(1, 1)) or not ground.has(tile - Vector2i(1, 1)):
+					continue
+				if keep_clear.any(func(rect: Rect2i) -> bool: return rect.has_point(tile)):
+					continue
+				var at := WorldService.tile_to_world(Vector2(tile) + Vector2(0.5, 0.5))
+				if placed.any(func(other: Vector2) -> bool: return other.distance_to(at) < PROP_SPACING * 0.7):
+					continue
+				return tile
+	return Vector2i(-99999, -99999)
+
+
+## Scenery in the water around the plateaus (D75): [kind, how many], biggest first.
+const SCENERY := [
+	[WorldScenery.Kind.LIGHTHOUSE, 1], [WorldScenery.Kind.WRECK, 1], [WorldScenery.Kind.ISLET_TREES, 4],
+	[WorldScenery.Kind.ISLET_PALMS, 3], [WorldScenery.Kind.SANDBAR, 4], [WorldScenery.Kind.ROCKS, 8],
+	[WorldScenery.Kind.LOG, 3], [WorldScenery.Kind.KELP, 6],
+]
+const SCENERY_SEED := 20261016
+## Scenery stays this far inside the camera bounds, and this far from land, cliffs and bridges (world px).
+const SCENERY_INSET := 30.0
+const SCENERY_SHORE := 60.0
+## The cliff faces hang this far below the land's front edges.
+const SCENERY_CLIFF := 48.0
+const SCENERY_TRIES := 80
+const CLOUD_COUNT := 6
+const GULL_COUNT := 5
+## The sky layer (clouds, gulls, the lighthouse beam) draws above the entities.
+const SKY_Z := 20
+## A boat lies moored this far from a palm islet's centre (below it, in open water).
+const BOAT_OFFSET := Vector2(12, 66)
+
+
+## Returns the pieces placed.
+func _spawn_scenery(props: Node2D) -> Array[WorldScenery]:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SCENERY_SEED
+	var area := world.get_bounds(96.0).grow(-SCENERY_INSET)
+	var taken: Array[Vector2] = []
+	var taken_reach: Array[float] = []
+	var salt := 0
+	var pieces: Array[WorldScenery] = []
+	for entry: Array in SCENERY:
+		var kind: WorldScenery.Kind = entry[0]
+		var reach := WorldScenery.reach_of(kind)
+		for n in int(entry[1]):
+			for attempt in SCENERY_TRIES:
+				var at := area.position + Vector2(rng.randf() * area.size.x, rng.randf() * area.size.y)
+				var clear := _open_water(at, reach + SCENERY_SHORE)
+				for i in taken.size():
+					clear = clear and taken[i].distance_to(at) >= taken_reach[i] + reach
+				if not clear:
+					continue
+				var piece := WorldScenery.new()
+				piece.kind = kind
+				piece.salt = salt
+				piece.position = at
+				salt += 1
+				props.add_child(piece)
+				pieces.append(piece)
+				taken.append(at)
+				taken_reach.append(reach)
+				break
+	return pieces
+
+
+## Moving life (D75): cloud shadows over everything, gulls circling the islets, a boat by a palm islet,
+## the lighthouse beacon. Clouds and gulls fly in a sky layer above the entities.
+func _spawn_ambience(pieces: Array[WorldScenery]) -> void:
+	var sky := Node2D.new()
+	sky.name = "Sky"
+	sky.z_index = SKY_Z
+	add_child(sky)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SCENERY_SEED + 1
+	var area := world.get_bounds(200.0)
+	for i in CLOUD_COUNT:
+		var cloud := WorldAmbience.new()
+		cloud.kind = WorldAmbience.Kind.CLOUD
+		cloud.area = area
+		cloud.size = rng.randf_range(90.0, 170.0)
+		cloud.speed = rng.randf_range(0.7, 1.3)
+		cloud.position = area.position + Vector2(rng.randf() * area.size.x, rng.randf() * area.size.y)
+		sky.add_child(cloud)
+	var islets := pieces.filter(func(piece: WorldScenery) -> bool:
+		return piece.kind in [WorldScenery.Kind.ISLET_TREES, WorldScenery.Kind.ISLET_PALMS, WorldScenery.Kind.LIGHTHOUSE])
+	for i in mini(GULL_COUNT, islets.size()):
+		var gull := WorldAmbience.new()
+		gull.kind = WorldAmbience.Kind.GULL
+		gull.centre = (islets[i] as WorldScenery).position + Vector2(0, -30)
+		gull.radius = rng.randf_range(50.0, 90.0)
+		gull.speed = rng.randf_range(0.35, 0.6) * (1.0 if i % 2 == 0 else -1.0)
+		gull.phase = rng.randf() * TAU
+		gull.position = gull.centre
+		sky.add_child(gull)
+	for piece in pieces:
+		if piece.kind == WorldScenery.Kind.LIGHTHOUSE:
+			var beacon := WorldAmbience.new()
+			beacon.kind = WorldAmbience.Kind.BEACON
+			beacon.position = WorldScenery.LIGHTHOUSE_LAMP
+			beacon.z_index = SKY_Z
+			beacon.add_to_group(DayNight.LIGHT_GROUP)
+			beacon.set_meta(&"light_radius", 36.0)
+			piece.add_child(beacon)
+	for piece in pieces:
+		if piece.kind == WorldScenery.Kind.ISLET_PALMS:
+			var boat := WorldAmbience.new()
+			boat.kind = WorldAmbience.Kind.BOAT
+			boat.position = piece.position + BOAT_OFFSET
+			piece.get_parent().add_child(boat)
+			break
+
+
+## No land, cliff face, bridge or dungeon ledge within `radius` of a water point (the centre and a
+## flattened ring).
+func _open_water(point: Vector2, radius: float) -> bool:
+	for i in 13:
+		var probe := point
+		if i > 0:
+			var angle := i * TAU / 12.0
+			probe = point + Vector2(cos(angle), sin(angle) * 0.5) * radius
+		if world.region_at(probe) != null or world.region_at(probe - Vector2(0, SCENERY_CLIFF)) != null:
+			return false
+		for gate in world.get_gates():
+			if WorldService.rect_has_point(gate.tiles.grow(2), probe):
+				return false
+	for definition in DataRegistry.get_all(&"expedition"):
+		var expedition := definition as ExpeditionDefinition
+		if expedition.region_id != &"" and WorldService.tile_center(expedition.entrance_tile).distance_to(point) < radius + 40.0:
+			return false
+	return true
 
 
 ## The pond blocks walking (a navigation obstacle over its water).
@@ -725,6 +931,9 @@ func _refresh_decor() -> void:
 				covered = true
 				break
 		decor.visible = not covered
+	# Hidden lamps stop glowing at night.
+	if _day_night != null:
+		_day_night.refresh_lights()
 
 
 ## Trees along the Town's back (top) edge, behind the fence, so it feels enclosed.
@@ -875,6 +1084,13 @@ func _on_monster_skill_cast(monster: Actor, skill: MonsterSkillDefinition) -> vo
 	if not is_instance_valid(monster):
 		return
 	_popup(skill.display_name, Color("ffb347") if skill.is_active() else Color("8ab4f8"), monster.global_position + Vector2(0, -44), 0.0)
+	# Pixel effect in the skill's element (D75): area and self effects on the monster, hits and spells on
+	# its target.
+	var kind := SkillEffect.kind_for(skill)
+	var at := monster.global_position
+	if not SkillEffect.on_caster(kind) and monster.combat.is_valid_target(monster.combat.target):
+		at = monster.combat.target.global_position
+	SkillEffect.play(_entities, at, kind, SkillEffect.element_for(skill))
 
 
 func _on_monster_killed(enemy: Enemy, killer: Hunter, reward: KillReward) -> void:
@@ -937,6 +1153,8 @@ func collect_drop(drop: LootDrop, hunter: Hunter) -> void:
 	drop.gold = 0
 	drop.items = left
 	hunter.visual.play_action(ChibiAnimations.LOOT)
+	if _audio != null:
+		_audio.play_loot(drop.global_position)
 	var at := hunter.global_position + Vector2(0, -34)
 	var line := 0
 	if gold > 0:

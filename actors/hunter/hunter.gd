@@ -3,7 +3,8 @@ extends Actor
 ## Scene presentation of one HunterRuntime. Holds no gameplay rules.
 
 const GROUP := &"hunters"
-const DEFAULT_WEAPON_TINT := Color("d8dde3")
+## No weapon item: the Forge weapon keeps its own colours (ChibiVisual.weapon_color).
+const DEFAULT_WEAPON_TINT := Color.WHITE
 
 var runtime: HunterRuntime
 var _service: HunterService
@@ -145,8 +146,8 @@ func _on_hunter_leveled_up(hunter: HunterRuntime, _new_level: int, healed: float
 	visual.play_level_up()
 
 
-## Skin, hair and dye from the Hunter's look, outfit from its base class, the weapon sprite from
-## the equipped item (or the class default) tinted by the item (D49, D53).
+## Skin, hair and dye from the Hunter's look, outfit from its base class, the Forge weapon from the
+## equipped item (or the class default) tinted by the item (D49, D53, D73).
 func _refresh_equipment_look() -> void:
 	var look := visual as ChibiVisual
 	if look == null:
@@ -156,11 +157,11 @@ func _refresh_equipment_look() -> void:
 	look.dead = not runtime.alive
 	look.weapon_color = weapon.tint if weapon != null else DEFAULT_WEAPON_TINT
 	var definition := _service.get_definition(runtime)
-	look.set_class_style(ChibiBody.outfit_for(definition))
-	look.dress = _equipment.get_dress(runtime) if _equipment != null else ChibiDress.plain(ChibiBody.outfit_for(definition))
-	look.weapon_sprite = WeaponSprites.kind_for_item(weapon, look.get_default_weapon_sprite())
-	look.weapon_width = definition.weapon_width if definition != null else look.weapon_width
-	# Reach of the slash arc: the sprite's length, a little more for better gear.
-	var base_length := WeaponSprites.length_of(look.weapon_sprite) if WeaponSprites.has_kind(look.weapon_sprite) \
-		else (definition.weapon_length if definition != null else 12.0)
-	look.weapon_length = base_length + (2.0 if weapon != null and weapon.rarity >= Tier.Level.U else 0.0)
+	var base_class := ChibiBody.outfit_for(definition)
+	look.set_class_style(base_class)
+	look.dress = _equipment.get_dress(runtime) if _equipment != null else ChibiDress.plain(base_class)
+	# Forge weapon and its effect element (D73): from the item, else the class weapon.
+	look.forge_weapon = ForgeLook.weapon_for(weapon, base_class)
+	look.element = ForgeLook.element_for(weapon)
+	# Reach of the slash arc: the weapon's length, a little more for better gear.
+	look.weapon_length = ForgeLook.tip_of(look.forge_weapon) + (2.0 if weapon != null and weapon.rarity >= Tier.Level.U else 0.0)

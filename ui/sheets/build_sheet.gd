@@ -1,9 +1,12 @@
 class_name BuildSheet
 extends Sheet
-## Build menu (BUILD_SYSTEM.md, D33): every building that can be bought, its cost and why it
-## cannot be built right now. "Place" hands over to the world's placement mode.
+## Build menu (BUILD_SYSTEM.md, D33): every building that can be bought with its picture (D77), its cost
+## and why it cannot be built right now. "Place" hands over to the world's placement mode.
 
 signal build_requested(building_id: StringName)
+
+## Size of the building pictures (D77).
+const THUMB_SIDE := 56.0
 
 
 func _watch() -> Array:
@@ -30,4 +33,5 @@ func _build(content: VBoxContainer) -> void:
 		var place := UIKit.button(Loc.t("ui.build.place"), func() -> void: build_requested.emit(building_id), &"PrimaryButton", reason)
 		place.size_flags_horizontal = Control.SIZE_SHRINK_END
 		place.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([info, place])))
+		var thumb := BuildingThumb.new().setup(building_id, definition.footprint, 1, THUMB_SIDE, not reason.is_empty())
+		content.add_child(UIKit.card(UIKit.hbox([thumb, info, place])))

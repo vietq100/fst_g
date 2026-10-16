@@ -1,8 +1,11 @@
 class_name SettingsSheet
 extends Sheet
-## Settings (gear button in the top bar): the language picker (LOCALIZATION.md, D61). Picking
-## another language saves it; Main then saves the game and reloads the scene in that language.
-## Not allowed during a dungeon run (the reload would drop the live run).
+## Settings (gear button in the top bar): the language picker (LOCALIZATION.md, D61) and the music and
+## sound volumes (D78, saved at once). Picking another language saves it; Main then saves the game and
+## reloads the scene in that language. Not allowed during a dungeon run (the reload would drop the live run).
+
+## Volume slider steps (0..1).
+const VOLUME_STEP := 0.1
 
 
 func _init() -> void:
@@ -29,3 +32,21 @@ func _build(content: VBoxContainer) -> void:
 	if busy:
 		content.add_child(UIKit.label(Loc.t("ui.settings.busy_dungeon"), &"WarningLabel"))
 	content.add_child(UIKit.label(Loc.t("ui.settings.language_note"), &"MutedLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.settings.audio"), &"AccentLabel"))
+	content.add_child(_volume_row(Loc.t("ui.settings.music"), Audio.MUSIC_BUS))
+	content.add_child(_volume_row(Loc.t("ui.settings.sounds"), Audio.SFX_BUS))
+
+
+## "Name [slider]" for a bus; changes apply and save at once (0 mutes).
+func _volume_row(text: String, bus: StringName) -> HBoxContainer:
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = VOLUME_STEP
+	slider.value = Audio.get_volume(bus)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slider.custom_minimum_size.y = GameTheme.TOUCH
+	slider.value_changed.connect(func(value: float) -> void: Audio.set_volume(bus, value))
+	var label := UIKit.label(text)
+	label.custom_minimum_size.x = 80
+	return UIKit.hbox([label, slider], 8)

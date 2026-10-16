@@ -14,7 +14,7 @@ const end = html.lastIndexOf('/* ===', marker);
 const js = html.slice(start, end);
 const forge = new Function(js + `; return { W, H, OX, OY, S, UNIT, OCC, RES, BLACK, FIXED, SHADE, HEAD, BODY, SHADOW, UNDER, ITEMS, ANIMS, FX,
   SHOULDER, ARM_LEN, IDLE_HAND, BOW_HAND, FAR_SHOULDER, CAST_X, BOW_X, GROUND, ramp, makePal, bodyPal, fineOf, rasterizeFine,
-  GLASS_FINE, local, compose, hexToRgb, findItem, OPT_CATS };`)();
+  GLASS_FINE, local, compose, composeRear, HEAD_REAR, rearHair, hexToRgb, findItem, OPT_CATS };`)();
 
 const { ITEMS, ANIMS, FX, RES, UNIT } = forge;
 const out = path.join(__dirname, '..', '..');
@@ -36,6 +36,12 @@ function exportItem(cat, it) {
   const conv = p => (fineKind[cat] ? flags(forge.fineOf(p, fineKind[cat])) : flags(p));
   if (it.parts) o.parts = it.parts.map(conv);
   if (it.back) o.back = it.back.map(conv);
+  // rear view (game: facing up): hats may list the parts kept (indices) or have their own parts
+  if (it.rear) {
+    if (typeof it.rear[0] === 'number') o.rear_keep = it.rear;
+    else o.rear = it.rear.map(conv);
+  }
+  if (cat === 'hair' && it.parts) o.rear = forge.rearHair(it).map(flags);
   o.has_shape = !!it.shape;       // weapons are drawn geometrically: they are ported by hand
   return o;
 }
@@ -52,7 +58,7 @@ for (const id of Object.keys(forge.GLASS_FINE)) {
 
 const data = {
   w: forge.W, h: forge.H, ox: forge.OX, oy: forge.OY, unit: UNIT, occ: forge.OCC, res: RES, black: forge.BLACK, fixed: forge.FIXED,
-  shade: forge.SHADE, head: forge.HEAD, body: forge.BODY, shadow: forge.SHADOW, under: forge.UNDER,
+  shade: forge.SHADE, head: forge.HEAD, body: { ...forge.BODY, head_rear: [{ x: 4, y: 3, rows: forge.HEAD_REAR }] }, shadow: forge.SHADOW, under: forge.UNDER,
   shoulder: forge.SHOULDER, arm_len: forge.ARM_LEN, idle_hand: forge.IDLE_HAND, bow_hand: forge.BOW_HAND, far_shoulder: forge.FAR_SHOULDER,
   cast_x: forge.CAST_X, bow_x: forge.BOW_X, ground: forge.GROUND,
   items, glasses, anims: ANIMS, fx: FX,
@@ -92,7 +98,34 @@ for (const w of ITEMS.weapon) {
       { pose: frames[fi], frames, fi, p: 0.5, t: 100, seed: 3 });
   }
 }
-for (const [cat, id] of [['hair', 'long'], ['hair', 'spiky'], ['hat', 'wizard'], ['hat', 'viking'], ['glasses', 'round'], ['glasses', 'goggle'],
+// every attack frame without its effects (PHASE_13 step 4: poses are drawn, effects come in step 6)
+const FX_KEYS = ['arc', 'hit', 'shock', 'circle', 'charge', 'strike', 'proj', 'lines', 'mark', 'shake', 'fade'];
+for (const w of ITEMS.weapon) {
+  if (!w.anim || !ANIMS[w.anim]) continue;
+  ANIMS[w.anim].forEach((frame, i) => {
+    if (i !== 0 && i !== 2) return;   // wind-up (behind / drawn arrow) and the swing
+    const pose = Object.fromEntries(Object.entries(frame).filter(([k]) => !FX_KEYS.includes(k)));
+    // frames / fi only feed the effects: one "hit" frame for the impact point, fi before it (no particles)
+    add(`pose_${w.id}_${i}`, withCfg({ weapon: sel('weapon', w.id) }), { pose, frames: [{ ...pose, hit: true }], fi: -1 });
+  });
+}
+// every element: a sword hit (burst + particles + aura), the staff's strike (spell column) and the rest aura
+for (const el of Object.keys(FX)) {
+  const slash = ANIMS.slash, hi = slash.findIndex(f => f.hit);
+  add(`fx_${el}_slash`, withCfg({ weapon: sel('weapon', 'sword'), fx: el }), { pose: slash[hi], frames: slash, fi: hi, p: 0.3, t: 240, seed: 5 });
+  const cast = ANIMS.cast;
+  add(`fx_${el}_strike`, withCfg({ weapon: sel('weapon', 'staff'), fx: el }), { pose: cast[3], frames: cast, fi: 3, p: 0.6, t: 380, seed: 9 });
+  add(`fx_${el}_rest`, withCfg({ weapon: sel('weapon', 'axe'), fx: el }), { t: 200 });
+}
+// rear view (facing up): a few looks, with and without weapons, one breathing
+const addRear = (name, cfg, st) => { golden[name] = { cfg, st: { ...(st || {}), back: true }, ops: ops(forge.composeRear(cfg, st || {})) }; };
+addRear('rear_core', coreCfg());
+addRear('rear_preset', presetCfg());
+addRear('rear_preset_bob', presetCfg(), { bob: 1 });
+addRear('rear_bow_hood', withCfg({ weapon: sel('weapon', 'bow'), hat: sel('hat', 'hood'), hair: { id: 'long', color: '#c0472f', accent: '#e0507a' } }));
+addRear('rear_helm_pony', withCfg({ weapon: sel('weapon', 'hammer'), hat: sel('hat', 'helm'), hair: { id: 'pony', color: '#d9a441', accent: '#e0507a' } }));
+addRear('rear_hoodie_twin', withCfg({ shirt: sel('shirt', 'hoodie'), weapon: sel('weapon', 'none'), hair: { id: 'twin', color: '#e070a8', accent: '#e0507a' } }));
+for (const [cat, id] of [['hat', 'helm'], ['hat', 'hood'], ['hair', 'long'], ['hair', 'spiky'], ['hat', 'wizard'], ['hat', 'viking'], ['glasses', 'round'], ['glasses', 'goggle'],
     ['shirt', 'hoodie'], ['pants', 'jeans'], ['shoes', 'boots']]) {
   if (!ITEMS[cat].some(o => o.id === id)) continue;
   add(`${cat}_${id}`, withCfg({ [cat]: sel(cat, id) }));

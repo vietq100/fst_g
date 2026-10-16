@@ -77,8 +77,8 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 	return modifiers
 
 
-## What the Hunter's sprite wears (D59): the class outfit, the top's / skin's cloth colour, pants,
-## boots, hat and pet from the equipped items.
+## What the Hunter's sprite wears (D59, D73): the class outfit, the top's / skin's cloth colour and Forge
+## style, pants, boots, hat, glasses (accessory) and pet from the equipped items.
 func get_dress(hunter: HunterRuntime) -> ChibiDress:
 	return dress_for(hunter, _hunters.get_definition(hunter), func(slot: StringName) -> ItemDefinition:
 		return get_equipped_item(hunter, slot))
@@ -89,13 +89,18 @@ static func dress_for(_hunter: HunterRuntime, definition: HunterDefinition, item
 	var dress := ChibiDress.new()
 	dress.outfit = ChibiBody.outfit_for(definition)
 	var top: ItemDefinition = item_of.call(&"armor")
-	if top != null and top.tint != Color.WHITE:
-		dress.cloth = top.tint
-		dress.has_cloth = true
+	if top != null:
+		if top.tint != Color.WHITE:
+			dress.cloth = top.tint
+			dress.has_cloth = true
+		dress.top = StringName(ForgeLook.top_for(top.look_id if top.look_id != &"" else top.outfit_id))
 	var skin: ItemDefinition = item_of.call(&"skin")
 	if skin != null:
-		if ChibiBody.OUTFITS.has(skin.outfit_id):
+		if ForgeLook.has_outfit(skin.outfit_id):
 			dress.outfit = skin.outfit_id
+		# The skin's look wins over the top: a Forge top named by its look or outfit (D73), else the
+		# outfit pattern's own top.
+		dress.top = StringName(ForgeLook.top_for(skin.look_id if skin.look_id != &"" else skin.outfit_id))
 		dress.cloth = skin.tint
 		dress.has_cloth = true
 		dress.skin = true
@@ -103,14 +108,20 @@ static func dress_for(_hunter: HunterRuntime, definition: HunterDefinition, item
 	if pants != null:
 		dress.pants = pants.tint
 		dress.has_pants = true
+		dress.pants_style = StringName(ForgeLook.style_for("pants", pants.look_id))
 	var boots: ItemDefinition = item_of.call(&"boots")
 	if boots != null:
 		dress.boots = boots.tint
 		dress.has_boots = true
+		dress.boots_style = StringName(ForgeLook.style_for("shoes", boots.look_id))
 	var helmet: ItemDefinition = item_of.call(&"helmet")
 	if helmet != null:
 		dress.hat = ChibiBody.hat_style_for(helmet)
 		dress.hat_tint = helmet.tint
+	var charm: ItemDefinition = item_of.call(&"accessory")
+	if charm != null:
+		dress.glasses = StringName(ForgeLook.glasses_for(charm))
+		dress.glasses_tint = charm.tint
 	var pet: ItemDefinition = item_of.call(&"pet")
 	if pet != null:
 		dress.pet = PetSprites.kind_for(pet)

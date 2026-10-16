@@ -88,6 +88,7 @@ kbd{font:600 11px/1 ui-monospace,monospace;background:rgba(0,0,0,.25);border-rad
       <label class="toggle"><input type="checkbox" id="anim" checked> Hoạt ảnh</label>
       <label class="toggle"><input type="checkbox" id="black"> Viền đen</label>
       <label class="toggle"><input type="checkbox" id="grid"> Lưới pixel</label>
+      <label class="toggle"><input type="checkbox" id="rear"> Sau lưng</label>
       <span style="flex:1"></span>
       <button class="bgchip bg-dusk on" data-bg="bg-dusk" title="Hoàng hôn"></button>
       <button class="bgchip bg-check" data-bg="bg-check" title="Trong suốt"></button>
@@ -755,6 +756,25 @@ const ITEMS = {
       P(2, 0, [".....hhbbbb....", "...hhbbbbbbbs..", "..hbbbbbbbbbbs.", ".hbbbbbbbbbbbbs",
         "hbbbbbbbbbbbbbs", "aawaaaaawaaaaAA", "AAAAAAAAAAAAAAA"]),
       P(7, 7, ["bb", "bb", "bb", "bs"])] },
+    // mũ sắt: vòm như viking nhưng không sừng, sống mũi, che gáy, đinh tán (game: helm)
+    { id: 'helm', name: 'Mũ sắt', color: '#a9b1bc', accent: '#6b7380', clip: 7, parts: [
+      P(2, 0, [".....hhbbbb....", "...hhbbwbbbbs..", "..hbbbbbbbbbbs.", ".hbbbbbbbbbbbbs",
+        "hbbbbbbbbbbbbbs", "aawaaawaaawaaAA", "AAAAAAAAAAAAAAA"]),
+      P(7, 7, ["bb", "bb", "bb", "bs"]),
+      P(14, 7, ["bbs", "bbs", "bss", "ss."])],
+      rear: [0, 2] },
+    // mũ trùm: ôm cả đầu, chừa khuôn mặt, buông xuống gáy (game: hood)
+    { id: 'hood', name: 'Mũ trùm', color: '#4a4e5c', accent: '#2c2f38', clip: 18, parts: [
+      P(2, 1, [".....hhbbbbb....", "...hhbbbbbbbbs..", "..hbbbbbbbbbbbs.", ".hbbbbbbbbbbbbbs",
+        ".hbbbbbbbbbbbbbs", "hbbbbbbbbbbbbbbs", "hbbaaaaaaabbbbbs", "hba......abbbbbs",
+        "hba.......bbbbbs", "hs........bbbbbs", "bs........abbbbs", "bs........abbbbs",
+        "bs........abbbbs", "s.........abbbss", "..........abbbs.", "..........abbs..",
+        "..........sbbs..", "...........ss..."])],
+      rear: [P(2, 1, [".....hhbbbbb....", "...hhbbbbbbbbs..", "..hbbbbbbbbbbbs.", ".hbbbbbbbbbbbbbs",
+        ".hbbbbbbbbbbbbbs", "hbbbbbbbbbbbbbbs", "hbbbbbbbbbbbbbbs", "hbbbbbbbbbbbbbbs",
+        "hbbbbbbbbbbbbbbs", "hbbbbbbbbbbbbbbs", "bbbbbbbbbbbbbbbs", "bbbbbbbbbbbbbbbs",
+        "sbbbbbbbbbbbbbbs", ".sbbbbbbbbbbbbss", "..sbbbbbbbbbbbs.", "...ssbbbbbbbbs..",
+        "......sbbbbbs...", "........sss....."])] },
     { id: 'crown', name: 'Vương miện', color: '#f2c14e', accent: '#d2384a', clip: 4, parts: [
       P(5, -1, ["h...hb...s", "hb.hbbs.bs", "hbbbaabbbs", "hbabbbbabs", "ssssssssss"])] },
     { id: 'nonla', name: 'Nón lá', color: '#e3c98b', clip: 7, parts: nonLa() },
@@ -1421,6 +1441,76 @@ function compose(cfg, st = {}) {
   return g;
 }
 
+/* ---------- nhìn từ sau lưng (game: hướng lên) ----------
+   Sinh từ bộ nhìn trước: cùng dáng 3/4, mặt bị tóc / gáy che, không kính, vũ khí sau lưng,
+   ống tên và tóc dài đè lên lưng. Chỉ cho tư thế nghỉ / đi (đòn đánh vẫn nhìn trước). */
+// đầu nhìn sau: không mặt; dưới tai chỉ còn gáy (x7..11, tối)
+const HEAD_REAR = HEAD.map((r, j) => 3 + j < 14 ? r.replace(/[eEkm]/g, 'b')
+  : [...r].map((c, i) => c === '.' || 4 + i < 7 || 4 + i > 11 ? '.' : 's').join(''));
+// tóc phủ kín phần đầu tới đường gáy (hàng thấp nhất của tóc ở nửa sau đầu, tối thiểu ngang tai y13)
+function rearHair(it) {
+  if (!it.parts) return null;
+  let neck = 13;
+  for (const pt of it.parts) pt.rows.forEach((row, ry) => {
+    for (let rx = 0; rx < row.length; rx++) {
+      const x = pt.x + rx, y = pt.y + ry;
+      if (row[rx] !== '.' && row[rx] !== 'K' && x >= 12 && x <= 15 && y <= 17) neck = Math.max(neck, y);
+    }
+  });
+  const rows = HEAD.map((row, j) => {
+    const y = 3 + j;
+    return [...row].map((c, i) => {
+      if (c === '.' || y > neck) return '.';
+      const x = 4 + i;
+      return x >= 14 || y === neck ? 's' : y <= 4 && x <= 9 ? 'h' : 'b';
+    }).join('');
+  });
+  return [P(4, 3, rows)];
+}
+function composeRear(cfg, st = {}) {
+  const { bob = 0 } = st;
+  const g = newGrid(), outline = cfg.black ? 'black' : 'color';
+  const KW = RES.weapon, KS = RES.shirt;
+  const it = {}; OPT_CATS.forEach(k => it[k] = findItem(k, (cfg[k] || {}).id));
+  const pal = k => makePal(cfg[k].color, cfg[k].accent);
+  const skin = bodyPal(cfg, false), clip = it.hat.clip ?? null;
+  const D = (parts, pl, o = {}) => (parts || []).forEach(pt => drawPart(g, pt, pl, { outline, ...o }));
+  const up = { dx: 0, dy: bob };
+  const wp = it.weapon, wpal = wp.shape ? pal('weapon') : null;
+  const sh = it.shirt, kind = !sh.parts ? 'none' : sh.sleeve || 'long';
+  const sp = sh.sleeveColor ? makePal(sh.sleeveColor) : pal('shirt');
+  const hairPal = { ...pal('hair'), K: skin.s };
+  let gm = null;
+  if (wp.shape) {
+    const S = [SHOULDER[0], SHOULDER[1] + bob], H2 = wp.hold.slice(0, 2);
+    gm = { S, H: H2, arm: Math.atan2(H2[1] - S[1], H2[0] - S[0]) * 180 / Math.PI, len: Math.hypot(H2[0] - S[0], H2[1] - S[1]) };
+  }
+  D(SHADOW, FIXED);
+  // vũ khí đeo / cầm phía trước người: từ sau lưng bị thân che
+  if (gm) drawPart(g, rasterizeFine(KW, gm.H[0], gm.H[1], wp.reach, local(gm.H[0], gm.H[1], wp.hold[2], (u, v) => wp.shape(u, v, { K: KW, pull: 0, arrow: false }))), wpal, { outline });
+  D(BODY.legs, skin);
+  D(gm ? BODY.upper.slice(0, 2) : BODY.upper, skin, up);
+  if (it.pants.parts) D(it.pants.parts, pal('pants')); else D(UNDER.shorts, makePal(cfg.shorts));
+  D(it.shoes.parts, pal('shoes'));
+  const FK = (parts, f) => parts && parts.map(q => fineOf(q, f));
+  const shirtParts = it.shirt.parts && (gm ? it.shirt.parts.filter(q => !q.near) : it.shirt.parts);
+  if (it.shirt.parts) D(FK(shirtParts, KS), pal('shirt'), up); else D(UNDER.tank, makePal(cfg.tank), up);
+  if (wp.id === 'bow') D(quiverParts(bob, KW), wpal);
+  D(FK(it.shirt.back, KS), pal('shirt'), up);              // mũ trùm của áo buông trên lưng
+  D([P(4, 3, HEAD_REAR)], skin, { ...up, cast: true });
+  D(rearHair(it.hair), hairPal, { ...up, clip, cast: true, inner: false });
+  D(it.hair.parts, hairPal, { ...up, clip, cast: true, inner: false });
+  D(it.hair.back, hairPal, { ...up, clip, cast: true });   // tóc dài, đuôi tóc đè lên lưng
+  // mũ: hình riêng khi nhìn sau (rear: part, hoặc chỉ số các part giữ lại), không thì như nhìn trước
+  const hatRear = !it.hat.rear ? it.hat.parts : typeof it.hat.rear[0] === 'number' ? it.hat.rear.map(i => it.hat.parts[i]) : it.hat.rear;
+  D(FK(hatRear, RES.hat), pal('hat'), { ...up, cast: true });
+  if (!gm) return g;
+  armParts(gm.S, gm.arm, kind, sp, skin, gm.len, KS).forEach(([pt, pl]) => drawPart(g, pt, pl, { outline }));
+  drawPart(g, rasterize(gm.H[0], gm.H[1], 2.5, (px, py) =>
+    Math.hypot(px - gm.H[0], py - gm.H[1]) <= 1.25 ? (py - gm.H[1] > .35 || px - gm.H[0] > .5 ? 's' : 'b') : null), skin, { outline });
+  return g;
+}
+
 function paint(ctx, g, scale, sx = 0, sy = 0, w = W, h = H) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   const k = scale / UNIT, X0 = sx * UNIT, Y0 = sy * UNIT, X1 = (sx + w) * UNIT, Y1 = (sy + h) * UNIT;
@@ -1475,7 +1565,8 @@ const vctx = view.getContext('2d');
 let anim = { bob: 0, blink: false };
 
 function renderView(st = anim) {
-  const g = compose(cfg, st);
+  // "Sau lưng": nhìn từ phía sau (game: hướng lên); đòn đánh vẫn nhìn trước
+  const g = document.getElementById('rear').checked && !st.pose ? composeRear(cfg, st) : compose(cfg, st);
   paint(vctx, g, S);
   const sh = st.pose && st.pose.shake;   // rung màn hình khi đòn nặng trúng đích
   view.style.transform = sh ? `translate(${(Math.random() - .5) * sh * .9}%, ${(Math.random() - .5) * sh * .6}%)` : '';
@@ -1622,6 +1713,7 @@ function startAttack() {
   attack = { start: performance.now(), frames: ANIMS[w.anim], seed: Math.random() * 1e9 | 0 };
 }
 document.getElementById('atk').onclick = startAttack;
+document.getElementById('rear').onchange = () => renderView();
 const loopEl = document.getElementById('loopAtk');
 function loop(t) {
   if (attack) {                              // phát chuỗi khung đòn đánh

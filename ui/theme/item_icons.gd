@@ -14,6 +14,7 @@ const PALETTE := {
 ## Default tint for kinds whose item has none (white = untinted).
 const KIND_TINT := {
 	&"sword": Color("c8d0d8"), &"dagger": Color("c8d0d8"), &"bow": Color("8b5e3c"), &"mace": Color("b8bcc4"),
+	&"axe": Color("c8d0d8"), &"spear": Color("c8d0d8"), &"staff": Color("5fa8ff"), &"glasses": Color("b8bcc4"),
 	&"armor": Color("b8bcc4"), &"potion": Color("ff6b7a"), &"helmet": Color("b8bcc4"), &"pants": Color("8b5e3c"),
 	&"boots": Color("8b5e3c"), &"necklace": Color("5fa8ff"), &"charm": Color("a78bfa"), &"skin": Color("c9503f"), &"pet": Color("c8925a"),
 }
@@ -106,6 +107,38 @@ const BITMAPS := {
 		".........kbbbkk.........", ".......kkbbbk...........", ".......kbbbkk...........", ".....kkbbbk.............",
 		".....kbbbkk.............", "...kkbbbk...............", "...kbbbkk...............", ".kkkbbk.................",
 		"kkBBkkk.................", "kkBBk...................", ".kkkk...................", "..kk....................",
+	],
+	&"axe": [
+		"........................", "........................", "........................", "...............kkkkkk...",
+		"..............kkbkktkk..", ".............kkbbBtttkk.", "............kkbbBtttttkk", "...........kkbbByytttttk",
+		"...........kbbByyTTtttLk", "..........kkbByyTTTTtLkk", ".........kkbbTTTTTTTLLk.", "........kkbbTTTTTTTLLkk.",
+		".......kkbbBkTTTTTLLkk..", "......kkbbBkkkTTTLLkk...", ".....kkbbBkk.kkTLkkk....", "....kkbbBkk...kkkk......",
+		"....kbbBkk..............", "...kkbBBk...............", "..kkbbBkk...............", ".kkbbBkk................",
+		".kbbBkk.................", ".kkBkk..................", "..kkk...................", "........................",
+	],
+	&"spear": [
+		"........................", "....................kkk.", "..................kkkTk.", "................kkkLTkk.",
+		"..............kkkLLTTk..", ".............kkLLLTTkk..", ".............kLLLTTtk...", ".............kLLTTtkk...",
+		"............kkLTTttk....", "...........kkbTTttkk....", "..........kkbTBkkkk.....", ".........kkbrykk........",
+		"........kkbbyrk.........", ".......kkbbBkkk.........", "......kkbbBkk...........", ".....kkbbBkk............",
+		"....kkbbBkk.............", "...kkbbBkk..............", "..kkbbBkk...............", ".kkbbBkk................",
+		"kkbbBkk.................", "kbbBkk..................", "kkBkk...................", ".kkk....................",
+	],
+	&"staff": [
+		"........................", ".............kkkkkkkk...", "............kkyyyyyykk..", "............kyyTTTTook..",
+		"............kyTTLLTTok..", "............kyTLwLLTok..", "............kyTLLLLTok..", "............kyTTLLTTok..",
+		"............kyoTTTTook..", "...........kkbooooookk..", "..........kkbBkkkkkkk...", ".........kkbbBk.........",
+		"........kkbbBkk.........", "........kbbBkk..........", ".......kkbBkk...........", "......kkbBkk............",
+		".....kkbbBk.............", "....kkbbBkk.............", "....kbbBkk..............", "...kkbBkk...............",
+		"..kkbbkk................", "..kbbBk.................", "..kkBkk.................", "...kkk..................",
+	],
+	&"glasses": [
+		"........................", "........................", "........................", "........................",
+		"........................", "........................", "...kkkkkkk....kkkkkkk...", "..kkTTTTTkk..kkTTTTTkk..",
+		".kkTTTTTTTkkkkTTTTTTTkk.", "kkTTwwwwwTTkkTTwwwwwTTkk", "TTTwwwwwwwTTTTwwwwwwwTTT", "kTTlwwwwwwTTTTlwwwwwwTTk",
+		"kTTllwwwwwTTTTllwwwwwTTk", "kTTlllwwwwTTTTlllwwwwTTk", "kTTllllwwwTTTTllllwwwTTk", "kkTTllllwTTkkTTllllwTTkk",
+		".kkTTTTTTTkkkkTTTTTTTkk.", "..kkTTTTTkk..kkTTTTTkk..", "...kkkkkkk....kkkkkkk...", "........................",
+		"........................", "........................", "........................", "........................",
 	],
 	&"armor": [
 		".....kkkk......kkkk.....", "...kkkkkkkk..kkkkkkkk...", "...kkTTTTkkkkkkTTTTkk...", ".kkTTTTTTTkkkkTTTTTTkkk.",
@@ -226,7 +259,7 @@ static func kind_of(item: ItemDefinition) -> StringName:
 		ItemDefinition.EquipmentSlot.RING:
 			return &"ring"
 		ItemDefinition.EquipmentSlot.ACCESSORY:
-			return &"charm"
+			return &"glasses" if String(item.look_id).begins_with("glasses_") else &"charm"
 		ItemDefinition.EquipmentSlot.SKIN:
 			return &"skin"
 		ItemDefinition.EquipmentSlot.PET:
@@ -239,6 +272,12 @@ static func kind_of(item: ItemDefinition) -> StringName:
 				return &"dagger"
 			if id.contains("mace") or id.contains("hammer") or id.contains("club"):
 				return &"mace"
+			if id.contains("axe"):
+				return &"axe"
+			if id.contains("spear") or id.contains("lance"):
+				return &"spear"
+			if id.contains("staff") or id.contains("wand"):
+				return &"staff"
 			return &"sword"
 		ItemDefinition.ItemType.ARMOR:
 			return &"armor"

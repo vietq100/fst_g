@@ -21,3 +21,4 @@ equipment_slot = 9
 modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0")])
 tint = Color(0.86, 0.9, 0.96, 1)
 outfit_id = &"guardian"
+look_id = &"robe"

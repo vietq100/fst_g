@@ -62,6 +62,8 @@ Hit radius (extra body size added to attackers' reach): Forest Guardian 14 px, o
 
 Skeleton attack range 20 px; drops Iron Ore ×1 (30%), Dark Essence ×1 (4%).
 
+Rare gear drops (D75): Goblin Straw Hat 3%, Eye Patch 2%, Cowboy Hat 1.5%, Battle Axe 1.5%; Wolf Iron Spear 1.5%; Slime Oak Staff 2%, Round Glasses 1.5%; Skeleton Hunter Goggles 1.5%, Viking Helm 1%, Ember Staff 0.8%.
+
 ## Regions (world redesign, D27, D29)
 | Region | Monsters | Monster level | Min Hunter level (Auto) | Population cap | Respawn |
 |---|---|---|---|---|---|
@@ -175,8 +177,21 @@ New village: 6 Meat Stew in stock.
 | Iron Sword | Uncommon | weapon | +7 atk | 50 gold + 5 Iron Ore | 20 |
 | Iron Armor | Uncommon | armor | +6 def, +20 HP | 60 gold + 6 Iron Ore | 25 |
 | Fang Blade | Rare | weapon | +10 atk, +5% crit | 150 gold + 8 Beast Fang + 1 Dark Essence (Blacksmith Lv2) | 60 |
+| Battle Axe (D75) | Uncommon | weapon | +8 atk | 55 gold + 6 Iron Ore | 22 |
+| Iron Spear (D75) | Uncommon | weapon | +6 atk, +5% atk speed | 50 gold + 4 Iron Ore + 2 Beast Fang | 20 |
+| Oak Staff (D75) | Uncommon | weapon | +5 atk, +5% XP | 45 gold + 3 Wild Herb + 2 Iron Ore | 20 |
+| Ember Staff (D75) | Rare | weapon | +10 atk, +10% crit dmg (fire effects) | 150 gold + 6 Slime Gel + 1 Dark Essence (Blacksmith Lv2) | 60 |
+| Round Glasses (D75) | Uncommon | accessory | +5% XP | 40 gold + 2 Iron Ore | 25 |
+| Eye Patch (D75) | Common | accessory | +2% crit | 20 gold + 2 Beast Fang | 8 |
+| Hunter Goggles (D75) | Rare | accessory | +2 atk, +3% crit | 90 gold + 4 Iron Ore + 2 Slime Gel (Blacksmith Lv2) | 55 |
+| Straw Hat (D75) | Common | helmet | +1 def, +2 move speed | 15 gold + 3 Wild Herb | 5 |
+| Cowboy Hat (D75) | Uncommon | helmet | +3 def, +2% crit | 45 gold + 3 Beast Fang + 1 Iron Ore | 22 |
+| Viking Helm (D75) | Rare | helmet | +6 def, +15 HP, +2 atk | 110 gold + 6 Iron Ore + 3 Bone Dust (Blacksmith Lv2) | 60 |
 
 Materials sell: Iron Ore 3, Beast Fang 4, Dark Essence 25. Stack size 99, one slot per stack.
+
+## Barber (D77)
+Changing a Hunter's hair style and colour costs 100 gold (`GameConfig.restyle_cost`).
 
 ## Mood (0–100, start 60)
 | State | Range | Effect |

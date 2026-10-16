@@ -49,6 +49,7 @@ Show:
 - HP
 - XP
 - equipment
+- barber: hair style and colour pickers on a preview figure, "New look" for gold (D77)
 - traits
 - mood (icon/colour state)
 - current activity / task (resting / training / socializing / sleeping / eating / hunting / returning / fetching / carrying / fallen)

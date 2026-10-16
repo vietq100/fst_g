@@ -1,7 +1,7 @@
 # PHASE 13 — Character Forge: thay bộ nhân vật chibi bằng bộ "Pixel Hero Forge"
 
 > Tài liệu giao việc cho agent. Viết theo `DOCS/ROADMAP/AGENT_TASK_TEMPLATE.md` và tuân thủ `DOCS/00_RULES.md`.
-> Trạng thái: **ĐANG LÀM — bước 1–3 (exporter + dữ liệu + golden; palette + renderer + compose + vũ khí/tay ở tư thế nghỉ) xong; xem "Completion report".** Owner yêu cầu ngày 2026-10-15. Quyết định Q1–Q6 đã chốt ngày 2026-10-15 (D73, §5).
+> Trạng thái: **XONG PHẦN CODE — bước 1–7 xong, thêm góc nhìn sau lưng và mũ helm/hood thật (D76); chưa chạy test bằng Godot (máy chưa có Godot 4.7). Xem "Completion report".** Owner yêu cầu ngày 2026-10-15. Quyết định Q1–Q6 đã chốt ngày 2026-10-15 (D73, §5).
 
 ## Task
 
@@ -294,6 +294,55 @@ Owner đồng ý toàn bộ mặc định ngày 2026-10-15:
 - Chưa làm: tư thế ra đòn + FX (`attack_*` golden, bước 6), nướng lượt lớp và nối vào `ChibiVisual` (bước 4), ánh xạ appearance/dress (5), dọn chibi cũ (7).
 - Next: bước 4 (baker ops → runs cùng độ phân giải, vẽ trong `ChibiVisual`, offset nhóm part theo bảng cũ).
 
+### Bước 4–5 và một phần bước 6 (2026-10-16, chưa chạy Godot)
+- `forge_composer.gd`:
+  - `st.offsets` (nhóm → `Vector2i`) dời nguyên part theo bảng `ChibiAnimations`: đầu/tóc/kính/mũ = head; thân, tank, áo, mũ trùm, ống tên, dây đeo = torso; tay xa và tay áo xa = arm_l; tay gần, tay áo `near`, vai của tay cầm vũ khí = arm_r; chân và giày theo cột = leg_l/leg_r; quần/quần đùi đi theo chân cao hơn (không tách quần nên không sinh nét trong ở đường cắt).
+  - `st.hand` dời tay cầm vũ khí ở tư thế nghỉ. `st.pose` = một khung `ANIMS` (port `poseGeom`, `behind`, `ext`, cung thủ hai tay, `pull`, `arrow`), **chưa vẽ hiệu ứng**. `st.no_weapon`, `st.no_shadow`. `hand_of()` trả vị trí tay.
+  - Offset bằng 0 cho đúng op như engine gốc.
+- `forge_frame.gd` (`ForgeFrame`): nướng op thành các lượt cùng cỡ ô (texel = ước chung của lưới lượt, ≥ nửa ô), vẽ bằng `draw_set_transform_matrix` (lật, zoom, xoay quanh chân). Mô phỏng Python trên 8 golden: khớp vẽ trực tiếp, chỉ lệch làm tròn 8-bit; 6–11 lượt mỗi khung.
+- `forge_look.gd` (`ForgeLook`): ánh xạ §3.6 (tóc 18 kiểu, áo/quần/giày theo class, `look_id`/`outfit_id`, alias `iron_plate`/`light_leather`, kính `glasses_*`, vũ khí theo `look_id`/từ khoá/WeaponSprites/class, nguyên tố theo hậu tố), cache khung dùng chung (tối đa 4000), `sequence()` chuyển `ANIMS` thành khung `{dur, pose}`, `figure()` cho UI, `PORTRAIT` = Rect2(-14, -40, 27, 29).
+- `forge_data.gd`: thêm mũ `helm` (viking bỏ 2 part sừng) và `hood` (= beanie) khi nạp dữ liệu (Q4, chờ HTML có biến thể thật).
+- `ChibiVisual` vẽ bằng Forge:
+  - Hướng: trái gốc, phải lật, lên/xuống giữ hướng ngang cuối.
+  - IDLE: nhịp thở 520 ms và chớp mắt 140 ms / 3,4 s, lệch pha theo từng Hunter.
+  - Animation bảng: dời part theo nhóm.
+  - ATTACK: chuỗi Forge của vũ khí, thời lượng từng khung. SKILL với gậy phép: `cast`.
+  - Chết: khung đứng xoay ±90° quanh chân.
+  - Khiên ở tay xa; bóng 9×3; linh hồn ở −18.
+  - Bỏ vẽ vũ khí kiểu cũ (`WeaponSprites` chỉ còn cho quái).
+- `ChibiDress`: thêm `top`, `pants_style`, `boots_style`, `glasses`, `glasses_tint`. `EquipmentService.dress_for` đọc chúng từ đồ (accessory → kính).
+- `ChibiBody.hat_style_for` nhận id mũ Forge, thêm từ khoá cowboy/viking/beanie/nonla/straw.
+- `Hunter._refresh_equipment_look` đặt `forge_weapon`, `element`; không có vũ khí thì `weapon_color` = trắng (màu gốc Forge).
+- `HunterPortrait`, `HunterFigure`: vẽ `ForgeFrame` (portrait cắt bằng `clip_contents`).
+- `HunterAppearance.HAIR_STYLE_COUNT` = 18; `ChibiAnimations.PIXEL_SCALE` = 1.0.
+- Exporter: thêm golden `pose_<vũ khí>_<0|2>` (18 cấu hình, khung bỏ khoá hiệu ứng). Golden cũ không đổi.
+- Test mới trong `test_forge.gd`:
+  - pose khớp golden;
+  - offset 0 không đổi op, offset đầu dời đúng 2 px;
+  - khung nướng có đủ 4 cỡ texel và chân ở gốc;
+  - ánh xạ class/đồ/vũ khí/kính/mũ;
+  - `ChibiVisual` nướng được mọi khung của mọi animation với búa, cung, gậy, tay không.
+- Sửa test `test_offsets_groups_and_side_override` theo `PIXEL_SCALE` 1.0.
+- **Chưa làm**:
+  - Hiệu ứng đòn đánh (`fxArc/Burst/Ring/Glow/Strike/Particles/Cross`, hào quang vũ khí) — bước 6 còn lại. Các golden `attack_*` vẫn chưa được test.
+  - Dọn chibi cũ (bước 7): `ChibiBody.get_frames/get_portrait/get_figure` và các map cũ vẫn còn, chỉ test cũ dùng.
+  - Đo hiệu năng.
+- **Rủi ro**: chưa chạy được Godot nên có thể còn lỗi phân tích kiểu GDScript. Lần chạy test đầu tiên cần xem kỹ `test_forge.gd`, `test_appearance.gd`, `test_equipment.gd`.
+
+### Bước 6 (2026-10-16, chưa chạy Godot; D75)
+- `forge_fx.gd` (`ForgeFx`): port 1:1 `fput/fline/fxArc/fxRing/fxBurst/fxGlow/fxCross/fxParticles/fxStrike/boltPath/aura` và `rng32` (mulberry32, đã so 16 số với JS: khớp).
+- `forge_composer.gd`: vẽ hiệu ứng đúng thứ tự lớp HTML (vòng phép, sóng chấn động ở lớp đất; hào quang vũ khí; vệt chém trước tay; vệt tốc độ, dấu X, tụ lực, cột phép, mũi tên bay, nổ sao, hạt sau nắm tay). `st.frames/fi/p/t/seed`; `_impact` = `impactPoint`.
+- `ChibiVisual`: khung đòn truyền `fi`, `t` = thời điểm bắt đầu khung, `p` = 0,5, `seed` = 3 (nướng một lần mỗi khung).
+- Nguyên tố theo skill: `ForgeLook.element_for_skill` (theo hiệu ứng trạng thái skill gây ra), `ChibiVisual.play_skill(element, attacking)` gọi từ `ClassSkillCaster.try_cast`. Skill hỗ trợ giờ chơi animation SKILL.
+- Golden mới: `fx_<nguyên tố>_<slash|strike|rest>` (18 cấu hình); test `test_attack_effects_match_original` so cả `attack_*` và `fx_*`. Test `test_skill_casts_in_its_element`.
+
+### Bước 7 và phần thêm (2026-10-16, chưa chạy Godot; D76)
+- HTML: thêm mũ `helm` (vòm sắt, đinh tán, sống mũi, che gáy) và `hood` (trùm kín tóc, chừa mặt); `composeRear` + nút "Sau lưng"; `HEAD_REAR`, `rearHair` (md5 HTML `47147b72bea89437c9e40a04eb73c6a0`, 1740 dòng).
+- Exporter: `body.head_rear`, `hair[].rear`, hat `rear`/`rear_keep`; golden `rear_*` (6) và `hat_helm`, `hat_hood`.
+- `ForgeComposer.compose_rear` (port 1:1, có offset nhóm part); `compose(st.back)` gọi nó. `ChibiVisual`: hướng lên dùng góc sau (khoá cache `rear|…`); đòn đánh và nằm chết vẫn nhìn trước. Bỏ mũ tạm trong `ForgeData`.
+- Bước 7: `ChibiBody` chỉ còn `SKINS`, `HAIR_COLORS`, `OUTFITS` (danh sách class), `hat_style_for`, `outfit_for`, `view_of`, `View`; bỏ `ChibiDress.ramp`. Viết lại `test_appearance.gd` (tóc Forge đủ 18 kiểu có góc sau, mọi animation × 4 hướng nướng được, dáng đứng và chân dung, ánh xạ màu/class) và sửa `test_equipment.gd` dùng `ForgeLook.figure`.
+- Test mới: `test_rear_view_matches_original`.
+
 ### Files changed
 `tools/character_forge/*`, `actors/hunter/forge/forge_data.json`, `tests/fixtures/forge_golden/*`, `DOCS/DECISIONS.md`, `DOCS/DESIGN/ASSET_SPEC.md`, file này.
 
@@ -305,4 +354,5 @@ Chạy exporter bằng Node (không chạy Godot). Kiểm tra: số lượng ite
 - Vũ khí và hiệu ứng là hình học trong JS nên phải port tay (không xuất sẵn được).
 
 ### Next step
-Bước 2: `forge_palette.gd` + `forge_renderer.gd` + `tests/unit/test_forge.gd` (golden `ramp.json` và `compose.json` cho `core`, `preset`).
+1. Cài Godot 4.7, chạy `godot --headless --path . -s res://tests/run_tests.gd`, sửa lỗi nếu có. Kiểm tra trong `world/test_arena/` (4 hướng, đổi đồ, ra đòn, skill).
+2. Đo hiệu năng với 30 Hunter (§6.5).

@@ -21,6 +21,7 @@ Loc="*res://core/localization.gd"
 DataRegistry="*res://core/data_registry.gd"
 GameManager="*res://core/game_manager.gd"
 SaveManager="*res://core/save_manager.gd"
+Audio="*res://core/audio/audio_manager.gd"
 
 [display]
 

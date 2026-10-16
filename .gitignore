@@ -4,3 +4,6 @@
 
 # macOS
 .DS_Store
+
+# Generated previews (tools/character_forge/export_sheets.js)
+/build/

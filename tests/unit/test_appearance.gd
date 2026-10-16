@@ -1,5 +1,5 @@
 extends TestCase
-## Hunter look (D47 data) and the chibi body + animations (D49).
+## Hunter look (D47 data), the Forge body (D73) and the animations (D49).
 
 
 func test_appearance_round_trip_and_sanitize() -> void:
@@ -35,104 +35,57 @@ func test_runtime_saves_appearance_and_old_saves_get_one() -> void:
 	assert_eq(first.appearance.key(), second.appearance.key())
 
 
-func test_body_map_is_well_formed() -> void:
-	assert_eq(ChibiBody.BODY.size(), ChibiBody.BODY_SIZE.y)
-	for view in [ChibiBody.View.FRONT, ChibiBody.View.BACK, ChibiBody.View.SIDE]:
-		for row: String in ChibiBody.body_map(view):
-			assert_eq(row.length(), ChibiBody.BODY_SIZE.x, "view %d" % view)
-	var symbols := ChibiBody.palette_for(HunterAppearance.new())
-	for row: String in ChibiBody.BODY:
-		for symbol in row:
-			assert_true(symbol == "." or symbols.has(symbol), "symbol " + symbol)
-	for outfit: StringName in ChibiBody.OUTFITS:
-		var rows: Array = ChibiBody.OUTFITS[outfit]
-		assert_eq(rows.size(), ChibiBody.BODY_SIZE.y - ChibiBody.TORSO_ROW, "outfit %s rows" % outfit)
-		for row: String in rows:
-			assert_eq(row.length(), ChibiBody.BODY_SIZE.x, "outfit %s" % outfit)
-			for symbol in row:
-				assert_true(symbol == "." or symbols.has(symbol), "outfit %s symbol %s" % [outfit, symbol])
-	for style in ChibiBody.HAIR_STYLES.size():
-		for view in [ChibiBody.View.FRONT, ChibiBody.View.BACK, ChibiBody.View.SIDE]:
-			for row: String in ChibiBody.hair_map(style, view):
-				assert_eq(row.length(), ChibiBody.BODY_SIZE.x, "hair %d view %d" % [style, view])
-				for symbol in row:
-					assert_true(symbol == "." or symbols.has(symbol), "hair symbol " + symbol)
-	# Back view has no eyes; side view hides the far ear.
-	assert_false(String(ChibiBody.body_map(ChibiBody.View.BACK)[12]).contains("w"))
-	assert_eq(String(ChibiBody.body_map(ChibiBody.View.SIDE)[12])[0], ".")
-	# Female lashes sit outside each eye, in both front and side views.
-	assert_eq(String(ChibiBody.body_map(ChibiBody.View.FRONT, &"", true)[ChibiBody.LASH_ROW])[ChibiBody.LASH_COLS.x], "r")
-	assert_eq(String(ChibiBody.body_map(ChibiBody.View.SIDE, &"", true)[ChibiBody.LASH_ROW])[ChibiBody.LASH_COLS.y + 1], "r")
-	assert_eq(String(ChibiBody.body_map(ChibiBody.View.FRONT, &"", false)[ChibiBody.LASH_ROW])[ChibiBody.LASH_COLS.x], "s")
+func test_every_hair_style_is_a_forge_hair() -> void:
+	assert_eq(ForgeLook.HAIR_IDS.size(), HunterAppearance.HAIR_STYLE_COUNT)
+	for id: String in ForgeLook.HAIR_IDS:
+		assert_true(ForgeData.has_item("hair", id), "hair " + id)
+		assert_true(ForgeData.find_item("hair", id).has("rear"), "hair %s has a rear view" % id)
+	assert_eq(ChibiBody.SKINS.size(), HunterAppearance.SKIN_COUNT)
+	assert_eq(ChibiBody.HAIR_COLORS.size(), HunterAppearance.HAIR_COLOR_COUNT)
 
 
-func test_every_animation_composes_on_every_facing() -> void:
-	# Long hair (the widest lying silhouette) in the Guardian outfit.
-	var look := HunterAppearance.from_dict({"hair_style": 1})
-	for animation: StringName in ChibiAnimations.ANIMATIONS:
-		for facing in [Facing.Direction.DOWN, Facing.Direction.UP, Facing.Direction.LEFT, Facing.Direction.RIGHT]:
-			var frames := ChibiBody.get_frames(look, facing, animation, &"guardian")
-			assert_eq(frames.size(), ChibiAnimations.get_frames(animation).size(), "%s %d" % [animation, facing])
-			for texture in frames:
-				var image := texture.get_image()
-				assert_eq(image.get_size(), ChibiBody.CANVAS)
-				var used := image.get_used_rect()
-				assert_true(used.size.x >= 12 and used.size.y >= 12, "%s %d visible" % [animation, facing])
-				assert_true(used.end.y <= ChibiBody.CANVAS.y, "inside canvas")
+func test_every_animation_bakes_on_every_facing() -> void:
+	# Long hair in the Guardian outfit, hammer and shield.
+	var visual := ChibiVisual.new()
+	visual.set_class_style(&"guardian")
+	visual.appearance = HunterAppearance.from_dict({"hair_style": 6})
+	for facing in [Facing.Direction.DOWN, Facing.Direction.UP, Facing.Direction.LEFT, Facing.Direction.RIGHT]:
+		visual.facing = facing
+		for animation: StringName in ChibiAnimations.ANIMATIONS:
+			visual._animation = animation
+			for index in visual._frames_of(animation).size():
+				visual._frame = index
+				var frame := visual._body_frame()
+				assert_true(frame.textures.size() > 0, "%s %d %d" % [animation, facing, index])
+				assert_true(frame.rect.size.x >= 10.0 and frame.rect.size.y >= 20.0, "%s %d visible" % [animation, facing])
+				assert_true(frame.rect.end.y <= 1.5, "%s %d on the feet" % [animation, facing])
+	visual.facing = Facing.Direction.UP
+	visual._animation = ChibiAnimations.WALK
+	visual._frame = 0
+	assert_true(visual._state_key().begins_with("rear|"), "facing up shows the back")
+	visual.free()
 
 
-func test_rest_pose_matches_reference_and_lying_is_wide() -> void:
-	var look := HunterAppearance.new()
-	var rest := ChibiBody.compose(look, ChibiBody.View.FRONT, {})
-	var rest_used := rest.get_used_rect()
-	# The body fills its box; hair adds a few rows above the head.
-	assert_eq(rest_used.end, ChibiBody.BODY_ORIGIN + ChibiBody.BODY_SIZE)
-	assert_eq(rest_used.position.x, ChibiBody.BODY_ORIGIN.x)
-	assert_true(rest_used.position.y <= ChibiBody.BODY_ORIGIN.y and rest_used.position.y >= ChibiBody.BODY_ORIGIN.y + ChibiBody.HAIR_TOP)
-	# Cheek below the fringe is skin.
-	assert_true(rest.get_pixel(ChibiBody.BODY_ORIGIN.x + 11, ChibiBody.BODY_ORIGIN.y + 16).is_equal_approx(ChibiBody.SKINS[0][1]))
-	var lying := ChibiBody.compose(look, ChibiBody.View.FRONT, {"lying": true})
-	var used := lying.get_used_rect()
-	assert_true(used.size.x > used.size.y, "lying body is horizontal")
-	assert_eq(used.end.y, ChibiBody.CANVAS.y - 1)
+func test_rest_figure_and_portrait() -> void:
+	var figure := ForgeLook.figure(HunterAppearance.new(), ChibiDress.plain(&"warrior"))
+	# A ~16×35 body standing on the origin.
+	assert_true(figure.rect.size.x >= 12.0 and figure.rect.size.x <= 30.0, "width %s" % figure.rect)
+	assert_true(figure.rect.size.y >= 30.0 and figure.rect.size.y <= 44.0, "height %s" % figure.rect)
+	assert_true(absf(figure.rect.end.y) <= 1.5, "feet at the origin")
+	assert_true(figure.rect.intersects(ForgeLook.PORTRAIT), "the portrait crops the head")
 
 
-func test_raised_body_never_tears_from_the_legs() -> void:
-	var image := ChibiBody.compose(HunterAppearance.new(), ChibiBody.View.FRONT, {"body": [0, -2]})
-	# Every row between the head top and the feet has pixels.
-	var used := image.get_used_rect()
-	for y in range(used.position.y, used.end.y):
-		var filled := false
-		for x in range(used.position.x, used.end.x):
-			if image.get_pixel(x, y).a > 0.0:
-				filled = true
-				break
-		assert_true(filled, "row %d" % y)
-
-
-func test_skin_and_dye_recolour() -> void:
-	var a := HunterAppearance.from_dict({"skin": 0, "dye": 0})
-	var b := HunterAppearance.from_dict({"skin": 3, "dye": 5})
-	var head := ChibiBody.BODY_ORIGIN + Vector2i(11, 16)
-	var shorts := ChibiBody.BODY_ORIGIN + Vector2i(11, 33)
-	var image_a := ChibiBody.compose(a, ChibiBody.View.FRONT, {})
-	var image_b := ChibiBody.compose(b, ChibiBody.View.FRONT, {})
-	assert_false(image_a.get_pixel(head.x, head.y).is_equal_approx(image_b.get_pixel(head.x, head.y)))
-	assert_false(image_a.get_pixel(shorts.x, shorts.y).is_equal_approx(image_b.get_pixel(shorts.x, shorts.y)))
-	assert_eq(ChibiBody.get_portrait(a).get_size(), Vector2(ChibiBody.PORTRAIT_RECT.size))
-
-
-func test_hair_and_outfit_layers() -> void:
-	var dark := HunterAppearance.from_dict({"hair_style": 0, "hair_color": 0})
-	var blonde := HunterAppearance.from_dict({"hair_style": 0, "hair_color": 4})
-	var top := ChibiBody.BODY_ORIGIN + Vector2i(11, 1)
-	var image_dark := ChibiBody.compose(dark, ChibiBody.View.FRONT, {})
-	var image_blonde := ChibiBody.compose(blonde, ChibiBody.View.FRONT, {})
-	assert_false(image_dark.get_pixel(top.x, top.y).is_equal_approx(image_blonde.get_pixel(top.x, top.y)), "hair colour")
-	var chest := ChibiBody.BODY_ORIGIN + Vector2i(11, 26)
-	var warrior := ChibiBody.compose(dark, ChibiBody.View.FRONT, {}, &"warrior")
-	var ranger := ChibiBody.compose(dark, ChibiBody.View.FRONT, {}, &"ranger")
-	assert_false(warrior.get_pixel(chest.x, chest.y).is_equal_approx(ranger.get_pixel(chest.x, chest.y)), "class outfit")
+func test_skin_hair_and_outfit_change_the_look() -> void:
+	var a := HunterAppearance.from_dict({"skin": 0, "dye": 0, "hair_color": 0})
+	var b := HunterAppearance.from_dict({"skin": 3, "dye": 5, "hair_color": 4})
+	var cfg_a := ForgeLook.config(a)
+	var cfg_b := ForgeLook.config(b)
+	assert_true(cfg_a["skin"] != cfg_b["skin"], "skin")
+	assert_true(cfg_a["shorts"] != cfg_b["shorts"], "dye")
+	assert_true(cfg_a["hair"]["color"] != cfg_b["hair"]["color"], "hair colour")
+	assert_true(cfg_a["eyes"] != cfg_b["eyes"], "eyes follow the hair (D51)")
+	assert_eq(ForgeLook.config(a, ChibiDress.plain(&"warrior"))["shirt"]["id"], "armor")
+	assert_eq(ForgeLook.config(a, ChibiDress.plain(&"ranger"))["shirt"]["id"], "jacket")
 	var promoted := HunterDefinition.new()
 	promoted.class_id = &"templar"
 	promoted.promotion_of = &"guardian"
@@ -146,11 +99,11 @@ func test_hair_and_outfit_layers() -> void:
 func test_offsets_groups_and_side_override() -> void:
 	var frame := {"body": [0, -1], "arm_r": [0, 1], "side": {"arm_r": [2, 0]}}
 	var front := ChibiAnimations.resolve_offsets(frame, false)
-	assert_eq(front[&"head"], Vector2i(0, -2))
+	assert_eq(front[&"head"], Vector2i(0, -1))
 	assert_eq(front[&"arm_r"], Vector2i(0, 0))
 	assert_eq(front[&"leg_l"], Vector2i.ZERO)
 	var side := ChibiAnimations.resolve_offsets(frame, true)
-	assert_eq(side[&"arm_r"], Vector2i(3, -2))
+	assert_eq(side[&"arm_r"], Vector2i(2, -1))
 
 
 func test_visual_state_machine() -> void:

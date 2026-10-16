@@ -61,3 +61,146 @@ func test_weapon_rows_match_original() -> void:
 			var want: Dictionary = golden[id][angle]
 			var part := ForgeShapes.weapon_part(weapon, 2.0, [hold[0], hold[1]], float(angle), {"K": 2.0, "pull": 0.0, "arrow": false})
 			assert_eq(part["rows"], want["rows"], "weapon %s at %s" % [id, angle])
+
+
+func test_rear_view_matches_original() -> void:
+	for name: String in _load("compose.json"):
+		if name.begins_with("rear_"):
+			_compare(name)
+
+
+func test_attack_poses_match_original() -> void:
+	for name: String in _load("compose.json"):
+		if name.begins_with("pose_"):
+			_compare(name)
+
+
+func test_zero_offsets_change_nothing_and_groups_move_whole_parts() -> void:
+	var entry: Dictionary = _load("compose.json")["preset"]
+	var zero := {&"head": Vector2i.ZERO, &"torso": Vector2i.ZERO, &"arm_l": Vector2i.ZERO, &"arm_r": Vector2i.ZERO,
+		&"leg_l": Vector2i.ZERO, &"leg_r": Vector2i.ZERO}
+	var still := ForgeComposer.compose(entry["cfg"], {"offsets": zero})
+	assert_eq(still.ops.size(), (entry["ops"] as Array).size(), "zero offsets: same ops")
+	var raised := ForgeComposer.compose(entry["cfg"], {"offsets": {&"head": Vector2i(0, -2)}})
+	assert_almost_eq(_top(raised.ops), _top(still.ops) - 2.0 * ForgeRenderer.UNIT, 0.01, "head (the top) raised 2 px")
+
+
+func _top(ops: Array) -> float:
+	var top := INF
+	for op: Array in ops:
+		top = minf(top, op[1])
+	return top
+
+
+func test_baked_frame_keeps_every_detail_level() -> void:
+	var entry: Dictionary = _load("compose.json")["glasses_round"]
+	var g := ForgeComposer.compose(entry["cfg"], entry["st"])
+	var frame := ForgeFrame.bake(g)
+	assert_true(frame.textures.size() >= 4 and frame.textures.size() <= 12, "a few runs: %d" % frame.textures.size())
+	# Texel sizes in renderer units: 30 body (1×), 10 clothes grid (1.5× parts), 15 weapon (2×), 12 glasses (2.5×).
+	var texels := {}
+	for texel in frame.texels:
+		texels[roundi(texel * ForgeRenderer.UNIT)] = true
+	for want: int in [30, 10, 15, 12]:
+		assert_true(texels.has(want), "texel %d units" % want)
+	# Feet at the origin: the shadow ends on design row 37 (the frame may hold one row more).
+	assert_true(frame.rect.end.y > -0.01 and frame.rect.end.y < 1.01, "feet at the origin: %s" % frame.rect)
+	assert_true(frame.rect.position.y < -30.0 and frame.rect.size.x < 30.0, "a 16×35 body: %s" % frame.rect)
+	for texture in frame.textures:
+		assert_true(texture.get_image().get_used_rect().size.x > 0, "no empty layer")
+	assert_eq(frame.get_rect(true).end.x, -frame.rect.position.x, "mirrored about the feet")
+
+
+func test_look_maps_classes_gear_and_weapons() -> void:
+	var look := HunterAppearance.from_dict({"hair_style": 6, "skin": 1})
+	var cfg := ForgeLook.config(look, ChibiDress.plain(&"ranger"), "bow")
+	assert_eq(cfg["hair"]["id"], "long")
+	assert_eq(cfg["shirt"]["id"], "jacket")
+	assert_eq(cfg["pants"]["id"], "cargo")
+	assert_eq(cfg["shoes"]["id"], "boots")
+	assert_eq(cfg["weapon"]["id"], "bow")
+	assert_eq(ForgeLook.config(look, ChibiDress.plain(&""))["shirt"]["id"], "none", "core tank top")
+	var dress := ChibiDress.plain(&"warrior")
+	dress.hat = &"helm"
+	dress.glasses = &"round"
+	dress.has_cloth = true
+	dress.cloth = Color("c94a4a")
+	var worn := ForgeLook.config(look, dress)
+	assert_eq(worn["hat"]["id"], "helm")
+	assert_eq(worn["glasses"]["id"], "round")
+	assert_eq(worn["shirt"]["color"], "#c94a4a")
+	assert_eq(ForgeData.find_item("hat", "helm")["id"], "helm", "helm and hood are Forge hats (D73 / Q4)")
+	assert_eq(ForgeData.find_item("hat", "hood")["id"], "hood")
+	var staff := ItemDefinition.new()
+	staff.id = &"oak_staff"
+	assert_eq(ForgeLook.weapon_for(staff, &"warrior"), "staff")
+	var axe := ItemDefinition.new()
+	axe.id = &"odd_thing"
+	axe.look_id = &"axe_fire"
+	assert_eq(ForgeLook.weapon_for(axe, &"warrior"), "axe")
+	assert_eq(ForgeLook.element_for(axe), "fire")
+	var sword := ItemDefinition.new()
+	sword.id = &"iron_sword"
+	assert_eq(ForgeLook.weapon_for(sword, &"rogue"), "sword")
+	assert_eq(ForgeLook.element_for(sword), "none")
+	assert_eq(ForgeLook.weapon_for(null, &"guardian"), "hammer")
+	var charm := ItemDefinition.new()
+	charm.look_id = &"glasses_goggle"
+	assert_eq(ForgeLook.glasses_for(charm), "goggle")
+	assert_eq(ForgeLook.top_for(&"iron_plate"), "armor")
+
+
+func test_visual_bakes_every_animation_frame() -> void:
+	for setup: Array in [[&"guardian", "hammer"], [&"ranger", "bow"], [&"", "staff"], [&"rogue", "none"]]:
+		var visual := ChibiVisual.new()
+		visual.set_class_style(setup[0])
+		visual.forge_weapon = setup[1]
+		visual.appearance = HunterAppearance.from_dict({"hair_style": 16})
+		for animation: StringName in ChibiAnimations.ANIMATIONS:
+			var frames := visual._frames_of(animation)
+			assert_true(frames.size() > 0, "%s %s" % [setup[1], animation])
+			visual._animation = animation
+			for index in frames.size():
+				visual._frame = index
+				var frame := visual._body_frame()
+				assert_true(frame.textures.size() > 0, "%s %s %d" % [setup[1], animation, index])
+				assert_true(frame.rect.end.y <= 1.5, "%s %s %d above the feet" % [setup[1], animation, index])
+		visual.free()
+	var archer := ChibiVisual.new()
+	archer.forge_weapon = "bow"
+	assert_eq(archer._frames_of(ChibiAnimations.ATTACK).size(), (ForgeData.data()["anims"]["shoot"] as Array).size(), "bow shoots")
+	archer.forge_weapon = "staff"
+	assert_true(archer._frames_of(ChibiAnimations.SKILL)[0].has("pose"), "staff casts")
+	archer.forge_weapon = "sword"
+	assert_false(archer._frames_of(ChibiAnimations.SKILL)[0].has("pose"), "other skills keep the table")
+	archer.free()
+
+
+func test_attack_effects_match_original() -> void:
+	for name: String in _load("compose.json"):
+		if name.begins_with("attack_") or name.begins_with("fx_"):
+			_compare(name)
+
+
+func test_skill_casts_in_its_element() -> void:
+	var skill := ClassSkillDefinition.new()
+	assert_eq(ForgeLook.element_for_skill(skill), "none")
+	var burn := StatusEffectDefinition.new()
+	burn.id = &"burn"
+	var chance := StatusEffectChance.new()
+	chance.effect = burn
+	skill.target_effects.append(chance)
+	assert_eq(ForgeLook.element_for_skill(skill), "fire")
+	var visual := ChibiVisual.new()
+	visual.element = "poison"
+	visual.play_skill("ice", false)
+	assert_eq(visual.get_animation(), ChibiAnimations.SKILL, "support skills play SKILL")
+	assert_eq(visual._config()["fx"], "ice")
+	assert_true(visual._body_frame().textures.size() > 0)
+	visual._process(3.0)
+	assert_eq(visual._config()["fx"], "poison", "back to the weapon's element")
+	visual.play_action(ChibiAnimations.ATTACK)
+	visual.play_skill("thunder", true)
+	assert_eq(visual.get_animation(), ChibiAnimations.ATTACK)
+	assert_eq(visual._config()["fx"], "thunder")
+	visual.free()

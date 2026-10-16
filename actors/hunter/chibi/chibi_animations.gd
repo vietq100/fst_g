@@ -16,10 +16,12 @@ extends RefCounted
 ##   sparkle, tap, dust.
 ## - "lying": drawn lying on the ground (death); "lift": extra px off the ground while lying.
 ## - "item": show a picked-up item in the weapon hand.
+## - "dur": this frame's duration in seconds (default 1 / fps). ChibiVisual plays ATTACK (and SKILL with a
+##   staff) from the weapon's Forge sequence instead (ForgeLook.sequence: frames {dur, pose}).
 
 const WEAPON_REST := 30.0
-## Offsets in the tables are in 15×29-body pixels (D49); the 23×44 body (D67) scales them.
-const PIXEL_SCALE := 1.5
+## Offsets in the tables are in 15×29-body pixels (D49), about the size of the Forge body (D73).
+const PIXEL_SCALE := 1.0
 
 const IDLE := &"idle"
 const WALK := &"walk"

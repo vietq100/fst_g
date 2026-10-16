@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://game/definitions/loot_table_definition.gd" id="1_table"]
 [ext_resource type="Script" path="res://game/definitions/loot_entry.gd" id="2_entry"]
@@ -17,8 +17,15 @@ quantity_min = 1
 quantity_max = 1
 chance = 0.5
 
+[sub_resource type="Resource" id="LootEntry_2"]
+script = ExtResource("2_entry")
+item_id = &"iron_spear"
+quantity_min = 1
+quantity_max = 1
+chance = 0.015
+
 [resource]
 script = ExtResource("1_table")
 id = &"wolf"
 display_name = "loot.wolf.name"
-entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1")])
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_0"), SubResource("LootEntry_1"), SubResource("LootEntry_2")])

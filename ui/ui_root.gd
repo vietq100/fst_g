@@ -605,6 +605,8 @@ func _build_nav(layout: VBoxContainer) -> void:
 func toast(text: String, is_error: bool = false) -> void:
 	if text.is_empty():
 		return
+	if is_error:
+		Audio.play_ui(&"error")
 	while _toasts.get_child_count() >= MAX_TOASTS:
 		var oldest := _toasts.get_child(0)
 		_toasts.remove_child(oldest)

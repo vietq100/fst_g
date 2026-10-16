@@ -8,9 +8,14 @@ signal follow_requested(unique_id: StringName)
 
 ## Gold moved per Give tap (treasury → purse).
 const GIVE_STEP := 50
+## Barber preview figure size (D77).
+const LOOK_PREVIEW := Vector2(56, 80)
 
 var runtime: HunterRuntime
 var _timer: Timer
+## Hair style and colour picked at the barber, shown before paying (-1 = the Hunter's own).
+var _style := -1
+var _color := -1
 
 
 func _init(hunter: HunterRuntime) -> void:
@@ -63,6 +68,7 @@ func _build(content: VBoxContainer) -> void:
 		"" if runtime.expedition_id == &"" or GameManager.expeditions.is_running() else Loc.t("ui.hunter.not_on_map")))
 	_build_needs_and_purse(content)
 	_build_equipment(content)
+	_build_look(content)
 	_build_traits_and_mood(content)
 	_build_activity(content)
 	_build_bonds_and_history(content)
@@ -236,6 +242,49 @@ func _build_equipment(content: VBoxContainer) -> void:
 		content.add_child(button)
 	if options == 0:
 		content.add_child(UIKit.label(Loc.t("ui.hunter.no_spare"), &"MutedLabel"))
+
+
+## Barber (D77): browse hair styles and colours on a preview, then pay to keep them.
+func _build_look(content: VBoxContainer) -> void:
+	var barber := GameManager.barber
+	if _style < 0:
+		_style = runtime.appearance.hair_style
+		_color = runtime.appearance.hair_color
+	content.add_child(UIKit.label(Loc.t("ui.hunter.look"), &"AccentLabel"))
+	var look := HunterAppearance.from_dict(runtime.appearance.to_dict())
+	look.hair_style = _style
+	look.hair_color = _color
+	var preview := HunterFigure.new().setup(runtime, GameManager.equipment, look)
+	preview.custom_minimum_size = LOOK_PREVIEW
+	var pickers := UIKit.vbox([
+		_stepper(Loc.t("ui.hunter.hair_style", {"index": _style + 1, "total": HunterAppearance.HAIR_STYLE_COUNT}), func(step: int) -> void:
+			_style = posmod(_style + step, HunterAppearance.HAIR_STYLE_COUNT)),
+		_stepper(Loc.t("ui.hunter.hair_color", {"index": _color + 1, "total": HunterAppearance.HAIR_COLOR_COUNT}), func(step: int) -> void:
+			_color = posmod(_color + step, HunterAppearance.HAIR_COLOR_COUNT)),
+	], 4)
+	pickers.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var reason := barber.can_restyle(runtime, _style, _color)
+	var pay := UIKit.button(Loc.t("ui.hunter.restyle", {"gold": barber.get_cost()}), func() -> void:
+		run_action(barber.restyle(runtime, _style, _color), Loc.t("ui.hunter.restyled", {"name": runtime.display_name})),
+		&"PrimaryButton", reason)
+	pickers.add_child(pay)
+	content.add_child(UIKit.hbox([preview, pickers], 8))
+
+
+## "< label >" row; `change(step)` moves the choice by −1 / +1, then the sheet redraws.
+func _stepper(text: String, change: Callable) -> HBoxContainer:
+	var back := UIKit.button(Loc.t("ui.common.previous"), func() -> void:
+		change.call(-1)
+		request_rebuild())
+	var forward := UIKit.button(Loc.t("ui.common.next"), func() -> void:
+		change.call(1)
+		request_rebuild())
+	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	forward.size_flags_horizontal = Control.SIZE_SHRINK_END
+	var label := UIKit.label(text)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return UIKit.hbox([back, label, forward], 4)
 
 
 func _build_traits_and_mood(content: VBoxContainer) -> void:

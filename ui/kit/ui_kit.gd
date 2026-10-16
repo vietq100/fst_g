@@ -23,6 +23,8 @@ static func button(text: String, action: Callable, variation: StringName = &"", 
 	node.disabled = not reason.is_empty()
 	node.tooltip_text = reason
 	node.pressed.connect(action)
+	# Every button clicks (D78).
+	node.pressed.connect(func() -> void: Audio.play_ui(&"click"))
 	return node
 
 
