@@ -126,7 +126,7 @@ func _physics_process(_delta: float) -> void:
 			if _party_center().distance_to(_travel_point) <= ARRIVE_RADIUS:
 				_spawn_section(_section)
 		Stage.FIGHT:
-			_enemies = _enemies.filter(func(enemy: Enemy) -> bool: return is_instance_valid(enemy) and enemy.is_targetable())
+			_enemies = _enemies.filter(func(enemy) -> bool: return is_instance_valid(enemy) and enemy.is_targetable())
 			if _enemies.is_empty():
 				_on_section_cleared()
 		Stage.TO_EXIT:

@@ -39,6 +39,15 @@ var _craft_recipe: RecipeDefinition
 var _craft_left := 0.0
 var _bubble: CraftBubble
 var _rng := RandomNumberGenerator.new()
+## Personality numbers (TraitService.get_behavior), refreshed on every think.
+var _behavior := {"retreat": 0.0, "aggro": 1.0, "weak": 0.0, "boss": 0.0, "potion": 0.0, "loot": 1.0}
+var _potion_cooldown := 0.0
+## Hunters targeting each enemy, rebuilt once per physics frame (shared by every brain).
+static var _focus_frame := -1
+static var _focus: Dictionary = {}
+
+## Something the player may see: &"retreat", &"retreat_coward", &"potion".
+signal behavior_event(hunter: Hunter, key: StringName)
 
 
 func setup(owner_hunter: Hunter, world_map: WorldMap) -> void:
@@ -49,6 +58,7 @@ func setup(owner_hunter: Hunter, world_map: WorldMap) -> void:
 	_think_in = _rng.randf_range(0.0, THINK_INTERVAL)
 	hunter.combat.acquire_filter = _can_engage
 	hunter.combat.keep_filter = _can_keep
+	hunter.combat.target_score = _score_target
 	hunter.health.damaged.connect(_on_damaged)
 
 
@@ -57,6 +67,7 @@ func is_crafting() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	_potion_cooldown = maxf(_potion_cooldown - delta, 0.0)
 	if _craft_recipe != null and enabled:
 		_craft_left -= delta
 		if _bubble != null:
@@ -77,6 +88,8 @@ func think() -> void:
 	if not enabled or runtime.injured or not runtime.alive or not hunter.is_targetable():
 		return
 	runtime.world_position = hunter.global_position
+	_behavior = GameManager.traits.get_behavior(runtime)
+	_fight_smart()
 	if depart_point != Vector2.INF:
 		_set_task(DEPARTING)
 		if hunter.combat.target == null:
@@ -131,6 +144,27 @@ func _self_care() -> bool:
 		elif _start_craft(talents.pick_recipe(runtime, TalentService.Kind.MEDICINE), BREWING):
 			return true
 	return false
+
+
+## In the middle of a fight: drink medicine from the bag before it is too late, and say so when
+## breaking off (a coward cries out).
+func _fight_smart() -> void:
+	var runtime := hunter.runtime
+	if not hunter.combat.is_valid_target(hunter.combat.target):
+		return
+	var regions: RegionService = GameManager.regions
+	var max_hp := hunter.health.max_health
+	if max_hp <= 0.0:
+		return
+	var ratio := runtime.current_hp / max_hp
+	var retreat := regions.get_retreat_ratio(runtime)
+	if _potion_cooldown <= 0.0 and ratio < HunterTactics.potion_ratio(retreat, _behavior) \
+			and GameManager.talents.use_medicine_from_bag(runtime) > 0.0:
+		_potion_cooldown = HunterTactics.POTION_COOLDOWN
+		behavior_event.emit(hunter, &"potion")
+		return
+	if not _resting and ratio < retreat and runtime.task == HunterRuntime.HUNTING:
+		behavior_event.emit(hunter, &"retreat_coward" if GameManager.traits.has_trait(runtime, &"coward") else &"retreat")
 
 
 func _start_craft(recipe: RecipeDefinition, task: StringName) -> bool:
@@ -205,7 +239,7 @@ func _hunt(region: RegionDefinition) -> void:
 	if hunter.combat.target != null:
 		return
 	# Loot left by slain monsters comes first: walk over and pick it up.
-	var drop := map.get_nearest_drop(hunter, LOOT_SEEK_RANGE)
+	var drop := map.get_nearest_drop(hunter, LOOT_SEEK_RANGE * float(_behavior["loot"]))
 	if drop != null and map.world.region_at(drop.global_position) == region:
 		if hunter.global_position.distance_to(drop.global_position) <= PICK_UP_DISTANCE:
 			map.collect_drop(drop, hunter)
@@ -307,7 +341,36 @@ func _can_engage(candidate: Actor) -> bool:
 	if not enabled:
 		return _can_keep(candidate)
 	return _can_keep(candidate) and \
-		candidate.global_position.distance_to(hunter.global_position) <= DataRegistry.config.hunter_engage_range
+		candidate.global_position.distance_to(hunter.global_position) <= _aggro_range()
+
+
+## Range in which this Hunter picks a fight: the config's, scaled by its personality.
+func _aggro_range() -> float:
+	return DataRegistry.config.hunter_engage_range * float(_behavior["aggro"])
+
+
+## Lower is better (HunterTactics.score): near, wounded, already fought by allies, hitting a weak ally.
+func _score_target(candidate: Actor) -> float:
+	var frame := Engine.get_physics_frames()
+	if frame != _focus_frame:
+		_focus_frame = frame
+		_focus.clear()
+		for node in hunter.get_tree().get_nodes_in_group(Hunter.GROUP):
+			var other := node as Hunter
+			if other != null and other.combat.target != null:
+				_focus[other.combat.target] = int(_focus.get(other.combat.target, 0)) + (0 if other == hunter else 1)
+	var enemy := candidate as Enemy
+	var attacked := candidate.combat.target
+	var in_trouble := attacked != null and attacked != hunter and is_instance_valid(attacked) and attacked is Hunter \
+		and attacked.health.get_ratio() < HunterTactics.ALLY_IN_TROUBLE
+	var info := {
+		"enemy_hp": candidate.health.get_ratio(),
+		"is_boss": enemy != null and enemy.definition != null and enemy.definition.is_boss,
+		"allies_on_it": int(_focus.get(candidate, 0)),
+		"hits_ally_in_trouble": in_trouble,
+		"my_hp": hunter.health.get_ratio(),
+	}
+	return HunterTactics.score(candidate.global_position.distance_to(hunter.global_position), _aggro_range(), info, _behavior)
 
 
 func _can_keep(candidate: Actor) -> bool:

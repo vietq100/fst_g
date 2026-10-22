@@ -5,8 +5,8 @@ extends RefCounted
 ## numbers; DECISIONS.md D23: fonts ≥ 10 px, body 12, touch targets ≥ 40 px).
 ## Built in code so colours live in one place. Buttons are chunky (a darker bottom edge that
 ## flattens when pressed); panels have a warm gold rim and a soft drop shadow. Type variations:
-## Button: PrimaryButton, DangerButton, SelectedButton, NavButton, RowButton
-## PanelContainer: Sheet, Card, TopBar, Toast, Chip (HUD resource pill) · ProgressBar: HpBar, XpBar, MoodBar, TimerBar
+## Button: PrimaryButton, DangerButton, SelectedButton, NavButton, RowButton, HudIconButton, HudBadge
+## PanelContainer: Sheet, Card, TopBar, Toast, Chip (HUD resource pill), QuestCard · ProgressBar: HpBar, XpBar, MoodBar, TimerBar
 ## Label: TitleLabel, MutedLabel, AccentLabel, WarningLabel
 
 const BACKGROUND := Color("12141c")
@@ -67,20 +67,39 @@ static func _create() -> Theme:
 	_button(theme, &"DangerButton", Color("b8372b"), Color("ffe8e2"))
 	_button(theme, &"SelectedButton", Color("3b6fb5"), Color("eef5ff"))
 	_button(theme, &"RowButton", CARD, TEXT, 4)
-	_flat_button(theme, &"NavButton", Color(0, 0, 0, 0), Color("b9bfd0"), 0)
+	var nav_tab := _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 0, 4)
+	nav_tab.content_margin_top = 6.0
+	nav_tab.content_margin_bottom = 4.0
+	_flat_button(theme, &"NavButton", Color(0, 0, 0, 0), Color("c3c8d8"), 0, nav_tab)
 	theme.set_color(&"font_pressed_color", &"NavButton", ACCENT)
 	theme.set_color(&"font_hover_color", &"NavButton", Color("f6e3b4"))
-	# Selected tab: lighter plate with a gold bar on top.
-	var nav_selected := _box(Color("2d3650"), ACCENT, 0, 0, 8)
+	# Selected tab: lighter rounded plate with a gold bar on top.
+	var nav_selected := _box(Color("2a3350"), ACCENT, 0, 0, 4)
 	nav_selected.border_width_top = 3
-	_flat_button(theme, &"NavSelected", Color("2d3650"), Color("fff3c4"), 0, nav_selected)
+	nav_selected.corner_radius_top_left = 10
+	nav_selected.corner_radius_top_right = 10
+	nav_selected.content_margin_top = 6.0
+	nav_selected.content_margin_bottom = 4.0
+	_flat_button(theme, &"NavSelected", Color("2a3350"), Color("ffe9a0"), 0, nav_selected)
 	_flat_button(theme, &"AlertNavButton", Color(0.75, 0.55, 0.15, 0.35), Color("ffe9a8"), 0)
 	var round_box := _box(Color(0.07, 0.08, 0.12, 0.88), Color(BORDER, 0.85), 20, 2, 8)
 	round_box.shadow_color = Color(0, 0, 0, 0.35)
 	round_box.shadow_size = 2
 	_flat_button(theme, &"RoundButton", Color(0.07, 0.08, 0.12, 0.88), Color("f6e3b4"), 20, round_box)
 	_flat_button(theme, &"HudButton", Color(0, 0, 0, 0), Color("f1ecdf"), 6)
-	for name: StringName in [&"HudButton", &"RoundButton"]:
+	# HUD shortcuts: small round dark plates with a thin gold rim.
+	var icon_box := _box(Color(0.06, 0.07, 0.11, 0.82), Color(BORDER, 0.6), 16, 1, 4)
+	icon_box.shadow_color = Color(0, 0, 0, 0.35)
+	icon_box.shadow_size = 2
+	_flat_button(theme, &"HudIconButton", Color(0.06, 0.07, 0.11, 0.82), Color("f1ecdf"), 16, icon_box)
+	# HUD badges (difficulty, Hunters waiting): rounded plate, icon over a small caption.
+	var badge_box := _box(Color(0.06, 0.07, 0.11, 0.82), Color(BORDER, 0.75), 10, 2, 4)
+	badge_box.content_margin_top = 5.0
+	badge_box.shadow_color = Color(0, 0, 0, 0.4)
+	badge_box.shadow_size = 3
+	_flat_button(theme, &"HudBadge", Color(0.06, 0.07, 0.11, 0.82), Color("f6e3b4"), 10, badge_box)
+	theme.set_constant(&"h_separation", &"HudBadge", 2)
+	for name: StringName in [&"HudButton", &"RoundButton", &"HudIconButton", &"HudBadge", &"NavButton", &"NavSelected"]:
 		theme.set_color(&"font_outline_color", name, INK)
 		theme.set_constant(&"outline_size", name, 3)
 
@@ -99,19 +118,34 @@ static func _create() -> Theme:
 	card.border_color = Color("141824")
 	_panel_variation(theme, &"Card", card)
 	_panel_variation(theme, &"TopBar", _box(Color(BACKGROUND, 0.92), BORDER, 0, 1, 6))
-	var hud := _box(Color(0.03, 0.04, 0.07, 0.6), Color(BORDER, 0.55), 0, 0, 6)
-	hud.border_width_bottom = 1
+	var hud := _box(Color(0.03, 0.04, 0.07, 0.78), Color(BORDER, 0.7), 0, 0, 6)
+	hud.border_width_bottom = 2
+	hud.content_margin_left = 10.0
+	hud.content_margin_right = 10.0
+	hud.content_margin_top = 8.0
+	hud.content_margin_bottom = 8.0
+	hud.shadow_color = Color(0, 0, 0, 0.35)
+	hud.shadow_size = 4
 	_panel_variation(theme, &"Hud", hud)
+	# The active quest over the map: translucent card with a gold accent on the left.
+	var quest_card := _box(Color(0.03, 0.04, 0.07, 0.62), Color(ACCENT, 0.85), 8, 0, 6)
+	quest_card.border_width_left = 3
+	quest_card.content_margin_left = 9.0
+	quest_card.content_margin_right = 10.0
+	_panel_variation(theme, &"QuestCard", quest_card)
 	var hunter_card := _box(Color("1b2030"), RIM, 6, 1, 4)
 	hunter_card.border_width_bottom = 2
 	_panel_variation(theme, &"HunterCard", hunter_card)
-	var chip := _box(Color(0.04, 0.05, 0.08, 0.65), Color(BORDER, 0.35), 9, 1, 1)
-	chip.content_margin_left = 3.0
-	chip.content_margin_right = 6.0
+	var chip := _box(Color(0.05, 0.06, 0.1, 0.82), Color(BORDER, 0.45), 11, 1, 2)
+	chip.content_margin_left = 4.0
+	chip.content_margin_right = 9.0
 	_panel_variation(theme, &"Chip", chip)
 	_panel_variation(theme, &"HudBubble", _box(Color(0.06, 0.07, 0.11, 0.78), Color(BORDER, 0.6), 8, 1, 5))
 	var nav := _box(Color("0d0f16"), BORDER, 0, 0, 2)
 	nav.border_width_top = 2
+	nav.content_margin_left = 4.0
+	nav.content_margin_right = 4.0
+	nav.content_margin_top = 3.0
 	nav.shadow_color = Color(0, 0, 0, 0.4)
 	nav.shadow_size = 4
 	_panel_variation(theme, &"NavBar", nav)

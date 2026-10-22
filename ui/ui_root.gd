@@ -15,6 +15,8 @@ signal placement_cancelled
 ## Hunter sheet "Follow" / navigation "Town" (recenter the camera on the Town).
 signal follow_requested(unique_id: StringName)
 signal recenter_requested
+## Settings → Switch profile: Main saves and shows the login screen.
+signal logout_requested
 ## Height of the HUD at the top / navigation bar at the bottom (the map scrolls under them).
 signal view_insets_changed(top: float, bottom: float)
 ## Hex buttons I / II / III: look at a hunting region.
@@ -43,6 +45,9 @@ var _quest_bar: ProgressBar
 var _waiting_button: Button
 var _overlays: Array[Control] = []
 var _feed: VBoxContainer
+## Top-left notices without a background: the active quest, then the Hunters' event feed.
+var _notices: VBoxContainer
+var _quest_box: VBoxContainer
 var _placement_bar: PanelContainer
 var _placement_label: Label
 var _placement_confirm: Button
@@ -67,9 +72,6 @@ func _ready() -> void:
 	layout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_safe.add_child(layout)
 	_build_top_bar(layout)
-	_toasts = UIKit.vbox([], 4)
-	_toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layout.add_child(_toasts)
 	_sheet_area = Control.new()
 	_sheet_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_sheet_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -96,6 +98,7 @@ func set_mode(new_mode: Mode) -> void:
 	_nav.visible = mode == Mode.TOWN
 	for overlay in _overlays:
 		overlay.visible = mode == Mode.TOWN
+	_highlight_nav()
 	if mode == Mode.TOWN and _waiting_button != null:
 		_refresh_resources()
 	_placement_bar.visible = false
@@ -115,7 +118,7 @@ func blocks_point(point: Vector2) -> bool:
 	if _sheet is HunterDialog or _sheet is MonsterDialog:
 		return true
 	for child in get_children():
-		if (child is ItemInfoModal or child is EquipPickerModal or child is ColosseumMatchView) and (child as Control).is_visible_in_tree():
+		if (child is ItemInfoModal or child is SkillInfoModal or child is EquipPickerModal or child is ColosseumMatchView) and (child as Control).is_visible_in_tree():
 			return true
 	for control: Control in [_top_bar, _nav, _sheet, _placement_bar] + _overlays:
 		if control != null and is_instance_valid(control) and control.is_visible_in_tree() and control.get_global_rect().has_point(point):
@@ -146,6 +149,16 @@ func open_item_info(item: ItemDefinition, instance_id: StringName = &"") -> void
 	add_child(modal)
 
 
+func request_logout() -> void:
+	logout_requested.emit()
+
+
+## Skill details over everything (class or monster skill); the open dialog stays.
+func open_skill_info(skill: GameDefinition, options: Dictionary = {}) -> void:
+	if skill != null:
+		add_child(SkillInfoModal.new().setup(skill, options))
+
+
 ## What a Hunter can wear in one slot (D66), over everything; the open sheet stays.
 func open_equip_picker(hunter: HunterRuntime, slot: StringName) -> void:
 	if hunter == null or slot == &"":
@@ -173,6 +186,9 @@ func _highlight_nav() -> void:
 		active = &"storage"
 	elif _sheet is ShopSheet:
 		active = &"shop"
+	# Notices never cover a drawer or dialog.
+	if _notices != null:
+		_notices.visible = mode == Mode.TOWN and not has_sheet()
 	# The Hunter dialog takes the whole screen above the nav bar.
 	if mode != Mode.EXPEDITION:
 		_top_bar.visible = not (_sheet is HunterDialog or _sheet is MonsterDialog)
@@ -307,84 +323,76 @@ func _notification(what: int) -> void:
 func _build_top_bar(layout: VBoxContainer) -> void:
 	_top_bar = PanelContainer.new()
 	_top_bar.theme_type_variation = &"Hud"
-	var column := UIKit.vbox([], 4)
-	# Row 1: difficulty badge, resources (left); hunters and shortcuts (right). Like Evil Hunter
-	# Tycoon's header: big outlined numbers over the map.
-	_difficulty_button = UIKit.button("", func() -> void: _open_portal_or_hint(), &"HudButton")
-	_difficulty_button.icon = PixelIcons.texture(&"skull", 3)
-	_difficulty_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_difficulty_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	_difficulty_button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_difficulty_button.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
-	_difficulty_button.custom_minimum_size = Vector2(48, 48)
+	# Difficulty badge and resources (left); Hunters and shortcuts (right). Like Evil Hunter
+	# Tycoon's header: big outlined numbers over the map, each in its own dark pill.
+	_difficulty_button = _badge_button(&"skull", func() -> void: _open_portal_or_hint())
+	_difficulty_button.add_theme_color_override(&"font_color", GameTheme.ACCENT)
+	_difficulty_button.custom_minimum_size = Vector2(52, 56)
 	_difficulty_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_difficulty_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var resources := GridContainer.new()
 	resources.columns = 2
-	resources.add_theme_constant_override(&"h_separation", 4)
-	resources.add_theme_constant_override(&"v_separation", 3)
+	resources.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	resources.add_theme_constant_override(&"h_separation", 5)
+	resources.add_theme_constant_override(&"v_separation", 5)
 	for entry in [[&"gold", &"coin"], [&"food", &"food"], [&"slots", &"bag"], [&"chest", &"chest"]]:
-		var line := UIKit.hbox([PixelIcons.rect(entry[1], 2)], 4)
-		var label := UIKit.label("", &"HudLabel", false)
-		label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		line.add_child(label)
-		_chips[entry[0]] = label
-		# Each resource sits in a dark pill so the numbers read over any part of the map.
-		var chip := PanelContainer.new()
-		chip.theme_type_variation = &"Chip"
-		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.add_child(line)
-		resources.add_child(chip)
+		resources.add_child(_resource_chip(entry[0], entry[1], 66))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var right := UIKit.vbox([], 4)
+	var right := UIKit.vbox([], 5)
 	right.size_flags_horizontal = Control.SIZE_SHRINK_END
-	var count_line := UIKit.hbox([PixelIcons.rect(&"hunters", 2)], 4)
-	var count_label := UIKit.label("", &"HudLabel", false)
-	count_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	count_line.add_child(count_label)
+	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var hunters_chip := _resource_chip(&"hunters", &"hunters", 0)
+	hunters_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var count_line := UIKit.hbox([hunters_chip], 6)
 	count_line.alignment = BoxContainer.ALIGNMENT_END
-	_chips[&"hunters"] = count_label
 	right.add_child(count_line)
-	var shortcuts := UIKit.hbox([], 2)
+	var shortcuts := UIKit.hbox([], 6)
+	shortcuts.alignment = BoxContainer.ALIGNMENT_END
 	for entry in [[&"book", "ui.root.tip_quests", open_quests], [&"trophy", "ui.root.tip_portal", _open_portal_or_hint],
 			[&"mail", "ui.root.tip_recruit", open_recruit], [&"gear", "ui.settings.title", open_settings]]:
-		var button := UIKit.button("", entry[2], &"HudButton")
+		var button := UIKit.button("", entry[2], &"HudIconButton")
 		button.icon = PixelIcons.texture(entry[0], 2)
+		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		button.tooltip_text = Loc.t(entry[1])
-		button.custom_minimum_size = Vector2(30, 30)
+		button.custom_minimum_size = Vector2(32, 32)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
 		# Settings sits beside the Hunter count so the header keeps three shortcuts per row.
 		if entry[0] == &"gear":
-			button.custom_minimum_size = Vector2(26, 26)
 			count_line.add_child(button)
 		else:
 			shortcuts.add_child(button)
 	right.add_child(shortcuts)
-	column.add_child(UIKit.hbox([_difficulty_button, resources, spacer, right], 6))
-	# Row 2: the active quest and the advisor's hint.
-	var quest_box := UIKit.vbox([], 2)
-	_quest_title = UIKit.label(Loc.t("ui.root.quest_title"), &"HudAccentLabel", false)
-	_quest_title.visible = false
-	_quest_text = UIKit.label("", &"HudSmallLabel")
-	_quest_text.add_theme_font_size_override(&"font_size", 10)
-	_quest_bar = UIKit.bar(0, 1, &"XpBar", "")
-	_quest_bar.custom_minimum_size = Vector2(0, 5)
-	quest_box.add_child(_quest_text)
-	quest_box.add_child(_quest_bar)
-	var quest_button := UIKit.button("", open_quests, &"HudButton")
-	quest_button.flat = true
-	quest_button.mouse_filter = Control.MOUSE_FILTER_STOP
-	var quest_panel := PanelContainer.new()
-	quest_panel.theme_type_variation = &"HudBubble"
-	quest_panel.add_child(quest_box)
-	quest_panel.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			open_quests())
-	column.add_child(quest_panel)
-	_top_bar.add_child(column)
+	_top_bar.add_child(UIKit.hbox([_difficulty_button, resources, spacer, right], 8))
 	layout.add_child(_top_bar)
+
+
+## A resource in a dark pill (icon, outlined number) so it reads over any part of the map.
+func _resource_chip(key: StringName, icon: StringName, min_width: float) -> PanelContainer:
+	var label := UIKit.label("", &"HudLabel", false)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_chips[key] = label
+	var glyph := PixelIcons.rect(icon, 2)
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var chip := PanelContainer.new()
+	chip.theme_type_variation = &"Chip"
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.custom_minimum_size.x = min_width
+	chip.add_child(UIKit.hbox([glyph, label], 5))
+	return chip
+
+
+## HUD badge button: pixel icon over a small outlined caption, on a rounded plate.
+func _badge_button(icon: StringName, action: Callable) -> Button:
+	var button := UIKit.button("", action, &"HudBadge")
+	button.icon = PixelIcons.texture(icon, 3)
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	button.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
+	return button
 
 
 func _open_portal_or_hint() -> void:
@@ -489,31 +497,25 @@ func _refresh_quest_panel() -> void:
 ## Left: "Hunters Waiting" (Tavern candidates); right: Town / I / II / III region buttons; above
 ## them a small event feed, as in Evil Hunter Tycoon.
 func _build_overlays() -> void:
-	_waiting_button = UIKit.button(Loc.t("ui.root.hunters_waiting"), open_recruit, &"HudButton")
-	_waiting_button.icon = PixelIcons.texture(&"hunters", 2)
-	_waiting_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_waiting_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	_waiting_button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_waiting_button.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
+	_waiting_button = _badge_button(&"hunters", open_recruit)
 	_waiting_button.add_theme_color_override(&"font_color", Color("7fe0d0"))
-	_waiting_button.add_theme_color_override(&"font_outline_color", GameTheme.INK)
-	_waiting_button.add_theme_constant_override(&"outline_size", 3)
-	_waiting_button.custom_minimum_size = Vector2(52, 50)
+	_waiting_button.add_theme_color_override(&"font_hover_color", Color("a8f0e4"))
+	_waiting_button.custom_minimum_size = Vector2(64, 56)
 	_waiting_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	_waiting_button.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_waiting_button.offset_left = 4
-	_waiting_button.offset_bottom = -4
+	_waiting_button.offset_left = 8
+	_waiting_button.offset_bottom = -8
 	_sheet_area.add_child(_waiting_button)
 	_overlays.append(_waiting_button)
 	var hex := GridContainer.new()
 	hex.columns = 2
-	hex.add_theme_constant_override(&"h_separation", 4)
-	hex.add_theme_constant_override(&"v_separation", 4)
+	hex.add_theme_constant_override(&"h_separation", 6)
+	hex.add_theme_constant_override(&"v_separation", 6)
 	hex.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	hex.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	hex.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	hex.offset_right = -4
-	hex.offset_bottom = -4
+	hex.offset_right = -8
+	hex.offset_bottom = -8
 	var entries: Array = [[Loc.t("ui.root.town"), &""]]
 	var numerals := ["I", "II", "III", "IV", "V"]
 	var regions := GameManager.regions.get_hunting_regions()
@@ -526,9 +528,9 @@ func _build_overlays() -> void:
 				recenter_requested.emit()
 			else:
 				focus_region_requested.emit(entry[1]), &"RoundButton")
-		button.custom_minimum_size = Vector2(38, 38)
+		button.custom_minimum_size = Vector2(40, 40)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
-		button.add_theme_font_size_override(&"font_size", 13)
+		button.add_theme_font_size_override(&"font_size", 14)
 		button.tooltip_text = Loc.t("ui.root.town") if entry[1] == &"" else GameManager.regions.get_duty_name(entry[1])
 		if entry[1] == &"":
 			button.text = ""
@@ -538,13 +540,47 @@ func _build_overlays() -> void:
 		hex.add_child(button)
 	_sheet_area.add_child(hex)
 	_overlays.append(hex)
+	# Top-left corner, above drawers and dialogs: the notices (quest card, feed; hidden while a
+	# drawer or dialog is open) and the toasts (always shown), outlined text over the map.
+	var corner := UIKit.vbox([], 6)
+	corner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	corner.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	corner.offset_left = 8
+	corner.offset_top = 8
+	corner.offset_right = 248
+	corner.z_index = 5
+	_sheet_area.add_child(corner)
+	_notices = UIKit.vbox([], 6)
+	_notices.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	corner.add_child(_notices)
+	_toasts = UIKit.vbox([], 3)
+	_toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	corner.add_child(_toasts)
+	# The active quest: a small translucent card over the map, tap to open the quest list.
+	var quest_card := PanelContainer.new()
+	quest_card.theme_type_variation = &"QuestCard"
+	quest_card.mouse_filter = Control.MOUSE_FILTER_STOP
+	quest_card.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			open_quests())
+	_quest_box = UIKit.vbox([], 3)
+	_quest_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quest_title = UIKit.label(Loc.t("ui.root.quest_title"), &"HudAccentLabel", false)
+	_quest_text = UIKit.label("", &"HudSmallLabel")
+	_quest_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quest_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quest_bar = UIKit.bar(0, 1, &"XpBar", "")
+	_quest_bar.custom_minimum_size = Vector2(0, 6)
+	_quest_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quest_box.add_child(_quest_title)
+	_quest_box.add_child(_quest_text)
+	_quest_box.add_child(_quest_bar)
+	quest_card.add_child(_quest_box)
+	_notices.add_child(quest_card)
+	_overlays.append(quest_card)
 	_feed = UIKit.vbox([], 2)
 	_feed.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_feed.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_feed.offset_left = 6
-	_feed.offset_top = 6
-	_feed.offset_right = 250
-	_sheet_area.add_child(_feed)
+	_notices.add_child(_feed)
 
 
 ## One line of the event feed ("Ana sold 3 items (+40 g)"), fades out.
@@ -592,10 +628,9 @@ func _build_nav(layout: VBoxContainer) -> void:
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 		button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		button.add_theme_font_size_override(&"font_size", 10)
-		button.add_theme_color_override(&"font_outline_color", GameTheme.INK)
-		button.add_theme_constant_override(&"outline_size", 3)
-		button.custom_minimum_size.y = 58
+		button.add_theme_font_size_override(&"font_size", 11)
+		button.add_theme_constant_override(&"h_separation", 3)
+		button.custom_minimum_size.y = 62
 		_nav_buttons[entry[0]] = button
 		buttons.add_child(button)
 	_nav.add_child(buttons)
@@ -611,17 +646,14 @@ func toast(text: String, is_error: bool = false) -> void:
 		var oldest := _toasts.get_child(0)
 		_toasts.remove_child(oldest)
 		oldest.queue_free()
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"Toast"
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var label := UIKit.label(text, &"WarningLabel" if is_error else &"AccentLabel")
+	var label := UIKit.label(text, &"HudLabel")
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(label)
-	_toasts.add_child(panel)
-	var tween := panel.create_tween()
+	label.add_theme_color_override(&"font_color", GameTheme.DANGER if is_error else Color("f2d36b"))
+	_toasts.add_child(label)
+	var tween := label.create_tween()
 	tween.tween_interval(TOAST_TIME)
-	tween.tween_property(panel, ^"modulate:a", 0.0, 0.4)
-	tween.tween_callback(panel.queue_free)
+	tween.tween_property(label, ^"modulate:a", 0.0, 0.4)
+	tween.tween_callback(label.queue_free)
 
 
 ## Game events worth telling the player (UI_DESIGN.md → Feedback).

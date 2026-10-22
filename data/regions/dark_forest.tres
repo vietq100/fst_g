@@ -6,14 +6,14 @@
 script = ExtResource("1_region")
 id = &"dark_forest"
 display_name = "region.dark_forest.name"
-tile_rect = Rect2i(-44, 38, 80, 80)
+tile_rect = Rect2i(-4, 38, 40, 40)
 is_town = false
-shape = 1
+shape = 0
 min_hunter_level = 1
 monster_ids = Array[StringName]([&"slime", &"wolf"])
 monster_level_min = 1
 monster_level_max = 3
-population_cap = 36
+population_cap = 24
 respawn_seconds = 15.0
 ground_color = Color(0.12, 0.25, 0.26, 1)
 ground_alt_color = Color(0.14, 0.28, 0.29, 1)

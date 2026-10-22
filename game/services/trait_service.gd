@@ -53,6 +53,20 @@ func get_activity_rate(hunter: HunterRuntime, activity_id: StringName) -> float:
 	return rate
 
 
+## How the Hunter's personality changes its fighting (HunterTactics): retreat (added to the rest
+## threshold), aggro (range multiplier), weak, boss, potion (added), loot (range multiplier).
+func get_behavior(hunter: HunterRuntime) -> Dictionary:
+	var behavior := {"retreat": 0.0, "aggro": 1.0, "weak": 0.0, "boss": 0.0, "potion": 0.0, "loot": 1.0}
+	for definition in get_traits(hunter):
+		behavior["retreat"] += definition.retreat_bias
+		behavior["aggro"] *= definition.aggro_mult
+		behavior["weak"] += definition.weak_bias
+		behavior["boss"] += definition.boss_bias
+		behavior["potion"] += definition.potion_bias
+		behavior["loot"] *= definition.loot_mult
+	return behavior
+
+
 ## Number of the Hunter's traits that like (+) and dislike (-) the tag.
 func count_reactions(hunter: HunterRuntime, tag: StringName) -> Vector2i:
 	var likes := 0

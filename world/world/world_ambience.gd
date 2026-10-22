@@ -16,6 +16,8 @@ const BEAM := Color(1.0, 0.92, 0.6, 0.12)
 const OUTLINE := Color("10140f")
 ## Margin around the viewport inside which a piece counts as on screen (world px).
 const SCREEN_MARGIN := 240.0
+## Seconds between the on-screen checks of a cloud.
+const CLOUD_CHECK := 0.4
 
 var kind := Kind.CLOUD
 ## Clouds: the area they wrap around in. Gulls: circle centre, radius, angular speed (rad/s), phase.
@@ -36,6 +38,11 @@ func _process(delta: float) -> void:
 		Kind.CLOUD:
 			var moved := position + CLOUD_SPEED * speed * delta
 			position = area.position + Vector2(fposmod(moved.x - area.position.x, area.size.x), fposmod(moved.y - area.position.y, area.size.y))
+			# Clouds off screen are hidden (a few checks a second): no blended ellipses to draw or cull.
+			_frame_time += delta
+			if _frame_time >= CLOUD_CHECK:
+				_frame_time = 0.0
+				visible = get_viewport_rect().grow(size * 1.2 + SCREEN_MARGIN).has_point(get_global_transform_with_canvas().origin)
 			return
 		Kind.GULL:
 			var angle := phase + _time * speed

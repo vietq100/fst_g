@@ -30,6 +30,10 @@ var attacks_enabled := true
 ## targets (aggro range), `keep_filter` also drops the current one (leash, left the region).
 var acquire_filter: Callable
 var keep_filter: Callable
+## Optional `func(candidate: Actor) -> float` (lower = better): picks the best target instead of the
+## nearest and may switch a current target for a clearly better one (HunterTactics).
+var target_score: Callable
+var switch_margin := 0.45
 
 var _service: CombatService
 var _timer: Timer
@@ -80,12 +84,33 @@ func resume() -> void:
 	refresh_target.call_deferred()
 
 
-## Keeps a valid target; otherwise picks the nearest valid one (or none).
+## Keeps a valid target (unless a much better one shows up); otherwise picks the best (the nearest
+## without a `target_score`) valid one, or none.
 func refresh_target() -> void:
-	if not _active or target_group == &"" or is_valid_target(target):
+	if not _active or target_group == &"":
+		return
+	var has_target := is_valid_target(target)
+	if has_target and not target_score.is_valid():
 		return
 	var origin := _owner_actor().global_position
-	_set_target(pick_nearest(origin, get_tree().get_nodes_in_group(target_group), _can_acquire))
+	var candidates := get_tree().get_nodes_in_group(target_group)
+	if not target_score.is_valid():
+		_set_target(pick_nearest(origin, candidates, _can_acquire))
+		return
+	var best: Actor = null
+	var best_score := INF
+	for candidate: Actor in candidates:
+		if not _can_acquire(candidate):
+			continue
+		var value: float = target_score.call(candidate)
+		if value < best_score:
+			best = candidate
+			best_score = value
+	if best == null or best == target:
+		return
+	if has_target and best_score > float(target_score.call(target)) - switch_margin:
+		return
+	_set_target(best)
 
 
 func is_valid_target(candidate: Actor) -> bool:

@@ -199,20 +199,50 @@ func _update_travel() -> void:
 		move_to(travel_target)
 
 
+## Spatial hash of every team's actors, rebuilt once per physics frame (cell = SEPARATION_DISTANCE):
+## separation then looks at the 3×3 cells around an actor instead of the whole team.
+static var _grid_frame := -1
+static var _grids: Dictionary = {}
+
+
+static func _team_grid(tree: SceneTree, group: StringName) -> Dictionary:
+	var frame := Engine.get_physics_frames()
+	if frame != _grid_frame:
+		_grid_frame = frame
+		_grids.clear()
+	if not _grids.has(group):
+		var cells := {}
+		for node in tree.get_nodes_in_group(group):
+			var actor := node as Actor
+			if actor == null:
+				continue
+			var key := Vector2i((actor.global_position / SEPARATION_DISTANCE).floor())
+			if not cells.has(key):
+				cells[key] = [actor]
+			else:
+				(cells[key] as Array).append(actor)
+		_grids[group] = cells
+	return _grids[group]
+
+
 ## Gentle push away from standing teammates that overlap this actor.
 func _apply_separation() -> void:
+	var cells := _team_grid(get_tree(), get_team_group())
+	var home := Vector2i((global_position / SEPARATION_DISTANCE).floor())
 	var push := Vector2.ZERO
-	for node in get_tree().get_nodes_in_group(get_team_group()):
-		var other := node as Actor
-		if other == null or other == self or not other.is_targetable():
-			continue
-		var offset := global_position - other.global_position
-		var distance := offset.length()
-		if distance >= SEPARATION_DISTANCE:
-			continue
-		# Exactly overlapping: split along a stable axis based on instance ids.
-		var direction := offset / distance if distance > 0.01 else (Vector2.RIGHT if get_instance_id() > other.get_instance_id() else Vector2.LEFT)
-		push += direction * (1.0 - distance / SEPARATION_DISTANCE)
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			var bucket: Array = cells.get(home + Vector2i(dx, dy), [])
+			for other: Actor in bucket:
+				if other == self:
+					continue
+				var offset := global_position - other.global_position
+				var distance := offset.length()
+				if distance >= SEPARATION_DISTANCE or not other.is_targetable():
+					continue
+				# Exactly overlapping: split along a stable axis based on instance ids.
+				var direction := offset / distance if distance > 0.01 else (Vector2.RIGHT if get_instance_id() > other.get_instance_id() else Vector2.LEFT)
+				push += direction * (1.0 - distance / SEPARATION_DISTANCE)
 	if push.is_zero_approx():
 		return
 	velocity = push.limit_length(1.0) * SEPARATION_SPEED

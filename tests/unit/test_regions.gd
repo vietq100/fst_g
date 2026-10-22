@@ -105,6 +105,7 @@ func test_trader_buys_what_the_village_cannot() -> void:
 
 
 func test_rest_threshold_has_hysteresis() -> void:
+	_hunter.trait_ids.clear()  # personality moves the threshold (test_hunter_ai.gd)
 	var max_hp: float = _game.hunters.get_stat(_hunter, HunterService.MAX_HP)
 	_hunter.current_hp = max_hp * 0.5
 	assert_false(_regions.needs_rest(_hunter, false))

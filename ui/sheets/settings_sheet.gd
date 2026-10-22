@@ -32,6 +32,11 @@ func _build(content: VBoxContainer) -> void:
 	if busy:
 		content.add_child(UIKit.label(Loc.t("ui.settings.busy_dungeon"), &"WarningLabel"))
 	content.add_child(UIKit.label(Loc.t("ui.settings.language_note"), &"MutedLabel"))
+	if SaveManager.has_profile():
+		content.add_child(UIKit.label(Loc.t("ui.settings.profile"), &"AccentLabel"))
+		content.add_child(UIKit.label(Loc.t("ui.settings.playing_as", {"name": ProfileStore.get_profile(SaveManager.profile_id).get("name", "")}), &"MutedLabel"))
+		content.add_child(UIKit.button(Loc.t("ui.settings.switch_profile"), func() -> void:
+			get_tree().call_group(&"ui_root", &"request_logout"), &"", Loc.t("ui.settings.busy_dungeon") if busy else ""))
 	content.add_child(UIKit.label(Loc.t("ui.settings.audio"), &"AccentLabel"))
 	content.add_child(_volume_row(Loc.t("ui.settings.music"), Audio.MUSIC_BUS))
 	content.add_child(_volume_row(Loc.t("ui.settings.sounds"), Audio.SFX_BUS))

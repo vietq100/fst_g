@@ -8,6 +8,8 @@ const MAX_ZOOM := 2.0
 const WHEEL_STEP := 1.12
 
 var bounds := Rect2(-1300, -100, 2600, 1400)
+## Zoom-out limit; the world sets it from the Town's size (the whole Town and a little more).
+var min_zoom := MIN_ZOOM
 ## Screen pixels covered by the HUD at the top and the navigation bar at the bottom: the map may
 ## scroll until its edges sit just clear of them, so every part of it can be reached.
 var inset_top := 0.0
@@ -67,10 +69,22 @@ func pan(relative: Vector2) -> void:
 ## Zooms by `factor` keeping the world point under `screen_point` in place.
 func zoom_at(factor: float, screen_point: Vector2) -> void:
 	var before := _screen_to_world(screen_point)
-	var value := clampf(zoom.x * factor, MIN_ZOOM, MAX_ZOOM)
+	var value := clampf(zoom.x * factor, min_zoom, MAX_ZOOM)
 	zoom = Vector2(value, value)
 	if follow_target == null:
 		global_position += before - _screen_to_world(screen_point)
+	clamp_to_bounds()
+
+
+## Sets the zoom-out limit so `area` (world px) plus `margin` (1.2 = a fifth more) just fits the screen
+## between the HUD insets, and pulls the current zoom inside it.
+func limit_zoom_out_to(area: Rect2, margin: float) -> void:
+	var view := get_viewport_rect().size - Vector2(0.0, inset_top + inset_bottom)
+	if view.x <= 0.0 or view.y <= 0.0 or area.size.x <= 0.0 or area.size.y <= 0.0:
+		return
+	min_zoom = clampf(minf(view.x / (area.size.x * margin), view.y / (area.size.y * margin)), MIN_ZOOM, MAX_ZOOM)
+	if zoom.x < min_zoom:
+		zoom = Vector2(min_zoom, min_zoom)
 	clamp_to_bounds()
 
 

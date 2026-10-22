@@ -147,7 +147,7 @@ static func compose(cfg: Dictionary, st: Dictionary = {}) -> ForgeRenderer:
 	var shirt: Dictionary = item["shirt"]
 	var wpal: Dictionary = pal.call("weapon") if has_shape else {}
 	var shoulder: Array = data["shoulder"]
-	var archer := posed and weapon.get("anim", "") == "shoot"
+	var archer: bool = posed and weapon.get("anim", "") == "shoot"
 
 	# Weapon arm: rest pose (the arm reaches the grip; the weapon does not follow the breathing bob),
 	# an attack pose, or the archer's two arms.

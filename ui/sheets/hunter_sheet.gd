@@ -239,6 +239,8 @@ func _build_equipment(content: VBoxContainer) -> void:
 		var button := UIKit.button(Loc.t("ui.hunter.equip_option", {"slot": slot_name, "item": item.display_name, "mods": UIKit.describe_modifiers(item)}), func() -> void:
 			run_action(equipment.equip(runtime, instance_id), Loc.t("ui.hunter.equipped", {"item": item.display_name})))
 		button.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
+		button.clip_text = true
+		button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		content.add_child(button)
 	if options == 0:
 		content.add_child(UIKit.label(Loc.t("ui.hunter.no_spare"), &"MutedLabel"))

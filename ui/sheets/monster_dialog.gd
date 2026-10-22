@@ -192,16 +192,26 @@ func _build_skills(body: VBoxContainer, loadout: MonsterLoadout) -> void:
 	if loadout == null or loadout.skills.is_empty():
 		body.add_child(UIKit.label(Loc.t("ui.monster.no_skills"), &"MutedLabel"))
 		return
+	var tiles: Array = []
 	for skill_id in loadout.skills:
 		var skill := DataRegistry.find_def(&"monster_skill", skill_id) as MonsterSkillDefinition
-		if skill == null:
-			continue
-		var kind := Loc.t("ui.monster.skill_passive") if not skill.is_active() \
-			else Loc.t("ui.monster.skill_active", {"seconds": roundi(skill.cooldown)})
-		var info := UIKit.vbox([UIKit.label(skill.display_name, &"AccentLabel"), UIKit.label(skill.description, &""),
-			UIKit.label(kind, &"MutedLabel")], 2)
-		var badge := UIKit.swatch(Color("e0874a") if skill.is_active() else Color("5fa8ff"), 14)
-		body.add_child(UIKit.card(UIKit.hbox([badge, info], 8)))
+		if skill != null:
+			tiles.append(SkillTile.new().setup(skill, {"lines": _skill_lines(skill)}))
+	body.add_child(SkillTile.grid(tiles))
+	body.add_child(UIKit.label(Loc.t("ui.skill.tap_hint"), &"MutedLabel"))
+
+
+func _skill_lines(skill: MonsterSkillDefinition) -> Array[String]:
+	var lines: Array[String] = []
+	if skill.attack_ratio > 0.0:
+		lines.append(Loc.t("ui.skill.damage", {"percent": roundi(skill.attack_ratio * 100.0), "hits": skill.hits}))
+	if skill.heal_ratio > 0.0:
+		lines.append(Loc.t("ui.skill.heal", {"percent": roundi(skill.heal_ratio * 100.0)}))
+	if skill.trigger_hp_below > 0.0:
+		lines.append(Loc.t("ui.skill.below_hp", {"percent": roundi(skill.trigger_hp_below * 100.0)}))
+	for modifier in skill.modifiers:
+		lines.append(ItemInfoModal._modifier_text(modifier))
+	return lines
 
 
 func _build_items(body: VBoxContainer, loadout: MonsterLoadout) -> void:

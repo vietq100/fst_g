@@ -58,8 +58,16 @@ func refresh_lights() -> void:
 		_glow.queue_redraw()
 
 
-func _process(_delta: float) -> void:
-	_apply(_phase())
+## The hour changes slowly: the tint is refreshed a few times a second, not every frame.
+const REFRESH := 0.25
+var _since := REFRESH
+
+
+func _process(delta: float) -> void:
+	_since += delta
+	if _since >= REFRESH:
+		_since = 0.0
+		_apply(_phase())
 
 
 ## Fraction of the current day, 0 = dawn.
@@ -80,8 +88,12 @@ static func is_night() -> bool:
 
 func _apply(phase: float) -> void:
 	var tint := tint_at(phase)
+	var night := night_of(tint)
 	_shade.modulate = tint
-	_glow.modulate = Color(1, 1, 1, night_of(tint))
+	_glow.modulate = Color(1, 1, 1, night)
+	# By day the shade is plain white and the glow invisible: skip the two full-screen blended passes.
+	_shade.visible = not tint.is_equal_approx(Color.WHITE)
+	_glow.visible = night > 0.01
 
 
 ## Tint of an hour (0..1 from dawn).

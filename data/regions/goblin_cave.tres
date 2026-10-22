@@ -6,14 +6,14 @@
 script = ExtResource("1_region")
 id = &"goblin_cave"
 display_name = "region.goblin_cave.name"
-tile_rect = Rect2i(38, 38, 80, 80)
+tile_rect = Rect2i(38, 38, 40, 40)
 is_town = false
-shape = 2
+shape = 0
 min_hunter_level = 5
 monster_ids = Array[StringName]([&"goblin", &"wolf"])
 monster_level_min = 4
 monster_level_max = 7
-population_cap = 38
+population_cap = 24
 respawn_seconds = 15.0
 ground_color = Color(0.29, 0.25, 0.21, 1)
 ground_alt_color = Color(0.32, 0.28, 0.23, 1)

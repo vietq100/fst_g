@@ -12,6 +12,11 @@ signal shield_absorbed(amount: float)
 var _effects: Array[StatusEffect] = []
 
 
+## Only ticks while an effect runs (most actors have none): the physics callback is off otherwise.
+func _ready() -> void:
+	set_physics_process(not _effects.is_empty())
+
+
 ## Adds the effect or stacks/refreshes the running one. Returns the active effect, or null
 ## when the owner is dead.
 func apply(definition: StatusEffectDefinition, source: Actor = null, stacks: int = 1) -> StatusEffect:
@@ -22,6 +27,7 @@ func apply(definition: StatusEffectDefinition, source: Actor = null, stacks: int
 	if effect == null:
 		effect = StatusEffect.new(definition, source, stacks)
 		_effects.append(effect)
+		set_physics_process(true)
 	else:
 		match definition.stacking:
 			StatusEffectDefinition.Stacking.IGNORE:
@@ -220,6 +226,8 @@ func _tick(effect: StatusEffect) -> void:
 
 func _remove(effect: StatusEffect) -> void:
 	_effects.erase(effect)
+	if _effects.is_empty():
+		set_physics_process(false)
 	effect_removed.emit(effect)
 
 

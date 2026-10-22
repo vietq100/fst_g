@@ -204,3 +204,19 @@ func test_skill_casts_in_its_element() -> void:
 	assert_eq(visual.get_animation(), ChibiAnimations.ATTACK)
 	assert_eq(visual._config()["fx"], "thunder")
 	visual.free()
+
+
+func test_class_skills_have_an_effect_kind_and_element() -> void:
+	var registry: Node = preload("res://core/data_registry.gd").new()
+	registry.report_errors = false
+	registry.load_all(registry.DATA_ROOT, registry.CONFIG_PATH)
+	var elements := {}
+	for definition in registry.get_all(&"class_skill"):
+		var skill := definition as ClassSkillDefinition
+		var kind := SkillEffect.kind_for_class(skill)
+		assert_true(kind >= 0, String(skill.id))
+		elements[SkillEffect.element_for_class(skill)] = true
+		assert_true(SkillEffect.frames_of(kind, SkillEffect.element_for_class(skill)).size() == SkillEffect.FRAMES, "%s frames" % skill.id)
+	assert_true(elements.size() >= 3, "several elements: " + str(elements.keys()))
+	assert_eq(SkillEffect.element_for_class(registry.find_def(&"class_skill", &"fire_arrow")), "fire")
+	registry.free()

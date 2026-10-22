@@ -10,3 +10,6 @@ description = "trait.disciplined.desc"
 activity_rate_modifiers = Dictionary[StringName, float]({&"training": 1.5})
 mood_likes = Array[StringName]([&"training"])
 mood_dislikes = Array[StringName]([&"reckless_partner"])
+retreat_bias = 0.05
+weak_bias = 0.4
+potion_bias = 0.2

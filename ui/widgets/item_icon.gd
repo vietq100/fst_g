@@ -62,7 +62,8 @@ func _draw() -> void:
 		draw_line(Vector2(3, 3), size - Vector2(3, 3), GameTheme.DANGER, 2.0)
 	if not _badge.is_empty():
 		var font := ThemeDB.fallback_font
-		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x
-		var at := Vector2(size.x - width - 2.0, size.y - 3.0)
-		draw_string_outline(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, 2, Color("0b0d12"))
-		draw_string(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("fff3c4"))
+		var font_size := 12 if size.x >= 48.0 else 9
+		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		var at := Vector2(size.x - width - 3.0, size.y - 4.0)
+		draw_string_outline(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 4, Color("0b0d12"))
+		draw_string(font, at, _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color("fff3c4"))

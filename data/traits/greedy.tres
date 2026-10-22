@@ -19,3 +19,5 @@ modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0")])
 activity_rate_modifiers = Dictionary[StringName, float]({})
 mood_likes = Array[StringName]([&"boss_kill"])
 mood_dislikes = Array[StringName]([&"failure"])
+aggro_mult = 1.1
+loot_mult = 1.7

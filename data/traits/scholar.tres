@@ -19,3 +19,5 @@ activity_rate_modifiers = Dictionary[StringName, float]({})
 mood_likes = Array[StringName]([])
 mood_dislikes = Array[StringName]([])
 academy_cost = 2
+weak_bias = 0.2
+potion_bias = 0.1

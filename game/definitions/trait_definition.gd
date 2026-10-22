@@ -15,3 +15,17 @@ extends GameDefinition
 @export var icon: Texture2D
 ## Academy: reincarnation points needed to learn it (0 = cannot be learned, e.g. flaws).
 @export var academy_cost: int = 1
+
+@export_group("Behaviour")
+## Added to the HP ratio at which the Hunter breaks off and goes home to rest (negative = fights on).
+@export var retreat_bias: float = 0.0
+## Multiplier of the range in which it picks a fight (cautious < 1 < brave).
+@export var aggro_mult: float = 1.0
+## Prefers wounded enemies (finishes them off, focus fire) when positive.
+@export var weak_bias: float = 0.0
+## Positive: seeks bosses and elites; negative: avoids them, most of all when hurt.
+@export var boss_bias: float = 0.0
+## Added to the HP ratio at which it drinks medicine from its bag in the middle of a fight.
+@export var potion_bias: float = 0.0
+## Multiplier of the range in which it goes for loot on the ground.
+@export var loot_mult: float = 1.0

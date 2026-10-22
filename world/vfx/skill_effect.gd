@@ -49,6 +49,38 @@ static func element_for(skill: MonsterSkillDefinition) -> String:
 	return "none"
 
 
+## Kind of a Hunter's class skill: area skills around the caster slam, support and self skills glow,
+## skills with only effects cast a spell on the target, other damage strikes it.
+static func kind_for_class(skill: ClassSkillDefinition) -> Kind:
+	match skill.target:
+		ClassSkillDefinition.Target.ENEMIES_AROUND_SELF:
+			return Kind.SLAM
+		ClassSkillDefinition.Target.ALLIES_AROUND, ClassSkillDefinition.Target.LOWEST_ALLY, ClassSkillDefinition.Target.SELF:
+			return Kind.AURA
+		ClassSkillDefinition.Target.ENEMIES_AROUND_TARGET:
+			return Kind.SLAM
+	if skill.deals_damage():
+		return Kind.STRIKE
+	return Kind.SPELL if not skill.target_effects.is_empty() else Kind.AURA
+
+
+## Whether a class skill's effect is centred on its target rather than the caster.
+static func class_effect_on_target(skill: ClassSkillDefinition) -> bool:
+	return skill.target == ClassSkillDefinition.Target.ENEMY or skill.target == ClassSkillDefinition.Target.ENEMIES_AROUND_TARGET
+
+
+## Element of a class skill: its status effects, else words in its id.
+static func element_for_class(skill: ClassSkillDefinition) -> String:
+	var from_effects := ForgeLook.element_for_effects([skill.target_effects, skill.self_effects, skill.ally_effects, skill.on_hit_effects])
+	if from_effects != "none":
+		return from_effects
+	for pair: Array in ELEMENT_WORDS + [["holy", "thunder"], ["smite", "thunder"], ["judg", "thunder"], ["bolt", "thunder"], ["explosive", "fire"],
+			["shadow", "shadow"], ["night", "shadow"], ["envenom", "poison"], ["toxic", "poison"]]:
+		if String(skill.id).contains(pair[0]):
+			return pair[1]
+	return "none"
+
+
 ## The baked frames of a kind in an element (shared).
 static func frames_of(effect: Kind, el: String) -> Array:
 	var key := "%d|%s" % [effect, el]

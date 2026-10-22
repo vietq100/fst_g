@@ -3219,6 +3219,10 @@
   "en": "Save loaded with {count} fix(es). Details are in the log.",
   "vi": "Đã tải save và sửa {count} lỗi dữ liệu. Chi tiết trong log."
  },
+ "trait.behavior.title": {
+  "en": "Behaviour",
+  "vi": "Hành vi"
+ },
  "trait.brave.desc": {
   "en": "Fights harder against bosses. Gets restless when left at home.",
   "vi": "Chiến đấu hăng hơn khi gặp Boss. Bồn chồn khi bị để ở nhà."
@@ -4783,6 +4787,10 @@
   "en": "Cannot sell",
   "vi": "Không bán được"
  },
+ "ui.inventory.empty": {
+  "en": "Nothing here yet.",
+  "vi": "Chưa có gì ở đây."
+ },
  "ui.inventory.equip_hint": {
   "en": "Equip items from a Hunter's panel.",
   "vi": "Trang bị đồ từ bảng của Hunter."
@@ -4807,6 +4815,10 @@
   "en": "Sell\n{gold} g",
   "vi": "Bán\n{gold} g"
  },
+ "ui.inventory.sell_all": {
+  "en": "Sell all {count}\n{gold} g",
+  "vi": "Bán hết {count}\n{gold} g"
+ },
  "ui.inventory.sell_one": {
   "en": "Sell 1\n{gold} g",
   "vi": "Bán 1\n{gold} g"
@@ -4818,6 +4830,26 @@
  "ui.inventory.spare": {
   "en": "Spare equipment",
   "vi": "Trang bị dư"
+ },
+ "ui.inventory.tab.all": {
+  "en": "All",
+  "vi": "Tất cả"
+ },
+ "ui.inventory.tab.equipment": {
+  "en": "Gear",
+  "vi": "Đồ"
+ },
+ "ui.inventory.tab.food": {
+  "en": "Food",
+  "vi": "Thức ăn"
+ },
+ "ui.inventory.tab.material": {
+  "en": "Items",
+  "vi": "Vật phẩm"
+ },
+ "ui.inventory.tap_hint": {
+  "en": "Tap an item to see its details or sell it.",
+  "vi": "Nhấn vào vật phẩm để xem chi tiết hoặc bán."
  },
  "ui.inventory.title": {
   "en": "Inventory",
@@ -5151,6 +5183,62 @@
   "en": "Storage",
   "vi": "Kho"
  },
+ "ui.profile.create": {
+  "en": "Create",
+  "vi": "Tạo"
+ },
+ "ui.profile.default_name": {
+  "en": "Profile {n}",
+  "vi": "Hồ sơ {n}"
+ },
+ "ui.profile.delete": {
+  "en": "Delete",
+  "vi": "Xóa"
+ },
+ "ui.profile.delete_confirm": {
+  "en": "Tap again",
+  "vi": "Nhấn lần nữa"
+ },
+ "ui.profile.empty": {
+  "en": "No profiles yet. Create one to start.",
+  "vi": "Chưa có hồ sơ. Hãy tạo một hồ sơ để bắt đầu."
+ },
+ "ui.profile.last_played": {
+  "en": "Last played: {date}",
+  "vi": "Chơi lần cuối: {date}"
+ },
+ "ui.profile.name_hint": {
+  "en": "New profile name",
+  "vi": "Tên hồ sơ mới"
+ },
+ "ui.profile.play": {
+  "en": "Play",
+  "vi": "Chơi"
+ },
+ "ui.profile.sample.lv10": {
+  "en": "Slot 1 · Hunters Lv 10",
+  "vi": "Ô 1 · Hunter Lv 10"
+ },
+ "ui.profile.sample.lv100": {
+  "en": "Slot 3 · Hunters Lv 100",
+  "vi": "Ô 3 · Hunter Lv 100"
+ },
+ "ui.profile.sample.lv50": {
+  "en": "Slot 2 · Hunters Lv 50",
+  "vi": "Ô 2 · Hunter Lv 50"
+ },
+ "ui.profile.subtitle": {
+  "en": "Each profile has its own town and save.",
+  "vi": "Mỗi hồ sơ có thị trấn và bản lưu riêng."
+ },
+ "ui.profile.summary": {
+  "en": "Town Lv {town} · {hunters} Hunters · {gold} gold",
+  "vi": "Thị trấn Lv {town} · {hunters} Hunter · {gold} vàng"
+ },
+ "ui.profile.title": {
+  "en": "Choose a profile",
+  "vi": "Chọn hồ sơ"
+ },
  "ui.quest.all_done": {
   "en": "All quests are done. Play on at your own pace.",
   "vi": "Đã xong mọi nhiệm vụ. Cứ chơi tiếp theo nhịp của bạn."
@@ -5267,9 +5355,21 @@
   "en": "Music",
   "vi": "Nhạc"
  },
+ "ui.settings.playing_as": {
+  "en": "Playing as {name}",
+  "vi": "Đang chơi: {name}"
+ },
+ "ui.settings.profile": {
+  "en": "Profile",
+  "vi": "Hồ sơ"
+ },
  "ui.settings.sounds": {
   "en": "Effects",
   "vi": "Hiệu ứng"
+ },
+ "ui.settings.switch_profile": {
+  "en": "Switch profile",
+  "vi": "Đổi hồ sơ / Đăng xuất"
  },
  "ui.settings.title": {
   "en": "Settings",
@@ -5302,6 +5402,42 @@
  "ui.shop.title": {
   "en": "Shop & Services",
   "vi": "Cửa hàng & Dịch vụ"
+ },
+ "ui.skill.below_hp": {
+  "en": "Only below {percent}% HP",
+  "vi": "Chỉ khi dưới {percent}% máu"
+ },
+ "ui.skill.cooldown": {
+  "en": "Cooldown",
+  "vi": "Hồi chiêu"
+ },
+ "ui.skill.damage": {
+  "en": "Damage: {percent}% attack × {hits}",
+  "vi": "Sát thương: {percent}% tấn công × {hits}"
+ },
+ "ui.skill.heal": {
+  "en": "Heals {percent}% max HP",
+  "vi": "Hồi {percent}% máu tối đa"
+ },
+ "ui.skill.level": {
+  "en": "Level",
+  "vi": "Cấp"
+ },
+ "ui.skill.mana": {
+  "en": "Mana",
+  "vi": "Mana"
+ },
+ "ui.skill.seconds": {
+  "en": "{seconds}s",
+  "vi": "{seconds} giây"
+ },
+ "ui.skill.tap_hint": {
+  "en": "Tap a skill to see its details.",
+  "vi": "Nhấn vào kỹ năng để xem chi tiết."
+ },
+ "ui.skill.type": {
+  "en": "Type",
+  "vi": "Loại"
  },
  "world.arena.cleanse": {
   "en": "Cleanse",
@@ -5522,5 +5658,17 @@
  "world.popup.miss": {
   "en": "Miss",
   "vi": "Trượt"
+ },
+ "world.popup.potion": {
+  "en": "Drinks potion",
+  "vi": "Uống thuốc"
+ },
+ "world.popup.retreat": {
+  "en": "Falling back!",
+  "vi": "Rút lui!"
+ },
+ "world.popup.retreat_coward": {
+  "en": "Run away!!",
+  "vi": "Chạy thôi!!"
  }
 }

@@ -19,6 +19,11 @@ var backup_path := BACKUP_PATH
 var last_warnings: PackedStringArray = []
 var last_offline_summary: Dictionary = {}
 
+## Selected profile (ProfileStore); empty until the login screen picked one. The autoload writes
+## nothing before that.
+var profile_id := ""
+var autosave_enabled := false
+
 var _autosave_pending := false
 var _background_since_unix := 0.0
 
@@ -27,10 +32,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	game = GameManager
 	game.autosave_requested.connect(request_autosave)
-	if has_save():
-		load_game()
-	else:
-		save_game(&"new_game")
+	ProfileStore.migrate_legacy()
 
 
 func _notification(what: int) -> void:
@@ -39,7 +41,7 @@ func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Mobile OSes may kill a backgrounded app without warning (SAVE_SYSTEM.md).
-			if what == NOTIFICATION_APPLICATION_PAUSED or OS.has_feature("mobile"):
+			if autosave_enabled and (what == NOTIFICATION_APPLICATION_PAUSED or OS.has_feature("mobile")):
 				save_game(&"background")
 				_background_since_unix = Time.get_unix_time_from_system()
 		NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN:
@@ -47,7 +49,38 @@ func _notification(what: int) -> void:
 				apply_offline_progress(Time.get_unix_time_from_system() - _background_since_unix)
 				_background_since_unix = 0.0
 		NOTIFICATION_WM_CLOSE_REQUEST:
-			save_game(&"quit")
+			if autosave_enabled:
+				save_game(&"quit")
+
+
+func has_profile() -> bool:
+	return not profile_id.is_empty()
+
+
+## Works on this profile's save from now on: loads it, or starts a new game when it has none.
+func select_profile(id: String) -> void:
+	profile_id = id
+	save_path = ProfileStore.save_path(id)
+	backup_path = ProfileStore.backup_path(id)
+	DirAccess.make_dir_recursive_absolute(save_path.get_base_dir())
+	autosave_enabled = true
+	if has_save():
+		load_game()
+	else:
+		last_warnings = PackedStringArray()
+		last_offline_summary = {}
+		game.reset_to_new_game()
+		save_game(&"new_game")
+
+
+## Saves and leaves the profile (back to the login screen).
+func logout() -> void:
+	if has_profile():
+		save_game(&"logout")
+	profile_id = ""
+	autosave_enabled = false
+	save_path = SAVE_PATH
+	backup_path = BACKUP_PATH
 
 
 func has_save() -> bool:
@@ -56,7 +89,7 @@ func has_save() -> bool:
 
 ## Coalesces several requests in one frame into one write.
 func request_autosave(reason: StringName = &"autosave") -> void:
-	if _autosave_pending:
+	if _autosave_pending or not autosave_enabled:
 		return
 	_autosave_pending = true
 	_flush_autosave.call_deferred(reason)
@@ -64,7 +97,8 @@ func request_autosave(reason: StringName = &"autosave") -> void:
 
 func _flush_autosave(reason: StringName) -> void:
 	_autosave_pending = false
-	save_game(reason)
+	if autosave_enabled:
+		save_game(reason)
 
 
 ## Safe write. Returns false (and leaves the previous save untouched) on any failure.
@@ -89,6 +123,8 @@ func save_game(reason: StringName = &"manual") -> bool:
 	if error != OK:
 		push_warning("SaveManager: cannot replace %s (%s)" % [save_path, error_string(error)])
 		return false
+	if has_profile():
+		ProfileStore.touch(profile_id, game.progress.town_level, game.hunters.get_all().size(), game.wallet.gold)
 	saved.emit(reason)
 	return true
 

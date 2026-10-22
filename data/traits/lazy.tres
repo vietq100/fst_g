@@ -11,3 +11,6 @@ activity_rate_modifiers = Dictionary[StringName, float]({&"training": 0.5, &"res
 mood_likes = Array[StringName]([&"resting"])
 mood_dislikes = Array[StringName]([&"back_to_back"])
 academy_cost = 0
+retreat_bias = 0.1
+aggro_mult = 0.7
+loot_mult = 0.7

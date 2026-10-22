@@ -83,20 +83,20 @@ func test_four_regions_and_four_gates() -> void:
 		if not pairs.has(pair):
 			pairs.append(pair)
 	pairs.sort()
-	assert_eq(pairs, ["ancient_ruins-boss_arena", "ancient_ruins-goblin_cave", "ancient_ruins-town", "dark_forest-goblin_cave",
+	assert_eq(pairs, ["ancient_ruins-goblin_cave", "ancient_ruins-town", "boss_arena-town", "dark_forest-goblin_cave",
 		"dark_forest-town", "hunter_gate-town"])
-	assert_eq(_world.gates_of(&"town").size(), 3)
+	assert_eq(_world.gates_of(&"town").size(), 4)
 	var forest_cave := _world.gates_of(&"dark_forest").filter(func(g: WorldService.Gate) -> bool: return g.region_a == &"dark_forest" and g.region_b == &"goblin_cave" or g.region_b == &"dark_forest" and g.region_a == &"goblin_cave")
-	assert_eq(forest_cave.size(), 3, "a long border has three bridges")
+	assert_eq(forest_cave.size(), 1, "a 40-tile border has one bridge")
 	assert_eq(_world.get_region(&"hunter_gate").kind, RegionDefinition.Kind.GATE)
 	assert_eq(_world.get_region(&"boss_arena").kind, RegionDefinition.Kind.BOSS)
 
 
 func test_region_lookup() -> void:
 	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(4, 4))).id, &"town")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(78, -4))).id, &"ancient_ruins")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(-4, 78))).id, &"dark_forest")
-	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(78, 78))).id, &"goblin_cave")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(58, 16))).id, &"ancient_ruins")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(16, 58))).id, &"dark_forest")
+	assert_eq(_world.region_at(WorldService.tile_center(Vector2i(58, 58))).id, &"goblin_cave")
 	assert_null(_world.region_at(WorldService.tile_center(Vector2i(-6, -6))), "open water")
 
 

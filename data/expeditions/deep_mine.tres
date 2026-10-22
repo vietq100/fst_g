@@ -9,5 +9,5 @@ display_name = "expedition.deep_mine.name"
 recommended_level = 10
 unlock_flag = &"coming_later"
 region_id = &"goblin_cave"
-entrance_tile = Vector2i(118, 78)
+entrance_tile = Vector2i(78, 58)
 locked = true

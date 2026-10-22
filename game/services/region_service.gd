@@ -28,6 +28,8 @@ var weapon_wear: Callable = Callable()
 var _progress: ProgressService
 var _config: GameConfig
 var _rng: RandomNumberGenerator
+## Personality (set by GameManager): shifts the HP ratio at which a Hunter breaks off a fight.
+var traits: TraitService
 
 
 func _init(registry: Node, world: WorldService, hunters: HunterService, purses: PurseService,
@@ -347,7 +349,14 @@ func deposit(hunter: HunterRuntime) -> Dictionary:
 	return report
 
 
-## Low HP: go home (below rest_below_hp_ratio); once resting, stay until rest_until_hp_ratio.
+## Low HP: go home (below the retreat ratio); once resting, stay until rest_until_hp_ratio.
 func needs_rest(hunter: HunterRuntime, resting: bool) -> bool:
 	var max_hp := _hunters.get_stat(hunter, HunterService.MAX_HP)
-	return hunter.current_hp < max_hp * (_config.rest_until_hp_ratio if resting else _config.rest_below_hp_ratio)
+	return hunter.current_hp < max_hp * (_config.rest_until_hp_ratio if resting else get_retreat_ratio(hunter))
+
+
+## HP ratio under which the Hunter breaks off: rest_below_hp_ratio moved by its personality (a coward
+## runs early, a reckless one fights on), kept between 5% and 80%.
+func get_retreat_ratio(hunter: HunterRuntime) -> float:
+	var bias: float = traits.get_behavior(hunter)["retreat"] if traits != null else 0.0
+	return clampf(_config.rest_below_hp_ratio + bias, 0.05, 0.8)

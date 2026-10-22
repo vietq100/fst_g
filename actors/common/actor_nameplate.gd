@@ -33,13 +33,19 @@ func setup(target: Actor, label: String, lift: float) -> void:
 	queue_redraw()
 
 
+var _shown_zoom := -1.0
+
+
 func _process(_delta: float) -> void:
 	if actor == null or not is_instance_valid(actor):
 		return
 	var camera := get_viewport().get_camera_2d()
 	var zoom := camera.zoom.x if camera != null else 1.0
-	var factor := clampf(1.0 / zoom, 1.0, 2.5)
-	scale = Vector2(factor, factor)
+	# Only touch the transform when the zoom changed (a scale write dirties the Y-sort every frame).
+	if not is_equal_approx(zoom, _shown_zoom):
+		_shown_zoom = zoom
+		var factor := clampf(1.0 / zoom, 1.0, 2.5)
+		scale = Vector2(factor, factor)
 	if actor.health.current_health != _shown_hp or actor.health.max_health != _shown_max:
 		_shown_hp = actor.health.current_health
 		_shown_max = actor.health.max_health

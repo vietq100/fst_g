@@ -35,12 +35,29 @@ var _pending_result: ExpeditionRun
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if not SaveManager.has_profile():
+		# Login screen first; the scene reloads once a profile is picked and loaded.
+		# Nothing of the game (HUD, menu bar, dev panel, map) shows before a profile is chosen.
+		$UI.visible = false
+		$WorldContainer.visible = false
+		$Transition/Banner.visible = false
+		var screen := ProfileScreen.new()
+		$Transition.add_child(screen)
+		screen.chosen.connect(func(profile_id: String) -> void:
+			SaveManager.select_profile(profile_id)
+			_booted = false
+			get_tree().reload_current_scene.call_deferred())
+		return
 	GameManager.expeditions.expedition_started.connect(_on_expedition_started)
 	GameManager.expeditions.expedition_finished.connect(_on_expedition_finished)
 	GameManager.world_change_requested.connect(_on_world_change_requested)
 	SaveManager.offline_progress_applied.connect(_on_offline_progress)
 	Loc.locale_changed.connect(_on_locale_changed)
 	_ui.depart_requested.connect(_on_depart_requested)
+	_ui.logout_requested.connect(func() -> void:
+		SaveManager.logout()
+		_booted = false
+		get_tree().reload_current_scene.call_deferred())
 	_ui.build_requested.connect(func(building_id: StringName) -> void:
 		if _world is WorldMap:
 			_world.begin_build(building_id))

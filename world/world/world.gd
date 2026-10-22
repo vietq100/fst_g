@@ -36,6 +36,8 @@ const PROP_SEED := 20261011
 ## Props closer than this leave slivers in the baked navigation mesh; keep them apart.
 const PROP_SPACING := 34.0
 const START_ZOOM := 0.6
+## The zoom-out limit shows the whole Town plus this much more (1.25 = a quarter).
+const ZOOM_OUT_MARGIN := 1.25
 const CARRIER_CHECK_INTERVAL := 1.0
 ## A sleeping Hunter this close to its House door goes inside (hidden).
 const ENTER_DISTANCE := 10.0
@@ -93,7 +95,7 @@ func _ready() -> void:
 	for placed in GameManager.buildings.get_instances():
 		_spawn_building(placed)
 	_spawn_props()
-	_navigation.bake_navigation_polygon(false)
+	_bake_navigation()
 	# Spawners need the synced navigation map to pick spawn points.
 	await _navigation_synced()
 	_spawn_regions()
@@ -114,6 +116,7 @@ func _ready() -> void:
 	GameManager.activities.activity_changed.connect(_on_activity_changed)
 	GameManager.corpses.body_delivered.connect(_on_body_delivered)
 	GameManager.combat.monster_skill_cast.connect(_on_monster_skill_cast)
+	GameManager.combat.skill_cast.connect(_on_class_skill_cast)
 
 
 func _build_scene() -> void:
@@ -192,6 +195,8 @@ func _build_scene() -> void:
 	_camera.zoom = Vector2(START_ZOOM, START_ZOOM)
 	_camera.position = world.region_center(world.get_town())
 	add_child(_camera)
+	_update_zoom_limit()
+	get_viewport().size_changed.connect(_update_zoom_limit)
 	_ghost = BuildingVisual.new()
 	_ghost.ghost = true
 	_ghost.visible = false
@@ -245,10 +250,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var magnify := event as InputEventMagnifyGesture
 	if magnify != null:
-		_camera.zoom_at(magnify.factor, magnify.position)
+		if not input_blocker.call(magnify.position):
+			_camera.zoom_at(magnify.factor, magnify.position)
 		return
 	var pan := event as InputEventPanGesture
-	if pan != null:
+	if pan != null and not input_blocker.call(pan.position):
 		_camera.pan(-pan.delta * 8.0)
 
 
@@ -263,8 +269,11 @@ func _on_touch(touch: InputEventScreenTouch) -> void:
 			# A second finger turns the gesture into a pinch, never a tap.
 			_dragging = true
 		return
+	# A release without a tracked press belongs to UI that took the press (a dialog's list or button):
+	# it must never turn into a tap on the map under it. A release over UI is never a tap either.
+	var tracked := _touches.has(touch.index)
 	_touches.erase(touch.index)
-	if touch.index == 0 and not _dragging and not _touch_on_ui:
+	if tracked and touch.index == 0 and not _dragging and not _touch_on_ui and not input_blocker.call(touch.position):
 		_on_tap(screen_to_world(touch.position))
 
 
@@ -362,7 +371,19 @@ func follow_hunter(unique_id: StringName) -> bool:
 func set_view_insets(top: float, bottom: float) -> void:
 	_camera.inset_top = top
 	_camera.inset_bottom = bottom
+	_update_zoom_limit()
 	_camera.clamp_to_bounds()
+
+
+## Zooming out stops a little beyond the whole Town (ZOOM_OUT_MARGIN) instead of showing the open sea.
+func _update_zoom_limit() -> void:
+	var outline := world.region_outline(world.get_town())
+	if outline.is_empty():
+		return
+	var area := Rect2(outline[0], Vector2.ZERO)
+	for point in outline:
+		area = area.expand(point)
+	_camera.limit_zoom_out_to(area, ZOOM_OUT_MARGIN)
 
 
 ## Navigation "Town": camera back over the Town at normal zoom.
@@ -1012,11 +1033,25 @@ func _town_plaza() -> Dictionary[Vector2i, bool]:
 
 # --- Regions: monsters, points -------------------------------------------------------------------
 
+## Walkable area in two steps: a quick mesh from the region outlines (no obstacles) so the world can
+## start at once, then the full bake with every prop carved out on a worker thread (~25 s for the
+## ~900 obstacles of the big map; baking it on the main thread was a black screen at start-up). The
+## full mesh replaces the quick one when it is done.
+func _bake_navigation() -> void:
+	var polygon := _navigation.navigation_polygon
+	var source := NavigationMeshSourceGeometryData2D.new()
+	for outline in polygon.get_outline_count():
+		source.add_traversable_outline(polygon.get_outline(outline))
+	NavigationServer2D.bake_from_source_geometry_data(polygon, source)
+	_navigation.navigation_polygon = polygon
+	_navigation.bake_navigation_polygon(true)
+
+
 func _navigation_synced() -> void:
 	var map_rid := get_world_2d().navigation_map
 	for frame in 30:
 		await get_tree().physics_frame
-		if NavigationServer2D.map_get_iteration_id(map_rid) > 0 and not _navigation.is_baking():
+		if NavigationServer2D.map_get_iteration_id(map_rid) > 0:
 			return
 
 
@@ -1093,6 +1128,26 @@ func _on_monster_skill_cast(monster: Actor, skill: MonsterSkillDefinition) -> vo
 	SkillEffect.play(_entities, at, kind, SkillEffect.element_for(skill))
 
 
+## A Hunter casts a class skill (D75): the cast pose (staff casters raise the staff) and a pixel effect in
+## the skill's element, on the target or around the caster.
+## A Hunter's personality shows: breaking off, drinking medicine.
+func _on_hunter_behavior(hunter: Hunter, key: StringName) -> void:
+	if is_instance_valid(hunter):
+		_popup(Loc.t("world.popup.%s" % key), Color("ff9f6b") if key != &"potion" else Color("7fe08a"), hunter.global_position + Vector2(0, -52), 0.0)
+
+
+func _on_class_skill_cast(caster: Actor, skill: ClassSkillDefinition) -> void:
+	if not is_instance_valid(caster) or skill == null or not skill.is_active():
+		return
+	if caster.visual != null:
+		caster.visual.play_action(ChibiAnimations.SKILL)
+	var kind := SkillEffect.kind_for_class(skill)
+	var at := caster.global_position
+	if SkillEffect.class_effect_on_target(skill) and caster.combat != null and caster.combat.is_valid_target(caster.combat.target):
+		at = caster.combat.target.global_position
+	SkillEffect.play(_entities, at, kind, SkillEffect.element_for_class(skill))
+
+
 func _on_monster_killed(enemy: Enemy, killer: Hunter, reward: KillReward) -> void:
 	if reward.on_ground:
 		_spawn_drop(enemy.global_position, reward)
@@ -1122,7 +1177,8 @@ func _spawn_drop(at: Vector2, reward: KillReward) -> void:
 
 
 func get_drops() -> Array[LootDrop]:
-	_drops.assign(_drops.filter(func(drop: LootDrop) -> bool: return is_instance_valid(drop) and not drop.is_queued_for_deletion()))
+	# Untyped: a freed drop cannot be converted to LootDrop, so a typed argument errors before the check.
+	_drops.assign(_drops.filter(func(drop) -> bool: return is_instance_valid(drop) and not drop.is_queued_for_deletion()))
 	return _drops
 
 
@@ -1188,6 +1244,7 @@ func _spawn_actor(runtime: HunterRuntime, at: Vector2) -> Hunter:
 	var brain := HunterBrain.new()
 	hunter.add_child(brain)
 	brain.setup(hunter, self)
+	brain.behavior_event.connect(_on_hunter_behavior)
 	hunter.health.died.connect(_on_hunter_died.bind(hunter))
 	_send_home(hunter)
 	return hunter

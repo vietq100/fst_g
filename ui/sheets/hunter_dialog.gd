@@ -261,8 +261,12 @@ func _build_class_skills(body: VBoxContainer) -> void:
 	var owned := skills.get_owned(runtime)
 	if owned.is_empty():
 		body.add_child(UIKit.label(Loc.t("ui.class_skill.none"), &"MutedLabel"))
+	var tiles: Array = []
 	for skill in owned:
-		body.add_child(_class_skill_card(skills, skill, config))
+		tiles.append(_class_skill_tile(skills, skill, config))
+	if not tiles.is_empty():
+		body.add_child(SkillTile.grid(tiles))
+		body.add_child(UIKit.label(Loc.t("ui.skill.tap_hint"), &"MutedLabel"))
 	var reason := skills.can_unlock(runtime)
 	body.add_child(UIKit.button(Loc.t("ui.class_skill.unlock"), func() -> void:
 		var learned := skills.unlock_random(runtime)
@@ -271,26 +275,25 @@ func _build_class_skills(body: VBoxContainer) -> void:
 		&"PrimaryButton", reason))
 
 
-func _class_skill_card(skills: ClassSkillService, skill: ClassSkillDefinition, config: GameConfig) -> Control:
+## Tile of an owned class skill; its details dialog carries the numbers and the upgrade / swap buttons.
+func _class_skill_tile(skills: ClassSkillService, skill: ClassSkillDefinition, config: GameConfig) -> Control:
 	var level := skills.get_level(runtime, skill.id)
-	var name_label := UIKit.label("%s · %s" % [skill.display_name, Loc.t("ui.class_skill.level", {"level": level, "max": config.class_skill_max_level})], &"HudLabel")
-	name_label.add_theme_color_override(&"font_color", GameTheme.ENERGY if skill.is_active() else GameTheme.INFO)
-	var kind := UIKit.label(Loc.t("class_skill.kind.active" if skill.is_active() else "class_skill.kind.passive"), &"MutedLabel", false)
-	var info := UIKit.vbox([UIKit.hbox([name_label, kind], 6), UIKit.label(skill.description, &"MutedLabel"),
-		UIKit.label(skills.describe(skill, level), &"HudSmallLabel")], 2)
-	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var upgrade := UIKit.button(Loc.t("ui.class_skill.upgrade"), func() -> void:
-		var done := skills.upgrade(runtime, skill.id)
-		run_action("" if done else skills.can_upgrade(runtime, skill.id),
-			Loc.t("ui.class_skill.upgraded", {"name": skill.display_name, "level": skills.get_level(runtime, skill.id)})),
-		&"PrimaryButton", skills.can_upgrade(runtime, skill.id))
-	var buttons := UIKit.vbox([upgrade], 4)
+	var actions: Array = [{
+		"text": Loc.t("ui.class_skill.upgrade"),
+		"reason": skills.can_upgrade(runtime, skill.id),
+		"action": func() -> void:
+			var done := skills.upgrade(runtime, skill.id)
+			run_action("" if done else skills.can_upgrade(runtime, skill.id),
+				Loc.t("ui.class_skill.upgraded", {"name": skill.display_name, "level": skills.get_level(runtime, skill.id)})),
+	}]
 	if runtime.skill_swap_points > 0:
-		buttons.add_child(UIKit.button(Loc.t("ui.class_skill.swap"), func() -> void:
-			var swapped := skills.swap(runtime, skill.id)
-			run_action("" if swapped != null else skills.can_swap(runtime, skill.id),
-				Loc.t("ui.class_skill.swapped", {"name": swapped.display_name}) if swapped != null else ""),
-			&"", skills.can_swap(runtime, skill.id)))
-	for button: Button in buttons.get_children():
-		button.custom_minimum_size = Vector2(76, 30)
-	return UIKit.card(UIKit.hbox([info, buttons], 6))
+		actions.append({
+			"text": Loc.t("ui.class_skill.swap"),
+			"reason": skills.can_swap(runtime, skill.id),
+			"action": func() -> void:
+				var swapped := skills.swap(runtime, skill.id)
+				run_action("" if swapped != null else skills.can_swap(runtime, skill.id),
+					Loc.t("ui.class_skill.swapped", {"name": swapped.display_name}) if swapped != null else ""),
+		})
+	var options := {"level": level, "max_level": config.class_skill_max_level, "lines": [skills.describe(skill, level)], "actions": actions}
+	return SkillTile.new().setup(skill, options, "Lv%d" % level)

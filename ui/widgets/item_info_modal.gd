@@ -81,6 +81,13 @@ func _rebuild() -> void:
 		child.queue_free()
 	var gm := GameManager
 	var equipment := gm.equipment
+	# The item is gone (sold): nothing left to show.
+	if instance_id != &"" and gm.inventory.get_instance_item(instance_id) == &"":
+		queue_free()
+		return
+	if instance_id == &"" and item.stackable and gm.inventory.count(item.id) <= 0:
+		queue_free()
+		return
 	var enhance := gm.inventory.get_enhance(instance_id) if instance_id != &"" else 0
 	var broken := instance_id != &"" and equipment.is_broken(instance_id)
 	# Title banner.
@@ -153,6 +160,23 @@ func _rebuild() -> void:
 				toast_requested.emit(reason, true))
 		_style_button(remove, BUTTON, FRAME_RIM.darkened(0.2))
 		actions.add_child(remove)
+	# Selling: stored stackables (one or all) and stored equipment; worn gear cannot be sold.
+	if item.sell_price > 0 and instance_id == &"" and item.stackable:
+		var owned: int = gm.inventory.count(item.id)
+		var sell_one := UIKit.button(Loc.t("ui.inventory.sell_one", {"gold": item.sell_price}), func() -> void:
+			gm.inventory.sell_item(item.id, 1), &"")
+		_style_button(sell_one, Color("7a2a22"), Color("c8562a"))
+		actions.add_child(sell_one)
+		if owned > 1:
+			var sell_all := UIKit.button(Loc.t("ui.inventory.sell_all", {"count": owned, "gold": item.sell_price * owned}), func() -> void:
+				gm.inventory.sell_item(item.id, owned), &"")
+			_style_button(sell_all, Color("7a2a22"), Color("c8562a"))
+			actions.add_child(sell_all)
+	elif item.sell_price > 0 and instance_id != &"" and owner == null:
+		var sell := UIKit.button(Loc.t("ui.inventory.sell", {"gold": item.sell_price}), func() -> void:
+			gm.inventory.sell_instance(instance_id), &"")
+		_style_button(sell, Color("7a2a22"), Color("c8562a"))
+		actions.add_child(sell)
 	if actions.get_child_count() > 0:
 		box.add_child(actions)
 	var inner := PanelContainer.new()
