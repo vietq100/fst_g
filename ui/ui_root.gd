@@ -28,7 +28,12 @@ signal focus_region_requested(region_id: StringName)
 enum Mode { TOWN, EXPEDITION, SANDBOX }
 
 const TOAST_TIME := 2.6
+const TOAST_FADE := 0.4
 const MAX_TOASTS := 3
+## Event feed lines (deposits, broken weapons): kept longer, fewer at once.
+const FEED_TIME := 5.0
+const FEED_FADE := 0.6
+const MAX_FEED_LINES := 3
 ## Sheets cover at most this share of the screen height, above the navigation bar.
 const SHEET_HEIGHT := 0.45
 ## Hunter / monster dialogs leave the top of the map free so the tapped Hunter stays in view.
@@ -186,12 +191,16 @@ func close_sheet() -> void:
 
 ## The camera has wandered off the Town: the "Town" button turns gold to offer the way back.
 func set_camera_away(away: bool) -> void:
-	if _town_button == null:
-		return
-	if away:
-		_town_button.add_theme_color_override(&"font_color", GameTheme.ACCENT)
+	if _town_button != null:
+		_set_accent(_town_button, away)
+
+
+## Gold text while `on` (a count that wants attention, the way back home); the theme's otherwise.
+static func _set_accent(control: Control, on: bool) -> void:
+	if on:
+		control.add_theme_color_override(&"font_color", GameTheme.ACCENT)
 	else:
-		_town_button.remove_theme_color_override(&"font_color")
+		control.remove_theme_color_override(&"font_color")
 
 
 ## The nav tab of the open drawer is drawn as selected (light tab, dark text).
@@ -481,10 +490,7 @@ func _refresh_resources() -> void:
 	var claimable := gm.quests.get_claimable_count()
 	_chips[&"chest"].text = "%d" % claimable
 	# Rewards waiting: the count lights up so the chest draws the eye.
-	if claimable > 0:
-		_chips[&"chest"].add_theme_color_override(&"font_color", GameTheme.ACCENT)
-	else:
-		_chips[&"chest"].remove_theme_color_override(&"font_color")
+	_set_accent(_chips[&"chest"], claimable > 0)
 	_chips[&"hunters"].text = "%d/%d" % [gm.hunters.count(), gm.recruitment.get_capacity()]
 	_difficulty_button.text = gm.reincarnation.get_difficulty_name(gm.progress.difficulty)
 	_refresh_quest_panel()
@@ -619,17 +625,13 @@ func _build_overlays() -> void:
 func feed(text: String) -> void:
 	if _feed == null or text.is_empty():
 		return
-	if _bump_repeat(_feed_lines, text, 5.0, 0.6):
+	if _bump_repeat(_feed_lines, text, FEED_TIME, FEED_FADE):
 		return
-	while _feed.get_child_count() >= 3:
-		var oldest := _feed.get_child(0)
-		_feed_lines.erase(oldest.get_meta(&"line_text", ""))
-		_feed.remove_child(oldest)
-		oldest.queue_free()
+	_evict_oldest(_feed, _feed_lines, MAX_FEED_LINES)
 	var line := UIKit.label(text, &"HudSmallLabel")
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_feed.add_child(line)
-	_hold_line(_feed_lines, line, text, 5.0, 0.6)
+	_hold_line(_feed_lines, line, text, FEED_TIME, FEED_FADE)
 
 
 func _build_placement_bar(layout: VBoxContainer) -> void:
@@ -672,15 +674,11 @@ func _build_nav(layout: VBoxContainer) -> void:
 func toast(text: String, is_error: bool = false) -> void:
 	if text.is_empty():
 		return
-	if _bump_repeat(_toast_lines, text, TOAST_TIME, 0.4):
+	if _bump_repeat(_toast_lines, text, TOAST_TIME, TOAST_FADE):
 		return
 	if is_error:
 		Audio.play_ui(&"error")
-	while _toasts.get_child_count() >= MAX_TOASTS:
-		var oldest := _toasts.get_child(0)
-		_toast_lines.erase(oldest.get_meta(&"line_text", ""))
-		_toasts.remove_child(oldest)
-		oldest.queue_free()
+	_evict_oldest(_toasts, _toast_lines, MAX_TOASTS)
 	var label := UIKit.label(text, &"HudLabel")
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_color_override(&"font_color", GameTheme.DANGER if is_error else Color("f2d36b"))
@@ -688,7 +686,16 @@ func toast(text: String, is_error: bool = false) -> void:
 	# Fades in, so a new toast is noticed rather than popping in place (the box lays it out).
 	label.modulate.a = 0.0
 	label.create_tween().tween_property(label, ^"modulate:a", 1.0, 0.15)
-	_hold_line(_toast_lines, label, text, TOAST_TIME, 0.4)
+	_hold_line(_toast_lines, label, text, TOAST_TIME, TOAST_FADE)
+
+
+## Drops the oldest lines of `box` until fewer than `keep` remain, forgetting them in `lines`.
+func _evict_oldest(box: Container, lines: Dictionary, keep: int) -> void:
+	while box.get_child_count() >= keep:
+		var oldest := box.get_child(0)
+		lines.erase(oldest.get_meta(&"line_text", ""))
+		box.remove_child(oldest)
+		oldest.queue_free()
 
 
 ## Shows `label` for `hold` s, fades it over `fade` s and frees it; remembers it in `lines` by its

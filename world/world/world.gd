@@ -384,13 +384,21 @@ func set_view_insets(top: float, bottom: float) -> void:
 
 ## Zooming out stops a little beyond the whole Town (ZOOM_OUT_MARGIN) instead of showing the open sea.
 func _update_zoom_limit() -> void:
+	var area := _town_bounds()
+	if area.size == Vector2.ZERO:
+		return
+	_camera.limit_zoom_out_to(area, ZOOM_OUT_MARGIN)
+
+
+## Bounding box (world px) of the Town's outline; empty before the Town has a shape.
+func _town_bounds() -> Rect2:
 	var outline := world.region_outline(world.get_town())
 	if outline.is_empty():
-		return
+		return Rect2()
 	var area := Rect2(outline[0], Vector2.ZERO)
 	for point in outline:
 		area = area.expand(point)
-	_camera.limit_zoom_out_to(area, ZOOM_OUT_MARGIN)
+	return area
 
 
 ## Navigation "Town": camera back over the Town at normal zoom.
@@ -1396,12 +1404,8 @@ func _poll_camera_away(delta: float) -> void:
 	_away_timer = 0.0
 	var away := false
 	if not is_in_dungeon():
-		var outline := world.region_outline(world.get_town())
-		if not outline.is_empty():
-			var area := Rect2(outline[0], Vector2.ZERO)
-			for point in outline:
-				area = area.expand(point)
-			away = not area.grow(AWAY_MARGIN).has_point(_camera.global_position)
+		var area := _town_bounds()
+		away = area.size != Vector2.ZERO and not area.grow(AWAY_MARGIN).has_point(_camera.global_position)
 	if away != _camera_away:
 		_camera_away = away
 		camera_away_changed.emit(away)

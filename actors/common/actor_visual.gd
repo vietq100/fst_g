@@ -55,24 +55,26 @@ func play_hit_flash() -> void:
 
 ## Short step towards `direction` and back.
 func play_attack_lunge(direction: Vector2) -> void:
-	if _lunge_tween != null:
-		_lunge_tween.kill()
-	position = Vector2.ZERO
-	_lunge_tween = create_tween()
-	_lunge_tween.tween_property(self, ^"position", direction.normalized() * LUNGE_DISTANCE, LUNGE_DURATION * 0.4)
-	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, LUNGE_DURATION * 0.6)
+	_nudge(direction, LUNGE_DISTANCE, LUNGE_DURATION, 0.4)
 
 
-## Short shove away from a hit, then back (monsters; CombatFeedback). Shares the lunge tween.
+## Short shove away from a hit, then back (monsters; CombatFeedback).
 func play_knockback(direction: Vector2) -> void:
-	if downed or direction.is_zero_approx():
+	if not downed:
+		_nudge(direction, KNOCKBACK_DISTANCE, KNOCKBACK_DURATION, 0.3)
+
+
+## Moves this node `distance` px along `direction` and back over `duration` s (`out` = the share
+## of the time spent going out). One tween for both: a new nudge replaces a running one.
+func _nudge(direction: Vector2, distance: float, duration: float, out: float) -> void:
+	if direction.is_zero_approx():
 		return
 	if _lunge_tween != null:
 		_lunge_tween.kill()
 	position = Vector2.ZERO
 	_lunge_tween = create_tween()
-	_lunge_tween.tween_property(self, ^"position", direction.normalized() * KNOCKBACK_DISTANCE, KNOCKBACK_DURATION * 0.3).set_ease(Tween.EASE_OUT)
-	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, KNOCKBACK_DURATION * 0.7).set_ease(Tween.EASE_IN_OUT)
+	_lunge_tween.tween_property(self, ^"position", direction.normalized() * distance, duration * out).set_ease(Tween.EASE_OUT)
+	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, duration * (1.0 - out)).set_ease(Tween.EASE_IN_OUT)
 
 
 ## One-shot action animation by name (ChibiAnimations: skill, pickup, loot, interact...).

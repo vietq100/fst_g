@@ -75,3 +75,7 @@ func test_facing_from_vector() -> void:
 	assert_eq(Facing.from_vector(Vector2(0.5, -2)), Facing.Direction.UP)
 	assert_eq(Facing.from_vector(Vector2(1, 1)), Facing.Direction.DOWN)
 	assert_eq(Facing.from_vector(Vector2.ZERO, Facing.Direction.LEFT), Facing.Direction.LEFT)
+	# Near a diagonal the current pair is kept (HYSTERESIS): no flip-flopping along a diagonal path.
+	assert_eq(Facing.from_vector(Vector2(1.0, 1.1), Facing.Direction.RIGHT), Facing.Direction.RIGHT, "stays sideways")
+	assert_eq(Facing.from_vector(Vector2(1.1, 1.0), Facing.Direction.DOWN), Facing.Direction.DOWN, "stays front")
+	assert_eq(Facing.from_vector(Vector2(1.0, 1.4), Facing.Direction.RIGHT), Facing.Direction.DOWN, "clear turn")
