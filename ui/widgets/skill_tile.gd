@@ -42,6 +42,10 @@ func _draw() -> void:
 	draw_rect(plate.grow(2.0), rim.darkened(0.45))
 	draw_rect(plate.grow(1.0), rim)
 	draw_texture_rect(SkillIcons.texture(_skill, 2), plate, false)
+	# Grade bar along the plate's foot: the skill's stars against the other skills of its kind (D80).
+	if _skill is ClassSkillDefinition and is_instance_valid(GameManager) and GameManager.grades != null:
+		var grade_color := StatGradeService.color(GameManager.grades.skill_grade(_skill))
+		draw_rect(Rect2(plate.position + Vector2(0.0, SIDE - 3.0), Vector2(SIDE, 3.0)), grade_color)
 	if _badge != "":
 		var font := ThemeDB.fallback_font
 		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 8.0

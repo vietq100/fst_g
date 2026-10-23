@@ -64,6 +64,40 @@ Skeleton attack range 20 px; drops Iron Ore ×1 (30%), Dark Essence ×1 (4%).
 
 Rare gear drops (D75): Goblin Straw Hat 3%, Eye Patch 2%, Cowboy Hat 1.5%, Battle Axe 1.5%; Wolf Iron Spear 1.5%; Slime Oak Staff 2%, Round Glasses 1.5%; Skeleton Hunter Goggles 1.5%, Viking Helm 1%, Ember Staff 0.8%.
 
+## Stat grades (D80)
+
+Every stat of a Hunter, monster or piece of gear is graded against the **average of its kind**, as the ratio value / average; the total of an object is the weighted mean of its stats' ratios (each capped at 8).
+
+| Step | Ratio ≥ | Colour |
+|---|---|---|
+| Poor | — (below 0.6) | grey `8a8f98` |
+| Plain | 0.6 | white `f4f1ea` |
+| Average | 0.85 | blue `5fa8ff` |
+| Good | 1.15 | deep blue `3a6fd8` |
+| Fine | 1.4 | orange `ff9a3d` |
+| Strong | 1.75 | red `ff5a5a` |
+| Excellent | 2.2 | gold `ffd23f` |
+| Elite | 2.8 | sky `8fe3ff` |
+| Legendary | 3.6 | emerald `3ddc97` |
+| Supreme | 5.0 | violet `c77dff` |
+
+Averages (built from the data at load, `StatGradeService`):
+- **Hunters**: per level, the mean of every class definition's base and growth (tier C, no gear, no rolls) through the stat formula. Weights in the total: HP 1, ATK 1, DEF 1, attack speed 0.5, crit chance 0.25, crit damage 0.25, move speed 0.25.
+- **Monsters**: the mean of the regular (non-boss) enemy definitions; HP, ATK and DEF are compared at the monster's level and tier scale. Same weights as Hunters (bosses are graded against regular monsters, so they read high).
+- **Gear**: per equipment slot, the mean size of the same bonus (stat, flat or percent) over the items of that slot; an item's total is the mean over its bonuses. Items without bonuses are Average.
+
+## Summoning and hibernation (D83)
+
+| Number | Value | Where |
+|---|---|---|
+| Tickets per summon | 1 | `GameConfig.summon_ticket_cost` |
+| Tickets of a new village | 1000 (owner test value; release value to be set with the ticket sources) | `GameConfig.start_summon_tickets` |
+| Hunters awake at once | 24, never above the Town Hall capacity | `GameConfig.active_hunter_cap` |
+| Sleepers on the Hibernation Mount | 100 | `GameConfig.hibernation_cap` |
+| Summoned tier | rolled with `Tier.HUNTER_WEIGHTS` (D60) | `HunterService.generate_candidate` |
+
+A sleeper costs nothing (no food, no bed) and gains nothing (no XP, no mood). Waking needs an active slot and a free bed.
+
 ## Regions (world redesign, D27, D29)
 | Region | Monsters | Monster level | Min Hunter level (Auto) | Population cap | Respawn |
 |---|---|---|---|---|---|

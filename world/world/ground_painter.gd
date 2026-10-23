@@ -53,6 +53,8 @@ static func layout(world: WorldService, region: RegionDefinition) -> Dictionary:
 static func biome_of(region: RegionDefinition) -> Biome:
 	if region.kind == RegionDefinition.Kind.BOSS:
 		return Biome.OBSIDIAN
+	if region.kind == RegionDefinition.Kind.MOUNT:
+		return Biome.CAVE
 	if region.is_town:
 		return Biome.GRASS
 	match region.props:

@@ -198,7 +198,7 @@ static func _effect_parts(effects: Dictionary) -> PackedStringArray:
 
 func _build_town_hall(content: VBoxContainer) -> void:
 	var gm := GameManager
-	content.add_child(UIKit.label(Loc.t("ui.building.town_hall_info", {"hunters": gm.hunters.count(), "capacity": gm.recruitment.get_capacity(),
+	content.add_child(UIKit.label(Loc.t("ui.building.town_hall_info", {"hunters": gm.hunters.count_active(), "capacity": gm.recruitment.get_active_cap(),
 		"cap": gm.stats.level_cap(gm.progress.town_level), "town_level": gm.progress.town_level})))
 
 

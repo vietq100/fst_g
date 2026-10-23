@@ -52,6 +52,8 @@ func can_enter(hunter: HunterRuntime) -> String:
 		return Loc.t("err.arena.level", {"level": _config.colosseum_min_level})
 	if not hunter.alive or hunter.injured:
 		return Loc.t("err.arena.hurt", {"name": hunter.display_name})
+	if hunter.hibernating:
+		return Loc.t("err.hibernate.asleep", {"name": hunter.display_name})
 	if hunter.expedition_id != &"":
 		return Loc.t("err.arena.busy", {"name": hunter.display_name})
 	if hunter.stamina < _config.arena_min_stamina:

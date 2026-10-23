@@ -73,7 +73,7 @@ func test_region_shapes_are_soft_but_keep_gates_entrances_and_pond() -> void:
 
 
 func test_four_regions_and_four_gates() -> void:
-	assert_eq(_world.get_regions().size(), 6, "4 regions + the Hunter Gate island + the Boss Arena (D58)")
+	assert_eq(_world.get_regions().size(), 7, "4 regions + the Hunter Gate island + the Boss Arena (D58) + the Hibernation Mount (D83)")
 	assert_eq(_world.get_town().id, &"town")
 	var pairs: Array[String] = []
 	for gate in _world.get_gates():
@@ -84,7 +84,7 @@ func test_four_regions_and_four_gates() -> void:
 			pairs.append(pair)
 	pairs.sort()
 	assert_eq(pairs, ["ancient_ruins-goblin_cave", "ancient_ruins-town", "boss_arena-town", "dark_forest-goblin_cave",
-		"dark_forest-town", "hunter_gate-town"])
+		"dark_forest-town", "hibernation_mount-hunter_gate", "hunter_gate-town"])
 	assert_eq(_world.gates_of(&"town").size(), 4)
 	var forest_cave := _world.gates_of(&"dark_forest").filter(func(g: WorldService.Gate) -> bool: return g.region_a == &"dark_forest" and g.region_b == &"goblin_cave" or g.region_b == &"dark_forest" and g.region_a == &"goblin_cave")
 	assert_eq(forest_cave.size(), 1, "a 40-tile border has one bridge")

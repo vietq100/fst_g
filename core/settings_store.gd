@@ -18,6 +18,15 @@ static func set_screen_shake(enabled: bool) -> void:
 	_set("screen_shake", enabled)
 
 
+## Card reveal when summoning (D83); off skips straight to the summary.
+static func get_summon_effects() -> bool:
+	return bool(_get("summon_effects", true))
+
+
+static func set_summon_effects(enabled: bool) -> void:
+	_set("summon_effects", enabled)
+
+
 static func _get(key: String, fallback: Variant) -> Variant:
 	if _cache.has(key):
 		return _cache[key]

@@ -43,7 +43,11 @@ func setup(hunter: HunterRuntime, status_text: String) -> HunterCard:
 	var top := UIKit.hbox([star, name_label, code], 3)
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
 	# Level, class in its colour, reincarnations in Roman numerals.
-	var level := _small("Lv.%d" % hunter.level, GameTheme.TEXT)
+	# The level reads in the colour of the Hunter's grade against its level's average (D80).
+	var grade := gm.grades.hunter_grade(hunter)
+	var level := _small("Lv.%d" % hunter.level, StatGradeService.color(grade))
+	level.tooltip_text = Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(grade)})
+	level.mouse_filter = Control.MOUSE_FILTER_PASS
 	# The class takes the room left between the level and the numeral; long names shrink first.
 	var class_name_text := definition.display_name if definition != null else ""
 	var class_label := _small(class_name_text, class_color(definition))
@@ -134,7 +138,7 @@ func _fit_class(line: HBoxContainer, level: Label, class_label: Label, numeral: 
 ## Small text without the HUD outline (it would steal width from the class name).
 func _small(text: String, color: Color) -> Label:
 	var label := UIKit.label(text, &"MutedLabel", false)
-	label.add_theme_font_size_override(&"font_size", 9)
+	label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	label.add_theme_color_override(&"font_color", color)
 	return label

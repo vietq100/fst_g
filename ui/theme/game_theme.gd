@@ -171,6 +171,7 @@ static func _create() -> Theme:
 	_bar(theme, &"EnergyBar", ENERGY)
 	_bar(theme, &"TimerBar", ACCENT)
 	_bar(theme, &"ManaBar", MANA)
+	_bar(theme, &"ManaBar", MANA)
 	theme.set_stylebox(&"panel", &"ScrollContainer", StyleBoxEmpty.new())
 	return theme
 

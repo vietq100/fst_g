@@ -69,6 +69,8 @@ var _town_button: Button
 ## Visible toast / feed lines by text: a repeat bumps a "×N" counter instead of adding a line.
 var _toast_lines: Dictionary = {}
 var _feed_lines: Dictionary = {}
+## Last grade seen per Hunter (unique id → Step), for the "grade up" toast.
+var _grade_seen: Dictionary = {}
 var _expedition_hud: ExpeditionHud
 
 
@@ -161,6 +163,19 @@ func open_item_info(item: ItemDefinition, instance_id: StringName = &"") -> void
 		return
 	var modal := ItemInfoModal.new().setup(item, instance_id)
 	modal.toast_requested.connect(toast)
+	add_child(modal)
+
+
+## The summoning reveal (D83) over everything; the batch joins when it closes, confirmed or not.
+func open_summon_reveal(hunters: Array[HunterRuntime], with_effects: bool) -> void:
+	if hunters.is_empty():
+		return
+	var modal := SummonRevealModal.new().setup(hunters, with_effects)
+	modal.confirmed.connect(func() -> void:
+		var joined := GameManager.recruitment.confirm_arrivals()
+		if not joined.is_empty():
+			var asleep := joined.filter(func(h: HunterRuntime) -> bool: return h.hibernating).size()
+			toast(Loc.t("ui.gate.summoned", {"count": joined.size(), "asleep": asleep}), false, &"hunters"))
 	add_child(modal)
 
 
@@ -474,6 +489,8 @@ func open_structure(region_id: StringName) -> void:
 	var region := DataRegistry.get_region(region_id)
 	if region != null and region.kind == RegionDefinition.Kind.BOSS:
 		open_arena()
+	elif region != null and region.kind == RegionDefinition.Kind.MOUNT:
+		open_sheet(HibernationSheet.new())
 	else:
 		open_gate()
 
@@ -491,7 +508,7 @@ func _refresh_resources() -> void:
 	_chips[&"chest"].text = "%d" % claimable
 	# Rewards waiting: the count lights up so the chest draws the eye.
 	_set_accent(_chips[&"chest"], claimable > 0)
-	_chips[&"hunters"].text = "%d/%d" % [gm.hunters.count(), gm.recruitment.get_capacity()]
+	_chips[&"hunters"].text = "%d/%d" % [gm.hunters.count_active(), gm.recruitment.get_active_cap()]
 	_difficulty_button.text = gm.reincarnation.get_difficulty_name(gm.progress.difficulty)
 	_refresh_quest_panel()
 	if _waiting_button != null:
@@ -631,7 +648,7 @@ func feed(text: String) -> void:
 	var line := UIKit.label(text, &"HudSmallLabel")
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_feed.add_child(line)
-	_hold_line(_feed_lines, line, text, FEED_TIME, FEED_FADE)
+	_hold_line(_feed_lines, line, line, text, FEED_TIME, FEED_FADE)
 
 
 func _build_placement_bar(layout: VBoxContainer) -> void:
@@ -671,7 +688,8 @@ func _build_nav(layout: VBoxContainer) -> void:
 	layout.add_child(_nav)
 
 
-func toast(text: String, is_error: bool = false) -> void:
+## `icon` (a PixelIcons kind) leads the line, so kinds of news tell apart at a glance.
+func toast(text: String, is_error: bool = false, icon: StringName = &"") -> void:
 	if text.is_empty():
 		return
 	if _bump_repeat(_toast_lines, text, TOAST_TIME, TOAST_FADE):
@@ -682,11 +700,19 @@ func toast(text: String, is_error: bool = false) -> void:
 	var label := UIKit.label(text, &"HudLabel")
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_color_override(&"font_color", GameTheme.DANGER if is_error else Color("f2d36b"))
-	_toasts.add_child(label)
+	var line: Control = label
+	if icon != &"":
+		var glyph := PixelIcons.rect(icon, 1)
+		glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line = UIKit.hbox([glyph, label], 4)
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toasts.add_child(line)
 	# Fades in, so a new toast is noticed rather than popping in place (the box lays it out).
-	label.modulate.a = 0.0
-	label.create_tween().tween_property(label, ^"modulate:a", 1.0, 0.15)
-	_hold_line(_toast_lines, label, text, TOAST_TIME, TOAST_FADE)
+	line.modulate.a = 0.0
+	line.create_tween().tween_property(line, ^"modulate:a", 1.0, 0.15)
+	_hold_line(_toast_lines, line, label, text, TOAST_TIME, TOAST_FADE)
 
 
 ## Drops the oldest lines of `box` until fewer than `keep` remain, forgetting them in `lines`.
@@ -698,18 +724,18 @@ func _evict_oldest(box: Container, lines: Dictionary, keep: int) -> void:
 		oldest.queue_free()
 
 
-## Shows `label` for `hold` s, fades it over `fade` s and frees it; remembers it in `lines` by its
-## text so a repeat of the same text bumps a "×N" counter on it (_bump_repeat).
-func _hold_line(lines: Dictionary, label: Label, text: String, hold: float, fade: float) -> void:
-	label.set_meta(&"line_text", text)
-	var tween := label.create_tween()
+## Shows `node` (holding `label`) for `hold` s, fades it over `fade` s and frees it; remembers it in
+## `lines` by its text so a repeat of the same text bumps a "×N" counter on it (_bump_repeat).
+func _hold_line(lines: Dictionary, node: Control, label: Label, text: String, hold: float, fade: float) -> void:
+	node.set_meta(&"line_text", text)
+	var tween := node.create_tween()
 	tween.tween_interval(hold)
-	tween.tween_property(label, ^"modulate:a", 0.0, fade)
+	tween.tween_property(node, ^"modulate:a", 0.0, fade)
 	tween.tween_callback(func() -> void:
-		if lines.get(text, {}).get("label") == label:
+		if lines.get(text, {}).get("node") == node:
 			lines.erase(text)
-		label.queue_free())
-	lines[text] = {"label": label, "tween": tween, "count": lines.get(text, {}).get("count", 1)}
+		node.queue_free())
+	lines[text] = {"node": node, "label": label, "tween": tween, "count": lines.get(text, {}).get("count", 1)}
 
 
 ## A line with this text is still showing: count the repeat on it and restart its timer.
@@ -717,15 +743,16 @@ func _bump_repeat(lines: Dictionary, text: String, hold: float, fade: float) -> 
 	if not lines.has(text):
 		return false
 	var entry: Dictionary = lines[text]
+	var node: Control = entry["node"]
 	var label: Label = entry["label"]
-	if not is_instance_valid(label):
+	if not is_instance_valid(node) or not is_instance_valid(label):
 		lines.erase(text)
 		return false
 	entry["count"] += 1
 	label.text = Loc.t("ui.root.repeat_count", {"text": text, "count": entry["count"]})
-	label.modulate.a = 1.0
+	node.modulate.a = 1.0
 	entry["tween"].kill()
-	_hold_line(lines, label, text, hold, fade)
+	_hold_line(lines, node, label, text, hold, fade)
 	return true
 
 
@@ -739,11 +766,18 @@ func _connect_notifications() -> void:
 	gm.hunters.hunter_added.connect(func(_h: HunterRuntime) -> void: _refresh_resources())
 	gm.buildings.building_upgraded.connect(func(id: StringName, level: int) -> void:
 		_refresh_resources()
-		toast(Loc.t("toast.root.reached_level", {"name": gm.buildings.get_definition(id).display_name, "level": level})))
+		toast(Loc.t("toast.root.reached_level", {"name": gm.buildings.get_definition(id).display_name, "level": level}), false, &"build"))
 	gm.hunters.hunter_leveled_up.connect(func(hunter: HunterRuntime, level: int, _healed: float) -> void:
 		if mode == Mode.TOWN:
-			toast(Loc.t("toast.root.reached_level", {"name": hunter.display_name, "level": level})))
+			toast(Loc.t("toast.root.reached_level", {"name": hunter.display_name, "level": level}), false, &"build"))
 	gm.quests.quests_changed.connect(_refresh_quest_badge)
+	gm.hunters.hunter_changed.connect(func(hunter: HunterRuntime) -> void:
+		# A Hunter measuring up to a higher grade (level, gear, awakening) is news (D80).
+		var grade: int = gm.grades.hunter_grade(hunter)
+		var before: int = _grade_seen.get(hunter.unique_id, grade)
+		_grade_seen[hunter.unique_id] = grade
+		if grade > before and mode == Mode.TOWN:
+			toast(Loc.t("toast.root.grade_up", {"name": hunter.display_name, "grade": StatGradeService.name_of(grade)}), false, &"trophy"))
 	gm.regions.bag_deposited.connect(func(hunter: HunterRuntime, report: Dictionary) -> void:
 		var count := 0
 		for quantity in report["items"].values():
@@ -757,24 +791,24 @@ func _connect_notifications() -> void:
 		feed(Loc.t("ui.root.feed_weapon_repaired", {"name": hunter.display_name, "item": item.display_name, "gold": cost})))
 	gm.recruitment.candidates_changed.connect(_refresh_resources)
 	gm.quests.quest_completed.connect(func(quest: QuestDefinition) -> void:
-		toast(Loc.t("toast.root.quest_done", {"quest": quest.display_name})))
+		toast(Loc.t("toast.root.quest_done", {"quest": quest.display_name}), false, &"book"))
 	_refresh_quest_badge()
 	gm.reincarnation.difficulty_changed.connect(func(_d: int) -> void: _refresh_resources())
 	gm.reincarnation.reincarnated.connect(func(hunter: HunterRuntime) -> void:
-		toast(Loc.t("toast.root.reborn", {"name": hunter.display_name, "count": hunter.reincarnations})))
+		toast(Loc.t("toast.root.reborn", {"name": hunter.display_name, "count": hunter.reincarnations}), false, &"star"))
 	gm.trading.request_completed.connect(func(item_id: StringName, quantity: int) -> void:
-		toast(Loc.t("toast.root.request_done", {"count": quantity, "item": DataRegistry.get_item(item_id).display_name})))
+		toast(Loc.t("toast.root.request_done", {"count": quantity, "item": DataRegistry.get_item(item_id).display_name}), false, &"shop"))
 	gm.recruitment.hunter_recruited.connect(func(hunter: HunterRuntime) -> void:
-		toast(Loc.t("toast.root.recruited", {"name": hunter.display_name})))
+		toast(Loc.t("toast.root.recruited", {"name": hunter.display_name}), false, &"hunters"))
 	gm.temple.hunter_recovered.connect(func(hunter: HunterRuntime) -> void:
-		toast(Loc.t("toast.root.recovered", {"name": hunter.display_name})))
+		toast(Loc.t("toast.root.recovered", {"name": hunter.display_name}), false, &"bed"))
 	gm.corpses.hunter_died.connect(func(hunter: HunterRuntime) -> void:
-		toast(Loc.t("toast.root.fallen", {"name": hunter.display_name}), true))
+		toast(Loc.t("toast.root.fallen", {"name": hunter.display_name}), true, &"skull"))
 	gm.corpses.body_delivered.connect(func(hunter: HunterRuntime) -> void:
-		toast(Loc.t("toast.root.delivered", {"name": hunter.display_name})))
+		toast(Loc.t("toast.root.delivered", {"name": hunter.display_name}), false, &"skull"))
 	gm.bonds.bond_changed.connect(func(a: StringName, b: StringName, _value: float) -> void:
 		if gm.bonds.is_bonded(a, b):
-			toast(Loc.t("toast.root.bonded", {"a": gm.hunters.get_hunter(a).display_name, "b": gm.hunters.get_hunter(b).display_name})))
+			toast(Loc.t("toast.root.bonded", {"a": gm.hunters.get_hunter(a).display_name, "b": gm.hunters.get_hunter(b).display_name}), false, &"hunters"))
 
 
 func _apply_safe_area() -> void:

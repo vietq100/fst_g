@@ -11,6 +11,10 @@ var _stash: Label
 var _progress: ProgressBar
 var _party_box: HBoxContainer
 var _bars: Dictionary[StringName, ProgressBar] = {}
+var _mana: Dictionary[StringName, ProgressBar] = {}
+## Row of coloured dots, one per status effect on the member (its definition's colour).
+var _effects: Dictionary[StringName, HBoxContainer] = {}
+var _shown_effects: Dictionary[StringName, String] = {}
 var _portraits: Dictionary[StringName, HunterPortrait] = {}
 
 
@@ -51,9 +55,15 @@ func _build_party() -> void:
 			continue
 		var portrait := HunterPortrait.new().setup(runtime, GameManager.equipment)
 		var bar := UIKit.bar(runtime.current_hp, 1.0, &"HpBar")
+		var mana := UIKit.bar(runtime.current_mana, 1.0, &"ManaBar")
+		mana.custom_minimum_size.y = 6
+		var effects := UIKit.hbox([], 2)
+		effects.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_bars[hunter_id] = bar
+		_mana[hunter_id] = mana
+		_effects[hunter_id] = effects
 		_portraits[hunter_id] = portrait
-		var card := UIKit.card(UIKit.vbox([UIKit.hbox([portrait, UIKit.label(runtime.display_name, &"MutedLabel", false)], 4), bar], 2))
+		var card := UIKit.card(UIKit.vbox([UIKit.hbox([portrait, UIKit.label(runtime.display_name, &"MutedLabel", false)], 4), bar, mana, effects], 2))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_party_box.add_child(card)
@@ -83,7 +93,45 @@ func _refresh() -> void:
 		var bar := _bars[hunter_id]
 		bar.max_value = maxf(GameManager.hunters.get_stat(runtime, HunterService.MAX_HP), 1.0)
 		bar.value = runtime.current_hp
+		var mana := _mana[hunter_id]
+		mana.max_value = maxf(GameManager.hunters.get_stat(runtime, HunterService.MAX_MANA), 1.0)
+		mana.value = runtime.current_mana
+		_refresh_effects(hunter_id, runtime)
 		var down := run.downed_ids.has(hunter_id)
 		if _portraits[hunter_id].downed != down:
 			_portraits[hunter_id].downed = down
 			_portraits[hunter_id].queue_redraw()
+
+
+## One dot per status effect on the member's actor (D48 colours), rebuilt only when the set changes.
+func _refresh_effects(hunter_id: StringName, runtime: HunterRuntime) -> void:
+	var actor := _actor_of(runtime)
+	var ids := PackedStringArray()
+	var colors: Array[Color] = []
+	if actor != null:
+		for effect in actor.effects.get_effects():
+			if effect.definition != null:
+				ids.append(String(effect.definition.id))
+				colors.append(effect.definition.color)
+	var key := ",".join(ids)
+	if _shown_effects.get(hunter_id, "") == key:
+		return
+	_shown_effects[hunter_id] = key
+	var row := _effects[hunter_id]
+	for child in row.get_children():
+		row.remove_child(child)
+		child.queue_free()
+	for color in colors:
+		var dot := ColorRect.new()
+		dot.color = color
+		dot.custom_minimum_size = Vector2(6, 6)
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(dot)
+
+
+func _actor_of(runtime: HunterRuntime) -> Hunter:
+	for node in get_tree().get_nodes_in_group(Hunter.GROUP):
+		var hunter := node as Hunter
+		if hunter != null and hunter.runtime == runtime:
+			return hunter
+	return null

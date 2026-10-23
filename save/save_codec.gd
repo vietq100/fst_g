@@ -3,7 +3,7 @@ extends RefCounted
 ## Converts the game state (a GameManager-like node with the service properties) to and from
 ## plain JSON-safe data (SAVE_SYSTEM.md, DECISIONS.md D21). No Nodes are ever saved.
 
-const SCHEMA_VERSION := 3
+const SCHEMA_VERSION := 4
 ## Purse given to Hunters of schema 1 saves (BALANCE.md → Money, new Hunter purse).
 const MIGRATED_PURSE := 20
 
@@ -27,6 +27,7 @@ static func capture(game: Node) -> Dictionary:
 		"schema_version": SCHEMA_VERSION,
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"gold": game.wallet.gold,
+		"summon_tickets": game.wallet.summon_tickets,
 		"progress": game.progress.to_dict(),
 		"buildings": game.buildings.to_dict(),
 		"hunters": hunters,
@@ -48,6 +49,7 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 	game.expeditions.current_run = null
 	game.corpses.clear()
 	game.wallet.gold = maxi(int(data.get("gold", 0)), 0)
+	game.wallet.summon_tickets = maxi(int(data.get("summon_tickets", 0)), 0)
 	game.progress.from_dict(_section(data, "progress", warnings))
 	var buildings := _section(data, "buildings", warnings)
 	if buildings.has("instances"):
@@ -98,6 +100,8 @@ static func migrate(data: Dictionary, warnings: PackedStringArray) -> Variant:
 				data = _migrate_1_to_2(data)
 			2:
 				data = _migrate_2_to_3(data)
+			3:
+				data = _migrate_3_to_4(data)
 		version += 1
 		data["schema_version"] = version
 		warnings.append(Loc.t("save.migrated", {"version": version}))
@@ -142,6 +146,14 @@ static func _migrate_2_to_3(data: Dictionary) -> Dictionary:
 	var buildings: Variant = data.get("buildings", {})
 	if buildings is Dictionary and buildings.has("instances"):
 		buildings["ensure"] = ["temple"]
+	return data
+
+
+## Schema 3 → 4 (D83): summoning tickets and hibernation. Old villages get the new-game ticket
+## allowance so the Gate can be used; Hunters without the field are awake.
+static func _migrate_3_to_4(data: Dictionary) -> Dictionary:
+	if not data.has("summon_tickets"):
+		data["summon_tickets"] = DataRegistry.config.start_summon_tickets if DataRegistry.config != null else 0
 	return data
 
 

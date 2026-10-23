@@ -131,6 +131,31 @@ func count() -> int:
 	return _hunters.size()
 
 
+## Hunters awake in the village (not on the Hibernation Mount, D83).
+func get_active() -> Array[HunterRuntime]:
+	var result: Array[HunterRuntime] = []
+	for hunter: HunterRuntime in _hunters.values():
+		if not hunter.hibernating:
+			result.append(hunter)
+	return result
+
+
+func get_hibernating() -> Array[HunterRuntime]:
+	var result: Array[HunterRuntime] = []
+	for hunter: HunterRuntime in _hunters.values():
+		if hunter.hibernating:
+			result.append(hunter)
+	return result
+
+
+func count_active() -> int:
+	return get_active().size()
+
+
+func count_hibernating() -> int:
+	return count() - count_active()
+
+
 func get_definition(hunter: HunterRuntime) -> HunterDefinition:
 	return _get_definition_by_id(hunter.definition_id)
 

@@ -7,8 +7,9 @@ extends GameDefinition
 enum Props { NONE, TREES, ROCKS, COLUMNS }
 ## HUNTING: monsters, a duty choice, Auto duty may pick it. TOWN: see `is_town`. GATE: the
 ## Hunter Gate island (no monsters, no duty). BOSS: the weekly boss arena (a duty choice, never
-## picked by Auto).
-enum Kind { HUNTING, TOWN, GATE, BOSS }
+## picked by Auto). MOUNT: the Hibernation Mount (D83), where sleeping Hunters wait; no monsters,
+## no duty.
+enum Kind { HUNTING, TOWN, GATE, BOSS, MOUNT }
 ## Outline of the region inside `tile_rect`. ROUNDED: the rectangle with rounded corners (Town,
 ## gate island, arena). WINDING: a meandering woodland of overlapping glades. LOBED: an irregular
 ## blob with peninsulas and bays. CROSS: a plus-shaped plaza with a court at each corner.

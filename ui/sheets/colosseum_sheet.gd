@@ -27,7 +27,7 @@ func _build(content: VBoxContainer) -> void:
 	var eligible := arena.get_eligible()
 	if eligible.is_empty():
 		content.add_child(UIKit.label(Loc.t("ui.arena.no_fighters"), &"WarningLabel"))
-		for hunter in gm.hunters.get_all():
+		for hunter in gm.hunters.get_active():
 			var reason := arena.can_enter(hunter)
 			if not reason.is_empty():
 				content.add_child(UIKit.label("%s — %s" % [hunter.display_name, reason], &"MutedLabel"))
@@ -59,7 +59,7 @@ func _build(content: VBoxContainer) -> void:
 		content.add_child(UIKit.card(UIKit.hbox([HunterPortrait.new().setup(rival, null), info, fight], 8)))
 	content.add_child(UIKit.separator())
 	content.add_child(UIKit.label(Loc.t("ui.arena.friendly"), &"AccentLabel"))
-	var partners := gm.hunters.get_all().filter(func(h: HunterRuntime) -> bool: return h != fighter and arena.can_enter(h).is_empty())
+	var partners := gm.hunters.get_active().filter(func(h: HunterRuntime) -> bool: return h != fighter and arena.can_enter(h).is_empty())
 	if partners.is_empty():
 		content.add_child(UIKit.label(Loc.t("ui.arena.no_partner"), &"MutedLabel"))
 		return

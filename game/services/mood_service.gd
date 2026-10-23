@@ -88,7 +88,7 @@ func on_expedition_finished(run: ExpeditionRun, definition: ExpeditionDefinition
 			change(hunter, _config.mood_overwork)
 		hunter.history[HunterRuntime.IDLE_CYCLES] = 0
 	for hunter in _hunters.get_all():
-		if party.has(hunter):
+		if party.has(hunter) or hunter.hibernating:
 			continue
 		var idle: int = hunter.history.get(HunterRuntime.IDLE_CYCLES, 0) + 1
 		if idle >= _config.idle_cycles_for_event:

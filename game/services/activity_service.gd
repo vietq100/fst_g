@@ -112,6 +112,9 @@ func _tick_once(include_outside: bool = true) -> void:
 		if not hunter.alive and not hunter.injured:
 			# A body lying in the world: nothing ticks (D30).
 			continue
+		if hunter.hibernating:
+			# Asleep on the Hibernation Mount (D83): no needs, no activity, no training.
+			continue
 		if hunter.expedition_id == &"" and hunter.task != &"":
 			if include_outside:
 				_set_activity(hunter, hunter.task)

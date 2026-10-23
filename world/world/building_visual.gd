@@ -152,7 +152,7 @@ func _wall_height() -> float:
 
 
 func _plinth() -> float:
-	return 5.0 if level >= 2 else 3.0
+	return 7.0 if level >= 3 else (5.0 if level >= 2 else 3.0)
 
 
 ## Height of the eave line (a little below the wall top so the roof overlaps it).
@@ -206,7 +206,8 @@ func _draw() -> void:
 		draw_colored_polygon(_face(w, s, plinth, plinth + 5.0), Color(0, 0, 0, 0.1))
 		draw_colored_polygon(_face(s, e, plinth, plinth + 5.0), Color(0, 0, 0, 0.14))
 		_draw_windows(style, w, s, plinth, top, [0.2, 0.8] if fx >= 3 else [0.25])
-		_draw_windows(style, s, e, plinth, top, [0.35, 0.7] if fy >= 3 else [0.5], true)
+		# Lv2+ opens a second window on the shaded face (the front keeps room for the door and lantern).
+		_draw_windows(style, s, e, plinth, top, [0.35, 0.7] if fy >= 3 or level >= 2 else [0.5], true)
 		_draw_door(w, s, top)
 		draw_colored_polygon(_face(w, s, top - 4.0, top), EAVE_SHADOW)
 		draw_colored_polygon(_face(s, e, top - 4.0, top), EAVE_SHADOW)
@@ -344,6 +345,9 @@ func _draw_door(a: Vector2, b: Vector2, top: float) -> void:
 	draw_circle(a.lerp(b, t + half * 0.5) + Vector2(0, -8), 1.0, Color("e8c547"))
 	if building_id != &"warehouse":
 		_draw_wall_lantern(a.lerp(b, t - half * 2.0) + Vector2(0, -16))
+		# Lv3: a pair of lanterns flanks the door.
+		if level >= 3:
+			_draw_wall_lantern(a.lerp(b, t + half * 2.0) + Vector2(0, -16))
 	# Keep the top of the wall clear of the door arch for short walls.
 	if top < 24.0:
 		pass
@@ -403,6 +407,12 @@ func _draw_roof(style: Dictionary, tint: Color) -> PackedVector2Array:
 		draw_line(s, e, OUTLINE, 1.0)
 		draw_line(ridge_w + Vector2(-1, 0), ridge_e + Vector2(1, 0), OUTLINE, 4.0)
 		draw_line(ridge_w, ridge_e, roof.lightened(0.35), 2.0)
+		# Lv3: the ridge is capped in the trim colour with a finial at its middle.
+		if level >= 3:
+			draw_line(ridge_w, ridge_e, trim, 1.0)
+			var finial := (ridge_w + ridge_e) * 0.5 + Vector2(0, -2)
+			draw_circle(finial, 3.5, OUTLINE)
+			draw_circle(finial, 2.5, trim)
 		_draw_emblem((w + s + ridge_e + ridge_w) * 0.25, trim)
 	var outline := PackedVector2Array([n, e, s, w])
 	draw_polyline(outline + PackedVector2Array([outline[0]]), OUTLINE, 1.0)

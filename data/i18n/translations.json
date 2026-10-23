@@ -2831,6 +2831,10 @@
   "en": "Goblin Cave",
   "vi": "Hang Goblin"
  },
+ "region.hibernation_mount.name": {
+  "en": "Hibernation Mount",
+  "vi": "Núi Ngủ Đông"
+ },
  "region.hunter_gate.name": {
   "en": "Hunter Gate",
   "vi": "Cổng Hunter"
@@ -3206,6 +3210,10 @@
  "toast.root.recovered": {
   "en": "{name} is back on their feet",
   "vi": "{name} đã hồi phục"
+ },
+ "toast.root.grade_up": {
+  "en": "{name} now grades {grade}",
+  "vi": "{name} đạt bậc {grade}"
  },
  "toast.root.recruited": {
   "en": "{name} joined the roster",
@@ -4043,6 +4051,50 @@
   "en": "Info",
   "vi": "Thông Tin"
  },
+ "grade.poor.name": {
+  "en": "Poor",
+  "vi": "Yếu kém"
+ },
+ "grade.plain.name": {
+  "en": "Plain",
+  "vi": "Thường"
+ },
+ "grade.average.name": {
+  "en": "Average",
+  "vi": "Trung bình"
+ },
+ "grade.good.name": {
+  "en": "Good",
+  "vi": "Khá"
+ },
+ "grade.fine.name": {
+  "en": "Fine",
+  "vi": "Tốt"
+ },
+ "grade.strong.name": {
+  "en": "Strong",
+  "vi": "Mạnh"
+ },
+ "grade.excellent.name": {
+  "en": "Excellent",
+  "vi": "Xuất sắc"
+ },
+ "grade.elite.name": {
+  "en": "Elite",
+  "vi": "Tinh anh"
+ },
+ "grade.legendary.name": {
+  "en": "Legendary",
+  "vi": "Huyền thoại"
+ },
+ "grade.supreme.name": {
+  "en": "Supreme",
+  "vi": "Tuyệt phẩm"
+ },
+ "ui.common.grade": {
+  "en": "Grade: {grade}",
+  "vi": "Đánh giá: {grade}"
+ },
  "ui.common.level_class": {
   "en": "Lv.{level} {class}",
   "vi": "Lv.{level} {class}"
@@ -4090,6 +4142,30 @@
  "ui.equip_slot.empty": {
   "en": "Nothing in this slot.",
   "vi": "Ô này đang trống."
+ },
+ "ui.equip_slot.compare_up": {
+  "en": "\u25b2 +{delta}% vs worn",
+  "vi": "\u25b2 +{delta}% so v\u1edbi \u0111ang m\u1eb7c"
+ },
+ "ui.equip_slot.compare_down": {
+  "en": "\u25bc {delta}% vs worn",
+  "vi": "\u25bc {delta}% so v\u1edbi \u0111ang m\u1eb7c"
+ },
+ "ui.equip_slot.compare_same": {
+  "en": "= same as worn",
+  "vi": "= nh\u01b0 m\u00f3n \u0111ang m\u1eb7c"
+ },
+ "ui.equip_slot.compare_new": {
+  "en": "slot is empty",
+  "vi": "\u00f4 \u0111ang tr\u1ed1ng"
+ },
+ "ui.equip_slot.compare_broken": {
+  "en": "\u25b2 worn piece is broken",
+  "vi": "\u25b2 món đang mặc đã hỏng"
+ },
+ "ui.equip_slot.broken": {
+  "en": "broken, no bonus",
+  "vi": "hỏng, mất bonus"
  },
  "ui.equip_slot.equip": {
   "en": "Equip",
@@ -4223,9 +4299,141 @@
   "en": "Found: {gold} gold · {items} items · {kills} defeated",
   "vi": "Thu được: {gold} vàng · {items} món · hạ {kills}"
  },
- "ui.gate.candidate_stats": {
-  "en": "HP {hp} · ATK {atk} · DEF {def}",
-  "vi": "HP {hp} · ATK {atk} · DEF {def}"
+ "ui.gate.candidate_stat": {
+  "en": "{name} {value}",
+  "vi": "{name} {value}"
+ },
+ "ui.gate.counts": {
+  "en": "Awake {active}/{active_max} · asleep {asleep}/{asleep_max} · free beds {beds}",
+  "vi": "Đang hoạt động {active}/{active_max} · ngủ đông {asleep}/{asleep_max} · giường trống {beds}"
+ },
+ "ui.gate.summon_title": {
+  "en": "Summoning",
+  "vi": "Triệu hồi"
+ },
+ "ui.gate.tickets": {
+  "en": "Summoning tickets: {count}",
+  "vi": "Thẻ triệu hồi: {count}"
+ },
+ "ui.gate.summon_five": {
+  "en": "Summon ×5 ({tickets} tickets)",
+  "vi": "Triệu hồi ×5 ({tickets} thẻ)"
+ },
+ "ui.gate.effects_toggle": {
+  "en": "Reveal cards (swipe)",
+  "vi": "Hiệu ứng lật thẻ (vuốt)"
+ },
+ "ui.summon.title": {
+  "en": "Summoning",
+  "vi": "Triệu hồi"
+ },
+ "ui.summon.swipe_hint": {
+  "en": "Swipe the card away to reveal the one beneath",
+  "vi": "Vuốt thẻ ra để lật thẻ bên dưới"
+ },
+ "ui.summon.skip": {
+  "en": "Skip",
+  "vi": "Bỏ qua"
+ },
+ "ui.summon.continue": {
+  "en": "Continue",
+  "vi": "Tiếp tục"
+ },
+ "ui.summon.summary_title": {
+  "en": "{count} Hunters answered the call",
+  "vi": "{count} Hunter đã đến"
+ },
+ "ui.summon.tap_detail": {
+  "en": "Tap a card for details",
+  "vi": "Chạm thẻ để xem chi tiết"
+ },
+ "ui.summon.confirm": {
+  "en": "Confirm",
+  "vi": "Xác nhận"
+ },
+ "ui.summon.back": {
+  "en": "Back",
+  "vi": "Quay lại"
+ },
+ "ui.summon.traits": {
+  "en": "Traits: {traits}",
+  "vi": "Tính cách: {traits}"
+ },
+ "ui.summon.talent": {
+  "en": "Talent: {talent}",
+  "vi": "Thiên phú: {talent}"
+ },
+ "ui.summon.no_talent": {
+  "en": "No talent",
+  "vi": "Không có thiên phú"
+ },
+ "ui.summon.cover": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "ui.summon.arrival_village": {
+  "en": "Will walk into the village",
+  "vi": "Sẽ vào làng"
+ },
+ "ui.summon.arrival_mount": {
+  "en": "Will sleep on the Hibernation Mount",
+  "vi": "Sẽ sang Núi Ngủ Đông"
+ },
+ "ui.gate.summon_one": {
+  "en": "Summon ×1 ({tickets} ticket)",
+  "vi": "Triệu hồi ×1 ({tickets} thẻ)"
+ },
+ "ui.gate.summon_ten": {
+  "en": "Summon ×10 ({tickets} tickets)",
+  "vi": "Triệu hồi ×10 ({tickets} thẻ)"
+ },
+ "ui.gate.summon_note": {
+  "en": "A newcomer walks into the village and takes a bed.",
+  "vi": "Hunter mới sẽ đi vào làng và nhận giường."
+ },
+ "ui.gate.summon_note_asleep": {
+  "en": "The village is full: newcomers cross the bridge to sleep on the Hibernation Mount.",
+  "vi": "Làng đã đầy: Hunter mới sẽ qua cầu sang Núi Ngủ Đông."
+ },
+ "ui.gate.arrivals": {
+  "en": "Just arrived",
+  "vi": "Vừa đến"
+ },
+ "ui.gate.summoned": {
+  "en": "{count} Hunters answered the call ({asleep} to the Mount)",
+  "vi": "{count} Hunter đã đến ({asleep} sang Núi Ngủ Đông)"
+ },
+ "ui.gate.went_village": {
+  "en": "→ village",
+  "vi": "→ vào làng"
+ },
+ "ui.gate.went_asleep": {
+  "en": "→ Hibernation Mount",
+  "vi": "→ Núi Ngủ Đông"
+ },
+ "err.summon.no_tickets": {
+  "en": "Needs {tickets} summoning ticket(s)",
+  "vi": "Cần {tickets} thẻ triệu hồi"
+ },
+ "err.summon.everything_full": {
+  "en": "Village ({active}) and Mount ({asleep}) are both full",
+  "vi": "Làng ({active}) và Núi ({asleep}) đều đã đầy"
+ },
+ "err.hibernate.already": {
+  "en": "Already asleep on the Mount",
+  "vi": "Đã đang ngủ đông"
+ },
+ "err.hibernate.awake": {
+  "en": "Not asleep",
+  "vi": "Không ở trạng thái ngủ đông"
+ },
+ "err.hibernate.asleep": {
+  "en": "{name} is asleep on the Mount",
+  "vi": "{name} đang ngủ đông"
+ },
+ "err.hibernate.mount_full": {
+  "en": "The Mount holds {max} sleepers",
+  "vi": "Núi chỉ chứa {max} Hunter ngủ đông"
  },
  "ui.gate.expel": {
   "en": "Expel",
@@ -4282,6 +4490,18 @@
  "ui.hud.victory": {
   "en": "VICTORY",
   "vi": "CHIẾN THẮNG"
+ },
+ "ui.hunter.equip_best": {
+  "en": "Wear best gear",
+  "vi": "Mặc đồ tốt nhất"
+ },
+ "ui.hunter.equip_best_done": {
+  "en": "{count} pieces put on",
+  "vi": "Đã mặc {count} món"
+ },
+ "ui.hunter.equip_best_none": {
+  "en": "Nothing in store beats what is worn",
+  "vi": "Trong kho không có món nào tốt hơn"
  },
  "ui.hunter.dps": {
   "en": "DPS",
@@ -4739,9 +4959,81 @@
   "en": "Find on the map",
   "vi": "Tìm trên bản đồ"
  },
+ "ui.hunters.asleep_title": {
+  "en": "Asleep on the Mount ({count}/{max})",
+  "vi": "Ngủ đông ({count}/{max})"
+ },
+ "ui.hunters.status.asleep": {
+  "en": "Hibernating",
+  "vi": "Ngủ đông"
+ },
+ "ui.mount.title": {
+  "en": "Hibernation Mount",
+  "vi": "Núi Ngủ Đông"
+ },
+ "ui.mount.counts": {
+  "en": "Awake {active}/{active_max} · asleep {asleep}/{asleep_max} · free beds {beds}",
+  "vi": "Đang hoạt động {active}/{active_max} · ngủ đông {asleep}/{asleep_max} · giường trống {beds}"
+ },
+ "ui.mount.note": {
+  "en": "Sleepers need nothing and earn nothing. Wake one when a slot and a bed are free, or pick an awake Hunter and swap.",
+  "vi": "Hunter ngủ đông không ăn, không tốn gì nhưng cũng không lên cấp. Đánh thức khi còn chỗ và giường, hoặc chọn một Hunter đang hoạt động để đổi chỗ."
+ },
+ "ui.mount.asleep": {
+  "en": "Asleep ({count})",
+  "vi": "Đang ngủ đông ({count})"
+ },
+ "ui.mount.nobody_asleep": {
+  "en": "Nobody is sleeping here.",
+  "vi": "Chưa có ai ngủ đông."
+ },
+ "ui.mount.awake": {
+  "en": "Awake in the village ({count})",
+  "vi": "Đang hoạt động ({count})"
+ },
+ "ui.mount.swap_hint": {
+  "en": "{name} will swap with the sleeper you pick.",
+  "vi": "{name} sẽ đổi chỗ với Hunter ngủ đông bạn chọn."
+ },
+ "ui.mount.wake": {
+  "en": "Wake",
+  "vi": "Đánh thức"
+ },
+ "ui.mount.sleep": {
+  "en": "Sleep",
+  "vi": "Cho ngủ"
+ },
+ "ui.mount.pick_swap": {
+  "en": "Swap…",
+  "vi": "Đổi…"
+ },
+ "ui.mount.swap": {
+  "en": "Swap",
+  "vi": "Đổi chỗ"
+ },
+ "ui.mount.woke": {
+  "en": "{name} wakes and walks back to the village",
+  "vi": "{name} tỉnh dậy, đi về làng"
+ },
+ "ui.mount.slept": {
+  "en": "{name} walks to the Mount to sleep",
+  "vi": "{name} đi sang Núi Ngủ Đông"
+ },
+ "ui.mount.swapped": {
+  "en": "{a} and {b} trade places",
+  "vi": "{a} và {b} đổi chỗ cho nhau"
+ },
+ "world.mount.plaque": {
+  "en": "Hibernation Mount",
+  "vi": "Núi Ngủ Đông"
+ },
  "ui.hunters.sort": {
   "en": "Sort: {mode}",
   "vi": "Xếp: {mode}"
+ },
+ "ui.hunters.sort_mode.grade": {
+  "en": "Grade",
+  "vi": "Đánh giá"
  },
  "ui.hunters.sort_mode.class": {
   "en": "Class",
@@ -4882,6 +5174,10 @@
  "ui.item.food": {
   "en": "Food: +{energy} energy",
   "vi": "Đồ ăn: +{energy} năng lượng"
+ },
+ "ui.item.grade": {
+  "en": "Grade",
+  "vi": "Đánh giá"
  },
  "ui.item.kind": {
   "en": "Kind",

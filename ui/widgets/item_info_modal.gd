@@ -106,11 +106,15 @@ func _rebuild() -> void:
 		facts.add_child(_fact(Loc.t("ui.item.enhance"), "+%d" % enhance, CREAM, 14))
 	if not item.modifiers.is_empty():
 		facts.add_child(_text(_modifier_text(item.modifiers[0]), CREAM if not broken else NOTE, 16, true))
+		# How the bonuses compare with the gear of this slot (D80).
+		var grade := GameManager.grades.item_grade(item)
+		facts.add_child(_fact(Loc.t("ui.item.grade"), StatGradeService.name_of(grade), StatGradeService.color(grade), 14))
 	_body.add_child(UIKit.hbox([icon_frame, facts], 12))
 	# Inner box: bonuses (blue), state lines (gold), flavour text.
 	var box := UIKit.vbox([], 4)
 	for modifier in item.modifiers:
-		box.add_child(_bullet(_modifier_text(modifier), STAT if not broken else NOTE, Color("8a8ea0")))
+		var bonus_color := StatGradeService.color(GameManager.grades.item_step(item, modifier)) if not broken else NOTE
+		box.add_child(_bullet(_modifier_text(modifier), bonus_color, Color("8a8ea0")))
 	if item.modifiers.is_empty():
 		box.add_child(_bullet(_plain_info(), STAT, Color("8a8ea0")))
 	var full := EquipmentService.max_durability(item)

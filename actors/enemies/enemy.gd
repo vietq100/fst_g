@@ -20,6 +20,7 @@ var loadout: MonsterLoadout
 var _percent: Dictionary[StringName, float] = {}
 var _flat: Dictionary[StringName, float] = {}
 var _caster: MonsterSkillCaster
+var _plate: ActorNameplate
 
 
 ## Call after the node is in the tree.
@@ -35,15 +36,17 @@ func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, ret
 	auto_combat = true
 	repositions_in_range = not definition.is_boss
 	# HP bar while hurt; bosses also show their name.
-	var plate := ActorNameplate.new()
-	add_child(plate)
-	# Bosses and monsters of tier R and up show their tier code (and bosses their name) in its colour.
+	_plate = ActorNameplate.new()
+	add_child(_plate)
+	# Bosses and monsters of tier R and up show their tier code (and bosses their name); the colour
+	# is the monster's grade (_refresh_grade, D80).
 	var label := definition.display_name if definition.is_boss else ""
 	if definition.is_boss or tier >= Tier.Level.R:
 		label = ("[%s] %s" % [Tier.code(tier), label]).strip_edges()
-	plate.boss = definition.is_boss
-	plate.setup(self, label, 56.0 if definition.is_boss else 28.0)
-	plate.name_color = Tier.color(tier) if tier > Tier.Level.C else ActorNameplate.NAME_COLOR
+	_plate.boss = definition.is_boss
+	_plate.setup(self, label, 56.0 if definition.is_boss else 28.0)
+	_plate.name_color = Tier.color(tier) if tier > Tier.Level.C else ActorNameplate.NAME_COLOR
+	_refresh_grade()
 
 
 ## Gives the monster its gear and skills: gear adds flat / percent stats, passive skills add
@@ -75,6 +78,22 @@ func apply_loadout(monster_loadout: MonsterLoadout) -> void:
 	_caster.name = "MonsterSkillCaster"
 	add_child(_caster)
 	_caster.setup(self, combat.get_service(), skills)
+	_refresh_grade()
+
+
+## Name in the colour of the monster's grade against the average regular monster at its level and
+## tier (D80); a monster graded Strong or above gets a name even below tier R.
+func _refresh_grade() -> void:
+	if _plate == null or not is_instance_valid(GameManager) or GameManager.grades == null:
+		return
+	var stats := get_combat_stats()
+	var grade: int = GameManager.grades.monster_grade({&"hp": health.max_health, &"attack": stats.attack,
+		&"defense": stats.defense, &"attack_speed": stats.attack_speed, &"critical_chance": stats.critical_chance,
+		&"critical_damage": stats.critical_damage, &"move_speed": get_move_speed()}, stat_scale)
+	_plate.name_color = StatGradeService.color(grade)
+	if _plate.text.is_empty() and grade >= StatGradeService.Step.STRONG:
+		_plate.text = StatGradeService.name_of(grade)
+	_plate.queue_redraw()
 
 
 func get_team_group() -> StringName:

@@ -27,6 +27,16 @@ extends Resource
 @export var starting_food: Dictionary[StringName, int] = {&"meat_stew": 6}
 @export var starting_hunter_class: StringName = &"warrior"
 @export var starting_hunter_count: int = 1
+## Summoning tickets of a new village (D83). 1000 is the owner's test value; the release value is
+## to be set once ticket sources exist (BALANCE.md → Summoning).
+@export var start_summon_tickets: int = 1000
+@export_group("Summoning (D83)")
+## Tickets one summon costs.
+@export var summon_ticket_cost: int = 1
+## Hunters awake in the village at once (hunting, training, living); the Town Hall cannot raise it past this.
+@export var active_hunter_cap: int = 24
+## Hunters asleep on the Hibernation Mount.
+@export var hibernation_cap: int = 100
 
 @export_group("Hunter life")
 ## Mood 0..mood_max (HUNTER_LIFE_SYSTEM.md §2, BALANCE.md → Mood).

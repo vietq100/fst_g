@@ -73,6 +73,13 @@ var _staff: Dictionary[StringName, StaffWorker] = {}
 ## Gate centres and dungeon entrances: monsters do not spawn next to them.
 var _keep_clear_points: Array[Vector2] = []
 var _hunter_actors: Dictionary[StringName, Hunter] = {}
+## Summoned newcomers waiting to come down at the Gate (D83), in order.
+var _arrivals: Array[HunterRuntime] = []
+var _arrival_playing := false
+var _shake: CameraShake
+## Height (px) a newcomer drops from, and the pause between two arrivals (s).
+const ARRIVAL_DROP := 56.0
+const ARRIVAL_GAP := 0.45
 var _selected_building: StringName = &""
 var _selected_hunter: Hunter
 ## Active touches (index → screen position) for drag / pinch.
@@ -190,6 +197,8 @@ func _build_scene() -> void:
 			structure = HunterGateVisual.new()
 		elif region.kind == RegionDefinition.Kind.BOSS:
 			structure = BossAltarVisual.new()
+		elif region.kind == RegionDefinition.Kind.MOUNT:
+			structure = HibernationMountVisual.new()
 		if structure == null:
 			continue
 		structure.position = world.region_center(region)
@@ -650,7 +659,7 @@ func _spawn_props() -> void:
 	for gate in world.get_gates():
 		keep_clear.append(gate.tiles.grow(PROP_CLEARANCE))
 	for region in world.get_regions():
-		if region.kind == RegionDefinition.Kind.GATE or region.kind == RegionDefinition.Kind.BOSS:
+		if region.kind == RegionDefinition.Kind.GATE or region.kind == RegionDefinition.Kind.BOSS or region.kind == RegionDefinition.Kind.MOUNT:
 			var centre := WorldService.tile_at(world.region_center(region))
 			keep_clear.append(Rect2i(centre, Vector2i.ONE).grow(PROP_CLEARANCE + 1))
 	for definition in DataRegistry.get_all(&"expedition"):
@@ -1363,6 +1372,8 @@ func _plaza() -> Vector2:
 ## Hall without a bed), eating / resting / socializing at the Tavern, training beside the Town Hall,
 ## dead or injured at the Temple, otherwise the plaza. Missing buildings fall back to the plaza.
 func get_home_position(runtime: HunterRuntime) -> Vector2:
+	if runtime.hibernating:
+		return _mount_spot(runtime)
 	var activity := runtime.activity if runtime.expedition_id == &"" else &""
 	if runtime.injured:
 		activity = ActivityService.RECOVERING
@@ -1451,9 +1462,49 @@ func _replan_all() -> void:
 
 
 func _on_hunter_added(runtime: HunterRuntime) -> void:
-	# New recruits walk in through the Hunter Gate (D58), or out of the Tavern without one.
 	var gate := _gate_region()
+	if gate != null and GameManager.recruitment.is_arriving(runtime.unique_id):
+		# Summoned (D83): queued, each comes down the light column in turn.
+		_arrivals.append(runtime)
+		_next_arrival()
+		return
+	# New recruits walk in through the Hunter Gate (D58), or out of the Tavern without one.
 	_spawn_actor(runtime, world.region_center(gate) if gate != null else _door_of(BuildingService.TAVERN, _plaza()))
+
+
+## Plays the next queued arrival (D83): a light column at the Gate climbs through the tiers up to
+## the newcomer's, the Hunter drops in with a small shake, then the brain walks it on.
+func _next_arrival() -> void:
+	if _arrival_playing or _arrivals.is_empty():
+		return
+	_arrival_playing = true
+	var runtime: HunterRuntime = _arrivals.pop_front()
+	var gate := _gate_region()
+	var at := world.region_center(gate) if gate != null else _plaza()
+	var column := SummonColumn.new()
+	column.position = at
+	_entities.add_child(column)
+	column.setup(runtime.tier)
+	await column.peaked
+	if not is_instance_valid(self) or GameManager.hunters.get_hunter(runtime.unique_id) == null:
+		_arrival_playing = false
+		_next_arrival()
+		return
+	var hunter := _spawn_actor(runtime, at)
+	hunter.visual.position = Vector2(0, -ARRIVAL_DROP)
+	var tween := hunter.create_tween()
+	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.22).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(hunter.visual, ^"position", Vector2(0, -4), 0.08).set_ease(Tween.EASE_OUT)
+	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.08).set_ease(Tween.EASE_IN)
+	await tween.finished
+	if _shake == null:
+		_shake = CameraShake.new()
+		add_child(_shake)
+	_shake.shake(3.0, 0.22)
+	GameManager.recruitment.mark_arrived(runtime.unique_id)
+	await get_tree().create_timer(ARRIVAL_GAP).timeout
+	_arrival_playing = false
+	_next_arrival()
 
 
 ## An expelled Hunter's actor leaves the world at once (D58).
@@ -1474,6 +1525,32 @@ func _gate_region() -> RegionDefinition:
 		if region.kind == RegionDefinition.Kind.GATE:
 			return region
 	return null
+
+
+func _mount_region() -> RegionDefinition:
+	for region in world.get_regions():
+		if region.kind == RegionDefinition.Kind.MOUNT:
+			return region
+	return null
+
+
+## A sleeper's spot on the Hibernation Mount (D83): the sleepers spread over the Mount's tiles in
+## a fixed order (by id), keeping clear of the cave mouth at its centre; the plaza without a Mount.
+func _mount_spot(runtime: HunterRuntime) -> Vector2:
+	var mount := _mount_region()
+	if mount == null:
+		return _plaza()
+	var sleepers := GameManager.hunters.get_hibernating()
+	sleepers.sort_custom(func(a: HunterRuntime, b: HunterRuntime) -> bool: return String(a.unique_id) < String(b.unique_id))
+	var index := maxi(sleepers.find(runtime), 0)
+	var centre := WorldService.tile_at(world.region_center(mount))
+	var spots: Array = world.region_tile_list(mount.id).filter(func(tile: Vector2i) -> bool:
+		return absi(tile.x - centre.x) > 1 or absi(tile.y - centre.y) > 1)
+	if spots.is_empty():
+		return world.region_center(mount)
+	# A stride coprime with most sizes scatters neighbours in the list across the hill.
+	var tile: Vector2i = spots[(index * 7) % spots.size()]
+	return WorldService.tile_to_world(Vector2(tile) + Vector2(0.5, 0.5))
 
 
 func _on_hunter_changed(runtime: HunterRuntime) -> void:
@@ -1618,7 +1695,7 @@ func _set_brain(hunter: Hunter, on: bool) -> void:
 
 func pick_party() -> Array[StringName]:
 	var available := GameManager.hunters.get_all().filter(func(h: HunterRuntime) -> bool:
-		return not h.injured and h.state == HunterRuntime.LifecycleState.AVAILABLE)
+		return not h.injured and not h.hibernating and h.state == HunterRuntime.LifecycleState.AVAILABLE)
 	available.sort_custom(func(a: HunterRuntime, b: HunterRuntime) -> bool: return a.level > b.level)
 	var party: Array[StringName] = []
 	for runtime in available.slice(0, DataRegistry.config.max_party_size):

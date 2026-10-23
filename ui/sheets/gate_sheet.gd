@@ -1,9 +1,12 @@
 class_name GateSheet
 extends Sheet
-## The Hunter Gate (D58): the "Hunters waiting" board (hire candidates, paid refresh) and the
-## roster with an Expel button per Hunter (two taps: Expel → Confirm).
+## The Hunter Gate (D83): summon Hunters for tickets (×1 / ×10), see who just came, and the
+## roster with an Expel button per Hunter (two taps: Expel → Confirm). Newcomers walk in through
+## the Gate, awake into the village or asleep over the bridge to the Hibernation Mount.
 
 var _confirm_id: StringName = &""
+## Who the last summons called (shown until the sheet closes).
+var _arrivals: Array[HunterRuntime] = []
 
 
 func _init() -> void:
@@ -12,34 +15,43 @@ func _init() -> void:
 
 func _watch() -> Array:
 	var gm := GameManager
-	return [[gm.recruitment, &"candidates_changed"], [gm.hunters, &"hunter_added"], [gm.hunters, &"hunter_removed"],
-		[gm.hunters, &"hunter_changed"], [gm.wallet, &"gold_changed"]]
+	return [[gm.recruitment, &"hibernation_changed"], [gm.recruitment, &"arrivals_confirmed"], [gm.hunters, &"hunter_added"],
+		[gm.hunters, &"hunter_removed"], [gm.hunters, &"hunter_changed"], [gm.wallet, &"tickets_changed"], [gm.housing, &"beds_changed"]]
 
 
 func _build(content: VBoxContainer) -> void:
 	var gm := GameManager
 	var recruitment := gm.recruitment
-	content.add_child(UIKit.label(Loc.t("ui.gate.roster", {"count": gm.hunters.count(), "max": recruitment.get_capacity(), "beds": gm.housing.get_free_beds()}), &"MutedLabel"))
-	content.add_child(UIKit.label(Loc.t("ui.gate.waiting"), &"AccentLabel"))
-	if recruitment.candidates.is_empty():
-		content.add_child(UIKit.label(Loc.t("ui.gate.nobody_waiting"), &"MutedLabel"))
-	# Two columns of candidate cards (like the reference game's "Hunters Waiting" board).
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override(&"h_separation", 4)
-	grid.add_theme_constant_override(&"v_separation", 4)
-	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for i in recruitment.candidates.size():
-		grid.add_child(_candidate_card(i))
-	content.add_child(grid)
-	# Roster full: show the reason (checked by count, never by the displayed text).
-	if not recruitment.candidates.is_empty() and gm.hunters.count() >= recruitment.get_capacity():
-		content.add_child(UIKit.label(recruitment.can_recruit(0), &"WarningLabel"))
-	var cost := recruitment.get_refresh_cost()
-	content.add_child(UIKit.button(Loc.t("ui.gate.refresh", {"gold": cost}), func() -> void:
-		run_action("" if recruitment.paid_refresh() else Loc.t("ui.common.needs_gold", {"gold": cost})),
-		&"", "" if gm.wallet.can_spend(cost) else Loc.t("ui.common.needs_gold", {"gold": cost})))
-	content.add_child(UIKit.label(Loc.t("ui.gate.refresh_note"), &"MutedLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.gate.counts", {"active": gm.hunters.count_active(), "active_max": recruitment.get_active_cap(),
+		"asleep": gm.hunters.count_hibernating(), "asleep_max": recruitment.get_hibernation_cap(), "beds": gm.housing.get_free_beds()}), &"MutedLabel"))
+	content.add_child(UIKit.label(Loc.t("ui.gate.summon_title"), &"AccentLabel"))
+	var tickets := UIKit.hbox([PixelIcons.rect(&"mail", 2), UIKit.label(Loc.t("ui.gate.tickets", {"count": gm.wallet.summon_tickets}), &"HudLabel", false)], 4)
+	content.add_child(tickets)
+	var reason := recruitment.can_summon()
+	var cost := recruitment.get_ticket_cost()
+	var one := UIKit.button(Loc.t("ui.gate.summon_one", {"tickets": cost}), func() -> void: _summon(1), &"PrimaryButton", reason)
+	var five := UIKit.button(Loc.t("ui.gate.summon_five", {"tickets": cost * 5}), func() -> void: _summon(5), &"", reason)
+	var ten := UIKit.button(Loc.t("ui.gate.summon_ten", {"tickets": cost * 10}), func() -> void: _summon(10), &"", reason)
+	content.add_child(UIKit.hbox([one, five, ten], 6))
+	var effects := CheckButton.new()
+	effects.text = Loc.t("ui.gate.effects_toggle")
+	effects.button_pressed = SettingsStore.get_summon_effects()
+	effects.custom_minimum_size.y = GameTheme.TOUCH
+	effects.toggled.connect(func(enabled: bool) -> void: SettingsStore.set_summon_effects(enabled))
+	content.add_child(effects)
+	content.add_child(UIKit.label(Loc.t("ui.gate.summon_note" if recruitment.has_active_room() else "ui.gate.summon_note_asleep"), &"MutedLabel"))
+	_arrivals = recruitment.last_arrivals
+	if not _arrivals.is_empty():
+		content.add_child(UIKit.label(Loc.t("ui.gate.arrivals"), &"AccentLabel"))
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override(&"h_separation", 4)
+		grid.add_theme_constant_override(&"v_separation", 4)
+		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for hunter in _arrivals:
+			if gm.hunters.get_hunter(hunter.unique_id) != null:
+				grid.add_child(_arrival_card(hunter))
+		content.add_child(grid)
 	content.add_child(UIKit.separator())
 	content.add_child(UIKit.label(Loc.t("ui.gate.expel_title"), &"AccentLabel"))
 	content.add_child(UIKit.label(Loc.t("ui.gate.expel_note"), &"MutedLabel"))
@@ -47,44 +59,41 @@ func _build(content: VBoxContainer) -> void:
 		content.add_child(_roster_row(hunter))
 
 
-## One candidate: portrait, name and class, talent star, traits, stats and the Hire button.
-func _candidate_card(index: int) -> Control:
+## Calls the batch and shows the reveal (cards, or straight to the summary); they join on Confirm.
+func _summon(count: int) -> void:
 	var recruitment := GameManager.recruitment
-	var hunters := GameManager.hunters
-	var candidate := recruitment.candidates[index]
-	var talent := GameManager.talents.get_talent(candidate)
-	var traits := PackedStringArray()
-	for definition in GameManager.traits.get_traits(candidate):
-		traits.append(definition.display_name)
+	var called := recruitment.summon_batch(count)
+	if called.is_empty():
+		run_action(recruitment.can_summon())
+		return
+	get_tree().call_group(&"ui_root", &"open_summon_reveal", called, SettingsStore.get_summon_effects())
+	request_rebuild()
+
+
+## One newcomer: figure, name, tier, class and level, grade, where it went.
+func _arrival_card(hunter: HunterRuntime) -> Control:
+	var gm := GameManager
+	var definition := gm.hunters.get_definition(hunter)
 	var panel := PanelContainer.new()
 	panel.theme_type_variation = &"HunterCard"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var star := PixelIcons.rect(&"star", 1)
-	star.modulate = Color.WHITE if talent != null else Color(1, 1, 1, 0.25)
-	star.tooltip_text = talent.display_name if talent != null else Loc.t("ui.hunter.no_talent")
-	var name_label := UIKit.label(candidate.display_name, &"HudSmallLabel", false)
+	var name_label := UIKit.label(hunter.display_name, &"HudSmallLabel", false)
 	name_label.clip_text = true
-	var top := UIKit.hbox([star, name_label], 2)
-	var portrait := HunterFigure.new().setup(candidate, null)
+	var code := UIKit.label(Tier.code(hunter.tier), &"HudSmallLabel", false)
+	code.add_theme_color_override(&"font_color", Tier.color(hunter.tier))
+	var top := UIKit.hbox([name_label, code], 4)
+	var portrait := HunterFigure.new().setup(hunter, null)
 	portrait.custom_minimum_size = Vector2(52, 72)
-	var class_label := UIKit.label(Loc.t("ui.common.level_class", {"level": candidate.level, "class": hunters.get_definition(candidate).display_name}), &"MutedLabel", false)
+	var class_label := UIKit.label(Loc.t("ui.common.level_class", {"level": hunter.level, "class": definition.display_name if definition != null else "?"}), &"MutedLabel", false)
 	class_label.clip_text = true
-	var stats := UIKit.label(Loc.t("ui.gate.candidate_stats", {"hp": "%d" % hunters.get_stat(candidate, HunterService.MAX_HP),
-		"atk": "%.0f" % hunters.get_stat(candidate, HunterService.ATTACK), "def": "%.0f" % hunters.get_stat(candidate, HunterService.DEFENSE)}), &"MutedLabel", false)
-	stats.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
-	stats.clip_text = true
-	var side := UIKit.vbox([class_label, stats], 1)
-	var trait_text := ", ".join(traits) + ("  ·  %s" % talent.display_name if talent != null else "")
-	var trait_label := UIKit.label(trait_text, &"HudAccentLabel")
-	trait_label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
-	var reason := recruitment.can_recruit(index)
-	var recruit := UIKit.button(Loc.t("ui.gate.hire", {"gold": recruitment.get_recruit_cost(index)}), func() -> void:
-		var hunter := recruitment.recruit(index)
-		run_action("" if hunter != null else recruitment.can_recruit(index),
-			Loc.t("ui.gate.hired", {"name": hunter.display_name}) if hunter != null else ""), &"PrimaryButton", reason)
-	recruit.custom_minimum_size.y = GameTheme.TOUCH
-	recruit.add_theme_font_size_override(&"font_size", 11)
-	panel.add_child(UIKit.vbox([top, UIKit.hbox([portrait, side], 4), trait_label, recruit], 3))
+	var grade := gm.grades.hunter_grade(hunter)
+	var grade_label := UIKit.label(Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(grade)}), &"MutedLabel", false)
+	grade_label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
+	grade_label.add_theme_color_override(&"font_color", StatGradeService.color(grade))
+	var where := UIKit.label(Loc.t("ui.gate.went_asleep" if hunter.hibernating else "ui.gate.went_village"), &"HudSmallLabel", false)
+	where.add_theme_color_override(&"font_color", Color("8fb3ff") if hunter.hibernating else GameTheme.GOOD)
+	var side := UIKit.vbox([class_label, grade_label, where], 1)
+	panel.add_child(UIKit.vbox([top, UIKit.hbox([portrait, side], 4)], 3))
 	return panel
 
 
@@ -92,7 +101,10 @@ func _candidate_card(index: int) -> Control:
 func _roster_row(hunter: HunterRuntime) -> Control:
 	var gm := GameManager
 	var definition := gm.hunters.get_definition(hunter)
-	var label := UIKit.label("%s  ·  %s" % [hunter.display_name, Loc.t("ui.common.level_class", {"level": hunter.level, "class": definition.display_name if definition != null else "?"})], &"", false)
+	var text := "%s  ·  %s" % [hunter.display_name, Loc.t("ui.common.level_class", {"level": hunter.level, "class": definition.display_name if definition != null else "?"})]
+	if hunter.hibernating:
+		text += "  ·  " + Loc.t("ui.hunters.status.asleep")
+	var label := UIKit.label(text, &"", false)
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.clip_text = true
 	var reason := gm.recruitment.can_dismiss(hunter)

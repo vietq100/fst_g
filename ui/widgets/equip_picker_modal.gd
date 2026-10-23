@@ -5,6 +5,9 @@ extends Control
 ## Lists the worn item (Remove) and every stored item that fits (Equip); tapping an icon opens
 ## its details on top. Like the item panel it dims the screen and keeps the dialog underneath.
 
+## Height of one item row (icon, three text lines) for sizing the scroll area.
+const ROW_HEIGHT := 64
+
 var runtime: HunterRuntime
 var slot: StringName
 var _body: VBoxContainer
@@ -67,6 +70,8 @@ func _rebuild() -> void:
 	box.add_child(_heading(Loc.t("ui.equip_slot.worn")))
 	var worn_id: StringName = runtime.equipment.get(slot, &"")
 	var worn := equipment.get_item(worn_id) if worn_id != &"" else null
+	var worn_enhance := GameManager.inventory.get_enhance(worn_id) if worn != null else 0
+	var worn_broken := worn != null and equipment.is_broken(worn_id)
 	if worn == null:
 		box.add_child(_note(Loc.t("ui.equip_slot.empty")))
 	else:
@@ -75,7 +80,7 @@ func _rebuild() -> void:
 			if not reason.is_empty():
 				get_tree().call_group(&"ui_root", &"toast", reason, true))
 		ItemInfoModal._style_button(remove, ItemInfoModal.BUTTON, ItemInfoModal.FRAME_RIM.darkened(0.2))
-		box.add_child(_row(worn, worn_id, remove))
+		box.add_child(_row(worn, worn_id, remove, worn, worn_enhance, worn_broken, true))
 	box.add_child(_heading(Loc.t("ui.equip_slot.stored")))
 	var options := 0
 	for instance_id in GameManager.inventory.get_instances():
@@ -88,7 +93,7 @@ func _rebuild() -> void:
 			get_tree().call_group(&"ui_root", &"toast", reason if not reason.is_empty() else Loc.t("ui.hunter.equipped", {"item": item.display_name}),
 				not reason.is_empty()))
 		ItemInfoModal._style_button(equip, Color("2f5a2a"), ItemInfoModal.GOLD.darkened(0.3))
-		box.add_child(_row(item, instance_id, equip))
+		box.add_child(_row(item, instance_id, equip, worn, worn_enhance, worn_broken, false))
 	if options == 0:
 		box.add_child(_note(Loc.t("ui.equip_slot.none")))
 	var inner := PanelContainer.new()
@@ -102,7 +107,7 @@ func _rebuild() -> void:
 	# Long lists scroll inside the frame.
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.y = mini(options + (1 if worn != null else 0), 5) * 52 + 70
+	scroll.custom_minimum_size.y = mini(options + (1 if worn != null else 0), 5) * ROW_HEIGHT + 70
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(box)
 	inner.add_child(scroll)
@@ -115,19 +120,45 @@ func _rebuild() -> void:
 	_body.add_child(close)
 
 
-## Icon (tap for details), name in the tier colour, bonuses, and an action button.
-func _row(item: ItemDefinition, instance_id: StringName, action: Button) -> Control:
+## Icon (tap for details), name in the tier colour, bonuses, the item's grade and how it compares
+## with the worn item (D80), and an action button.
+func _row(item: ItemDefinition, instance_id: StringName, action: Button, worn: ItemDefinition, worn_enhance: int,
+		worn_broken: bool, is_worn: bool) -> Control:
 	var enhance := GameManager.inventory.get_enhance(instance_id)
 	var icon := ItemIcon.new().setup(item, 40, "+%d" % enhance if enhance > 0 else "", instance_id)
 	var name_label := _label(item.display_name, Tier.color(item.rarity), 14)
 	name_label.clip_text = true
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var mods := _label(UIKit.describe_modifiers(item), ItemInfoModal.STAT, 12)
-	var info := UIKit.vbox([name_label, mods], 1)
+	var grades := GameManager.grades
+	var grade := grades.item_grade(item)
+	var grade_label := _label(StatGradeService.name_of(grade), StatGradeService.color(grade), 11)
+	var compare_line := UIKit.hbox([grade_label], 6)
+	if not is_worn:
+		# Broken gear gives nothing: a broken candidate is a downgrade, a broken worn piece an upgrade.
+		if GameManager.equipment.is_broken(instance_id):
+			compare_line.add_child(_label(Loc.t("ui.equip_slot.broken"), GameTheme.DANGER, 11))
+		elif worn_broken:
+			compare_line.add_child(_label(Loc.t("ui.equip_slot.compare_broken"), GameTheme.GOOD, 11))
+		else:
+			compare_line.add_child(_compare_label(grades.item_delta(item, worn, enhance, worn_enhance), worn != null))
+	var info := UIKit.vbox([name_label, mods, compare_line], 1)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	action.size_flags_horizontal = Control.SIZE_SHRINK_END
 	action.custom_minimum_size = Vector2(64, 36)
 	return UIKit.hbox([icon, info, action], 8)
+
+
+## "▲ +40% vs worn" (green), "▼ −20% vs worn" (red), "= same" (grey) or "slot is empty" (note).
+func _compare_label(delta: float, has_worn: bool) -> Label:
+	if not has_worn:
+		return _label(Loc.t("ui.equip_slot.compare_new"), ItemInfoModal.NOTE, 11)
+	var percent := roundi(delta * 100.0)
+	if percent > 0:
+		return _label(Loc.t("ui.equip_slot.compare_up", {"delta": percent}), GameTheme.GOOD, 11)
+	if percent < 0:
+		return _label(Loc.t("ui.equip_slot.compare_down", {"delta": percent}), GameTheme.DANGER, 11)
+	return _label(Loc.t("ui.equip_slot.compare_same"), ItemInfoModal.NOTE, 11)
 
 
 func _heading(text: String) -> Label:

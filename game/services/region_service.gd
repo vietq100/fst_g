@@ -58,7 +58,7 @@ func get_hunting_regions() -> Array[RegionDefinition]:
 ## Where the Hunter's duty sends it, or null for "Stay in town" (D29). Auto = the hardest region
 ## whose minimum level the Hunter has reached.
 func get_duty_region(hunter: HunterRuntime) -> RegionDefinition:
-	if hunter.duty == HunterRuntime.STAY_IN_TOWN:
+	if hunter.hibernating or hunter.duty == HunterRuntime.STAY_IN_TOWN:
 		return null
 	if hunter.duty != &"":
 		var fixed := _world.get_region(hunter.duty)

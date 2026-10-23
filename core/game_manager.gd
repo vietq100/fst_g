@@ -14,6 +14,8 @@ var registry: Node
 var rng := RandomNumberGenerator.new()
 var stats: StatService
 var hunters: HunterService
+## Stat colours and tier-by-total of Hunters, monsters and gear (D80).
+var grades: StatGradeService
 var combat: CombatService
 var wallet: WalletService
 var progress: ProgressService
@@ -61,6 +63,7 @@ func build(data_registry: Node) -> void:
 	var config: GameConfig = registry.config
 	stats = StatService.new(config)
 	hunters = HunterService.new(registry, stats, config)
+	grades = StatGradeService.new(registry, stats, hunters)
 	combat = CombatService.new(stats, rng)
 	wallet = WalletService.new()
 	progress = ProgressService.new()
@@ -70,6 +73,7 @@ func build(data_registry: Node) -> void:
 	buildings = BuildingService.new(registry, wallet, inventory, progress, world)
 	housing = HousingService.new(hunters, buildings)
 	recruitment = RecruitmentService.new(registry, hunters, buildings, wallet, rng)
+	recruitment.config = config
 	recruitment.housing = housing
 	temple = TempleService.new(hunters, buildings, wallet, stats, config)
 	equipment = EquipmentService.new(registry, hunters, inventory)
@@ -152,6 +156,7 @@ func _connect_services() -> void:
 func start_new_game() -> void:
 	var config: GameConfig = registry.config
 	wallet.gold = config.start_gold
+	wallet.summon_tickets = config.start_summon_tickets
 	for i in config.starting_hunter_count:
 		var candidate := hunters.generate_candidate(config.starting_hunter_class, rng)
 		traits.assign_random_traits(candidate)

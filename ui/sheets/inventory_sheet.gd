@@ -78,11 +78,19 @@ func _slots_for_tab(inventory: InventoryService) -> Array[Dictionary]:
 			continue
 		var enhance := inventory.get_enhance(instance_id)
 		slots.append({"item": item, "badge": "+%d" % enhance if enhance > 0 else "", "instance": instance_id})
+	# Rarest first; among spare gear of one rarity the best measured piece (grade total, enhancement
+	# included, D80) comes first; then by id.
+	var grades := GameManager.grades
 	slots.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		var ia: ItemDefinition = a["item"]
 		var ib: ItemDefinition = b["item"]
 		if ia.rarity != ib.rarity:
 			return ia.rarity > ib.rarity
+		if a.has("instance") and b.has("instance"):
+			var ta := grades.item_total_enhanced(ia, inventory.get_enhance(a["instance"]))
+			var tb := grades.item_total_enhanced(ib, inventory.get_enhance(b["instance"]))
+			if not is_equal_approx(ta, tb):
+				return ta > tb
 		return String(ia.id) < String(ib.id))
 	return slots
 

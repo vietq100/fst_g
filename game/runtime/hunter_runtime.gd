@@ -68,6 +68,8 @@ var alive: bool = true
 var world_position: Vector2 = Vector2.ZERO
 ## &"" = town life; HUNTING while out in a region (set by the Hunter brain).
 var task: StringName
+## Asleep on the Hibernation Mount (D83): no needs, no duty, no bed; not counted as active.
+var hibernating := false
 ## Evil Hunter Tycoon systems: reincarnation count, unspent points (Academy traits), Academy skills.
 var reincarnations: int = 0
 ## Tier (D60): rolled C..UR when the candidate is generated; scales HP / attack / defense.
@@ -88,6 +90,8 @@ var loot_bag: Dictionary[StringName, int] = {}
 
 const STAY_IN_TOWN := &"stay"
 const HUNTING := &"hunting"
+## Task while asleep on the Hibernation Mount (D83).
+const HIBERNATING := &"hibernating"
 
 
 ## Plain data for saving (ids and primitive values only, SAVE_SYSTEM.md).
@@ -118,6 +122,7 @@ func to_dict() -> Dictionary:
 		"purse": purse,
 		"duty": duty,
 		"task": task,
+		"hibernating": hibernating,
 		"home_id": home_id,
 		"alive": alive,
 		"world_position": [world_position.x, world_position.y],
@@ -188,6 +193,7 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 	hunter.purse = maxi(int(data.get("purse", 0)), 0)
 	hunter.duty = StringName(str(data.get("duty", "")))
 	hunter.task = StringName(str(data.get("task", "")))
+	hunter.hibernating = bool(data.get("hibernating", false))
 	hunter.home_id = StringName(str(data.get("home_id", "")))
 	hunter.alive = bool(data.get("alive", true))
 	var at: Variant = data.get("world_position", [])

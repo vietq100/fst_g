@@ -39,7 +39,7 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(UIKit.separator())
 	_party = _party.filter(func(id: StringName) -> bool: return _is_available(gm.hunters.get_hunter(id)))
 	content.add_child(UIKit.label(Loc.t("ui.expedition.party", {"count": _party.size(), "max": DataRegistry.config.max_party_size}), &"AccentLabel"))
-	for runtime in gm.hunters.get_all():
+	for runtime in gm.hunters.get_active():
 		content.add_child(_member_row(runtime))
 	var warnings := _warnings(definition)
 	for warning in warnings:
@@ -101,7 +101,8 @@ func _warnings(definition: ExpeditionDefinition) -> PackedStringArray:
 
 
 static func _is_available(runtime: HunterRuntime) -> bool:
-	return runtime != null and runtime.alive and not runtime.injured and runtime.state == HunterRuntime.LifecycleState.AVAILABLE
+	return runtime != null and runtime.alive and not runtime.injured and not runtime.hibernating \
+			and runtime.state == HunterRuntime.LifecycleState.AVAILABLE
 
 
 static func _enemy_preview(definition: ExpeditionDefinition) -> String:

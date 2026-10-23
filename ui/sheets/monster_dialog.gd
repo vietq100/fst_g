@@ -161,15 +161,27 @@ func _build_info(body: VBoxContainer) -> void:
 	var move: float = enemy.get_move_speed() if is_instance_valid(enemy) else _definition.move_speed
 	var dps := attack * speed * (1.0 + _definition.critical_chance * (_definition.critical_damage - 1.0))
 	var rows := UIKit.vbox([], 4)
-	for entry in [["stat.attack", "%d" % roundi(attack)], ["stat.defense", "%d" % roundi(defense)],
-			["stat.attack_speed", "%.2f" % speed], ["stat.move_speed", "%d" % roundi(move)],
-			["stat.critical_chance", "%d%%" % roundi(_definition.critical_chance * 100.0)],
-			["stat.critical_damage", "×%.1f" % _definition.critical_damage], ["ui.monster.dps", "%.1f" % dps]]:
+	# Each value in the colour of its grade against the average regular monster at this level and
+	# tier (D80); the total grades the monster as a whole.
+	var grades := gm.grades
+	var values := {&"hp": enemy.health.max_health if is_instance_valid(enemy) else _definition.hp * scale,
+		&"attack": attack, &"defense": defense, &"attack_speed": speed, &"move_speed": move,
+		&"critical_chance": _definition.critical_chance, &"critical_damage": _definition.critical_damage}
+	for entry in [["stat.attack", "%d" % roundi(attack), &"attack"], ["stat.defense", "%d" % roundi(defense), &"defense"],
+			["stat.attack_speed", "%.2f" % speed, &"attack_speed"], ["stat.move_speed", "%d" % roundi(move), &"move_speed"],
+			["stat.critical_chance", "%d%%" % roundi(_definition.critical_chance * 100.0), &"critical_chance"],
+			["stat.critical_damage", "×%.1f" % _definition.critical_damage, &"critical_damage"], ["ui.monster.dps", "%.1f" % dps, &""]]:
 		var name_label := UIKit.label(Loc.t(entry[0]), &"HudSmallLabel", false)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var value := UIKit.label(entry[1], &"HudAccentLabel", false)
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		if entry[2] != &"":
+			value.add_theme_color_override(&"font_color", StatGradeService.color(grades.monster_step(entry[2], values[entry[2]], scale)))
 		rows.add_child(UIKit.hbox([name_label, value], 4))
+	var grade := grades.monster_grade(values, scale)
+	var grade_label := UIKit.label(Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(grade)}), &"HudSmallLabel", false)
+	grade_label.add_theme_color_override(&"font_color", StatGradeService.color(grade))
+	rows.add_child(grade_label)
 	body.add_child(rows)
 	var reward_scale := gm.regions.get_reward_scale(_level) * Tier.reward_scale(_tier)
 	body.add_child(UIKit.label(Loc.t("ui.monster.rewards", {"xp": roundi(_definition.xp_reward * reward_scale),

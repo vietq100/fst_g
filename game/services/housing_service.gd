@@ -43,13 +43,13 @@ func assign_beds() -> void:
 		capacity[house.instance_id] = int(_buildings.get_instance_effect(house, BuildingService.BEDS))
 	var changed := false
 	for hunter in _hunters.get_all():
-		if hunter.home_id != &"" and capacity.has(hunter.home_id) and used.get(hunter.home_id, 0) < capacity[hunter.home_id]:
+		if hunter.home_id != &"" and not hunter.hibernating and capacity.has(hunter.home_id) and used.get(hunter.home_id, 0) < capacity[hunter.home_id]:
 			used[hunter.home_id] = used.get(hunter.home_id, 0) + 1
 		elif hunter.home_id != &"":
 			hunter.home_id = &""
 			changed = true
 	for hunter in _hunters.get_all():
-		if hunter.home_id != &"":
+		if hunter.home_id != &"" or hunter.hibernating:
 			continue
 		for house in houses:
 			if used.get(house.instance_id, 0) < capacity[house.instance_id]:

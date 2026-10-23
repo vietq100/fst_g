@@ -88,3 +88,7 @@ Every gate and dungeon entrance gets a 5-tile corridor to the region's centre (a
 - **Landmarks and water scenery (2026-10-16, D75)**: each hunting region has landmarks (Dark Forest shrine, stumps, logs; Goblin Cave camps of tents around a campfire, totems; Ancient Ruins obelisk, arches, statues) as navigation obstacles. The open water inside the camera bounds holds a lighthouse islet, a shipwreck, islets with trees or palms, sandbars, rocks, logs and kelp (`WorldScenery`, one small node per piece, nothing blocks). The ground is drawn by child nodes in strips so off-screen parts are culled.
 - **Ambience (2026-10-16, D76)**: cloud shadows drift over everything, gulls circle the islets, a rowing boat rocks by a palm islet, the lighthouse beacon pulses and sweeps (`WorldAmbience`, a sky layer above the entities). Monster skills show pixel effects in their element (`SkillEffect`).
 - **Day and night (2026-10-16, D77)**: the world is tinted by the hour of the in-game day (white day, warm dusk and dawn, blue night); at night lamps, camp fires, the shrine, the obelisk and the lighthouse glow (`DayNight`). The Temple staff are robed, hooded Forge acolytes.
+
+## Hibernation Mount (D83)
+
+A small rocky island of its own kind below and left of the Hunter Gate island, joined to it by a bridge: a snow-capped hill with a cave mouth at its centre. Hunters sent to sleep walk over the bridge and settle on the hill; woken ones walk back. No monsters, no duty, no buildings.

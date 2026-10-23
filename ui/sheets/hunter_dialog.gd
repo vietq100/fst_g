@@ -92,7 +92,17 @@ func _paper_doll() -> Control:
 	right.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var row := UIKit.hbox([left, middle, right], 10)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	return row
+	# Puts on every stored piece that grades above the worn one (StatGradeService.suggest_gear, D80).
+	var best := UIKit.button(Loc.t("ui.hunter.equip_best"), func() -> void:
+		var gm := GameManager
+		var picks: Dictionary = gm.grades.suggest_gear(runtime, gm.inventory, gm.equipment)
+		var count := 0
+		for slot: StringName in picks:
+			if gm.equipment.equip(runtime, picks[slot]).is_empty():
+				count += 1
+		get_tree().call_group(&"ui_root", &"toast",
+			Loc.t("ui.hunter.equip_best_done", {"count": count}) if count > 0 else Loc.t("ui.hunter.equip_best_none"), false), &"")
+	return UIKit.vbox([row, best], 6)
 
 
 func _slot(slot: StringName) -> Control:
@@ -162,14 +172,23 @@ func _build_info(body: VBoxContainer, definition: HunterDefinition) -> void:
 		UIKit.bar(runtime.xp, gm.stats.required_xp(runtime.level), &"XpBar", Loc.t("ui.hunter.xp_short", {"current": runtime.xp, "max": gm.stats.required_xp(runtime.level)})),
 	], 4)
 	var stats := UIKit.vbox([], 4)
-	for entry in [[Loc.t("stat.attack"), "%d" % roundi(attack)], [Loc.t("stat.defense"), "%d" % roundi(hunters.get_stat(runtime, HunterService.DEFENSE))],
-			[Loc.t("ui.hunter.crit"), "%d%%" % roundi(crit * 100.0)], [Loc.t("stat.attack_speed"), "%.2f" % speed],
-			[Loc.t("stat.move_speed"), "%d" % roundi(hunters.get_stat(runtime, HunterService.MOVE_SPEED))]]:
+	# Each value in the colour of its grade against the average Hunter of this level (D80).
+	var grades := gm.grades
+	for entry in [[Loc.t("stat.attack"), "%d" % roundi(attack), HunterService.ATTACK],
+			[Loc.t("stat.defense"), "%d" % roundi(hunters.get_stat(runtime, HunterService.DEFENSE)), HunterService.DEFENSE],
+			[Loc.t("ui.hunter.crit"), "%d%%" % roundi(crit * 100.0), HunterService.CRITICAL_CHANCE],
+			[Loc.t("stat.attack_speed"), "%.2f" % speed, HunterService.ATTACK_SPEED],
+			[Loc.t("stat.move_speed"), "%d" % roundi(hunters.get_stat(runtime, HunterService.MOVE_SPEED)), HunterService.MOVE_SPEED]]:
 		var name_label := UIKit.label(entry[0], &"HudSmallLabel", false)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var value := UIKit.label(entry[1], &"HudAccentLabel", false)
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		value.add_theme_color_override(&"font_color", StatGradeService.color(grades.hunter_step(runtime, entry[2])))
 		stats.add_child(UIKit.hbox([name_label, value], 4))
+	var grade := grades.hunter_grade(runtime)
+	var grade_label := UIKit.label(Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(grade)}), &"HudSmallLabel", false)
+	grade_label.add_theme_color_override(&"font_color", StatGradeService.color(grade))
+	stats.add_child(grade_label)
 	bars.size_flags_stretch_ratio = 1.4
 	body.add_child(UIKit.hbox([bars, stats], 10))
 	body.add_child(UIKit.label(Loc.t("ui.hunter.awakening", {"count": runtime.reincarnations, "status": _status_text()}), &"HudSmallLabel"))

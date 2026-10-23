@@ -7,7 +7,7 @@ extends Sheet
 ## Camera follows this Hunter; UIRoot forwards it to the world.
 signal follow_requested(unique_id: StringName)
 
-enum Sort { LEVEL, NAME, CLASS }
+enum Sort { LEVEL, NAME, CLASS, GRADE }
 
 const COLUMNS := 3
 
@@ -29,12 +29,12 @@ func _watch() -> Array:
 
 func _build(content: VBoxContainer) -> void:
 	var gm := GameManager
-	set_title(Loc.t("ui.hunters.title_count", {"count": gm.hunters.count(), "max": gm.recruitment.get_capacity()}))
+	set_title(Loc.t("ui.hunters.title_count", {"count": gm.hunters.count_active(), "max": gm.recruitment.get_active_cap()}))
 	var options := gm.regions.get_duty_options()
 	var next_duty: StringName = options[(_duty_index + 1) % options.size()]
 	var place := UIKit.button(Loc.t("ui.hunters.hunting_grounds", {"duty": gm.regions.get_duty_name(options[_duty_index % options.size()])}), func() -> void:
 		_duty_index = (_duty_index + 1) % options.size()
-		for hunter in gm.hunters.get_all():
+		for hunter in gm.hunters.get_active():
 			gm.regions.set_duty(hunter, options[_duty_index])
 		toast_requested.emit(Loc.t("ui.hunters.everyone", {"duty": gm.regions.get_duty_name(options[_duty_index])}), false)
 		request_rebuild(), &"")
@@ -48,12 +48,25 @@ func _build(content: VBoxContainer) -> void:
 	grid.add_theme_constant_override(&"h_separation", 4)
 	grid.add_theme_constant_override(&"v_separation", 4)
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var roster := gm.hunters.get_all()
+	var roster := gm.hunters.get_active()
 	roster.sort_custom(_sorter)
 	for runtime in roster:
 		grid.add_child(_card(runtime))
 	content.add_child(grid)
-	if gm.hunters.count() < gm.recruitment.get_capacity():
+	# The sleepers on the Hibernation Mount (D83), after the village.
+	var sleepers := gm.hunters.get_hibernating()
+	if not sleepers.is_empty():
+		content.add_child(UIKit.label(Loc.t("ui.hunters.asleep_title", {"count": sleepers.size(), "max": gm.recruitment.get_hibernation_cap()}), &"AccentLabel"))
+		var asleep_grid := GridContainer.new()
+		asleep_grid.columns = COLUMNS
+		asleep_grid.add_theme_constant_override(&"h_separation", 4)
+		asleep_grid.add_theme_constant_override(&"v_separation", 4)
+		asleep_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		sleepers.sort_custom(_sorter)
+		for runtime in sleepers:
+			asleep_grid.add_child(_card(runtime))
+		content.add_child(asleep_grid)
+	if gm.hunters.count_active() < gm.recruitment.get_active_cap():
 		content.add_child(UIKit.label(Loc.t("ui.hunters.hire_more"), &"MutedLabel"))
 
 
@@ -63,6 +76,9 @@ func _sorter(a: HunterRuntime, b: HunterRuntime) -> bool:
 			return a.display_name < b.display_name
 		Sort.CLASS:
 			return String(a.definition_id) < String(b.definition_id) or (a.definition_id == b.definition_id and a.level > b.level)
+		Sort.GRADE:
+			# Best measured against their level first (D80).
+			return GameManager.grades.hunter_total(a) > GameManager.grades.hunter_total(b)
 	return a.level > b.level or (a.level == b.level and a.reincarnations > b.reincarnations)
 
 
@@ -82,6 +98,8 @@ func _card(runtime: HunterRuntime) -> Control:
 static func _status(runtime: HunterRuntime) -> String:
 	if GameManager.corpses.is_body(runtime):
 		return Loc.t("ui.hunters.status.fallen")
+	if runtime.hibernating:
+		return Loc.t("ui.hunters.status.asleep")
 	if not runtime.alive:
 		return Loc.t("ui.hunters.status.reviving", {"time": UIKit.format_duration(GameManager.temple.get_remaining(runtime))})
 	if runtime.injured:

@@ -23,6 +23,9 @@ const PICK_UP_DISTANCE := 18.0
 const LOOT_SEEK_RANGE := 260.0
 ## Stopped this close to a door counts as arrived (the exact point may be hard to reach).
 const STOPPED_ARRIVE_DISTANCE := 64.0
+## Idle strolls near home: how far (px) and how likely per think (every THINK_INTERVAL).
+const STROLL_RADIUS := 56.0
+const STROLL_CHANCE := 0.08
 
 var hunter: Hunter
 var map: WorldMap
@@ -32,6 +35,8 @@ var enabled := true
 var override_filter: Callable
 ## Set by the world while the Hunter walks to a dungeon entrance (INF = not departing).
 var depart_point := Vector2.INF
+## Where the current idle stroll heads (INF: none).
+var _stroll_point := Vector2.INF
 var _resting := false
 var _think_in := 0.0
 ## Field crafting in progress (null = none) and the seconds left.
@@ -88,6 +93,15 @@ func think() -> void:
 	if not enabled or runtime.injured or not runtime.alive or not hunter.is_targetable():
 		return
 	runtime.world_position = hunter.global_position
+	if runtime.hibernating:
+		# Asleep on the Hibernation Mount (D83): walk to its spot and stay; no needs, no duty.
+		_cancel_craft()
+		_set_task(HunterRuntime.HIBERNATING)
+		hunter.travel_target = map.get_home_position(runtime)
+		return
+	if runtime.task == HunterRuntime.HIBERNATING:
+		# Just woke: back to town life.
+		_set_task(&"")
 	_behavior = GameManager.traits.get_behavior(runtime)
 	_fight_smart()
 	if depart_point != Vector2.INF:
@@ -231,7 +245,26 @@ func _go_home(in_town: bool) -> void:
 		_set_task(&"")
 	elif hunter.runtime.task != RETURNING:
 		_set_task(RETURNING)
-	hunter.travel_target = map.get_home_position(hunter.runtime)
+	var home := map.get_home_position(hunter.runtime)
+	if in_town and not _busy_in_town(hunter.runtime) and _stroll(home):
+		return
+	hunter.travel_target = home
+
+
+## Idle in town: now and then wander to a spot near home instead of standing still (presentation
+## of town life; the Hunter is still free for any order). True while a stroll is on.
+func _stroll(home: Vector2) -> bool:
+	if _stroll_point != Vector2.INF:
+		if _arrived(_stroll_point):
+			_stroll_point = Vector2.INF
+			return false
+		hunter.travel_target = _stroll_point
+		return true
+	if _arrived(home) and randf() < STROLL_CHANCE:
+		_stroll_point = home + Vector2.from_angle(randf() * TAU) * randf_range(STROLL_RADIUS * 0.3, STROLL_RADIUS)
+		hunter.travel_target = _stroll_point
+		return true
+	return false
 
 
 func _hunt(region: RegionDefinition) -> void:
