@@ -145,7 +145,7 @@ func _card(profile: Dictionary) -> Control:
 		else:
 			_delete_armed = id
 		_rebuild())
-	remove.custom_minimum_size = Vector2(82, 28)
+	remove.custom_minimum_size = Vector2(82, GameTheme.TOUCH)
 	remove.add_theme_font_size_override(&"font_size", 11)
 	remove.clip_text = true
 	ItemInfoModal._style_button(remove, Color("7a2a22") if armed else ItemInfoModal.BUTTON, Color("c8562a") if armed else ItemInfoModal.FRAME_RIM.darkened(0.2))

@@ -81,6 +81,9 @@ func _ready() -> void:
 	_ui.focus_region_requested.connect(func(region_id: StringName) -> void:
 		if _world is WorldMap and not _world.is_in_dungeon():
 			_world.focus_region(region_id))
+	_ui.sheet_cover_changed.connect(func(height: float) -> void:
+		if _world is WorldMap:
+			_world.set_sheet_cover(height))
 	_ui.view_insets_changed.connect(func(top: float, bottom: float) -> void:
 		if _world is WorldMap:
 			_world.set_view_insets(top, bottom))
@@ -205,6 +208,7 @@ func _show_world(next_world: Node) -> void:
 		map.monster_tapped.connect(_ui.open_monster)
 		map.placement_changed.connect(_ui.set_placement)
 		map.depart_failed.connect(func(reason: String) -> void: _ui.toast(reason, true))
+		map.camera_away_changed.connect(_ui.set_camera_away)
 		if _pending_result != null:
 			_ui.show_message(MessageSheet.for_expedition(_pending_result))
 			_pending_result = null

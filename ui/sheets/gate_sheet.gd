@@ -71,18 +71,18 @@ func _candidate_card(index: int) -> Control:
 	class_label.clip_text = true
 	var stats := UIKit.label(Loc.t("ui.gate.candidate_stats", {"hp": "%d" % hunters.get_stat(candidate, HunterService.MAX_HP),
 		"atk": "%.0f" % hunters.get_stat(candidate, HunterService.ATTACK), "def": "%.0f" % hunters.get_stat(candidate, HunterService.DEFENSE)}), &"MutedLabel", false)
-	stats.add_theme_font_size_override(&"font_size", 9)
+	stats.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	stats.clip_text = true
 	var side := UIKit.vbox([class_label, stats], 1)
 	var trait_text := ", ".join(traits) + ("  ·  %s" % talent.display_name if talent != null else "")
 	var trait_label := UIKit.label(trait_text, &"HudAccentLabel")
-	trait_label.add_theme_font_size_override(&"font_size", 9)
+	trait_label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	var reason := recruitment.can_recruit(index)
 	var recruit := UIKit.button(Loc.t("ui.gate.hire", {"gold": recruitment.get_recruit_cost(index)}), func() -> void:
 		var hunter := recruitment.recruit(index)
 		run_action("" if hunter != null else recruitment.can_recruit(index),
 			Loc.t("ui.gate.hired", {"name": hunter.display_name}) if hunter != null else ""), &"PrimaryButton", reason)
-	recruit.custom_minimum_size.y = 32
+	recruit.custom_minimum_size.y = GameTheme.TOUCH
 	recruit.add_theme_font_size_override(&"font_size", 11)
 	panel.add_child(UIKit.vbox([top, UIKit.hbox([portrait, side], 4), trait_label, recruit], 3))
 	return panel
@@ -106,5 +106,5 @@ func _roster_row(hunter: HunterRuntime) -> Control:
 		button = UIKit.button(Loc.t("ui.gate.expel"), func() -> void:
 			_confirm_id = hunter.unique_id
 			request_rebuild(), &"", reason)
-	button.custom_minimum_size = Vector2(72, 32)
+	button.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 	return UIKit.hbox([label, button], 6)

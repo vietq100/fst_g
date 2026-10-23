@@ -6,13 +6,28 @@ extends Node2D
 ## Number appears above the target's head.
 const NUMBER_OFFSET := Vector2(0, -36)
 const NUMBER_JITTER := 6.0
+## Hits on one target this close together (ms) add up into one number instead of a shower of
+## small ones.
+const MERGE_WINDOW_MS := 350
+## Screen shake [strength px, seconds] per cause (Settings → Display → Screen shake).
+const SHAKE_BOSS_SKILL := [5.0, 0.35]
+const SHAKE_HUNTER_DOWN := [4.0, 0.3]
+
+## Target instance id → {"number": DamageNumber, "until": ticks ms} for merging.
+var _merged: Dictionary = {}
+var _shake_left := 0.0
+var _shake_time := 0.0
+var _shake_strength := 0.0
 
 
 func _ready() -> void:
 	z_index = 100
+	set_process(false)
 	GameManager.combat.damage_dealt.connect(_on_damage_dealt)
 	GameManager.combat.effect_damage_dealt.connect(_on_effect_damage_dealt)
 	GameManager.combat.skill_cast.connect(_on_skill_cast)
+	GameManager.combat.monster_skill_cast.connect(_on_monster_skill_cast)
+	GameManager.combat.actor_defeated.connect(_on_actor_defeated)
 	GameManager.combat.attack_dodged.connect(_on_attack_dodged)
 	GameManager.combat.actor_healed.connect(_on_actor_healed)
 
@@ -30,11 +45,62 @@ func _on_damage_dealt(attacker: Actor, target: Actor, amount: float, is_critical
 		var streak := ArrowStreak.new()
 		add_child(streak)
 		streak.setup(attacker.global_position + Vector2(0, -14), target.global_position + Vector2(0, -12))
-	var number := _spawn_number(target)
 	if amount <= 0.0 and target.effects.is_invulnerable():
-		number.show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR)
-	else:
-		number.setup(amount, is_critical, target is Hunter)
+		_spawn_number(target).show_text(Loc.t("world.popup.immune"), IMMUNE_COLOR)
+		return
+	if target is Enemy and is_instance_valid(attacker):
+		target.visual.play_knockback(target.global_position - attacker.global_position)
+	# A hit soon after another on the same target joins that number.
+	var key := target.get_instance_id()
+	var now := Time.get_ticks_msec()
+	var entry: Dictionary = _merged.get(key, {})
+	if not entry.is_empty() and now <= entry["until"] and is_instance_valid(entry["number"]):
+		entry["number"].absorb(amount, is_critical)
+		entry["until"] = now + MERGE_WINDOW_MS
+		return
+	if _merged.size() > 64:
+		_merged.clear()
+	var number := _spawn_number(target)
+	number.setup(amount, is_critical, target is Hunter)
+	_merged[key] = {"number": number, "until": now + MERGE_WINDOW_MS}
+
+
+## A boss skill rocks the screen a little.
+func _on_monster_skill_cast(monster: Actor, _skill: MonsterSkillDefinition) -> void:
+	var enemy := monster as Enemy
+	if enemy != null and enemy.definition != null and enemy.definition.is_boss:
+		_shake(SHAKE_BOSS_SKILL[0], SHAKE_BOSS_SKILL[1])
+
+
+## A Hunter going down is felt, not just seen.
+func _on_actor_defeated(actor: Actor, _by: Actor) -> void:
+	if actor is Hunter:
+		_shake(SHAKE_HUNTER_DOWN[0], SHAKE_HUNTER_DOWN[1])
+
+
+## Shakes the current camera (its `offset`) for `duration` s, fading out; off in Settings.
+func _shake(strength: float, duration: float) -> void:
+	if not SettingsStore.get_screen_shake():
+		return
+	_shake_strength = maxf(strength, _shake_strength)
+	_shake_time = duration
+	_shake_left = duration
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	var camera := get_viewport().get_camera_2d()
+	if camera == null:
+		set_process(false)
+		return
+	_shake_left -= delta
+	if _shake_left <= 0.0:
+		camera.offset = Vector2.ZERO
+		_shake_strength = 0.0
+		set_process(false)
+		return
+	var amount := _shake_strength * (_shake_left / _shake_time)
+	camera.offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount) * 0.6)
 
 
 ## Damage over time and thorns: small number in the effect's colour (D48).

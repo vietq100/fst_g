@@ -6,6 +6,7 @@ extends Node2D
 const DURATION := 1.2
 const RISE := 18.0
 const FONT_SIZE := 10
+const RARE_FONT_SIZE := 12
 const OUTLINE := Color("16161c")
 const SPARKLE_RAYS := 6
 
@@ -20,7 +21,9 @@ func setup(text: String, color: Color, delay: float) -> void:
 	modulate.a = 0.0
 	var label := Label.new()
 	label.text = text
-	label.add_theme_font_size_override("font_size", FONT_SIZE)
+	# Anything above common reads bigger, so a rare drop stands out in the rush of a fight.
+	var rare := not color.is_equal_approx(RarityColors.COMMON)
+	label.add_theme_font_size_override("font_size", RARE_FONT_SIZE if rare else FONT_SIZE)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", OUTLINE)
 	label.add_theme_constant_override("outline_size", 4)

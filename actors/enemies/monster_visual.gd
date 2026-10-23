@@ -43,7 +43,7 @@ var _mirrored := false
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
-	var fps := WALK_FPS if moving else MonsterBodies.get_idle_fps(body_id)
+	var fps := WALK_FPS * step_scale if moving else MonsterBodies.get_idle_fps(body_id)
 	if fps > 0.0 and not downed:
 		_frame_time += delta
 		if _frame_time >= 1.0 / fps:
@@ -74,9 +74,9 @@ func play_action(_action: StringName) -> void:
 
 func _draw() -> void:
 	var half_width := MonsterBodies.get_world_size(body_id).x * 0.5
-	fill_ellipse(Vector2.ZERO, Vector2(half_width + 1.0, 3.0), SHADOW_COLOR)
+	draw_shadow(Vector2(half_width + 1.0, 3.0))
 	if selected:
-		outline_ellipse(Vector2.ZERO, Vector2(half_width + 3.0, 5.0), SELECTION_COLOR)
+		draw_selection(Vector2(half_width + 3.0, 5.0))
 	if facing == Facing.Direction.LEFT:
 		_mirrored = true
 	elif facing == Facing.Direction.RIGHT:

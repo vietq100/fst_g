@@ -202,6 +202,9 @@ func _draw() -> void:
 		_draw_plinth(s, e, plinth, true)
 		_draw_wall_material(style, w, s, plinth, top, false)
 		_draw_wall_material(style, s, e, plinth, top, true)
+		# Contact shadow where the walls meet the plinth: the box reads as sitting on the ground.
+		draw_colored_polygon(_face(w, s, plinth, plinth + 5.0), Color(0, 0, 0, 0.1))
+		draw_colored_polygon(_face(s, e, plinth, plinth + 5.0), Color(0, 0, 0, 0.14))
 		_draw_windows(style, w, s, plinth, top, [0.2, 0.8] if fx >= 3 else [0.25])
 		_draw_windows(style, s, e, plinth, top, [0.35, 0.7] if fy >= 3 else [0.5], true)
 		_draw_door(w, s, top)
@@ -295,8 +298,12 @@ func _draw_windows(style: Dictionary, a: Vector2, b: Vector2, z0: float, z1: flo
 	var sill := z0 + (z1 - z0) * 0.42
 	for t: float in spots:
 		var pane := _patch(a, b, t - half, t + half, sill, sill + 10.0)
+		# Soft spill of light on the wall around the pane.
+		draw_colored_polygon(_grow(pane, 4.0), Color(glass, 0.12))
 		draw_colored_polygon(_grow(pane, 1.0), OUTLINE)
 		draw_colored_polygon(pane, glass)
+		# Reflection in the lower-left of the glass.
+		draw_colored_polygon(_patch(a, b, t - half * 0.8, t - half * 0.2, sill + 1.0, sill + 3.0), Color(1, 1, 1, 0.35))
 		draw_colored_polygon(_patch(a, b, t - half, t + half, sill + 7.0, sill + 10.0), glass.darkened(0.25) if building_id == &"hospital" else WINDOW_DARK)
 		draw_line(a.lerp(b, t - half) + Vector2(0, -sill - 5.0), a.lerp(b, t + half) + Vector2(0, -sill - 5.0), OUTLINE, 1.0)
 		draw_line(a.lerp(b, t) + Vector2(0, -sill), a.lerp(b, t) + Vector2(0, -sill - 10.0), OUTLINE, 1.0)
@@ -335,9 +342,20 @@ func _draw_door(a: Vector2, b: Vector2, top: float) -> void:
 		draw_line(door[0] + Vector2(1, -1), door[2] + Vector2(-1, 1), DOOR.darkened(0.4), 1.0)
 		draw_line(door[1] + Vector2(-1, -1), door[3] + Vector2(1, 1), DOOR.darkened(0.4), 1.0)
 	draw_circle(a.lerp(b, t + half * 0.5) + Vector2(0, -8), 1.0, Color("e8c547"))
+	if building_id != &"warehouse":
+		_draw_wall_lantern(a.lerp(b, t - half * 2.0) + Vector2(0, -16))
 	# Keep the top of the wall clear of the door arch for short walls.
 	if top < 24.0:
 		pass
+
+
+## Small lantern on a bracket beside the door, with a warm pool of light on the wall.
+func _draw_wall_lantern(at: Vector2) -> void:
+	draw_circle(at + Vector2(0, 1), 6.0, Color(1.0, 0.8, 0.35, 0.22))
+	draw_line(at + Vector2(0, -4), at + Vector2(0, -2), OUTLINE, 1.0)
+	draw_rect(Rect2(at - Vector2(2.5, 2.5), Vector2(5, 6)), OUTLINE)
+	draw_rect(Rect2(at - Vector2(1.5, 1.5), Vector2(3, 4)), WINDOW)
+	draw_rect(Rect2(at - Vector2(1.5, 1.5), Vector2(3, 1)), Color("fff2a8"))
 
 
 ## Hip roof: eave diamond just below the wall top, ridge along the tile x axis half-way back.
@@ -365,8 +383,12 @@ func _draw_roof(style: Dictionary, tint: Color) -> PackedVector2Array:
 	draw_colored_polygon(hip_e, roof.darkened(0.3) * tint)
 	draw_colored_polygon(front, roof * tint)
 	if not ghost:
+		# The front slope darkens toward the eave, under the overhang of the rows above.
+		draw_colored_polygon(PackedVector2Array([w, s, s.lerp(ridge_e, 0.3), w.lerp(ridge_w, 0.3)]), Color(0, 0, 0, 0.08))
 		for t: float in [0.16, 0.3, 0.43, 0.55, 0.65, 0.74, 0.82, 0.89]:
 			draw_line(w.lerp(ridge_w, t), s.lerp(ridge_e, t), roof.darkened(0.3), 1.0)
+			# Lit upper edge of each shingle row.
+			draw_line(w.lerp(ridge_w, t + 0.025), s.lerp(ridge_e, t + 0.025), roof.lightened(0.12), 1.0)
 		for t: float in [0.3, 0.55, 0.78]:
 			draw_line(s.lerp(ridge_e, t), e.lerp(ridge_e, t), roof.darkened(0.45), 1.0)
 		for t: float in [0.35, 0.7]:
@@ -506,9 +528,6 @@ func _draw_details(style: Dictionary, w: Vector2, s: Vector2, e: Vector2, top: f
 			_draw_hanging_sign(sign_at, Color("5b6c8f"))
 			draw_rect(Rect2(sign_at + Vector2(-3, 2), Vector2(6, 3)), Color("f4f1ea"))
 			draw_rect(Rect2(sign_at + Vector2(-3, 1), Vector2(2, 2)), Color("e8c35a"))
-			var lantern := door_at + ground_dir * 12.0 + Vector2(0, -16)
-			draw_circle(lantern, 5.0, Color(1.0, 0.8, 0.35, 0.3))
-			draw_rect(Rect2(lantern - Vector2(1.5, 2), Vector2(3, 4)), Color("ffcf6b"))
 		&"academy":
 			_draw_banner(apex)
 			var crest := door_at + Vector2(0, -top * 0.72)

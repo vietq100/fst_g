@@ -16,6 +16,8 @@ signal entrance_tapped(expedition_id: StringName)
 signal structure_tapped(region_id: StringName)
 ## The departure walk failed (e.g. validation changed meanwhile).
 signal depart_failed(reason: String)
+## The camera left (true) or came back over (false) the Town: the UI offers the way back.
+signal camera_away_changed(away: bool)
 ## Placement preview moved / started / ended. `active` false = placement mode closed.
 ## `reason` is empty when the ghost can be placed where it is.
 signal placement_changed(active: bool, title: String, reason: String)
@@ -53,6 +55,11 @@ var _entities: Node2D
 var _buildings_root: Node2D
 var _actors: Node2D
 var _camera: WorldCamera
+## Camera-away polling (see _poll_camera_away): world px past the Town's bounds that still count as home.
+const AWAY_MARGIN := 80.0
+const AWAY_POLL := 0.25
+var _away_timer := 0.0
+var _camera_away := false
 var _panel: DebugPanel
 var _building_nodes: Dictionary[StringName, TownBuilding] = {}
 var _entrances: Array[DungeonEntrance] = []
@@ -1376,7 +1383,32 @@ func get_home_position(runtime: HunterRuntime) -> Vector2:
 
 
 ## Hunters asleep in a House are inside it (hidden, not tappable). Bodies follow carriers.
+## An open sheet covers `height` screen px at the bottom: the camera keeps a followed Hunter above it.
+func set_sheet_cover(height: float) -> void:
+	_camera.cover_bottom = height
+
+
+## Polled a few times a second: is the camera's centre outside the Town (plus AWAY_MARGIN)?
+func _poll_camera_away(delta: float) -> void:
+	_away_timer += delta
+	if _away_timer < AWAY_POLL:
+		return
+	_away_timer = 0.0
+	var away := false
+	if not is_in_dungeon():
+		var outline := world.region_outline(world.get_town())
+		if not outline.is_empty():
+			var area := Rect2(outline[0], Vector2.ZERO)
+			for point in outline:
+				area = area.expand(point)
+			away = not area.grow(AWAY_MARGIN).has_point(_camera.global_position)
+	if away != _camera_away:
+		_camera_away = away
+		camera_away_changed.emit(away)
+
+
 func _physics_process(delta: float) -> void:
+	_poll_camera_away(delta)
 	_drag_bodies()
 	_carrier_check_in -= delta
 	if _carrier_check_in <= 0.0:
@@ -1530,7 +1562,8 @@ func enter_dungeon() -> void:
 	_dungeon.start(service, party)
 	_camera.bounds = Rect2(origin + ExpeditionScene.MAP_RECT.position, ExpeditionScene.MAP_RECT.size)
 	_camera.zoom = Vector2.ONE
-	_camera.follow_party(_as_actors(party))
+	# The dungeon is far from the Town: jump there rather than glide across the map.
+	_camera.follow_party(_as_actors(party), true)
 
 
 ## The run ended (Main, after the result banner): survivors come out at the entrance and go back to

@@ -26,6 +26,8 @@ const DEFAULT_LIGHT := Color(1.0, 0.78, 0.42)
 ## Luminance of the tint at which lights are fully on (night) and off (day).
 const NIGHT_LUMA := 0.5
 const DAY_LUMA := 0.95
+## Phase at which the sun sets (shadows: dawn 0 → dusk here).
+const DAYLIGHT_END := 0.68
 
 var _shade: Node2D
 var _glow: Node2D
@@ -107,6 +109,20 @@ static func tint_at(phase: float) -> Color:
 		if phase >= start and phase < end:
 			return (key[1] as Color).lerp(next[1], (phase - start) / (end - start))
 	return TINTS[0][1]
+
+
+## Sun of an hour, for the ground shadows (ActorVisual.draw_shadow): "shift" (−1..1, the shadow
+## leans away from the sun: east at dawn, none at noon, west at dusk), "stretch" (1 at noon,
+## longer at the ends of the day) and "strength" (1 by day, fading at night as lamps take over).
+static func shadow_of(phase: float) -> Dictionary:
+	var day := clampf(phase / DAYLIGHT_END, 0.0, 1.0)
+	var elevation := sin(day * PI)
+	var night := night_of(tint_at(phase))
+	return {
+		"shift": -cos(day * PI) * (1.0 - night),
+		"stretch": lerpf(1.6, 1.0, elevation) * (1.0 - night) + 0.8 * night,
+		"strength": 1.0 - 0.5 * night,
+	}
 
 
 ## 0 by day → 1 at full night, from the tint's brightness.

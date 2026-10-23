@@ -239,6 +239,8 @@ func _cliff_face(a: Vector2, b: Vector2, shaded: bool, stone: bool) -> void:
 		for layer: float in [0.35, 0.68]:
 			draw_line(a + Vector2(0, CLIFF_DEPTH * layer), b + Vector2(0, CLIFF_DEPTH * layer), color.darkened(0.25), 1.0)
 		_cliff_details(a, b, CLIFF_DEPTH, color)
+		# Moss creeping down from the lip.
+		draw_colored_polygon(_band(a, b, 0.0, CLIFF_DEPTH * 0.14), Color(CLIFF_GRASS.darkened(0.25), 0.55))
 		draw_line(a, b, CLIFF_GRASS, 4.0)
 		_hanging_grass(a, b, CLIFF_GRASS)
 	draw_line(a + Vector2(0, CLIFF_DEPTH), b + Vector2(0, CLIFF_DEPTH), Color(0, 0, 0, 0.45), 2.0)
@@ -461,7 +463,9 @@ func _town_tile(ground: Dictionary, tile: Vector2i, color: Color, painted: bool 
 		_cobbles(tile)
 		return
 	if road_tiles.has(tile):
-		_tile(tile, ROAD)
+		# Worn patches break up the flat dirt.
+		var wear := _hash(tile.x, tile.y, 9) % 100
+		_tile(tile, ROAD.darkened(0.07) if wear < 25 else (ROAD.lightened(0.05) if wear > 85 else ROAD))
 		_pebbles(tile)
 		# Kerb towards grass neighbours.
 		for step in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:

@@ -191,7 +191,8 @@ func _process(delta: float) -> void:
 		if wanted != _animation:
 			_start(wanted)
 	var frames := _frames_of(_animation)
-	_frame_time += delta
+	var walking := _animation == ChibiAnimations.WALK or _animation == ChibiAnimations.RUN
+	_frame_time += delta * (step_scale if walking else 1.0)
 	while _frame_time >= _duration(frames, _frame):
 		_frame_time -= _duration(frames, _frame)
 		if _frame + 1 < frames.size():
@@ -445,9 +446,9 @@ func _draw() -> void:
 	var frame := _current_frame()
 	var lying: bool = frame.get("lying", false)
 	var mirrored := _is_mirrored()
-	fill_ellipse(Vector2.ZERO, LYING_SHADOW_RADII if lying else SHADOW_RADII, SHADOW_COLOR)
+	draw_shadow(LYING_SHADOW_RADII if lying else SHADOW_RADII)
 	if selected:
-		outline_ellipse(Vector2.ZERO, SELECTION_RADII, SELECTION_COLOR)
+		draw_selection(SELECTION_RADII)
 	_draw_pet(frame)
 	if shield and not lying and not frame.get("item", false):
 		_draw_shield(frame)

@@ -31,5 +31,10 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
-	var radius := lerpf(6.0, 22.0, _progress)
-	draw_ellipse(Vector2(0, -2), radius, radius * 0.4, COLOR, false, 2.0)
+	# Two rings, the second trailing the first, fading as they spread.
+	for lag: float in [0.0, 0.3]:
+		var t := _progress - lag
+		if t <= 0.0:
+			continue
+		var radius := lerpf(6.0, 22.0, t)
+		draw_ellipse(Vector2(0, -2), radius, radius * 0.4, Color(COLOR, 1.0 - t * 0.6), false, 2.0)

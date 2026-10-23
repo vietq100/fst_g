@@ -40,6 +40,13 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(UIKit.label(Loc.t("ui.settings.audio"), &"AccentLabel"))
 	content.add_child(_volume_row(Loc.t("ui.settings.music"), Audio.MUSIC_BUS))
 	content.add_child(_volume_row(Loc.t("ui.settings.sounds"), Audio.SFX_BUS))
+	content.add_child(UIKit.label(Loc.t("ui.settings.display"), &"AccentLabel"))
+	var shake := CheckButton.new()
+	shake.text = Loc.t("ui.settings.screen_shake")
+	shake.button_pressed = SettingsStore.get_screen_shake()
+	shake.custom_minimum_size.y = GameTheme.TOUCH
+	shake.toggled.connect(func(enabled: bool) -> void: SettingsStore.set_screen_shake(enabled))
+	content.add_child(shake)
 
 
 ## "Name [slider]" for a bus; changes apply and save at once (0 mutes).

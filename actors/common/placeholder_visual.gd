@@ -63,9 +63,9 @@ func _on_downed_changed() -> void:
 
 func _draw() -> void:
 	var half_width := body_size.x * 0.5
-	fill_ellipse(Vector2.ZERO, Vector2(half_width + 2.0, 3.0), SHADOW_COLOR)
+	draw_shadow(Vector2(half_width + 2.0, 3.0))
 	if selected:
-		outline_ellipse(Vector2.ZERO, Vector2(half_width + 4.0, 5.0), SELECTION_COLOR)
+		draw_selection(Vector2(half_width + 4.0, 5.0))
 	if downed:
 		_draw_downed(half_width)
 		return

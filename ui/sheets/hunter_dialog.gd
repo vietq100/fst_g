@@ -45,7 +45,7 @@ func _build(content: VBoxContainer) -> void:
 		var tab_button := UIKit.button(Loc.t(TAB_NAMES[i]), func() -> void:
 			_tab = i as Tab
 			request_rebuild(), &"NavSelected" if _tab == i else &"NavButton")
-		tab_button.custom_minimum_size = Vector2(0, 32)
+		tab_button.custom_minimum_size = Vector2(0, GameTheme.TOUCH)
 		tab_button.add_theme_font_size_override(&"font_size", 11)
 		tab_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_button.clip_text = true
@@ -114,7 +114,7 @@ func _slot(slot: StringName) -> Control:
 	if item == null:
 		panel.modulate = Color(1, 1, 1, 0.45)
 		var hint := UIKit.label(EquipmentService.slot_label(slot), &"MutedLabel", false)
-		hint.add_theme_font_size_override(&"font_size", 9)
+		hint.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		panel.add_child(hint)
@@ -123,7 +123,7 @@ func _slot(slot: StringName) -> Control:
 	var icon := ItemIcon.new().setup(item, 28, "+%d" % enhance if enhance > 0 else "", instance_id)
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var name_label := UIKit.label(item.display_name, &"MutedLabel", false)
-	name_label.add_theme_font_size_override(&"font_size", 8)
+	name_label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	name_label.clip_text = true
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.custom_minimum_size.x = SLOT_SIZE - 6.0
@@ -149,7 +149,7 @@ func _build_info(body: VBoxContainer, definition: HunterDefinition) -> void:
 	rank.add_theme_color_override(&"font_color", grade[1])
 	rank.add_theme_font_size_override(&"font_size", 17)
 	var title := UIKit.vbox([rank, UIKit.label(Loc.t("ui.common.level_class", {"level": runtime.level, "class": definition.display_name}), &"HudLabel", false)], 0)
-	var dps_box := UIKit.vbox([UIKit.label("DPS", &"HudLabel", false), UIKit.label("%.1f" % dps, &"HudAccentLabel", false)], 0)
+	var dps_box := UIKit.vbox([UIKit.label(Loc.t("ui.hunter.dps"), &"HudLabel", false), UIKit.label("%.1f" % dps, &"HudAccentLabel", false)], 0)
 	dps_box.size_flags_horizontal = Control.SIZE_SHRINK_END
 	body.add_child(UIKit.hbox([title, dps_box]))
 	var max_hp := hunters.get_stat(runtime, HunterService.MAX_HP)

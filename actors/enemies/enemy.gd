@@ -41,6 +41,7 @@ func setup(enemy_definition: EnemyDefinition, combat_service: CombatService, ret
 	var label := definition.display_name if definition.is_boss else ""
 	if definition.is_boss or tier >= Tier.Level.R:
 		label = ("[%s] %s" % [Tier.code(tier), label]).strip_edges()
+	plate.boss = definition.is_boss
 	plate.setup(self, label, 56.0 if definition.is_boss else 28.0)
 	plate.name_color = Tier.color(tier) if tier > Tier.Level.C else ActorNameplate.NAME_COLOR
 

@@ -4283,6 +4283,10 @@
   "en": "VICTORY",
   "vi": "CHIẾN THẮNG"
  },
+ "ui.hunter.dps": {
+  "en": "DPS",
+  "vi": "DPS"
+ },
  "ui.hunter.academy_hint": {
   "en": "Build an Academy (Town Hall Lv 3) to train skills and learn traits.",
   "vi": "Xây Học Viện (Tòa Thị Chính Lv 3) để luyện Skill và học tính cách."
@@ -5327,6 +5331,10 @@
   "en": "Recruit",
   "vi": "Tuyển Hunter"
  },
+ "ui.root.repeat_count": {
+  "en": "{text} ×{count}",
+  "vi": "{text} ×{count}"
+ },
  "ui.root.town": {
   "en": "Town",
   "vi": "Thị trấn"
@@ -5362,6 +5370,14 @@
  "ui.settings.profile": {
   "en": "Profile",
   "vi": "Hồ sơ"
+ },
+ "ui.settings.display": {
+  "en": "Display",
+  "vi": "Hiển thị"
+ },
+ "ui.settings.screen_shake": {
+  "en": "Screen shake",
+  "vi": "Rung màn hình"
  },
  "ui.settings.sounds": {
   "en": "Effects",

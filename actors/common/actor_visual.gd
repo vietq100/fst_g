@@ -11,6 +11,8 @@ const HIT_FLASH_COLOR := Color(2.5, 2.5, 2.5)
 const HIT_FLASH_DURATION := 0.12
 const LUNGE_DISTANCE := 4.0
 const LUNGE_DURATION := 0.15
+const KNOCKBACK_DISTANCE := 3.0
+const KNOCKBACK_DURATION := 0.16
 
 var facing: Facing.Direction = Facing.Direction.DOWN:
 	set(value):
@@ -29,6 +31,9 @@ var downed := false:
 var moving := false
 ## Moving fast (chasing a target, hasted): visuals may show a run instead of a walk.
 var running := false
+## Playback rate of the walk / run cycle: actual speed over the base walk speed, so a slowed or
+## hasted actor's feet keep pace with the ground instead of sliding.
+var step_scale := 1.0
 ## Body colour from status effects (D48), e.g. green while poisoned. The hit flash returns to it.
 var status_tint := Color.WHITE:
 	set(value):
@@ -58,6 +63,18 @@ func play_attack_lunge(direction: Vector2) -> void:
 	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, LUNGE_DURATION * 0.6)
 
 
+## Short shove away from a hit, then back (monsters; CombatFeedback). Shares the lunge tween.
+func play_knockback(direction: Vector2) -> void:
+	if downed or direction.is_zero_approx():
+		return
+	if _lunge_tween != null:
+		_lunge_tween.kill()
+	position = Vector2.ZERO
+	_lunge_tween = create_tween()
+	_lunge_tween.tween_property(self, ^"position", direction.normalized() * KNOCKBACK_DISTANCE, KNOCKBACK_DURATION * 0.3).set_ease(Tween.EASE_OUT)
+	_lunge_tween.tween_property(self, ^"position", Vector2.ZERO, KNOCKBACK_DURATION * 0.7).set_ease(Tween.EASE_IN_OUT)
+
+
 ## One-shot action animation by name (ChibiAnimations: skill, pickup, loot, interact...).
 ## Visuals without such animations ignore it.
 func play_action(_action: StringName) -> void:
@@ -77,6 +94,45 @@ func play_death(duration: float) -> void:
 
 func _on_downed_changed() -> void:
 	pass
+
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_ENTER_TREE:
+			set_notify_local_transform(true)
+		NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
+			# A lunge / knockback moved this node (or a flourish scaled it): redraw so the shadow
+			# and the selection ring stay on the ground.
+			queue_redraw()
+
+
+## Ground shadow at the feet, cast by the hour's sun (DayNight.shadow_of): leaning and long at
+## dawn and dusk, short at noon, faint at night. Drawn in the actor's space, so it stays put while
+## `position` / `scale` animate the body.
+func draw_shadow(radii: Vector2) -> void:
+	# Plain noon shadow in the editor and before the game data is loaded (tests, sandbox).
+	var sun := {"shift": 0.0, "stretch": 1.0, "strength": 1.0} if Engine.is_editor_hint() or DataRegistry.config == null \
+			else DayNight.shadow_of(DayNight.current_phase())
+	_begin_ground_space()
+	var centre := Vector2(float(sun["shift"]) * radii.x * 0.5, 0.0)
+	var size := Vector2(radii.x * float(sun["stretch"]), radii.y)
+	fill_ellipse(centre, size, Color(SHADOW_COLOR, SHADOW_COLOR.a * float(sun["strength"])))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Selection ring on the ground (see draw_shadow).
+func draw_selection(radii: Vector2) -> void:
+	_begin_ground_space()
+	outline_ellipse(Vector2.ZERO, radii, SELECTION_COLOR)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Draw transform cancelling this node's own offset and scale: (0, 0) is the actor's feet.
+func _begin_ground_space() -> void:
+	var inverse := Vector2.ONE
+	if not is_zero_approx(scale.x) and not is_zero_approx(scale.y):
+		inverse = Vector2.ONE / scale
+	draw_set_transform(-position * inverse, 0.0, inverse)
 
 
 func fill_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:

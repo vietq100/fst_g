@@ -156,6 +156,7 @@ func _physics_process(delta: float) -> void:
 	velocity = to_next.normalized() * minf(get_final_move_speed(), to_next.length() / maxf(delta, 0.0001))
 	visual.facing = Facing.from_vector(velocity, visual.facing)
 	visual.moving = true
+	visual.step_scale = clampf(velocity.length() / maxf(get_move_speed(), 1.0), 0.5, 1.6)
 	# Chasing a target or hasted: run (presentation only, speed is unchanged).
 	visual.running = (auto_combat and not _manual_move and combat.is_valid_target(combat.target)) \
 		or get_final_move_speed() > get_move_speed() * RUN_SPEED_FACTOR

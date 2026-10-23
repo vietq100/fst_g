@@ -35,7 +35,7 @@ func _build(content: VBoxContainer) -> void:
 			_tab = i as Tab
 			_last_tab = _tab
 			request_rebuild(), &"NavSelected" if _tab == i else &"NavButton")
-		tab_button.custom_minimum_size = Vector2(0, 34)
+		tab_button.custom_minimum_size = Vector2(0, GameTheme.TOUCH)
 		tab_button.add_theme_font_size_override(&"font_size", 12)
 		tab_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_button.clip_text = true

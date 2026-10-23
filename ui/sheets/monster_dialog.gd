@@ -74,7 +74,7 @@ func _build(content: VBoxContainer) -> void:
 		var tab_button := UIKit.button(Loc.t(TAB_NAMES[i]), func() -> void:
 			_tab = i as Tab
 			request_rebuild(), &"NavSelected" if _tab == i else &"NavButton")
-		tab_button.custom_minimum_size.y = 32
+		tab_button.custom_minimum_size.y = GameTheme.TOUCH
 		tab_button.add_theme_font_size_override(&"font_size", 11)
 		tabs.add_child(tab_button)
 	content.add_child(tabs)
@@ -131,7 +131,7 @@ func _slot(name_key: String, item_id: StringName) -> Control:
 	if item == null:
 		panel.modulate = Color(1, 1, 1, 0.45)
 		var hint := UIKit.label(Loc.t(name_key) if name_key != "" and _definition.can_equip else "", &"MutedLabel", false)
-		hint.add_theme_font_size_override(&"font_size", 8)
+		hint.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 		hint.clip_text = true
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		panel.add_child(hint)
@@ -140,7 +140,7 @@ func _slot(name_key: String, item_id: StringName) -> Control:
 	var icon := ItemIcon.new().setup(item, 28)
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var name_label := UIKit.label(item.display_name, &"MutedLabel", false)
-	name_label.add_theme_font_size_override(&"font_size", 8)
+	name_label.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 	name_label.clip_text = true
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.custom_minimum_size.x = SLOT_SIZE - 6.0

@@ -7,6 +7,8 @@ const POLL := 0.25
 
 var _header: Label
 var _stash: Label
+## How far through the dungeon's sections the party is (full at the boss / on the way back).
+var _progress: ProgressBar
 var _party_box: HBoxContainer
 var _bars: Dictionary[StringName, ProgressBar] = {}
 var _portraits: Dictionary[StringName, HunterPortrait] = {}
@@ -19,7 +21,9 @@ func _ready() -> void:
 	var top := PanelContainer.new()
 	top.theme_type_variation = &"TopBar"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_child(UIKit.vbox([_header, _stash], 2))
+	_progress = UIKit.bar(0.0, 1.0, &"TimerBar")
+	_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(UIKit.vbox([_header, _progress, _stash], 2))
 	add_child(top)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -67,6 +71,9 @@ func _refresh() -> void:
 	if run.phase == ExpeditionRun.Phase.RETURNING:
 		where = Loc.t("ui.expedition_hud.returning")
 	_header.text = Loc.t("ui.expedition_hud.header", {"dungeon": definition.display_name, "where": where})
+	_progress.max_value = maxi(sections, 1)
+	_progress.value = _progress.max_value if run.boss_reached or run.phase == ExpeditionRun.Phase.RETURNING \
+			else clampi(run.section_index, 0, sections)
 	var items := 0
 	for quantity in run.stash_items.values():
 		items += quantity

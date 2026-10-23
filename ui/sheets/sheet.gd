@@ -30,7 +30,7 @@ func _ready() -> void:
 	close.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	close.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	close.size_flags_horizontal = Control.SIZE_SHRINK_END
-	close.custom_minimum_size = Vector2(36, 36)
+	close.custom_minimum_size = Vector2(GameTheme.TOUCH, GameTheme.TOUCH)
 	_header = UIKit.hbox([_title_label, close])
 	layout.add_child(_header)
 	layout.add_child(UIKit.separator())

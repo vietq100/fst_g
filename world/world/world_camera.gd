@@ -14,9 +14,17 @@ var min_zoom := MIN_ZOOM
 ## scroll until its edges sit just clear of them, so every part of it can be reached.
 var inset_top := 0.0
 var inset_bottom := 0.0
+## Screen pixels an open sheet covers at the bottom: a followed actor is kept in the free band above
+## it (not part of the zoom-out limit, which only the fixed HUD sets).
+var cover_bottom := 0.0
 var follow_target: Node2D
 ## Follows the centre of these actors' standing members (a dungeon party).
 var follow_group: Array[Actor] = []
+## Rate of the follow easing (per second); higher is tighter.
+const FOLLOW_SMOOTHING := 7.0
+## The followed actor sits a little below the screen centre (its sprite rises from the feet).
+const FOLLOW_OFFSET := Vector2(0, -20)
+var _snap := false
 
 
 func _ready() -> void:
@@ -24,7 +32,7 @@ func _ready() -> void:
 	clamp_to_bounds()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not follow_group.is_empty():
 		var sum := Vector2.ZERO
 		var count := 0
@@ -33,25 +41,39 @@ func _process(_delta: float) -> void:
 				sum += actor.global_position
 				count += 1
 		if count > 0:
-			global_position = sum / count + Vector2(0, -20)
-			clamp_to_bounds()
+			_glide_to(sum / count + FOLLOW_OFFSET, delta)
 		return
 	if follow_target != null:
 		if not is_instance_valid(follow_target) or not follow_target.is_inside_tree():
 			follow_target = null
 		else:
-			global_position = follow_target.global_position + Vector2(0, -20)
-			clamp_to_bounds()
+			_glide_to(follow_target.global_position + FOLLOW_OFFSET, delta)
 
 
-func follow(target: Node2D) -> void:
+## Eases towards `goal` (frame-rate independent) so a followed walker does not jerk the screen
+## with every step; snaps when `_snap` is set (a fresh follow starting far away).
+func _glide_to(goal: Vector2, delta: float) -> void:
+	# Centre the target in the part of the screen the HUD and an open sheet leave free.
+	goal.y += (inset_bottom + cover_bottom - inset_top) * 0.5 / zoom.y
+	if _snap:
+		global_position = goal
+		_snap = false
+	else:
+		global_position = global_position.lerp(goal, 1.0 - exp(-delta * FOLLOW_SMOOTHING))
+	clamp_to_bounds()
+
+
+## `snap` jumps to the target at once instead of gliding there.
+func follow(target: Node2D, snap: bool = false) -> void:
 	follow_group.clear()
 	follow_target = target
+	_snap = snap
 
 
-func follow_party(actors: Array[Actor]) -> void:
+func follow_party(actors: Array[Actor], snap: bool = false) -> void:
 	follow_target = null
 	follow_group = actors.duplicate()
+	_snap = snap
 
 
 func stop_following() -> void:
@@ -101,7 +123,7 @@ func clamp_to_bounds() -> void:
 	global_position.x = clampf(global_position.x, minf(lo.x, bounds.get_center().x), maxf(hi.x, bounds.get_center().x))
 	# Vertically the map may slide under the HUD's insets by their size (in world px).
 	var lo_y := bounds.position.y + half.y - inset_top / zoom.y
-	var hi_y := bounds.end.y - half.y + inset_bottom / zoom.y
+	var hi_y := bounds.end.y - half.y + (inset_bottom + cover_bottom) / zoom.y
 	global_position.y = clampf(global_position.y, minf(lo_y, bounds.get_center().y), maxf(hi_y, bounds.get_center().y))
 
 

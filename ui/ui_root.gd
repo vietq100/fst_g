@@ -19,6 +19,9 @@ signal recenter_requested
 signal logout_requested
 ## Height of the HUD at the top / navigation bar at the bottom (the map scrolls under them).
 signal view_insets_changed(top: float, bottom: float)
+## Screen px the open sheet / dialog covers at the bottom (0 when none): the camera keeps a
+## followed Hunter in the free band above it.
+signal sheet_cover_changed(height: float)
 ## Hex buttons I / II / III: look at a hunting region.
 signal focus_region_requested(region_id: StringName)
 
@@ -28,6 +31,8 @@ const TOAST_TIME := 2.6
 const MAX_TOASTS := 3
 ## Sheets cover at most this share of the screen height, above the navigation bar.
 const SHEET_HEIGHT := 0.45
+## Hunter / monster dialogs leave the top of the map free so the tapped Hunter stays in view.
+const DIALOG_HEIGHT := 0.78
 
 var mode := Mode.TOWN
 ## `func() -> Array[StringName]` giving the default party (Town.pick_party).
@@ -54,6 +59,11 @@ var _placement_confirm: Button
 var _sheet_area: Control
 var _sheet: Sheet
 var _toasts: VBoxContainer
+## Navigation "Town" (lit while the camera is away from the Town).
+var _town_button: Button
+## Visible toast / feed lines by text: a repeat bumps a "×N" counter instead of adding a line.
+var _toast_lines: Dictionary = {}
+var _feed_lines: Dictionary = {}
 var _expedition_hud: ExpeditionHud
 
 
@@ -171,6 +181,17 @@ func close_sheet() -> void:
 		_sheet.queue_free()
 	_sheet = null
 	_highlight_nav()
+	sheet_cover_changed.emit(0.0)
+
+
+## The camera has wandered off the Town: the "Town" button turns gold to offer the way back.
+func set_camera_away(away: bool) -> void:
+	if _town_button == null:
+		return
+	if away:
+		_town_button.add_theme_color_override(&"font_color", GameTheme.ACCENT)
+	else:
+		_town_button.remove_theme_color_override(&"font_color")
 
 
 ## The nav tab of the open drawer is drawn as selected (light tab, dark text).
@@ -297,20 +318,23 @@ func show_message(sheet: MessageSheet) -> void:
 func _layout_sheet() -> void:
 	if not has_sheet():
 		return
+	var height: float
+	_sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	if _sheet is HunterDialog or _sheet is MonsterDialog:
-		# Centered dialog over the map: nearly full width, as tall as the area allows.
-		_sheet.set_anchors_preset(Control.PRESET_FULL_RECT)
+		# Dialog over the map: nearly full width, with a band of the map free above it where the
+		# camera keeps the tapped Hunter (sheet_cover_changed).
+		height = minf(_sheet_area.size.y - 8.0, get_viewport_rect().size.y * DIALOG_HEIGHT)
 		_sheet.offset_left = 12
 		_sheet.offset_right = -12
-		_sheet.offset_top = 4
+		_sheet.offset_top = -height - 4
 		_sheet.offset_bottom = -4
-		return
-	_sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	var height := minf(_sheet_area.size.y, get_viewport_rect().size.y * SHEET_HEIGHT)
-	_sheet.offset_top = -height
-	_sheet.offset_bottom = 0
-	_sheet.offset_left = 0
-	_sheet.offset_right = 0
+	else:
+		height = minf(_sheet_area.size.y, get_viewport_rect().size.y * SHEET_HEIGHT)
+		_sheet.offset_top = -height
+		_sheet.offset_bottom = 0
+		_sheet.offset_left = 0
+		_sheet.offset_right = 0
+	sheet_cover_changed.emit(height)
 
 
 func _notification(what: int) -> void:
@@ -348,7 +372,7 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 	var count_line := UIKit.hbox([hunters_chip], 6)
 	count_line.alignment = BoxContainer.ALIGNMENT_END
 	right.add_child(count_line)
-	var shortcuts := UIKit.hbox([], 6)
+	var shortcuts := UIKit.hbox([], 4)
 	shortcuts.alignment = BoxContainer.ALIGNMENT_END
 	for entry in [[&"book", "ui.root.tip_quests", open_quests], [&"trophy", "ui.root.tip_portal", _open_portal_or_hint],
 			[&"mail", "ui.root.tip_recruit", open_recruit], [&"gear", "ui.settings.title", open_settings]]:
@@ -357,7 +381,7 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		button.tooltip_text = Loc.t(entry[1])
-		button.custom_minimum_size = Vector2(32, 32)
+		button.custom_minimum_size = Vector2(GameTheme.TOUCH, GameTheme.TOUCH)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_END
 		# Settings sits beside the Hunter count so the header keeps three shortcuts per row.
 		if entry[0] == &"gear":
@@ -454,7 +478,13 @@ func _refresh_resources() -> void:
 	_chips[&"gold"].text = _format_number(gm.wallet.gold)
 	_chips[&"food"].text = "%d" % gm.supply.get_food_stock()
 	_chips[&"slots"].text = "%d/%d" % [gm.inventory.used_slots(), gm.inventory.capacity]
-	_chips[&"chest"].text = "%d" % gm.quests.get_claimable_count()
+	var claimable := gm.quests.get_claimable_count()
+	_chips[&"chest"].text = "%d" % claimable
+	# Rewards waiting: the count lights up so the chest draws the eye.
+	if claimable > 0:
+		_chips[&"chest"].add_theme_color_override(&"font_color", GameTheme.ACCENT)
+	else:
+		_chips[&"chest"].remove_theme_color_override(&"font_color")
 	_chips[&"hunters"].text = "%d/%d" % [gm.hunters.count(), gm.recruitment.get_capacity()]
 	_difficulty_button.text = gm.reincarnation.get_difficulty_name(gm.progress.difficulty)
 	_refresh_quest_panel()
@@ -533,6 +563,8 @@ func _build_overlays() -> void:
 		button.add_theme_font_size_override(&"font_size", 14)
 		button.tooltip_text = Loc.t("ui.root.town") if entry[1] == &"" else GameManager.regions.get_duty_name(entry[1])
 		if entry[1] == &"":
+			_town_button = button
+		if entry[1] == &"":
 			button.text = ""
 			button.icon = PixelIcons.texture(&"town", 2)
 			button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -587,17 +619,17 @@ func _build_overlays() -> void:
 func feed(text: String) -> void:
 	if _feed == null or text.is_empty():
 		return
+	if _bump_repeat(_feed_lines, text, 5.0, 0.6):
+		return
 	while _feed.get_child_count() >= 3:
 		var oldest := _feed.get_child(0)
+		_feed_lines.erase(oldest.get_meta(&"line_text", ""))
 		_feed.remove_child(oldest)
 		oldest.queue_free()
 	var line := UIKit.label(text, &"HudSmallLabel")
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_feed.add_child(line)
-	var tween := line.create_tween()
-	tween.tween_interval(5.0)
-	tween.tween_property(line, ^"modulate:a", 0.0, 0.6)
-	tween.tween_callback(line.queue_free)
+	_hold_line(_feed_lines, line, text, 5.0, 0.6)
 
 
 func _build_placement_bar(layout: VBoxContainer) -> void:
@@ -640,20 +672,54 @@ func _build_nav(layout: VBoxContainer) -> void:
 func toast(text: String, is_error: bool = false) -> void:
 	if text.is_empty():
 		return
+	if _bump_repeat(_toast_lines, text, TOAST_TIME, 0.4):
+		return
 	if is_error:
 		Audio.play_ui(&"error")
 	while _toasts.get_child_count() >= MAX_TOASTS:
 		var oldest := _toasts.get_child(0)
+		_toast_lines.erase(oldest.get_meta(&"line_text", ""))
 		_toasts.remove_child(oldest)
 		oldest.queue_free()
 	var label := UIKit.label(text, &"HudLabel")
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_color_override(&"font_color", GameTheme.DANGER if is_error else Color("f2d36b"))
 	_toasts.add_child(label)
+	# Fades in, so a new toast is noticed rather than popping in place (the box lays it out).
+	label.modulate.a = 0.0
+	label.create_tween().tween_property(label, ^"modulate:a", 1.0, 0.15)
+	_hold_line(_toast_lines, label, text, TOAST_TIME, 0.4)
+
+
+## Shows `label` for `hold` s, fades it over `fade` s and frees it; remembers it in `lines` by its
+## text so a repeat of the same text bumps a "×N" counter on it (_bump_repeat).
+func _hold_line(lines: Dictionary, label: Label, text: String, hold: float, fade: float) -> void:
+	label.set_meta(&"line_text", text)
 	var tween := label.create_tween()
-	tween.tween_interval(TOAST_TIME)
-	tween.tween_property(label, ^"modulate:a", 0.0, 0.4)
-	tween.tween_callback(label.queue_free)
+	tween.tween_interval(hold)
+	tween.tween_property(label, ^"modulate:a", 0.0, fade)
+	tween.tween_callback(func() -> void:
+		if lines.get(text, {}).get("label") == label:
+			lines.erase(text)
+		label.queue_free())
+	lines[text] = {"label": label, "tween": tween, "count": lines.get(text, {}).get("count", 1)}
+
+
+## A line with this text is still showing: count the repeat on it and restart its timer.
+func _bump_repeat(lines: Dictionary, text: String, hold: float, fade: float) -> bool:
+	if not lines.has(text):
+		return false
+	var entry: Dictionary = lines[text]
+	var label: Label = entry["label"]
+	if not is_instance_valid(label):
+		lines.erase(text)
+		return false
+	entry["count"] += 1
+	label.text = Loc.t("ui.root.repeat_count", {"text": text, "count": entry["count"]})
+	label.modulate.a = 1.0
+	entry["tween"].kill()
+	_hold_line(lines, label, text, hold, fade)
+	return true
 
 
 ## Game events worth telling the player (UI_DESIGN.md → Feedback).
