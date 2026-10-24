@@ -51,7 +51,9 @@ func test_sheets_fit_the_screen_in_every_language() -> void:
 		Loc.set_locale(code, false)
 		var sheets: Array[Sheet] = [HuntersSheet.new(), HunterSheet.new(hunter), InventorySheet.new(), BuildSheet.new(),
 			ExpeditionSheet.new(&"dark_forest", [hunter.unique_id] as Array[StringName]), GateSheet.new(), BossSheet.new(),
-			SettingsSheet.new(), QuestSheet.new(), ShopSheet.new()]
+			SettingsSheet.new(), QuestSheet.new(), ShopSheet.new(), HibernationSheet.new(), ColosseumSheet.new(),
+			MessageSheet.for_offline({"seconds": 19_200.0, "capped": true, "recovered": PackedStringArray([hunter.display_name]),
+				"xp": 120, "levels": 2, "meals": 3, "hungry_ticks": 4})]
 		for tab in HunterDialog.Tab.values():
 			var dialog := HunterDialog.new(hunter)
 			dialog._tab = tab
@@ -64,6 +66,58 @@ func test_sheets_fit_the_screen_in_every_language() -> void:
 			assert_true(needed <= width, "%s (%s, tab %s) needs %d px" % [sheet.get_script().get_global_name(), code,
 				sheet.get("_tab"), needed])
 	Loc.set_locale("en", false)
+
+
+## Scroll bars are hidden everywhere (owner report): the bar reserved width on the right of a
+## drawer, over the sheet's gold rim. Dragging and the wheel still scroll.
+func test_scroll_areas_hide_their_bars() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var scrollables: Array[Control] = [HuntersSheet.new(), InventorySheet.new(), GateSheet.new(),
+		ExpeditionSheet.new(&"dark_forest", [hunter.unique_id] as Array[StringName])]
+	for control in scrollables:
+		_show(control as Sheet)
+		for scroll in _find_scrolls(control):
+			assert_eq(scroll.vertical_scroll_mode, ScrollContainer.SCROLL_MODE_SHOW_NEVER,
+				"%s hides its scroll bar" % control.get_script().get_global_name())
+			assert_false(scroll.get_v_scroll_bar().visible, "the bar itself stays hidden")
+
+
+func _find_scrolls(node: Node) -> Array[ScrollContainer]:
+	var found: Array[ScrollContainer] = []
+	if node is ScrollContainer:
+		found.append(node as ScrollContainer)
+	for child in node.get_children():
+		found.append_array(_find_scrolls(child))
+	return found
+
+
+## The HUD column never grows past the screen (owner report: the top bar was 365 px wide on a
+## 360 px screen, which widened the whole column and pushed the drawers' and nav's right edge off
+## it). Checked with an empty and a seven-figure purse.
+func test_hud_column_fits_the_screen() -> void:
+	var saved: int = _game.wallet.gold
+	for gold in [0, 5_057, 9_999_999]:
+		_game.wallet.gold = gold
+		for code in Loc.LOCALES:
+			Loc.set_locale(code, false)
+			var root := load("res://ui/ui_root.gd").new() as Control
+			(Engine.get_main_loop() as SceneTree).root.add_child(root)
+			_nodes.append(root)
+			var column: Control = root._top_bar.get_parent()
+			assert_true(column.get_combined_minimum_size().x <= 360.0,
+				"the UI column fits (%s, %d gold): %d px" % [code, gold, column.get_combined_minimum_size().x])
+			var bar: Control = root._top_bar.get_child(0).get_child(0)
+			assert_true(bar.get_combined_minimum_size().x <= 360.0,
+				"the HUD row fits (%s, %d gold): %d px" % [code, gold, bar.get_combined_minimum_size().x])
+	_game.wallet.gold = saved
+	Loc.set_locale("en", false)
+
+
+func test_big_purses_read_short() -> void:
+	assert_eq(UIRoot._format_number(9_999), "9,999")
+	assert_eq(UIRoot._format_number(12_300), "12K")
+	assert_eq(UIRoot._format_number(9_999_999), "9.9M", "rounded down, never richer than it is")
+	assert_eq(UIRoot._format_number(2_400_000_000), "2.4B")
 
 
 ## Class skills section (D70) with skills, points and swap buttons fits a phone in every language.
@@ -217,3 +271,29 @@ func test_colosseum_sheet_and_replay_build() -> void:
 	view._skip()
 	assert_true(view._ended, "skip jumps to the result")
 	assert_true(view._next_event >= result.events.size(), "every blow was replayed")
+
+
+func test_summon_reveal_stack_summary_and_detail() -> void:
+	var hunter: HunterRuntime = _game.hunters.get_all()[0]
+	var called: Array[HunterRuntime] = [hunter, hunter]
+	var modal := SummonRevealModal.new().setup(called, true)
+	(Engine.get_main_loop() as SceneTree).root.add_child(modal)
+	_nodes.append(modal)
+	assert_eq(modal._cards.size(), 3, "the cover over one card per newcomer")
+	assert_true(modal._cards[0].is_cover, "the cover is on top")
+	var cover := modal._top_card()
+	cover.position += Vector2(0, SummonRevealModal.CARD_SIZE.y)
+	modal._release(cover)
+	assert_eq(modal._top, 1, "a long drag reveals the card beneath")
+	assert_false(modal._stack_controls.is_empty(), "Skip stays while cards are left")
+	var next := modal._top_card()
+	next.position += Vector2(0, SummonRevealModal.CARD_SIZE.y)
+	modal._release(next)
+	assert_true(modal._stack_controls.is_empty(), "the last card open: Skip gives way to Done")
+	modal._show_summary()
+	modal._show_detail(hunter)
+	assert_true(modal._body.get_child_count() > 0, "the detail shows the full card")
+	var confirmations := [0]
+	modal.confirmed.connect(func() -> void: confirmations[0] += 1)
+	modal.free()
+	assert_eq(confirmations[0], 1, "closing any way still lets them in")

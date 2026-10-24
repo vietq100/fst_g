@@ -46,6 +46,16 @@ static func vbox(children: Array = [], separation: int = 4) -> VBoxContainer:
 	return box
 
 
+## Vertical scroll area with the bar hidden: the bar reserved width on the right, which pushed
+## sheets past the screen and cut their gold rim. Dragging and the wheel still scroll.
+static func scroll() -> ScrollContainer:
+	var node := ScrollContainer.new()
+	node.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	node.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	node.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return node
+
+
 static func card(content: Control) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.theme_type_variation = &"Card"

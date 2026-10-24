@@ -11,23 +11,23 @@ static var _cache: Dictionary = {}
 
 ## Camera shake on boss skills and fallen Hunters (CombatFeedback); on unless switched off.
 static func get_screen_shake() -> bool:
-	return bool(_get("screen_shake", true))
+	return bool(_read("screen_shake", true))
 
 
 static func set_screen_shake(enabled: bool) -> void:
-	_set("screen_shake", enabled)
+	_write("screen_shake", enabled)
 
 
 ## Card reveal when summoning (D83); off skips straight to the summary.
 static func get_summon_effects() -> bool:
-	return bool(_get("summon_effects", true))
+	return bool(_read("summon_effects", true))
 
 
 static func set_summon_effects(enabled: bool) -> void:
-	_set("summon_effects", enabled)
+	_write("summon_effects", enabled)
 
 
-static func _get(key: String, fallback: Variant) -> Variant:
+static func _read(key: String, fallback: Variant) -> Variant:
 	if _cache.has(key):
 		return _cache[key]
 	var value: Variant = fallback
@@ -38,7 +38,7 @@ static func _get(key: String, fallback: Variant) -> Variant:
 	return value
 
 
-static func _set(key: String, value: Variant) -> void:
+static func _write(key: String, value: Variant) -> void:
 	_cache[key] = value
 	var config := ConfigFile.new()
 	config.load(SETTINGS_PATH)

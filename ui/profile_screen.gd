@@ -44,9 +44,7 @@ func _ready() -> void:
 	var banner := ItemInfoModal.Banner.new()
 	banner.text = Loc.t("ui.profile.title")
 	inner.add_child(banner)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var scroll := UIKit.scroll()
 	inner.add_child(scroll)
 	_list = UIKit.vbox([], 8)
 	scroll.add_child(_list)

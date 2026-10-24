@@ -107,9 +107,11 @@ static func _create() -> Theme:
 	var sheet := _box(PANEL, BORDER, 0, 0, 10)
 	sheet.corner_radius_top_left = 14
 	sheet.corner_radius_top_right = 14
+	# The rim is 2 px on every open side: a 1 px side rim fell on the last partial pixel column of
+	# the screen at the fractional canvas scale and the right edge read as missing.
 	sheet.border_width_top = 2
-	sheet.border_width_left = 1
-	sheet.border_width_right = 1
+	sheet.border_width_left = 2
+	sheet.border_width_right = 2
 	sheet.shadow_color = Color(0, 0, 0, 0.45)
 	sheet.shadow_size = 6
 	_panel_variation(theme, &"Sheet", sheet)
@@ -120,8 +122,8 @@ static func _create() -> Theme:
 	_panel_variation(theme, &"TopBar", _box(Color(BACKGROUND, 0.92), BORDER, 0, 1, 6))
 	var hud := _box(Color(0.03, 0.04, 0.07, 0.78), Color(BORDER, 0.7), 0, 0, 6)
 	hud.border_width_bottom = 2
-	hud.content_margin_left = 10.0
-	hud.content_margin_right = 10.0
+	hud.content_margin_left = 6.0
+	hud.content_margin_right = 6.0
 	hud.content_margin_top = 8.0
 	hud.content_margin_bottom = 8.0
 	hud.shadow_color = Color(0, 0, 0, 0.35)
@@ -138,7 +140,7 @@ static func _create() -> Theme:
 	_panel_variation(theme, &"HunterCard", hunter_card)
 	var chip := _box(Color(0.05, 0.06, 0.1, 0.82), Color(BORDER, 0.45), 11, 1, 2)
 	chip.content_margin_left = 4.0
-	chip.content_margin_right = 9.0
+	chip.content_margin_right = 6.0
 	_panel_variation(theme, &"Chip", chip)
 	_panel_variation(theme, &"HudBubble", _box(Color(0.06, 0.07, 0.11, 0.78), Color(BORDER, 0.6), 8, 1, 5))
 	var nav := _box(Color("0d0f16"), BORDER, 0, 0, 2)

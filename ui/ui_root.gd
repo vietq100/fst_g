@@ -38,6 +38,8 @@ const MAX_FEED_LINES := 3
 const SHEET_HEIGHT := 0.45
 ## Hunter / monster dialogs leave the top of the map free so the tapped Hunter stays in view.
 const DIALOG_HEIGHT := 0.78
+## Gap between the Hunter / monster dialog and the nav bar under it.
+const DIALOG_LIFT := 16.0
 
 var mode := Mode.TOWN
 ## `func() -> Array[StringName]` giving the default party (Town.pick_party).
@@ -345,13 +347,14 @@ func _layout_sheet() -> void:
 	var height: float
 	_sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	if _sheet is HunterDialog or _sheet is MonsterDialog:
-		# Dialog over the map: nearly full width, with a band of the map free above it where the
-		# camera keeps the tapped Hunter (sheet_cover_changed).
-		height = minf(_sheet_area.size.y - 8.0, get_viewport_rect().size.y * DIALOG_HEIGHT)
+		# Dialog over the map: nearly full width, lifted a little off the nav bar, with a band of
+		# the map free above it where the camera keeps the tapped Hunter (sheet_cover_changed).
+		height = minf(_sheet_area.size.y - DIALOG_LIFT - 4.0, get_viewport_rect().size.y * DIALOG_HEIGHT)
 		_sheet.offset_left = 12
 		_sheet.offset_right = -12
-		_sheet.offset_top = -height - 4
-		_sheet.offset_bottom = -4
+		_sheet.offset_top = -height - DIALOG_LIFT
+		_sheet.offset_bottom = -DIALOG_LIFT
+		height += DIALOG_LIFT
 	else:
 		height = minf(_sheet_area.size.y, get_viewport_rect().size.y * SHEET_HEIGHT)
 		_sheet.offset_top = -height
@@ -384,7 +387,7 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 	resources.add_theme_constant_override(&"h_separation", 5)
 	resources.add_theme_constant_override(&"v_separation", 5)
 	for entry in [[&"gold", &"coin"], [&"food", &"food"], [&"slots", &"bag"], [&"chest", &"chest"]]:
-		resources.add_child(_resource_chip(entry[0], entry[1], 66))
+		resources.add_child(_resource_chip(entry[0], entry[1], 54))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -413,7 +416,18 @@ func _build_top_bar(layout: VBoxContainer) -> void:
 		else:
 			shortcuts.add_child(button)
 	right.add_child(shortcuts)
-	_top_bar.add_child(UIKit.hbox([_difficulty_button, resources, spacer, right], 8))
+	var row := UIKit.hbox([_difficulty_button, resources, spacer, right], 5)
+	# The row is laid out over the screen width and clipped there. Without this a crowded bar (a
+	# seven-figure purse, a big bag) made the whole UI column wider than the screen, and every
+	# drawer and the nav below lost their right edge off it.
+	var clip := Control.new()
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.custom_minimum_size.y = row.get_combined_minimum_size().y
+	row.minimum_size_changed.connect(func() -> void: clip.custom_minimum_size.y = row.get_combined_minimum_size().y)
+	clip.add_child(row)
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_top_bar.add_child(clip)
 	layout.add_child(_top_bar)
 
 
@@ -517,8 +531,20 @@ func _refresh_resources() -> void:
 		_waiting_button.visible = gm.buildings.has_building(BuildingService.TAVERN)
 
 
+## Grouped below ten thousand, then short (12K, 1.2M, 340M) so the purse chip cannot grow
+## without end and push the rest of the bar off the screen.
 static func _format_number(value: int) -> String:
-	var text := str(absi(value))
+	var size := absi(value)
+	if size >= 10_000:
+		var sign_text := "-" if value < 0 else ""
+		for step in [[1_000_000_000, "B"], [1_000_000, "M"], [1_000, "K"]]:
+			var unit: int = step[0]
+			if size < unit:
+				continue
+			# Rounded down, so the purse never reads richer than it is (9,999,999 → 9.9M).
+			var scaled := floorf(float(size) / float(unit) * 10.0) / 10.0
+			return sign_text + (("%.1f" % scaled) if scaled < 10.0 else ("%d" % int(scaled))) + (step[1] as String)
+	var text := str(size)
 	var out := ""
 	for i in text.length():
 		if i > 0 and (text.length() - i) % 3 == 0:

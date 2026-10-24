@@ -4315,10 +4315,6 @@
   "en": "Summoning tickets: {count}",
   "vi": "Thẻ triệu hồi: {count}"
  },
- "ui.gate.summon_five": {
-  "en": "Summon ×5 ({tickets} tickets)",
-  "vi": "Triệu hồi ×5 ({tickets} thẻ)"
- },
  "ui.gate.effects_toggle": {
   "en": "Reveal cards (swipe)",
   "vi": "Hiệu ứng lật thẻ (vuốt)"
@@ -4335,9 +4331,9 @@
   "en": "Skip",
   "vi": "Bỏ qua"
  },
- "ui.summon.continue": {
-  "en": "Continue",
-  "vi": "Tiếp tục"
+ "ui.summon.finish": {
+  "en": "Done",
+  "vi": "Hoàn tất"
  },
  "ui.summon.summary_title": {
   "en": "{count} Hunters answered the call",
@@ -4379,13 +4375,9 @@
   "en": "Will sleep on the Hibernation Mount",
   "vi": "Sẽ sang Núi Ngủ Đông"
  },
- "ui.gate.summon_one": {
-  "en": "Summon ×1 ({tickets} ticket)",
-  "vi": "Triệu hồi ×1 ({tickets} thẻ)"
- },
- "ui.gate.summon_ten": {
-  "en": "Summon ×10 ({tickets} tickets)",
-  "vi": "Triệu hồi ×10 ({tickets} thẻ)"
+ "ui.gate.summon_times": {
+  "en": "×{count}",
+  "vi": "×{count}"
  },
  "ui.gate.summon_note": {
   "en": "A newcomer walks into the village and takes a bed.",

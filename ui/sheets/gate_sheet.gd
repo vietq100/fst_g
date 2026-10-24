@@ -29,10 +29,8 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(tickets)
 	var reason := recruitment.can_summon()
 	var cost := recruitment.get_ticket_cost()
-	var one := UIKit.button(Loc.t("ui.gate.summon_one", {"tickets": cost}), func() -> void: _summon(1), &"PrimaryButton", reason)
-	var five := UIKit.button(Loc.t("ui.gate.summon_five", {"tickets": cost * 5}), func() -> void: _summon(5), &"", reason)
-	var ten := UIKit.button(Loc.t("ui.gate.summon_ten", {"tickets": cost * 10}), func() -> void: _summon(10), &"", reason)
-	content.add_child(UIKit.hbox([one, five, ten], 6))
+	content.add_child(UIKit.hbox([_summon_column(1, cost, reason, &"PrimaryButton"),
+		_summon_column(5, cost * 5, reason), _summon_column(10, cost * 10, reason)], 6))
 	var effects := CheckButton.new()
 	effects.text = Loc.t("ui.gate.effects_toggle")
 	effects.button_pressed = SettingsStore.get_summon_effects()
@@ -59,7 +57,16 @@ func _build(content: VBoxContainer) -> void:
 		content.add_child(_roster_row(hunter))
 
 
-## Calls the batch and shows the reveal (cards, or straight to the summary); they join on Confirm.
+## One summon size: ×N over the tickets it costs, so the three fit a phone in every language.
+func _summon_column(count: int, tickets: int, reason: String, variation: StringName = &"") -> Control:
+	var button := UIKit.button(Loc.t("ui.gate.summon_times", {"count": count}), func() -> void: _summon(count), variation, reason)
+	var price := UIKit.hbox([PixelIcons.rect(&"mail", 1), UIKit.label(str(tickets), &"MutedLabel", false)], 3)
+	price.alignment = BoxContainer.ALIGNMENT_CENTER
+	return UIKit.vbox([button, price], 2)
+
+
+## Calls the batch, closes the Gate and shows the reveal (cards, or straight to the summary);
+## they join on Confirm.
 func _summon(count: int) -> void:
 	var recruitment := GameManager.recruitment
 	var called := recruitment.summon_batch(count)
@@ -67,7 +74,7 @@ func _summon(count: int) -> void:
 		run_action(recruitment.can_summon())
 		return
 	get_tree().call_group(&"ui_root", &"open_summon_reveal", called, SettingsStore.get_summon_effects())
-	request_rebuild()
+	closed.emit()
 
 
 ## One newcomer: figure, name, tier, class and level, grade, where it went.

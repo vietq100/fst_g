@@ -105,8 +105,7 @@ func _rebuild() -> void:
 	inner_style.set_content_margin_all(10)
 	inner.add_theme_stylebox_override(&"panel", inner_style)
 	# Long lists scroll inside the frame.
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var scroll := UIKit.scroll()
 	scroll.custom_minimum_size.y = mini(options + (1 if worn != null else 0), 5) * ROW_HEIGHT + 70
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(box)
@@ -129,19 +128,19 @@ func _row(item: ItemDefinition, instance_id: StringName, action: Button, worn: I
 	var name_label := _label(item.display_name, Tier.color(item.rarity), 14)
 	name_label.clip_text = true
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	var mods := _label(UIKit.describe_modifiers(item), ItemInfoModal.STAT, 12)
+	var mods := _clipped(_label(UIKit.describe_modifiers(item), ItemInfoModal.STAT, 12))
 	var grades := GameManager.grades
 	var grade := grades.item_grade(item)
-	var grade_label := _label(StatGradeService.name_of(grade), StatGradeService.color(grade), 11)
+	var grade_label := _clipped(_label(StatGradeService.name_of(grade), StatGradeService.color(grade), 11))
 	var compare_line := UIKit.hbox([grade_label], 6)
 	if not is_worn:
 		# Broken gear gives nothing: a broken candidate is a downgrade, a broken worn piece an upgrade.
 		if GameManager.equipment.is_broken(instance_id):
-			compare_line.add_child(_label(Loc.t("ui.equip_slot.broken"), GameTheme.DANGER, 11))
+			compare_line.add_child(_clipped(_label(Loc.t("ui.equip_slot.broken"), GameTheme.DANGER, 11)))
 		elif worn_broken:
-			compare_line.add_child(_label(Loc.t("ui.equip_slot.compare_broken"), GameTheme.GOOD, 11))
+			compare_line.add_child(_clipped(_label(Loc.t("ui.equip_slot.compare_broken"), GameTheme.GOOD, 11)))
 		else:
-			compare_line.add_child(_compare_label(grades.item_delta(item, worn, enhance, worn_enhance), worn != null))
+			compare_line.add_child(_clipped(_compare_label(grades.item_delta(item, worn, enhance, worn_enhance), worn != null)))
 	var info := UIKit.vbox([name_label, mods, compare_line], 1)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	action.size_flags_horizontal = Control.SIZE_SHRINK_END
@@ -168,6 +167,14 @@ func _heading(text: String) -> Label:
 func _note(text: String) -> Label:
 	var label := _label(text, ItemInfoModal.NOTE, 12)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return label
+
+
+## Long texts (Vietnamese runs wider) share the row instead of pushing it past the frame width.
+static func _clipped(label: Label) -> Label:
+	label.clip_text = true
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return label
 
 

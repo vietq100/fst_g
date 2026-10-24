@@ -69,9 +69,6 @@ func _build(content: VBoxContainer) -> void:
 			_build_needs_and_purse(body)
 			_build_activity(body)
 			_build_bonds_and_history(body)
-	var close := UIKit.button(Loc.t("ui.common.close"), func() -> void: closed.emit(), &"DangerButton")
-	close.custom_minimum_size = Vector2(0, 40)
-	content.add_child(close)
 
 
 ## Paper doll (D59): the whole figure with its gear and pet in the middle; worn pieces on the
@@ -94,7 +91,6 @@ func _paper_doll() -> Control:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	# Puts on every stored piece that grades above the worn one (StatGradeService.suggest_gear, D80).
 	var best := UIKit.button(Loc.t("ui.hunter.equip_best"), func() -> void:
-		var gm := GameManager
 		var picks: Dictionary = gm.grades.suggest_gear(runtime, gm.inventory, gm.equipment)
 		var count := 0
 		for slot: StringName in picks:
@@ -185,9 +181,9 @@ func _build_info(body: VBoxContainer, definition: HunterDefinition) -> void:
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		value.add_theme_color_override(&"font_color", StatGradeService.color(grades.hunter_step(runtime, entry[2])))
 		stats.add_child(UIKit.hbox([name_label, value], 4))
-	var grade := grades.hunter_grade(runtime)
-	var grade_label := UIKit.label(Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(grade)}), &"HudSmallLabel", false)
-	grade_label.add_theme_color_override(&"font_color", StatGradeService.color(grade))
+	var stat_grade := grades.hunter_grade(runtime)
+	var grade_label := UIKit.label(Loc.t("ui.common.grade", {"grade": StatGradeService.name_of(stat_grade)}), &"HudSmallLabel", false)
+	grade_label.add_theme_color_override(&"font_color", StatGradeService.color(stat_grade))
 	stats.add_child(grade_label)
 	bars.size_flags_stretch_ratio = 1.4
 	body.add_child(UIKit.hbox([bars, stats], 10))
