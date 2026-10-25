@@ -200,10 +200,15 @@ func _release(top: SummonCard) -> void:
 	var revealed := _cards[_top]
 	_card_home = revealed.position
 	revealed.reveal()
+	_check_last_card()
+
+
+func _check_last_card() -> void:
 	if not _can_drag():
 		# The last card is open: nothing left to skip, Done lets them in.
 		for control in _stack_controls:
-			control.queue_free()
+			if is_instance_valid(control):
+				control.queue_free()
 		_stack_controls.clear()
 		_body.add_child(_go_button(Loc.t("ui.summon.finish"), _finish))
 
@@ -530,3 +535,4 @@ class SummonCard extends Control:
 		if outline.a > 0.0:
 			draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 4, outline)
 		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+

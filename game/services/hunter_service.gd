@@ -92,10 +92,17 @@ func generate_candidate(definition_id: StringName, rng: RandomNumberGenerator) -
 	return hunter
 
 
+## Generates the next sequential Hunter ID.
+func next_id() -> StringName:
+	var id := StringName("h_%d" % _next_id)
+	_next_id += 1
+	return id
+
+
 ## Adds a generated Hunter to the roster and gives it a unique id.
 func add_hunter(hunter: HunterRuntime) -> HunterRuntime:
-	hunter.unique_id = StringName("h_%d" % _next_id)
-	_next_id += 1
+	if hunter.unique_id == &"":
+		hunter.unique_id = next_id()
 	_hunters[hunter.unique_id] = hunter
 	hunter_added.emit(hunter)
 	return hunter

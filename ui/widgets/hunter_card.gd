@@ -10,7 +10,11 @@ signal info_pressed
 signal locate_pressed
 
 const CLASS_COLORS := {
-	&"warrior": Color("f0904a"), &"ranger": Color("8fd36b"), &"rogue": Color("c79bff"), &"guardian": Color("f2c94c"),
+	&"warrior": Color("f0904a"), &"berserker": Color("f0904a"),
+	&"ranger": Color("8fd36b"),
+	&"rogue": Color("c79bff"),
+	&"guardian": Color("f2c94c"), &"paladin": Color("f2c94c"),
+	&"sorcerer": Color("5fa8ff"), &"mage": Color("5fa8ff"),
 }
 const DEFAULT_CLASS_COLOR := Color("6fd6d0")
 const ROMAN := [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],

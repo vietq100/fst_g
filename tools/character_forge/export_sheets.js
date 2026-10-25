@@ -39,9 +39,12 @@ const base = (hair = 'short') => ({
 const CLASSES = [
   ['core', base(), 'sword'],
   ['warrior', { ...base('spiky'), shirt: sel('shirt', 'armor'), pants: sel('pants', 'armor'), shoes: sel('shoes', 'armor') }, 'sword'],
+  ['berserker', { ...base('mohawk'), shirt: sel('shirt', 'armor'), pants: sel('pants', 'armor'), shoes: sel('shoes', 'armor') }, 'great'],
   ['ranger', { ...base('pony'), shirt: sel('shirt', 'jacket', '#5f8236'), pants: sel('pants', 'cargo'), shoes: sel('shoes', 'boots') }, 'bow'],
   ['rogue', { ...base('hime'), shirt: sel('shirt', 'hoodie', '#52456c'), pants: sel('pants', 'jeans', '#2b2630'), shoes: sel('shoes', 'leather') }, 'dagger'],
   ['guardian', { ...base('buzz'), shirt: sel('shirt', 'knight'), pants: sel('pants', 'armor'), shoes: sel('shoes', 'armor') }, 'hammer'],
+  ['paladin', { ...base('sweep'), shirt: sel('shirt', 'knight'), pants: sel('pants', 'armor'), shoes: sel('shoes', 'armor') }, 'hammer'],
+  ['sorcerer', { ...base('long'), shirt: sel('shirt', 'robe', '#3d5a9e'), pants: sel('pants', 'jeans', '#2b2630'), shoes: sel('shoes', 'boots'), hat: sel('hat', 'wizard', '#5b3fa0') }, 'staff'],
 ];
 
 // ---- painting (like the HTML paint(): rectangles rounded to the output grid, alpha blended) ----

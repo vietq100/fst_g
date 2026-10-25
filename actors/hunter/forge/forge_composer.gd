@@ -410,9 +410,12 @@ static func compose_rear(cfg: Dictionary, st: Dictionary = {}) -> ForgeRenderer:
 	_draw_all(g, shirt.get("back"), pal.call("shirt"), up, offsets, "torso")
 	_draw_all(g, data["body"]["head_rear"], skin, up.merged({"cast": true}), offsets, "head")
 	var hair_opts := up.merged({"clip": clip, "cast": true, "inner": false})
-	_draw_all(g, item["hair"].get("rear"), hair_pal, hair_opts, offsets, "head")
-	_draw_all(g, item["hair"].get("parts"), hair_pal, hair_opts, offsets, "head")
-	_draw_all(g, item["hair"].get("back"), hair_pal, up.merged({"clip": clip, "cast": true}), offsets, "head")
+	if item["hair"].get("has_custom_rear", false):
+		_draw_all(g, item["hair"].get("rear"), hair_pal, hair_opts, offsets, "head")
+	else:
+		_draw_all(g, item["hair"].get("rear"), hair_pal, hair_opts, offsets, "head")
+		_draw_all(g, item["hair"].get("parts"), hair_pal, hair_opts, offsets, "head")
+		_draw_all(g, item["hair"].get("back"), hair_pal, up.merged({"clip": clip, "cast": true}), offsets, "head")
 	_draw_all(g, _rear_hat(item["hat"]), pal.call("hat"), up.merged({"cast": true}), offsets, "head")
 	if gm.is_empty():
 		return g

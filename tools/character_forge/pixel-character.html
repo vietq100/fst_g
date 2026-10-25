@@ -165,9 +165,11 @@ function makePal(color, accent) {
 }
 function bodyPal(cfg, blink) {
   const p = makePal(cfg.skin), eye = { c: hexToRgb(cfg.eyes) };
-  p.e = eye; p.E = blink ? p.b : eye;
-  p.k = { c: mix(p.b.c, [255, 105, 120], .4) };
-  p.m = { c: mix(p.s.c, [150, 45, 60], .55) };
+  p.e = blink ? p.b : eye;
+  p.E = blink ? p.s : eye;
+  p.I = blink ? p.b : { c: [255, 255, 255] };
+  p.k = { c: mix(p.b.c, [255, 105, 120], .35) };
+  p.m = { c: mix(p.s.c, [160, 48, 65], .55) };
   return p;
 }
 
@@ -255,31 +257,53 @@ const HEAD = [
   "hbbbbbbbbbss",
   "bbbbbbbbbbss",
   "bbbbbbbbbbss",
-  "bbbbbbbbbbss", // 11
-  "bEbbbbEbbbss", // 12 mắt xa x5, mắt gần x10
-  "bebbbbebbss.",
-  "bkkbbbkkbs..", // 14 má
-  "skkbbbkkbs..",
-  ".sbbmmbbs...", // 16 miệng
+  "bsbbbbssbbss", // 11 lông mày/mí mắt
+  "bEbbbbEEbbss", // 12 mi trên & con ngươi (mắt gần 2 px)
+  "bebbbbIebbss", // 13 mắt xa có tròng e, mắt gần có điểm sáng I + tròng e
+  "bkkbbbkkbs..", // 14 má hồng
+  "bkkbbbkkbs..", // 15 má dưới sáng mịn
+  ".sbbmmbbs...", // 16 miệng cười
   "..sbbbbs....", // 17 cằm
 ];
 const BODY = {
   legs: [
-    P(5, 28, [...rep(".bb", 5), ".bs", "bbs"]),                     // chân xa (bàn chân y34)
-    P(10, 28, [...rep(".bb", 6), ".bs", "bbs"]),                    // chân gần (bàn chân y35)
+    P(5, 28, [".hb", ".bb", ".bb", ".bb", ".bb", ".bs", "bbs"]),                     // chân xa (bàn chân y34)
+    P(10, 28, [".hbs", ".bbs", ".bbs", ".bbs", ".bbs", ".bbs", ".bss", "hbbs"]),      // chân gần (bàn chân y35)
   ],
   upper: [
-    P(3, 19, [...rep("ss", 8), "sb", "bb"]),                        // tay xa
-    P(5, 18, [".bbbbbb.", ".hbbbbbs", ".hbbbbs.", ".hbbbbs.", ".hbbbbs.", // thân: vai xuôi,
-      "..hbbbbs", "..hbbbbs", ".hbbbbbs", "hbbbbbbs", "ssssssss"]),         // eo lệch về phía gần
-    P(12, 18, ["hbbs", "bbbs", ...rep("..bs", 8), "..bb", "..ss"]), // vai + tay gần
+    P(3, 19, [...rep("ss", 8), "sb", "bb"]),                                          // tay xa
+    P(5, 18, [
+      ".bbbbbb.",
+      ".hbbbbbs",
+      ".hbbbbs.",
+      ".hbbbbs.",
+      ".hbbbbs.",
+      "..hbbbbs",
+      "..hbbbbs",
+      ".hbbbbbs",
+      "hbbbbbbs",
+      "ssssssss"]),
+    P(12, 18, ["hbbs", "bbbs", "hdds", ...rep("..bs", 7), "..bb", "..ss"]),             // vai + tay gần
   ],
   head: [P(4, 3, HEAD)],
 };
 const SHADOW = [P(3, 35, [".pppppppppp.", "..pppppppp.."], NO)];
 const UNDER = {
-  tank: [P(5, 18, [".bb..bb.", ".hbbbbs.", ".hbbbbs.", ".hbbsbs.", ".hbbbbs.", "..hbbbbs", "..hbsbbs", ".sssssss"])],
-  shorts: [P(6, 26, ["dddddd.", "hbbbbbs", "hbbbbbs", "hbs.hbs", "sss.sss"])],
+  tank: [P(5, 18, [
+    ".bb..bb.",
+    ".hbbbbbs",
+    ".hbbbbs.",
+    ".hbbaabs",
+    ".hbaasbs",
+    "..hbbbbs",
+    "..hbsbbs",
+    ".sssssss"])],
+  shorts: [P(6, 26, [
+    "ddddddd",
+    "hbbbbbs",
+    "hbbbbbs",
+    "hbs.hbs",
+    "sss.sss"])],
 };
 
 /* ============================================================
@@ -299,12 +323,12 @@ const SHORT_HAIR = [
   "...hbbbbbbbbbs..",
   "..bbhbhhhbhbbbs.",
   ".bbbbbbbbbbbbbbs",
-  "dssssssssssssssd", // 7
-  ".dss......dsbbs.", // 8 trán lộ ra
-  "..d........dbbs.",
-  "..d.........bbs.",
-  "..d.........bbs.",
-  "..d.........bKs.", // 12 tai
+  ".bbshbbbbhhbbbbs", // 7 ánh sáng và lọn tóc tự nhiên
+  ".bbs..sbb..sbbbs", // 8 mái nhọn tỉa so le anime
+  "..bs...sb...dbbs", // 9
+  "..b..........bbs", // 10
+  "..b..........bbs", // 11
+  "..b.........bKs.", // 12 tai
   "............bKs.",
   ".............s..",
 ];
@@ -312,10 +336,10 @@ const BOB_TOP = [
   "....hhbbbbbb....", // 3
   "...hbbbbbbbbbs..",
   "..bbhbhhhbhbbbs.",
+  ".hbbbbbbbbbbbbbs",
+  ".bbhbbbbbbhhbbbs", // 7 ánh sáng vòm angel-ring
   ".bbbbbbbbbbbbbbs",
-  ".bbbbbbbbbbbbbbs", // 7
-  ".bbbbbbbbbbbbbbs",
-  ".bbsbbsbbsbbbbbs", // 9 mái
+  ".bbshbbsbbshbbbs", // 9 mái vòm búp bê tỉa nhẹ
 ];
 const SIDE_SHORT = ["..b.........bbs.", "..b.........bKs.", "............bKs.", ".............s.."]; // y10..13
 const PIXIE_TOP = [  // mái vuốt lệch về phía mặt, y3..9
@@ -323,19 +347,114 @@ const PIXIE_TOP = [  // mái vuốt lệch về phía mặt, y3..9
   "...hbbhbbbbbbs..",
   "..hbbbbbhbbbbbs.",
   ".hbbbbbbbbbbbbbs",
-  ".bbbbbbbbbbbbbbs",
-  ".bbbbbbbbsbbbbs.",
-  ".bbbbbs...sbbbs.",
+  ".bbhbbbbbbhhbbbs",
+  ".bbbbbbbbsbbbbbs",
+  ".bbbbbs...sbbbbs",
 ];
-// tóc dài chảy ra sau gáy, xuống sau vai gần (bên phải) — vẽ sau lưng nhân vật
-const LONG_BACK = P(11, 6, [
-  "..ssss...", ".ssssss..", "sssssss..", "ssssssss.", "ssdsssss.", "ssdssdss.", "ssdssdss.",
-  ...rep("ssdssdsss", 4), ...rep("ssdssdsds", 5), ".sdssdsds", ".sdssdsd.", "..dssdsd.", "...sdsd..", "....dd..."]);
-const WAVY_BACK = P(11, 6, [
-  "..ssss...", ".ssssss..", "sssssss..", "ssssssss.", "ssdsssss.", "ssssssss.", "ssdssss..", "sssssssss",
-  "sssssdss.", "ssssssss.", "ssssdsss.", "sssssssss", "sssssdsss", "ssssssss.", "ssdsssss.", "sssssssss",
-  ".ssssssds", "..ssssss.", "...sssd..", "....ss...", ".....d..."]);
 const TIED = { inner: true }; // phần tóc buộc riêng: có nét tối tách khỏi tóc chính
+// tóc dài suôn mượt chảy ra sau hai vai — vẽ sau lưng nhân vật
+const LONG_BACK = [
+  P(2, 13, [
+    "..hb", ".hbb", "hbbs", "hbbs", ".bbs", ".bbs", ".bbs", ".bbs", "..bs", "..bs", "..bs", "...s"
+  ]),
+  P(12, 12, [
+    ".hbb.", ".hbbs", "hbbbs", "hbbbs", "hbbbs", "bbbbs", "hbbbs", "hbbbs", ".bbbs", ".hbbs", "..bbs", "..bss", "...bs", "...s."
+  ]),
+];
+// tóc gợn sóng bồng bềnh sau hai vai
+const WAVY_BACK = [
+  P(1, 13, [
+    "..hb", ".hbb", "hbbs", ".bbs", "..bs", "..hb", ".hbb", "hbbs", ".bbs", "..bs", "..bs", "...s"
+  ]),
+  P(13, 12, [
+    ".hb..", "hbbbs", "hbbbs", ".bbbs", "..bbs", ".hbb.", "hbbbs", "hbbbs", ".bbbs", "..bbs", "..bss", "...bs", "...s."
+  ]),
+];
+// mẫu nhìn từ sau (rear view) hoàn chỉnh không bị vướng vệt cắt mái trước
+const HIME_REAR = [
+  P(3, 3, [
+    "...hhbbbbbb...",
+    "..hbbbbbbbbbs.",
+    ".bbhbhhhbhbbbs",
+    "hbbbbbbbbbbbbs",
+    "hbbbbbbbbbbbbs",
+    "hbbshbbbbhhbbs",
+    "hbbbbbbbbbbbbs",
+    "bbbbbbbbbbbbbs",
+    "bbbbbbbbbbbbbs",
+    "bbbhbbbbhbbbbs",
+    "bbbhbbbbhbbbbs",
+    "bbbhbbbbhbbbbs",
+    ".bbhbbbbhbbbs.",
+    ".bbbbbbbbbbbs.",
+    ".bbhbbbbhbbbs.",
+    ".bbhbbbbhbbbs.",
+    ".bbhbbbbhbbbs.",
+    "..bbbbbbbbbs..",
+    "..bbhbbbhbbs..",
+    "..bbhbbbhbbs..",
+    "...bbbbbbbs...",
+    "...bbsssss....",
+    "....sssss.....",
+  ])
+];
+const WAVY_REAR = [
+  P(3, 3, [
+    "...hhbbbbbb...", // y3
+    "..hbbbbbbbbbs.", // y4
+    ".bbhbhhhbhbbbs", // y5
+    "hbbbbbbbbbbbbs", // y6
+    "hbbbbbbbbbbbbs", // y7
+    "hbbshbbbbhhbbs", // y8
+    "hbbbbbbbbbbbbs", // y9
+    "bbbbbbbbbbbbbs", // y10
+    "bbhhbbbbhhbbbs", // y11: gợn sóng 1 đỉnh sáng
+    "bbssbbbbssbbbs", // y12: nếp sóng 1
+    "bbbbbbbbbbbbbs", // y13
+    ".bbhhbbbbhhbs.", // y14: gợn sóng 2 đỉnh sáng
+    ".bbssbbbbssbs.", // y15: nếp sóng 2
+    ".bbbbbbbbbbbs.", // y16
+    ".bbhhbbbbhhbs.", // y17: gợn sóng 3
+    ".bbssbbbbssss.", // y18
+    "..bbbbbbbbbs..", // y19
+    "..bbhhbbhhbs..", // y20
+    "..bbssbbssbs..", // y21
+    "...bbbbbbbs...", // y22
+    "...bbssssss...", // y23
+    "....bbssss....", // y24
+    ".....ssss.....", // y25
+  ])
+];
+const BRAID_REAR = [
+  P(3, 3, [
+    "...hhbbbbbb...", // y3
+    "..hbbbbbbbbbs.", // y4
+    ".bbhbhhhbhbbbs", // y5
+    "hbbbbbbbbbbbbs", // y6
+    "hbbbbbbbbbbbbs", // y7
+    "hbbshbbbbhhbbs", // y8
+    "hbbbbbbbbbbbbs", // y9
+    "bbbbbbbbbbbbbs", // y10
+    "bbbhbbbbbbbbbs", // y11: nét chải chéo về bên phải
+    "bbbbhbbbbhbbbs", // y12
+    ".bbbbhbbbbhbbb", // y13: gom về gáy phải
+    "..bbbbhbbbbhbb", // y14
+    "...sbbbbbbbbbb", // y15: nối khít vào gốc bím
+    ".....sssssssss", // y16: chân gáy tiếp giáp bím
+  ]),
+  P(11, 16, [
+    "..hbbs", // y16: múi bím phía sau
+    ".bbbbs", // y17
+    "hbbbs.", // y18
+    "..bbbs", // y19
+    ".bbbs.", // y20
+    ".aAAa.", // y21: nơ
+    "..aA..", // y22
+    ".hbbs.", // y23: đuôi tóc
+    "..bbs.", // y24
+    "...s..", // y25
+  ], TIED)
+];
 
 function nonLa() {
   const hws = [1, 2.4, 3.8, 5.2, 6.6, 8, 9.4, 10.8, 11.8], rows = [];
@@ -361,12 +480,14 @@ const ITEMS = {
     { id: 'none', name: 'Trọc' },
     // ---------- kiểu nam ----------
     { id: 'short', name: 'Ngắn', parts: [P(1, 3, SHORT_HAIR)] },
-    { id: 'spiky', name: 'Dựng', parts: [P(1, 0, [
-      ".....b...b......",
-      "....bb..bb...b..",
-      "...hbbbhbbb.bb..",
-      "..hbbbbbbbbbbs..",
-      ...SHORT_HAIR.slice(1)])] },
+    { id: 'spiky', name: 'Dựng', parts: [P(1, -1, [
+      "......b.........",
+      ".....bb...b.....",
+      "....hbb..bb...b.",
+      "...hbbbhbbb..bb.",
+      "..hhbbbbbbbbbbs.",
+      ".hbbbbbbbbbbbbbs",
+      ...SHORT_HAIR.slice(2)])] },
     { id: 'buzz', name: 'Đầu đinh', parts: [P(1, 3, [
       ".....hbbbbb.....",
       "....hbbbbbbbs...",
@@ -376,7 +497,7 @@ const ITEMS = {
       "...s........bbs.",
       "...s........bbs.",
       "............bbs.",
-      "............bbs.",
+      "............dds.",
       "............bKs.",
       "............bKs.",
       ".............s.."])] },
@@ -388,21 +509,21 @@ const ITEMS = {
       "hbbbbbbbbbbbbbbs",
       "bbbbbbbbbbbbbbbs",
       "bbbbbbbbbsbbbbbs",
-      "bbbbbbbs..sbbbs.",  // mái vuốt chéo sang phía mặt
-      ".bbbbbs.....bbs.",
+      "bbbbbbbs..sbbbbs",
+      ".bbbbbs.....bbbs",
       "..bs........bbs.",
       "..b.........bKs.",
       "............bKs.",
       ".............s.."])] },
     { id: 'quiff', name: 'Vuốt ngược', parts: [P(1, 0, [
-      "...hhbbb........",
+      "...hhbbbb.......",
       "..hhbbbbbbb.....",
       "..hbbhbbbbbbb...",
       "..hbhbbbbbbbbbs.",
-      "...bbbbbbbbbbbbs",
+      "...hbbbbbbbbbbbs",
       "...sbbbbbbbbbbbs",
       "...ddsbbbbbbbbs.",
-      "...dd.....sbbbs.",  // chân tóc cao, hai bên cạo (d)
+      "...dd.....sbbbs.",
       "...d.......dbbs.",
       "...d........dds.",
       "............dds.",
@@ -417,15 +538,29 @@ const ITEMS = {
       "bbbbbbbbbbbbbbbs",
       "bbbbbbbbbbbbbbbs",
       ".bbsbbbsbbbsbbbs",
-      ".bb.bbs.bbs.sbbs",  // mái nhọn rủ xuống trán
+      ".bb.bbs.bbs.sbbs",
       ".bs..b...s...bbs",
       ".bs..........bbs",
-      "..b..........bbs",  // lọn tóc ôm mặt
+      "..b..........bbs",
       "..b..........bbs",
       "..s..........bs.",
       "..............s."])] },
-    { id: 'mohawk', name: 'Mohawk', parts: [P(7, -1, [".bb.", "hbbs", "hbbs", "hbbs", "hbbs", "hbbs", "sbbs"])] },
-    { id: 'afro', name: 'Xoăn', parts: [P(1, 0, [   // khối tóc lệch ra sau gáy (bên phải)
+    { id: 'mohawk', name: 'Mohawk', parts: [
+      P(7, -2, ["..b.", ".hb.", "hbbs", "hbbs", "hbbs", "hbbs", "hbbs", "sbbs", ".ss."]),
+      P(1, 3, [
+        "................",
+        "................",
+        "................",
+        "................",
+        "....ss....ss....",
+        "....d......d....",
+        "....d......d....",
+        "...........d....",
+        "...........d....",
+        "...........dK...",
+        "...........dK...",
+        "............s..."])] },
+    { id: 'afro', name: 'Xoăn', parts: [P(1, 0, [
       "......bbbbbbb......",
       "....bbbhbbbbbhb....",
       "..bbbhbbbbhbbbbbb..",
@@ -435,7 +570,7 @@ const ITEMS = {
       "bhbbbbbbbhbbbbbbhbs",
       "bbbbbhbbbbbbbbhbbbs",
       "bbbbbbbbbbbhbbbbbbs",
-      "bbsbbsbbsbbbbbbhbbs",  // mái xoăn
+      "bbsbbsbbsbbbbbbhbbs",
       "bbs.........bbbbbbs",
       "bhs.........bbbhbbs",
       ".bs.........bbbbbbs",
@@ -452,51 +587,102 @@ const ITEMS = {
       "............bKs.",
       ".............s.."]))] },
     { id: 'bob', name: 'Bob', parts: [P(1, 3, [...BOB_TOP, ...rep("..bb........bbbs", 6), "..ss........sss."])] },
-    { id: 'hime', name: 'Hime', back: [LONG_BACK], parts: [P(1, 3, [
-      ...BOB_TOP.slice(0, 6),
-      ".bbsssssssssbbbs",  // mái bằng
-      ".bb.........bbbs", ".bb.........bhbs", ".bb.........bhbs",
-      ".bb.........bbbs", ".bb.........bhss", ".bb.........bbss",
-      ".ss.........bbss",  // lọn ôm má cắt ngang (phía mặt)
-      "............bs..",
-      "............s..."])] },
-    { id: 'long', name: 'Dài', back: [LONG_BACK], parts: [P(1, 3, [
+    { id: 'hime', name: 'Hime', back: LONG_BACK, rear: HIME_REAR, parts: [P(1, 3, [
+      "....hhbbbbbb....",
+      "...hbbbbbbbbbs..",
+      "..bbhbhhhbhbbbs.",
+      ".hbbbbbbbbbbbbbs",
+      ".bbhbbbbbbhhbbbs",
+      ".bbbbbbbbbbbbbbs",
+      ".bbshbbbbhhbbbbs",
+      ".bbsbbbbbbbssbbs", // mái bằng ngang trán tự nhiên
+      "..b.........bbs.",
+      "..bb........bhbs",
+      "..bb........bbbs",
+      "..bb........bbbs",
+      "..bb........bhbs",
+      "..bb........bbbs",
+      "..ss........ssss", // lọn tóc mai cắt ngang bằng vai
+    ])] },
+    { id: 'long', name: 'Dài', back: LONG_BACK, rear: HIME_REAR, parts: [P(1, 3, [
       "....hhbbbbbb....",
       "...hbbhbbbbbbs..",
       "..hbbbhbbbhbbbs.",
       ".hbbbbbbbbbbbbbs",
-      ".bbbbbbbbbbbbbbs",
+      ".bbhbbbbbbhhbbbs",
       ".bbbbbbbbbbhbbbs",
       ".bbsbbsbbsbbbbbs",
       ".bs.........bbbs", ".bb.........bhbs", ".bh.........bhbs", ".bb.........bbbs",
       ".bs.........bhss", ".bb..........bss", ".bs..........bs.",
-      ".bb.............",  // lọn mảnh rủ trước vai xa
+      ".bb.............",
       ".bs.............",
       "..s............."])] },
-    { id: 'wavy', name: 'Gợn sóng', back: [WAVY_BACK], parts: [P(1, 3, PIXIE_TOP.concat(
-      ".bb.........bbbs", ".bh.........bbbs", "bb...........bbs", "bs...........bhs",
-      ".bb.........bbbs", ".hb.........bbbs", "bb...........bbs", "bs...........bbs",
-      ".bb..........bs.", ".bs.............", "bb..............", "s..............."))] },
+    { id: 'wavy', name: 'Gợn sóng', back: WAVY_BACK, rear: WAVY_REAR, parts: [P(1, 3, [
+      "....hhbbbbbb....",
+      "...hbbbbbbbbbs..",
+      "..bbhbhhhbhbbbs.",
+      ".hbbbbbbbbbbbbbs",
+      ".bbhbbbbbbhhbbbs",
+      ".bbbbbbbbbbbbbbs",
+      ".bbshbbbbhhbbbbs",
+      ".bb.sbbbbs..sbbs", // mái gợn sóng rẽ nhẹ
+      "..b.........bbs.",
+      "..bb........bhbs",
+      ".hbb.........bbs", // lọn uốn phồng gò má
+      "..bb........bhbs",
+      "..b.........bbbs",
+      ".hbb.........bbs", // lọn uốn ngang vai
+      "..bb........bhbs",
+      "..bbs.......bbss",
+      "...ss........ss.",
+    ])] },
     { id: 'pony', name: 'Đuôi ngựa', accent: '#e0507a', parts: [
       P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
-      P(15, 4, [".aa.", "bbbb", "bbbs", ".bbs", ".bbs", "..bs", "..bs", "..bs", ".bs.", ".bs.", ".s.."], TIED)] },
+      P(15, 3, [".aa.", "hbbb", "bbbb", "bbbs", ".bbs", ".bbs", "..bs", "..bs", "..bs", ".bs.", ".bs.", ".s.."], TIED)] },
     { id: 'twin', name: 'Hai bím', accent: '#e0507a',
-      back: [P(-1, 7, [".aa", "bbb", "bbs", "bhs", "bbs", ".bs", ".bb", "bbs", "bs.", "s.."], TIED)],
+      back: [P(-1, 6, [".aa.", "hbbb", "bbbs", "bhs.", "bbbs", ".bbs", ".bb.", "bbs.", "bs..", "s..."], TIED)],
       parts: [
         P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
-        P(15, 7, ["aa.", "bbb", "bhs", "bbs", "bbs", "bs.", "bb.", "bbs", ".bs", "..s"], TIED)] },
-    { id: 'braid', name: 'Bím tết', accent: '#e0507a', parts: [
-      P(1, 3, [...BOB_TOP, "..b.........bbs.", "..b.........bbs."]),
-      P(10, 12, [               // bím từ gáy vắt qua vai gần ra trước ngực
-        "...hbs", "...sbb", "..bhs.", "..sbb.", ".bhs..", ".sbb..", "bhs...",
-        "sbb...", "bhs...", "sbb...", "bhs...", ".aa...", ".bs...", ".s...."], TIED)] },
+        P(15, 6, [".aa.", "hbbb", "bhs.", "bbbs", "bbbs", "bs..", "bb..", "bbs.", ".bs.", "..s."], TIED)] },
+    { id: 'braid', name: 'Bím tết', accent: '#e0507a', rear: BRAID_REAR, parts: [
+      P(1, 3, [
+        "....hhbbbbbb....",
+        "...hbbbbbbbbbs..",
+        "..bbhbhhhbhbbbs.",
+        ".hbbbbbbbbbbbbbs",
+        ".bbhbbbbbbhhbbbs",
+        ".bbbbbbbbbbbbbbs",
+        ".bbshbbbbhhbbbbs",
+        ".bb.sbbbbs..sbbs",
+        "..b.........bbs.",
+        "..b.........bhbs",
+        "..b.........bbbs",
+        "..b..........bbs",
+        "..s..........bs.",
+      ]),
+      P(11, 12, [
+        "..hbb.",
+        ".hbbbs",
+        "hbbs..",
+        "hbbbs.",
+        "..hbbs",
+        ".bbbbs",
+        "hbbbs.",
+        "..bbbs",
+        ".bbbs.",
+        ".aAAa.", // nơ thắt bím
+        "..aA..",
+        ".hbbs.", // đuôi tóc vểnh
+        "..bbs.",
+        "...s..",
+      ], TIED)] },
     { id: 'bun', name: 'Búi', accent: '#e0507a', parts: [
       P(1, 3, [...BOB_TOP, ...SIDE_SHORT]),
-      P(10, -1, [".hb.", "hbbs", "hbbs", ".aa."], TIED)] },
+      P(10, -2, [".hhb.", "hbbbs", "bbbbs", ".aa.."], TIED)] },
     { id: 'buns', name: 'Hai búi', accent: '#e0507a', parts: [
       P(1, 3, [...PIXIE_TOP, "..bbs.......bbs.", "..b.........bKs.", "............bKs.", ".............s.."]),
-      P(2, 0, [".hb.", "hbbs", "bbbs", ".aa."], TIED),
-      P(11, -1, [".hb.", "hbbs", "bbbs", ".aa."], TIED)] },
+      P(2, -1, [".hhb.", "hbbbs", "bbbbs", ".aa.."], TIED),
+      P(11, -2, [".hhb.", "hbbbs", "bbbbs", ".aa.."], TIED)] },
   ],
   shirt: [
     { id: 'none', name: 'Ba lỗ' },
@@ -511,15 +697,15 @@ const ITEMS = {
       ".hbbbbbs",
       "hbbbbbbd",
       "sssssssd"]) },
-    { id: 'hoodie', name: 'Hoodie', color: '#4e6fae',
+    { id: 'hoodie', name: 'Hoodie', color: '#4e6fae', accent: '#2a2230',
       back: [P(10, 15, ["...hb", "..bbb", "bbbbs", "ssss."])],
       parts: mkShirt(SLEEVE_L, [
       ".bbbbbb.",
-      ".hwbbwbs",   // dây mũ
-      ".hwbbws.",
-      ".hbbbbs.",
-      ".hbbsbs.",
-      "..hdddds",   // túi kangaroo
+      ".hbaabhs",   // nẹp cổ / viền áo choàng
+      ".hbAAbh.",
+      ".hbaabs.",   // đai chéo da ngực
+      ".hbaasb.",
+      "..hdddds",   // túi / nẹp thắt lưng
       "..hdbbds",
       ".hbdddds",
       "sdsdsdsd",   // bo gấu
@@ -669,7 +855,7 @@ const ITEMS = {
       P(5, 18, [
         ".gggggg.",
         ".gbbbbbg",
-        ".gbbabG.",   // huy hiệu chữ thập
+        ".gbbabG.",   // huy hiệu chữ thập hoàng gia
         ".gbaaas.",
         ".gbbabs.",
         "..hbabbs",
@@ -678,14 +864,20 @@ const ITEMS = {
         "GhbbbbsG",
         "gsbbbbsg"]),
       P(12, 18, [".gG.", "gGgG", "GgGG", ".gGg", ".Ggg", "..gG", "..Gg", "..gG", "..GG"])] },
-    { id: 'armor', name: 'Áo giáp', color: '#57585e', accent: '#a8401c', parts: [   // chép theo ảnh mẫu
+    { id: 'armor', name: 'Áo giáp', color: '#57585e', accent: '#a8401c', parts: [
       P(3, 18, [".a", "Aa", "Aa", "Aa", ".A", ".A"]),          // tay áo xa màu cam
-      P(3, 24, ["b", "b", "s", "s"]),                          // giáp tay xa
+      P(3, 24, ["G", "G", "s", "s"]),                          // giáp tay xa
       P(4, 28, [".A", "AA"]),                                  // găng xa
-      P(6, 19, ["dbhbdd.", "sddds..", "bbdbb..", "bbdbbs.", ".ddddds", ".sbbbbs"]),
-      P(5, 25, ["dddddddd", "ssssssss", "dddddddd"]),          // thắt lưng
+      P(6, 19, [
+        "hbbbbd.",                                              // gờ trên giáp ngực
+        "hhwwbds",                                              // vệt phản quang thép
+        "hbbbbbs",                                              // sống lưng giáp
+        "hbbaabs",                                              // huy hiệu đồng
+        ".hbbbbs",                                              // eo thon
+        ".ssssss"]),
+      P(5, 25, ["dddddddd", "syyyssdd", "dddddddd"]),          // thắt lưng với khoá vàng y
       P(14, 22, ["bb", "bb", "dd", "bb", "bb", "sb", "bb"]),   // tay gần
-      P(12, 18, ["..bb.", ".sbbb", "hdsbb", "hd..."], { keep: true })] }, // giáp vai gần
+      P(12, 18, [".hbb.", "hhbbg", "hhbbs", "hds.."], { keep: true })] }, // giáp vai gần sáng bóng
   ],
   pants: [
     { id: 'none', name: 'Quần đùi' },
@@ -712,7 +904,7 @@ const ITEMS = {
     { id: 'leather', name: 'Giày tây', color: '#2b2630', parts: [
       P(4, 33, ["..bs", "bhbs", "dddd"]), P(9, 34, ["..bs", "bhbs", "dddd"])] },
     { id: 'armor', name: 'Giày giáp', color: '#5c6068', accent: '#3e414a', parts: [
-      P(4, 33, ["..bs", "bbbs"]), P(9, 34, ["..bs", "bbbs"])] },
+      P(4, 32, ["..GG", "..bs", "hhbs", "dddd"]), P(9, 33, ["..GG", "..bs", "hhbs", "dddd"])] },
   ],
 
   glasses: [
@@ -1445,7 +1637,7 @@ function compose(cfg, st = {}) {
    Sinh từ bộ nhìn trước: cùng dáng 3/4, mặt bị tóc / gáy che, không kính, vũ khí sau lưng,
    ống tên và tóc dài đè lên lưng. Chỉ cho tư thế nghỉ / đi (đòn đánh vẫn nhìn trước). */
 // đầu nhìn sau: không mặt; dưới tai chỉ còn gáy (x7..11, tối)
-const HEAD_REAR = HEAD.map((r, j) => 3 + j < 14 ? r.replace(/[eEkm]/g, 'b')
+const HEAD_REAR = HEAD.map((r, j) => 3 + j < 14 ? r.replace(/[eEkmI]/g, 'b')
   : [...r].map((c, i) => c === '.' || 4 + i < 7 || 4 + i > 11 ? '.' : 's').join(''));
 // tóc phủ kín phần đầu tới đường gáy (hàng thấp nhất của tóc ở nửa sau đầu, tối thiểu ngang tai y13)
 function rearHair(it) {
@@ -1462,7 +1654,11 @@ function rearHair(it) {
     return [...row].map((c, i) => {
       if (c === '.' || y > neck) return '.';
       const x = 4 + i;
-      return x >= 14 || y === neck ? 's' : y <= 4 && x <= 9 ? 'h' : 'b';
+      if (y === neck || x >= 14) return 's';
+      if (y <= 4 && x >= 6 && x <= 11) return 'h';
+      if (y === 5 && (x === 7 || x === 10)) return 'h';
+      if (x === 9 || x === 12) return y % 2 === 0 ? 's' : 'b';
+      return 'b';
     }).join('');
   });
   return [P(4, 3, rows)];
@@ -1498,9 +1694,13 @@ function composeRear(cfg, st = {}) {
   if (wp.id === 'bow') D(quiverParts(bob, KW), wpal);
   D(FK(it.shirt.back, KS), pal('shirt'), up);              // mũ trùm của áo buông trên lưng
   D([P(4, 3, HEAD_REAR)], skin, { ...up, cast: true });
-  D(rearHair(it.hair), hairPal, { ...up, clip, cast: true, inner: false });
-  D(it.hair.parts, hairPal, { ...up, clip, cast: true, inner: false });
-  D(it.hair.back, hairPal, { ...up, clip, cast: true });   // tóc dài, đuôi tóc đè lên lưng
+  if (it.hair.rear) {
+    D(it.hair.rear, hairPal, { ...up, clip, cast: true, inner: false });
+  } else {
+    D(rearHair(it.hair), hairPal, { ...up, clip, cast: true, inner: false });
+    D(it.hair.parts, hairPal, { ...up, clip, cast: true, inner: false });
+    D(it.hair.back, hairPal, { ...up, clip, cast: true });   // tóc dài, đuôi tóc đè lên lưng
+  }
   // mũ: hình riêng khi nhìn sau (rear: part, hoặc chỉ số các part giữ lại), không thì như nhìn trước
   const hatRear = !it.hat.rear ? it.hat.parts : typeof it.hat.rear[0] === 'number' ? it.hat.rear.map(i => it.hat.parts[i]) : it.hat.rear;
   D(FK(hatRear, RES.hat), pal('hat'), { ...up, cast: true });

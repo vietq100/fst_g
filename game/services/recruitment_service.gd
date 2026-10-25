@@ -154,8 +154,10 @@ func summon_batch(count: int) -> Array[HunterRuntime]:
 func confirm_arrivals() -> Array[HunterRuntime]:
 	var joined: Array[HunterRuntime] = []
 	for newcomer in pending:
+		if newcomer.unique_id == &"":
+			newcomer.unique_id = _hunters.next_id()
+		_arriving[newcomer.unique_id] = true
 		var hunter := _hunters.add_hunter(newcomer)
-		_arriving[hunter.unique_id] = true
 		joined.append(hunter)
 		hunter_recruited.emit(hunter)
 	pending.clear()
@@ -181,6 +183,9 @@ func summon() -> HunterRuntime:
 	var newcomer := _call_one()
 	if newcomer == null:
 		return null
+	if newcomer.unique_id == &"":
+		newcomer.unique_id = _hunters.next_id()
+	_arriving[newcomer.unique_id] = true
 	var hunter := _hunters.add_hunter(newcomer)
 	hunter_recruited.emit(hunter)
 	autosave_requested.emit(&"summon")

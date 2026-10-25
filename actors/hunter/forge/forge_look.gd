@@ -13,9 +13,13 @@ const HAIR_IDS := ["short", "spiky", "buzz", "sweep", "hero", "bob", "long", "po
 ## Base class → [top, top colour, pants, pants colour, shoes, shoes colour]; "" = the Forge item's colour.
 const CLASS_LOOKS := {
 	&"warrior": ["armor", "", "armor", "", "armor", ""],
+	&"berserker": ["armor", "", "armor", "", "armor", ""],
 	&"ranger": ["jacket", "#5f8236", "cargo", "", "boots", ""],
 	&"rogue": ["hoodie", "#52456c", "jeans", "#2b2630", "leather", ""],
 	&"guardian": ["knight", "", "armor", "", "armor", ""],
+	&"paladin": ["knight", "", "armor", "", "armor", ""],
+	&"sorcerer": ["robe", "#3d5a9e", "jeans", "#2b2630", "boots", "", "wizard", "#5b3fa0"],
+	&"mage": ["robe", "#3d5a9e", "jeans", "#2b2630", "boots", "", "wizard", "#5b3fa0"],
 }
 const CORE_LOOK := ["none", "", "none", "", "none", ""]
 ## Skin `outfit_id`s that name no class pattern → Forge top.
@@ -34,7 +38,10 @@ const SPRITE_WEAPONS := {
 ## Words in a weapon id → Forge weapon (kinds WeaponSprites does not know).
 const WEAPON_WORDS := [["katana", "katana"], ["axe", "axe"], ["spear", "spear"], ["lance", "spear"],
 	["staff", "staff"], ["wand", "staff"], ["rod", "staff"]]
-const CLASS_WEAPONS := {&"warrior": "sword", &"ranger": "bow", &"rogue": "dagger", &"guardian": "hammer"}
+const CLASS_WEAPONS := {
+	&"warrior": "sword", &"berserker": "great", &"ranger": "bow", &"rogue": "dagger",
+	&"guardian": "hammer", &"paladin": "hammer", &"sorcerer": "staff", &"mage": "staff",
+}
 const ELEMENTS := ["fire", "ice", "thunder", "poison", "shadow"]
 ## Status effect a skill applies → element of its effects (D73 / Q5), first match wins.
 const EFFECT_ELEMENTS := {
@@ -71,8 +78,8 @@ static func config(look: HunterAppearance, dress: ChibiDress = null, weapon := "
 	var shoes: String = style[4]
 	var shoes_color: String = style[5]
 	var tank := TANK
-	var hat := "none"
-	var hat_color := ""
+	var hat: String = style[6] if style.size() > 6 else "none"
+	var hat_color: String = style[7] if style.size() > 7 else ""
 	var glasses := "none"
 	var glasses_color := ""
 	if dress != null:

@@ -107,8 +107,9 @@ static func make_pal(color: String, accent: String = "") -> Dictionary:
 static func body_pal(skin: String, eyes: String, blink: bool) -> Dictionary:
 	var p := make_pal(skin)
 	var eye := {"c": hex_to_rgb(eyes)}
-	p["e"] = eye
-	p["E"] = p["b"] if blink else eye
-	p["k"] = {"c": mix(p["b"]["c"], [255, 105, 120], 0.4)}
-	p["m"] = {"c": mix(p["s"]["c"], [150, 45, 60], 0.55)}
+	p["e"] = p["b"] if blink else eye
+	p["E"] = p["s"] if blink else eye
+	p["I"] = p["b"] if blink else {"c": [255, 255, 255]}
+	p["k"] = {"c": mix(p["b"]["c"], [255, 105, 120], 0.35)}
+	p["m"] = {"c": mix(p["s"]["c"], [160, 48, 65], 0.55)}
 	return p

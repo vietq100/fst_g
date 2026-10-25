@@ -78,7 +78,7 @@ var _arrivals: Array[HunterRuntime] = []
 var _arrival_playing := false
 var _shake: CameraShake
 ## Height (px) a newcomer drops from, and the pause between two arrivals (s).
-const ARRIVAL_DROP := 56.0
+const ARRIVAL_DROP := 88.0
 const ARRIVAL_GAP := 0.45
 var _selected_building: StringName = &""
 var _selected_hunter: Hunter
@@ -1481,6 +1481,9 @@ func _next_arrival() -> void:
 	var runtime: HunterRuntime = _arrivals.pop_front()
 	var gate := _gate_region()
 	var at := world.region_center(gate) if gate != null else _plaza()
+	if _camera != null:
+		_camera.stop_following()
+		_camera.center_on(at)
 	var column := SummonColumn.new()
 	column.position = at
 	_entities.add_child(column)
@@ -1491,17 +1494,29 @@ func _next_arrival() -> void:
 		_next_arrival()
 		return
 	var hunter := _spawn_actor(runtime, at)
+	var brain := hunter.get_node_or_null(^"Brain") as HunterBrain
+	if brain != null:
+		brain.enabled = false
+	hunter.travel_target = Vector2.INF
+	hunter.z_index = 85
 	hunter.visual.position = Vector2(0, -ARRIVAL_DROP)
 	var tween := hunter.create_tween()
-	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.22).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-	tween.tween_property(hunter.visual, ^"position", Vector2(0, -4), 0.08).set_ease(Tween.EASE_OUT)
-	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.08).set_ease(Tween.EASE_IN)
+	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.28).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(hunter.visual, ^"position", Vector2(0, -6), 0.09).set_ease(Tween.EASE_OUT)
+	tween.tween_property(hunter.visual, ^"position", Vector2.ZERO, 0.09).set_ease(Tween.EASE_IN)
 	await tween.finished
+	hunter.z_index = 0
+	column.impact()
 	if _shake == null:
 		_shake = CameraShake.new()
 		add_child(_shake)
-	_shake.shake(3.0, 0.22)
+	_shake.shake(4.0, 0.25)
 	GameManager.recruitment.mark_arrived(runtime.unique_id)
+	if brain != null:
+		brain.enabled = true
+		brain.think()
+	else:
+		_send_home(hunter)
 	await get_tree().create_timer(ARRIVAL_GAP).timeout
 	_arrival_playing = false
 	_next_arrival()

@@ -41,7 +41,14 @@ function exportItem(cat, it) {
     if (typeof it.rear[0] === 'number') o.rear_keep = it.rear;
     else o.rear = it.rear.map(conv);
   }
-  if (cat === 'hair' && it.parts) o.rear = forge.rearHair(it).map(flags);
+  if (cat === 'hair') {
+    if (it.rear) {
+      o.rear = it.rear.map(flags);
+      o.has_custom_rear = true;
+    } else if (it.parts) {
+      o.rear = forge.rearHair(it).map(flags);
+    }
+  }
   o.has_shape = !!it.shape;       // weapons are drawn geometrically: they are ported by hand
   return o;
 }
