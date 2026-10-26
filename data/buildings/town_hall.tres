@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BuildingDefinition" load_steps=16 format=3]
+[gd_resource type="Resource" script_class="BuildingDefinition" load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://game/definitions/building_definition.gd" id="1_building"]
 [ext_resource type="Script" path="res://game/definitions/building_level.gd" id="2_level"]
@@ -79,11 +79,121 @@ required_flags = Array[StringName]([])
 effects = Dictionary[StringName, float]({&"hunter_capacity": 16.0})
 visual_variant = &"lv5"
 
+[sub_resource type="Resource" id="Amt_5_0"]
+script = ExtResource("3_amount")
+item_id = &"dark_essence"
+quantity = 40
+
+[sub_resource type="Resource" id="Amt_5_1"]
+script = ExtResource("3_amount")
+item_id = &"bone_dust"
+quantity = 30
+
+[sub_resource type="Resource" id="Amt_5_2"]
+script = ExtResource("3_amount")
+item_id = &"beast_fang"
+quantity = 30
+
+[sub_resource type="Resource" id="Lvl_5"]
+script = ExtResource("2_level")
+gold_cost = 20000
+material_costs = Array[ExtResource("3_amount")]([SubResource("Amt_5_0"), SubResource("Amt_5_1"), SubResource("Amt_5_2")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"hunter_capacity": 20.0})
+visual_variant = &"lv6"
+
+[sub_resource type="Resource" id="Amt_6_0"]
+script = ExtResource("3_amount")
+item_id = &"dark_essence"
+quantity = 60
+
+[sub_resource type="Resource" id="Amt_6_1"]
+script = ExtResource("3_amount")
+item_id = &"iron_ore"
+quantity = 40
+
+[sub_resource type="Resource" id="Lvl_6"]
+script = ExtResource("2_level")
+gold_cost = 35000
+material_costs = Array[ExtResource("3_amount")]([SubResource("Amt_6_0"), SubResource("Amt_6_1")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"hunter_capacity": 22.0})
+visual_variant = &"lv7"
+
+[sub_resource type="Resource" id="Amt_7_0"]
+script = ExtResource("3_amount")
+item_id = &"dark_essence"
+quantity = 80
+
+[sub_resource type="Resource" id="Amt_7_1"]
+script = ExtResource("3_amount")
+item_id = &"bone_dust"
+quantity = 50
+
+[sub_resource type="Resource" id="Amt_7_2"]
+script = ExtResource("3_amount")
+item_id = &"beast_fang"
+quantity = 40
+
+[sub_resource type="Resource" id="Lvl_7"]
+script = ExtResource("2_level")
+gold_cost = 55000
+material_costs = Array[ExtResource("3_amount")]([SubResource("Amt_7_0"), SubResource("Amt_7_1"), SubResource("Amt_7_2")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"hunter_capacity": 24.0})
+visual_variant = &"lv8"
+
+[sub_resource type="Resource" id="Amt_8_0"]
+script = ExtResource("3_amount")
+item_id = &"dark_essence"
+quantity = 100
+
+[sub_resource type="Resource" id="Amt_8_1"]
+script = ExtResource("3_amount")
+item_id = &"iron_ore"
+quantity = 60
+
+[sub_resource type="Resource" id="Amt_8_2"]
+script = ExtResource("3_amount")
+item_id = &"bone_dust"
+quantity = 50
+
+[sub_resource type="Resource" id="Lvl_8"]
+script = ExtResource("2_level")
+gold_cost = 80000
+material_costs = Array[ExtResource("3_amount")]([SubResource("Amt_8_0"), SubResource("Amt_8_1"), SubResource("Amt_8_2")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"hunter_capacity": 24.0})
+visual_variant = &"lv9"
+
+[sub_resource type="Resource" id="Amt_9_0"]
+script = ExtResource("3_amount")
+item_id = &"dark_essence"
+quantity = 150
+
+[sub_resource type="Resource" id="Amt_9_1"]
+script = ExtResource("3_amount")
+item_id = &"bone_dust"
+quantity = 80
+
+[sub_resource type="Resource" id="Amt_9_2"]
+script = ExtResource("3_amount")
+item_id = &"beast_fang"
+quantity = 60
+
+[sub_resource type="Resource" id="Lvl_9"]
+script = ExtResource("2_level")
+gold_cost = 120000
+material_costs = Array[ExtResource("3_amount")]([SubResource("Amt_9_0"), SubResource("Amt_9_1"), SubResource("Amt_9_2")])
+required_flags = Array[StringName]([])
+effects = Dictionary[StringName, float]({&"hunter_capacity": 24.0})
+visual_variant = &"lv10"
+
 [resource]
 script = ExtResource("1_building")
 id = &"town_hall"
 display_name = "building.town_hall.name"
-levels = Array[ExtResource("2_level")]([SubResource("Lvl_0"), SubResource("Lvl_1"), SubResource("Lvl_2"), SubResource("Lvl_3"), SubResource("Lvl_4")])
+levels = Array[ExtResource("2_level")]([SubResource("Lvl_0"), SubResource("Lvl_1"), SubResource("Lvl_2"), SubResource("Lvl_3"), SubResource("Lvl_4"), SubResource("Lvl_5"), SubResource("Lvl_6"), SubResource("Lvl_7"), SubResource("Lvl_8"), SubResource("Lvl_9")])
 required_town_level = 1
 build_cost = 0
 footprint = Vector2i(3, 3)

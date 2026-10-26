@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/quest_definition.gd" id="1_q"]
+[ext_resource type="Script" path="res://game/definitions/item_amount.gd" id="2_amt"]
+
+[sub_resource type="Resource" id="A0"]
+script = ExtResource("2_amt")
+item_id = &"dark_essence"
+quantity = 20
+
+[resource]
+script = ExtResource("1_q")
+id = &"town_hall_7"
+display_name = "quest.town_hall_7.name"
+description = "quest.town_hall_7.desc"
+order = 17
+kind = 1
+target_id = &""
+amount = 7
+reward_gold = 8000
+reward_items = Array[ExtResource("2_amt")]([SubResource("A0")])
