@@ -46,7 +46,7 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(UIKit.hbox([UIKit.label(Loc.t("ui.arena.rivals"), &"AccentLabel"),
 		UIKit.button(Loc.t("ui.arena.refresh"), func() -> void:
 			arena.refresh_board(fighter)
-			request_rebuild())], 6))
+			request_rebuild(), &"Button")], 6))
 	var tiers := ["ui.arena.rival_weaker", "ui.arena.rival_even", "ui.arena.rival_stronger"]
 	for i in arena.board.size():
 		var rival := arena.board[i]

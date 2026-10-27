@@ -16,7 +16,7 @@ func _init() -> void:
 func _watch() -> Array:
 	var gm := GameManager
 	return [[gm.recruitment, &"hibernation_changed"], [gm.recruitment, &"arrivals_confirmed"], [gm.hunters, &"hunter_added"],
-		[gm.hunters, &"hunter_removed"], [gm.hunters, &"hunter_changed"], [gm.wallet, &"tickets_changed"], [gm.housing, &"beds_changed"]]
+		[gm.hunters, &"hunter_removed"], [gm.hunters, &"hunter_changed"], [gm.wallet, &"tickets_changed"], [gm.wallet, &"gold_changed"], [gm.housing, &"beds_changed"]]
 
 
 func _build(content: VBoxContainer) -> void:
@@ -25,12 +25,18 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(UIKit.label(Loc.t("ui.gate.counts", {"active": gm.hunters.count_active(), "active_max": recruitment.get_active_cap(),
 		"asleep": gm.hunters.count_hibernating(), "asleep_max": recruitment.get_hibernation_cap(), "beds": gm.housing.get_free_beds()}), &"MutedLabel"))
 	content.add_child(UIKit.label(Loc.t("ui.gate.summon_title"), &"AccentLabel"))
-	var tickets := UIKit.hbox([PixelIcons.rect(&"mail", 2), UIKit.label(Loc.t("ui.gate.tickets", {"count": gm.wallet.summon_tickets}), &"HudLabel", false)], 4)
-	content.add_child(tickets)
+	var ticket_label := UIKit.hbox([PixelIcons.rect(&"mail", 2), UIKit.label(Loc.t("ui.gate.tickets", {"count": gm.wallet.summon_tickets}), &"HudLabel", false)], 4)
+	var ticket_chip := PanelContainer.new()
+	ticket_chip.theme_type_variation = &"Chip"
+	ticket_chip.add_child(ticket_label)
+	var buy_btn := UIKit.button(Loc.t("ui.gate.buy_ticket", {"gold": recruitment.get_ticket_gold_price()}),
+		func() -> void: recruitment.buy_ticket(), &"Button", recruitment.can_buy_ticket())
+	var ticket_bar := UIKit.hbox([ticket_chip, buy_btn], 8)
+	content.add_child(ticket_bar)
 	var reason := recruitment.can_summon()
 	var cost := recruitment.get_ticket_cost()
-	content.add_child(UIKit.hbox([_summon_column(1, cost, reason, &"PrimaryButton"),
-		_summon_column(5, cost * 5, reason), _summon_column(10, cost * 10, reason)], 6))
+	content.add_child(UIKit.hbox([_summon_column(1, cost, reason, &"Button"),
+		_summon_column(5, cost * 5, reason, &"Button"), _summon_column(10, cost * 10, reason, &"PrimaryButton")], 6))
 	var effects := CheckButton.new()
 	effects.text = Loc.t("ui.gate.effects_toggle")
 	effects.button_pressed = SettingsStore.get_summon_effects()
@@ -43,8 +49,8 @@ func _build(content: VBoxContainer) -> void:
 		content.add_child(UIKit.label(Loc.t("ui.gate.arrivals"), &"AccentLabel"))
 		var grid := GridContainer.new()
 		grid.columns = 2
-		grid.add_theme_constant_override(&"h_separation", 4)
-		grid.add_theme_constant_override(&"v_separation", 4)
+		grid.add_theme_constant_override(&"h_separation", 6)
+		grid.add_theme_constant_override(&"v_separation", 6)
 		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		for hunter in _arrivals:
 			if gm.hunters.get_hunter(hunter.unique_id) != null:
@@ -58,8 +64,9 @@ func _build(content: VBoxContainer) -> void:
 
 
 ## One summon size: ×N over the tickets it costs, so the three fit a phone in every language.
-func _summon_column(count: int, tickets: int, reason: String, variation: StringName = &"") -> Control:
+func _summon_column(count: int, tickets: int, reason: String, variation: StringName = &"Button") -> Control:
 	var button := UIKit.button(Loc.t("ui.gate.summon_times", {"count": count}), func() -> void: _summon(count), variation, reason)
+	button.custom_minimum_size = Vector2(0, GameTheme.TOUCH)
 	var price := UIKit.hbox([PixelIcons.rect(&"mail", 1), UIKit.label(str(tickets), &"MutedLabel", false)], 3)
 	price.alignment = BoxContainer.ALIGNMENT_CENTER
 	return UIKit.vbox([button, price], 2)
@@ -124,6 +131,6 @@ func _roster_row(hunter: HunterRuntime) -> Control:
 	else:
 		button = UIKit.button(Loc.t("ui.gate.expel"), func() -> void:
 			_confirm_id = hunter.unique_id
-			request_rebuild(), &"", reason)
+			request_rebuild(), &"Button", reason)
 	button.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 	return UIKit.hbox([label, button], 6)

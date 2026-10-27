@@ -24,6 +24,16 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var layout := UIKit.vbox([], 6)
 	add_child(layout)
+	var grabber_center := CenterContainer.new()
+	grabber_center.custom_minimum_size.y = 8
+	var grabber := Panel.new()
+	var grabber_style := StyleBoxFlat.new()
+	grabber_style.bg_color = Color(0.35, 0.42, 0.55, 0.55)
+	grabber_style.set_corner_radius_all(2)
+	grabber.add_theme_stylebox_override(&"panel", grabber_style)
+	grabber.custom_minimum_size = Vector2(36, 4)
+	grabber_center.add_child(grabber)
+	layout.add_child(grabber_center)
 	_title_label = UIKit.label(title, &"TitleLabel", false)
 	var close := UIKit.button("", func() -> void: closed.emit(), &"RoundButton")
 	close.icon = PixelIcons.texture(&"close", 2)

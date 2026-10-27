@@ -14,6 +14,7 @@ signal autosave_requested(reason: StringName)
 const WEEK_SECONDS := 7 * 24 * 3600
 const REGION_ID := &"boss_arena"
 const BONUS_GOLD := 1500
+const BONUS_TICKETS := 5
 const BONUS_ITEMS := {&"dark_essence": 3, &"iron_ore": 10, &"beast_fang": 6}
 
 ## Unix time when the boss is back (0 = it is up now).
@@ -65,7 +66,8 @@ func record_defeat(now: int = int(Time.get_unix_time_from_system())) -> Dictiona
 	kills += 1
 	next_available_unix = now + WEEK_SECONDS
 	_wallet.add(BONUS_GOLD)
-	var reward := {"gold": BONUS_GOLD, "items": {}}
+	_wallet.add_tickets(BONUS_TICKETS)
+	var reward := {"gold": BONUS_GOLD, "tickets": BONUS_TICKETS, "items": {}}
 	for item_id: StringName in BONUS_ITEMS:
 		var stored := _inventory.add_item(item_id, BONUS_ITEMS[item_id])
 		if stored > 0:

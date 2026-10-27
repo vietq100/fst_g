@@ -75,7 +75,7 @@ func _member_row(runtime: HunterRuntime) -> Control:
 		else:
 			_party.append(runtime.unique_id)
 		request_rebuild(),
-		&"SelectedButton" if selected else &"",
+		&"SelectedButton" if selected else &"Button",
 		"" if available and (selected or not full) else (Loc.t("ui.expedition.party_full") if available else Loc.t("ui.expedition.not_available")))
 	toggle.size_flags_horizontal = Control.SIZE_SHRINK_END
 	toggle.custom_minimum_size.x = 80

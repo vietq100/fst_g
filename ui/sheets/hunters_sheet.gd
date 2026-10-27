@@ -37,16 +37,16 @@ func _build(content: VBoxContainer) -> void:
 		for hunter in gm.hunters.get_active():
 			gm.regions.set_duty(hunter, options[_duty_index])
 		toast_requested.emit(Loc.t("ui.hunters.everyone", {"duty": gm.regions.get_duty_name(options[_duty_index])}), false)
-		request_rebuild(), &"")
+		request_rebuild(), &"Button")
 	place.tooltip_text = Loc.t("ui.hunters.hunting_grounds_tip", {"next": gm.regions.get_duty_name(next_duty)})
 	var sort := UIKit.button(Loc.t("ui.hunters.sort", {"mode": Loc.t("ui.hunters.sort_mode.%s" % String(Sort.keys()[_sort]).to_lower())}), func() -> void:
 		_sort = ((_sort + 1) % Sort.size()) as Sort
-		request_rebuild(), &"")
+		request_rebuild(), &"Button")
 	content.add_child(UIKit.hbox([place, sort], 4))
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
-	grid.add_theme_constant_override(&"h_separation", 4)
-	grid.add_theme_constant_override(&"v_separation", 4)
+	grid.add_theme_constant_override(&"h_separation", 6)
+	grid.add_theme_constant_override(&"v_separation", 6)
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var roster := gm.hunters.get_active()
 	roster.sort_custom(_sorter)
@@ -59,8 +59,8 @@ func _build(content: VBoxContainer) -> void:
 		content.add_child(UIKit.label(Loc.t("ui.hunters.asleep_title", {"count": sleepers.size(), "max": gm.recruitment.get_hibernation_cap()}), &"AccentLabel"))
 		var asleep_grid := GridContainer.new()
 		asleep_grid.columns = COLUMNS
-		asleep_grid.add_theme_constant_override(&"h_separation", 4)
-		asleep_grid.add_theme_constant_override(&"v_separation", 4)
+		asleep_grid.add_theme_constant_override(&"h_separation", 6)
+		asleep_grid.add_theme_constant_override(&"v_separation", 6)
 		asleep_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		sleepers.sort_custom(_sorter)
 		for runtime in sleepers:

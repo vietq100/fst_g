@@ -1535,6 +1535,10 @@
   "en": "Not equipment",
   "vi": "Không phải trang bị"
  },
+ "err.gate.short_gold_for_ticket": {
+  "en": "Needs {gold} gold for a ticket",
+  "vi": "Cần {gold} vàng để mua thẻ"
+ },
  "err.market.missing": {
   "en": "Build a Market to buy loot into the Warehouse",
   "vi": "Hãy xây Chợ để thu mua đồ vào Nhà Kho"
@@ -2567,6 +2571,14 @@
   "en": "Peak of Power",
   "vi": "Đỉnh Cao Sức Mạnh"
  },
+ "quest.level_50.desc": {
+  "en": "Bring a Hunter to level 50.",
+  "vi": "Đưa một Hunter lên level 50."
+ },
+ "quest.level_50.name": {
+  "en": "Ascension to Glory",
+  "vi": "Vươn Tới Vinh Quang"
+ },
  "quest.portal.desc": {
   "en": "Build the Reincarnation Portal.",
   "vi": "Xây Cổng Luân Hồi."
@@ -2598,6 +2610,30 @@
  "quest.town_hall_3.name": {
   "en": "Town Hall Lv 3",
   "vi": "Tòa Thị Chính Lv 3"
+ },
+ "quest.town_hall_5.desc": {
+  "en": "Upgrade the Town Hall to level 5.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 5."
+ },
+ "quest.town_hall_5.name": {
+  "en": "Town Hall Lv 5",
+  "vi": "Tòa Thị Chính Lv 5"
+ },
+ "quest.town_hall_7.desc": {
+  "en": "Upgrade the Town Hall to level 7.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 7."
+ },
+ "quest.town_hall_7.name": {
+  "en": "Town Hall Lv 7",
+  "vi": "Tòa Thị Chính Lv 7"
+ },
+ "quest.town_hall_10.desc": {
+  "en": "Upgrade the Town Hall to level 10.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 10."
+ },
+ "quest.town_hall_10.name": {
+  "en": "Town Hall Lv 10",
+  "vi": "Tòa Thị Chính Lv 10"
  },
  "quest.trading_post.desc": {
   "en": "Build a Trading Post.",
@@ -4314,6 +4350,10 @@
  "ui.gate.tickets": {
   "en": "Summoning tickets: {count}",
   "vi": "Thẻ triệu hồi: {count}"
+ },
+ "ui.gate.buy_ticket": {
+  "en": "Buy Ticket ({gold}g)",
+  "vi": "Mua Thẻ ({gold} vàng)"
  },
  "ui.gate.effects_toggle": {
   "en": "Reveal cards (swipe)",

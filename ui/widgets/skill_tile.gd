@@ -38,29 +38,54 @@ func _draw() -> void:
 		return
 	var active := SkillIcons.is_active(_skill)
 	var plate := Rect2(Vector2((size.x - SIDE) * 0.5, 2.0), Vector2(SIDE, SIDE))
-	var rim := Color("e0874a") if active else Color("5fa8ff")
-	draw_rect(plate.grow(2.0), rim.darkened(0.45))
-	draw_rect(plate.grow(1.0), rim)
+	var rim := Color("f97316") if active else Color("38bdf8")
+
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color("12151f")
+	box.border_color = rim.darkened(0.2)
+	box.set_border_width_all(2)
+	box.border_width_bottom = 3
+	box.set_corner_radius_all(6)
+	box.shadow_color = Color(0, 0, 0, 0.45)
+	box.shadow_size = 3
+	box.shadow_offset = Vector2(0, 1)
+	draw_style_box(box, plate.grow(2.0))
+
+	# Inner glowing sheen on top
+	draw_rect(Rect2(plate.position + Vector2(2, 2), Vector2(SIDE - 4.0, 2.0)), Color(rim.lightened(0.2), 0.35))
+
 	draw_texture_rect(SkillIcons.texture(_skill, 2), plate, false)
-	# Grade bar along the plate's foot: the skill's stars against the other skills of its kind (D80).
+
+	# Grade bar along the plate foot: the skill's stars against the other skills of its kind (D80).
 	if _skill is ClassSkillDefinition and is_instance_valid(GameManager) and GameManager.grades != null:
 		var grade_color := StatGradeService.color(GameManager.grades.skill_grade(_skill))
-		draw_rect(Rect2(plate.position + Vector2(0.0, SIDE - 3.0), Vector2(SIDE, 3.0)), grade_color)
+		var bar_rect := Rect2(plate.position + Vector2(1.0, SIDE - 4.0), Vector2(SIDE - 2.0, 3.0))
+		draw_rect(bar_rect, Color("090b0f"))
+		draw_rect(bar_rect.grow(-0.5), grade_color)
+
 	if _badge != "":
 		var font := ThemeDB.fallback_font
-		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 8.0
-		var tag := Rect2(plate.end - Vector2(width, 16.0), Vector2(width, 16.0))
-		draw_rect(tag, Color(0.06, 0.05, 0.04, 0.9))
-		draw_string(font, tag.position + Vector2(4.0, 12.0), _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f4ead2"))
-	var name_rect := Rect2(Vector2(0.0, plate.end.y + 3.0), Vector2(size.x, NAME_HEIGHT))
+		var font_size := 11
+		var width := font.get_string_size(_badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 8.0
+		var tag := Rect2(plate.end - Vector2(width + 1.0, 15.0), Vector2(width, 15.0))
+		var tag_box := StyleBoxFlat.new()
+		tag_box.bg_color = Color("090b0f", 0.92)
+		tag_box.border_color = Color(rim, 0.75)
+		tag_box.set_border_width_all(1)
+		tag_box.set_corner_radius_all(3)
+		draw_style_box(tag_box, tag)
+		draw_string_outline(font, tag.position + Vector2(4.0, 11.0), _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 3, Color("090b0f"))
+		draw_string(font, tag.position + Vector2(4.0, 11.0), _badge, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color("fef3c7"))
+
+	var name_rect := Rect2(Vector2(0.0, plate.end.y + 4.0), Vector2(size.x, NAME_HEIGHT))
 	var font := ThemeDB.fallback_font
 	var lines := _wrap(_skill.display_name, font, 12, size.x - 4.0)
 	for i in mini(lines.size(), 2):
 		var line: String = lines[i]
 		var width := font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 		var at := Vector2((size.x - width) * 0.5, name_rect.position.y + 11.0 + i * 13.0)
-		draw_string_outline(font, at, line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 3, Color("0b0805"))
-		draw_string(font, at, line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f4ead2"))
+		draw_string_outline(font, at, line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 3, Color("090b0f"))
+		draw_string(font, at, line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("f7f4ec"))
 
 
 static func _wrap(text: String, font: Font, font_size: int, max_width: float) -> Array[String]:

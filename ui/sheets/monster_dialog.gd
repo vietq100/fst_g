@@ -68,7 +68,11 @@ func _build(content: VBoxContainer) -> void:
 	if loadout != null:
 		var gold := UIKit.hbox([PixelIcons.rect(&"coin", 2), UIKit.label(Loc.t("ui.monster.gold", {"gold": loadout.gold}), &"HudLabel", false)], 4)
 		gold.alignment = BoxContainer.ALIGNMENT_CENTER
-		content.add_child(gold)
+		var gold_chip := PanelContainer.new()
+		gold_chip.theme_type_variation = &"Chip"
+		gold_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		gold_chip.add_child(gold)
+		content.add_child(gold_chip)
 	var tabs := UIKit.hbox([], 0)
 	for i in TAB_NAMES.size():
 		var tab_button := UIKit.button(Loc.t(TAB_NAMES[i]), func() -> void:
@@ -91,7 +95,7 @@ func _build(content: VBoxContainer) -> void:
 		Tab.ITEMS:
 			_build_items(body, loadout)
 	var close := UIKit.button(Loc.t("ui.common.close"), func() -> void: closed.emit(), &"DangerButton")
-	close.custom_minimum_size = Vector2(0, 40)
+	close.custom_minimum_size = Vector2(0, GameTheme.TOUCH)
 	content.add_child(close)
 
 
@@ -125,17 +129,23 @@ func _paper_doll() -> Control:
 
 func _slot(name_key: String, item_id: StringName) -> Control:
 	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"HunterCard"
 	panel.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 	var item := DataRegistry.find_def(&"item", item_id) as ItemDefinition if item_id != &"" else null
 	if item == null:
-		panel.modulate = Color(1, 1, 1, 0.45)
+		var empty_style := StyleBoxFlat.new()
+		empty_style.bg_color = Color(0.06, 0.07, 0.1, 0.9)
+		empty_style.border_color = Color(0.18, 0.22, 0.32, 0.8)
+		empty_style.set_border_width_all(1)
+		empty_style.set_corner_radius_all(4)
+		empty_style.set_content_margin_all(4)
+		panel.add_theme_stylebox_override(&"panel", empty_style)
 		var hint := UIKit.label(Loc.t(name_key) if name_key != "" and _definition.can_equip else "", &"MutedLabel", false)
 		hint.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 		hint.clip_text = true
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		panel.add_child(hint)
 		return panel
+	panel.theme_type_variation = &"HunterCard"
 	# The icon opens the item's details (ItemInfoModal), like a Hunter's worn gear.
 	var icon := ItemIcon.new().setup(item, 28)
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

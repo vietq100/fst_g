@@ -16,7 +16,7 @@ func _build(content: VBoxContainer) -> void:
 	set_title(Loc.t("ui.shop.title"))
 	var buildings := GameManager.buildings
 	var quests := UIKit.button(Loc.t("ui.shop.quests", {"count": GameManager.quests.get_claimable_count()}),
-		func() -> void: open_requested.emit(QuestSheet.new()), &"PrimaryButton" if GameManager.quests.get_claimable_count() > 0 else &"")
+		func() -> void: open_requested.emit(QuestSheet.new()), &"PrimaryButton" if GameManager.quests.get_claimable_count() > 0 else &"Button")
 	content.add_child(quests)
 	for building_id in SERVICES:
 		var definition := buildings.get_definition(building_id)
@@ -33,7 +33,7 @@ func _build(content: VBoxContainer) -> void:
 		else:
 			var reason := buildings.can_build(building_id)
 			info.add_child(UIKit.label(reason if not reason.is_empty() else Loc.t("ui.shop.not_built_hint"), &"WarningLabel"))
-			action = UIKit.button(Loc.t("ui.shop.locked"), func() -> void: pass, &"", Loc.t("ui.shop.not_built"))
+			action = UIKit.button(Loc.t("ui.shop.locked"), func() -> void: pass, &"Button", Loc.t("ui.shop.not_built"))
 		action.size_flags_horizontal = Control.SIZE_SHRINK_END
 		action.custom_minimum_size.x = 64
 		content.add_child(UIKit.card(UIKit.hbox([info, action])))

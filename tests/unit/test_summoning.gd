@@ -39,6 +39,18 @@ func test_tickets_are_a_currency() -> void:
 	assert_eq(_wallet.summon_tickets, 1)
 
 
+func test_buy_ticket_with_gold() -> void:
+	assert_eq(_recruitment.get_ticket_gold_price(), 300)
+	assert_eq(_wallet.gold, 0)
+	assert_false(_recruitment.can_buy_ticket().is_empty())
+	assert_false(_recruitment.buy_ticket())
+	_wallet.add(350)
+	assert_eq(_recruitment.can_buy_ticket(), "")
+	assert_true(_recruitment.buy_ticket())
+	assert_eq(_wallet.gold, 50)
+	assert_eq(_wallet.summon_tickets, 2)
+
+
 func test_summon_costs_a_ticket_and_fills_the_village_first() -> void:
 	assert_false(_recruitment.can_summon().is_empty(), "no tickets: refused")
 	assert_null(_recruitment.summon())

@@ -19,8 +19,8 @@ const CLASS_COLORS := {
 const DEFAULT_CLASS_COLOR := Color("6fd6d0")
 const ROMAN := [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
 	[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]
-const INFO_BUTTON := Color("3b3f2a")
-const LOCATE_BUTTON := Color("4f7a2a")
+const INFO_BUTTON := Color("2c3448")
+const LOCATE_BUTTON := Color("257a3e")
 
 var runtime: HunterRuntime
 
@@ -31,7 +31,7 @@ func setup(hunter: HunterRuntime, status_text: String) -> HunterCard:
 	var definition := gm.hunters.get_definition(hunter)
 	var tier_color := Tier.color(hunter.tier)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	add_theme_stylebox_override(&"panel", _card_style(tier_color))
+	add_theme_stylebox_override(&"panel", _card_style(tier_color, hunter.tier))
 	# Top: talent star, name, tier code.
 	var star := PixelIcons.rect(&"star", 1)
 	star.modulate = Color("f2c94c") if gm.talents.get_talent(hunter) != null else Color(1, 1, 1, 0.3)
@@ -149,16 +149,20 @@ func _small(text: String, color: Color) -> Label:
 
 
 ## Dark card washed with the tier colour, rim in the tier colour, darker bottom edge.
-static func _card_style(tier_color: Color) -> StyleBoxFlat:
+static func _card_style(tier_color: Color, tier_level: int = 0) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color("1b2030").lerp(tier_color, 0.22)
-	box.border_color = tier_color.darkened(0.25)
+	var is_legendary := tier_level >= Tier.Level.SSR
+	var bg_tint := 0.28 if is_legendary else 0.20
+	box.bg_color = Color("141824").lerp(tier_color, bg_tint)
+	box.border_color = tier_color if is_legendary else tier_color.darkened(0.2)
 	box.set_border_width_all(2)
+	box.border_width_top = 3 if is_legendary else 2
 	box.border_width_bottom = 3
 	box.set_corner_radius_all(6)
 	box.set_content_margin_all(3)
-	box.shadow_color = Color(0, 0, 0, 0.35)
-	box.shadow_size = 2
+	box.shadow_color = Color(0, 0, 0, 0.55 if is_legendary else 0.4)
+	box.shadow_size = 4 if is_legendary else 2
+	box.shadow_offset = Vector2(0, 2)
 	return box
 
 
@@ -172,6 +176,10 @@ static func _style_button(button: Button, color: Color) -> void:
 		box.border_width_bottom = 3 if state[0] != &"pressed" else 1
 		box.set_corner_radius_all(5)
 		box.set_content_margin_all(2)
+		if state[0] != &"pressed":
+			box.shadow_color = Color(0, 0, 0, 0.35)
+			box.shadow_size = 2
+			box.shadow_offset = Vector2(0, 1)
 		if state[0] == &"focus":
 			box.draw_center = false
 		button.add_theme_stylebox_override(state[0], box)

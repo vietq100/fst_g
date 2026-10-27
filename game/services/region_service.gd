@@ -341,7 +341,13 @@ func deposit(hunter: HunterRuntime) -> Dictionary:
 			report["items"][item_id] = stored
 			_wallet.spend(stored * price)
 			report["village_gold"] += stored * price
-		report["trader_gold"] += (quantity - stored) * price
+		var trader_overflow := (quantity - stored) * price
+		var tax_rate: float = _config.trader_tax_rate if _config != null else 0.0
+		var tax := floori(trader_overflow * tax_rate)
+		report["trader_gold"] += trader_overflow - tax
+		if tax > 0:
+			_wallet.add(tax)
+			report["trader_tax"] = report.get("trader_tax", 0) + tax
 	_purses.earn(hunter, report["village_gold"] + report["trader_gold"])
 	hunter.loot_bag.clear()
 	loot_bag_changed.emit(hunter)

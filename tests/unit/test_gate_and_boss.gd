@@ -62,9 +62,12 @@ func test_weekly_boss_rewards_then_returns_in_a_week() -> void:
 	assert_eq(_boss.get_boss().id, &"weekly_boss")
 	assert_true(_boss.is_available(1000))
 	var gold := _wallet.gold
+	var tickets := _wallet.summon_tickets
 	var reward := _boss.record_defeat(1000)
 	assert_eq(reward["gold"], WeeklyBossService.BONUS_GOLD)
+	assert_eq(reward["tickets"], WeeklyBossService.BONUS_TICKETS)
 	assert_eq(_wallet.gold, gold + WeeklyBossService.BONUS_GOLD)
+	assert_eq(_wallet.summon_tickets, tickets + WeeklyBossService.BONUS_TICKETS)
 	assert_eq(_boss.kills, 1)
 	assert_false(_boss.is_available(1000))
 	assert_almost_eq(_boss.seconds_until_available(1000), float(WeeklyBossService.WEEK_SECONDS))

@@ -27,12 +27,13 @@ extends Resource
 @export var starting_food: Dictionary[StringName, int] = {&"meat_stew": 6}
 @export var starting_hunter_class: StringName = &"warrior"
 @export var starting_hunter_count: int = 1
-## Summoning tickets of a new village (D83). 1000 is the owner's test value; the release value is
-## to be set once ticket sources exist (BALANCE.md → Summoning).
-@export var start_summon_tickets: int = 1000
+## Summoning tickets of a new village (D83). Set to 20 for release balance.
+@export var start_summon_tickets: int = 20
 @export_group("Summoning (D83)")
 ## Tickets one summon costs.
 @export var summon_ticket_cost: int = 1
+## Gold cost to buy one summoning ticket from the treasury at the Gate.
+@export var ticket_gold_price: int = 300
 ## Hunters awake in the village at once (hunting, training, living); the Town Hall cannot raise it past this.
 @export var active_hunter_cap: int = 24
 ## Hunters asleep on the Hibernation Mount.
@@ -135,6 +136,10 @@ extends Resource
 ## D34: purse of a new Hunter; share of a treasury ↔ purse transfer lost as fee.
 @export var purse_start: int = 20
 @export_range(0.0, 1.0) var transfer_fee: float = 0.1
+## Tax rate taken by village treasury on trader purchases of surplus materials.
+@export_range(0.0, 1.0) var trader_tax_rate: float = 0.15
+## Gold spent by a Hunter at the Tavern during social activities (goes to village treasury).
+@export var social_drink_cost: int = 2
 
 @export_group("Offline")
 ## Max real time applied to town timers after the app was closed (DECISIONS.md D24).

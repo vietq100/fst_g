@@ -25,9 +25,16 @@ func _build(content: VBoxContainer) -> void:
 			UIKit.bar(progress.x, progress.y, &"XpBar" if not done else &"HpBar", "%d / %d" % [progress.x, progress.y]),
 			UIKit.label(Loc.t("ui.quest.reward", {"reward": quests.describe_reward(quest)}), &"MutedLabel"),
 		], 3)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var claim := UIKit.button(Loc.t("ui.quest.claim"), func() -> void:
 			run_action("" if quests.claim(quest) else quests.can_claim(quest), Loc.t("ui.quest.claimed", {"reward": quests.describe_reward(quest)})),
 			&"PrimaryButton", quests.can_claim(quest))
 		claim.size_flags_horizontal = Control.SIZE_SHRINK_END
-		claim.custom_minimum_size.x = 64
-		content.add_child(UIKit.card(UIKit.hbox([info, claim])))
+		claim.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
+		var card := UIKit.card(UIKit.hbox([info, claim], 8))
+		if done:
+			var card_style := GameTheme._box(Color(0.086, 0.11, 0.16, 0.95), Color(0.83, 0.69, 0.22, 0.7), 6, 1, 8)
+			card_style.shadow_color = Color(0, 0, 0, 0.4)
+			card_style.shadow_size = 4
+			card.add_theme_stylebox_override(&"panel", card_style)
+		content.add_child(card)

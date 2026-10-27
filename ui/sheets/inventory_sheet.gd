@@ -27,8 +27,11 @@ func _watch() -> Array:
 
 func _build(content: VBoxContainer) -> void:
 	var inventory := GameManager.inventory
-	content.add_child(UIKit.bar(inventory.used_slots(), inventory.capacity, &"TimerBar",
-		Loc.t("ui.inventory.slots", {"used": inventory.used_slots(), "total": inventory.capacity})))
+	var bar := UIKit.bar(inventory.used_slots(), inventory.capacity, &"TimerBar",
+		Loc.t("ui.inventory.slots", {"used": inventory.used_slots(), "total": inventory.capacity}))
+	if inventory.used_slots() >= inventory.capacity:
+		bar.modulate = Color("ff5252")
+	content.add_child(bar)
 	var tabs := UIKit.hbox([], 0)
 	for i in TAB_NAMES.size():
 		var tab_button := UIKit.button(Loc.t(TAB_NAMES[i]), func() -> void:
@@ -48,8 +51,8 @@ func _build(content: VBoxContainer) -> void:
 		return
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
-	grid.add_theme_constant_override(&"h_separation", 4)
-	grid.add_theme_constant_override(&"v_separation", 4)
+	grid.add_theme_constant_override(&"h_separation", 6)
+	grid.add_theme_constant_override(&"v_separation", 6)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	for slot: Dictionary in slots:
 		grid.add_child(ItemIcon.new().setup(slot["item"], SLOT_SIZE, slot["badge"], slot.get("instance", &"")))

@@ -1,5 +1,7 @@
 # PHASE 10 — UI — ✅ DONE (2026-10-11)
 
+> **Note (post-MVP update):** Phase 10 established the initial mobile bottom sheets and HUD. The UI system was later significantly enhanced and restructured by D62 (Hunter cards), D64–D65 (item modals & durability), D66 (equip picker modal), D71 (monster dialog), D77 (building thumbnails, barber modal), D79 (modal dialog overhaul, top bar resources), D80 (stat grade badges & dark fantasy styling), D81 (dungeon HUD mana & status dots), and D83 (summoning reveal modal).
+
 ## Read first
 - `DOCS/00_RULES.md`
 - `DOCS/DESIGN/UI_DESIGN.md`

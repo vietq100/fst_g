@@ -59,10 +59,19 @@ func _fit() -> void:
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
 	var plate := StyleBoxFlat.new()
-	plate.bg_color = PLATE
+	plate.bg_color = Color("141824")
+	plate.border_color = Color(GameTheme.BORDER, 0.6 if not _locked else 0.3)
+	plate.set_border_width_all(1)
+	plate.border_width_bottom = 2
 	plate.set_corner_radius_all(6)
+	plate.shadow_color = Color(0, 0, 0, 0.45)
+	plate.shadow_size = 3
+	plate.shadow_offset = Vector2(0, 2)
 	draw_style_box(plate, rect)
-	draw_rect(Rect2(Vector2(2, 2), Vector2(size.x - 4.0, size.y * 0.55)), Color(SKY, 0.6))
+
+	# Sky background with rich tone
+	draw_rect(Rect2(Vector2(2, 2), Vector2(size.x - 4.0, size.y * 0.55)), Color(SKY, 0.7 if not _locked else 0.4))
+
 	if _visual != null:
 		# Grass diamond under the footprint.
 		var grass := GRASS_DARK if _locked else GRASS
@@ -72,9 +81,14 @@ func _draw() -> void:
 		for corner in corners:
 			ground.append(_visual.position + (middle + (corner - middle) * 1.18) * _visual.scale.x)
 		draw_colored_polygon(ground, grass)
+
 	var rim := StyleBoxFlat.new()
 	rim.draw_center = false
-	rim.border_color = Color(GameTheme.BORDER, 0.5)
+	rim.border_color = Color(GameTheme.BORDER, 0.75 if not _locked else 0.35)
 	rim.set_border_width_all(1)
+	rim.border_width_top = 2 if not _locked else 1
 	rim.set_corner_radius_all(6)
 	draw_style_box(rim, rect)
+
+	if _locked:
+		draw_rect(rect.grow(-1.0), Color(0.08, 0.08, 0.12, 0.45))

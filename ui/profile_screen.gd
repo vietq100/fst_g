@@ -152,13 +152,15 @@ func _card(profile: Dictionary) -> Control:
 	buttons.size_flags_horizontal = Control.SIZE_SHRINK_END
 	var card := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("241d17")
-	style.border_color = RIM
+	style.bg_color = Color(0.11, 0.13, 0.18, 0.95)
+	style.border_color = GOLD if str(profile.get("preset", "")) == "" else RIM
 	style.set_border_width_all(1)
 	style.border_width_left = 4
-	style.border_color = RIM
-	style.set_corner_radius_all(4)
+	style.set_corner_radius_all(6)
 	style.set_content_margin_all(8)
+	style.shadow_color = Color(0, 0, 0, 0.45)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 2)
 	card.add_theme_stylebox_override(&"panel", style)
 	card.add_child(UIKit.hbox([avatar, info, buttons], 10))
 	return card

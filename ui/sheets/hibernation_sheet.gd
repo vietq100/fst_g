@@ -67,17 +67,17 @@ func _row(hunter: HunterRuntime, asleep: bool) -> Control:
 			swap.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 			buttons.add_child(swap)
 		var wake := UIKit.button(Loc.t("ui.mount.wake"), func() -> void:
-			run_action(recruitment.activate(hunter), Loc.t("ui.mount.woke", {"name": hunter.display_name})), &"", recruitment.can_activate(hunter))
+			run_action(recruitment.activate(hunter), Loc.t("ui.mount.woke", {"name": hunter.display_name})), &"Button", recruitment.can_activate(hunter))
 		wake.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 		buttons.add_child(wake)
 	else:
 		var pick := UIKit.button(Loc.t("ui.mount.pick_swap"), func() -> void:
 			_swap_awake = &"" if _swap_awake == hunter.unique_id else hunter.unique_id
-			request_rebuild(), &"SelectedButton" if _swap_awake == hunter.unique_id else &"", recruitment.can_hibernate(hunter))
+			request_rebuild(), &"SelectedButton" if _swap_awake == hunter.unique_id else &"Button", recruitment.can_hibernate(hunter))
 		pick.custom_minimum_size = Vector2(60, GameTheme.TOUCH)
 		buttons.add_child(pick)
 		var sleep := UIKit.button(Loc.t("ui.mount.sleep"), func() -> void:
-			run_action(recruitment.hibernate(hunter), Loc.t("ui.mount.slept", {"name": hunter.display_name})), &"", recruitment.can_hibernate(hunter))
+			run_action(recruitment.hibernate(hunter), Loc.t("ui.mount.slept", {"name": hunter.display_name})), &"Button", recruitment.can_hibernate(hunter))
 		sleep.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 		buttons.add_child(sleep)
 	return UIKit.hbox([info, buttons], 6)

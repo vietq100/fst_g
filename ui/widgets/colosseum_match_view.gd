@@ -90,8 +90,8 @@ func _ready() -> void:
 	_stage.resized.connect(_place_figures)
 	_place_figures.call_deferred()
 	# Controls.
-	_speed_button = UIKit.button(Loc.t("ui.arena.speed", {"speed": 1}), _toggle_speed)
-	var skip := UIKit.button(Loc.t("ui.arena.skip"), _skip)
+	_speed_button = UIKit.button(Loc.t("ui.arena.speed", {"speed": 1}), _toggle_speed, &"Button")
+	var skip := UIKit.button(Loc.t("ui.arena.skip"), _skip, &"Button")
 	column.add_child(UIKit.hbox([_speed_button, skip], 8))
 	_refresh()
 
@@ -99,6 +99,7 @@ func _ready() -> void:
 func _toggle_speed() -> void:
 	_speed = 2.0 if _speed == 1.0 else 1.0
 	_speed_button.text = Loc.t("ui.arena.speed", {"speed": int(_speed)})
+	_speed_button.theme_type_variation = &"SelectedButton" if _speed == 2.0 else &"Button"
 
 
 func _skip() -> void:
@@ -211,10 +212,14 @@ func _end() -> void:
 	_result_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
 	_result_panel.custom_minimum_size = Vector2(280, 0)
 	add_child(_result_panel)
+	_result_panel.modulate.a = 0.0
+	_result_panel.create_tween().tween_property(_result_panel, ^"modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func _close() -> void:
 	if GameManager.hunters.get_hunter(_first.unique_id) == _first:
 		GameManager.arena.apply_result(_first, _result, 0)
 	finished.emit()
-	queue_free()
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(self, ^"modulate:a", 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(queue_free)

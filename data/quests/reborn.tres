@@ -18,4 +18,5 @@ kind = 4
 target_id = &""
 amount = 1
 reward_gold = 2000
+reward_summon_tickets = 5
 reward_items = Array[ExtResource("2_amt")]([SubResource("A0")])

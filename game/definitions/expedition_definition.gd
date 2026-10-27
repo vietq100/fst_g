@@ -7,6 +7,8 @@ extends GameDefinition
 @export var enemy_groups: Array[EnemyGroup] = []
 @export var boss_id: StringName
 @export var completion_bonus_gold: int = 0
+@export var completion_bonus_summon_tickets: int = 0
+@export var first_clear_bonus_summon_tickets: int = 0
 @export var first_clear_loot_table_id: StringName
 @export var repeat_clear_loot_table_id: StringName
 ## Progress flags set on the first clear, e.g. &"first_boss_clear".

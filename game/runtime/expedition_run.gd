@@ -25,6 +25,7 @@ var levels_gained: Dictionary[StringName, int] = {}
 
 ## Filled when the run ends.
 var gold_granted: int = 0
+var tickets_granted: int = 0
 ## Items that went into the inventory (item id -> quantity).
 var items_granted: Dictionary[StringName, int] = {}
 ## Items that did not fit and were auto-sold, and the gold they gave (already in gold_granted).

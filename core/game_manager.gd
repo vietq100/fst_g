@@ -86,6 +86,7 @@ func build(data_registry: Node) -> void:
 	supply = SupplyService.new(registry, inventory, purses, hunters, buildings)
 	needs = NeedsService.new(hunters, housing, supply, mood, config)
 	activities.needs = needs
+	activities.purses = purses
 	corpses = CorpseService.new(hunters, wallet, config)
 	regions = RegionService.new(registry, world, hunters, purses, inventory, wallet, loot, stats, progress, config, rng)
 	regions.traits = traits

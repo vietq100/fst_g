@@ -21,12 +21,13 @@ var _portraits: Dictionary[StringName, HunterPortrait] = {}
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_header = UIKit.label("", &"TitleLabel", false)
-	_stash = UIKit.label("", &"MutedLabel", false)
+	_stash = UIKit.label("", &"AccentLabel", false)
 	var top := PanelContainer.new()
 	top.theme_type_variation = &"TopBar"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_progress = UIKit.bar(0.0, 1.0, &"TimerBar")
 	_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_progress.custom_minimum_size.y = 14
 	top.add_child(UIKit.vbox([_header, _progress, _stash], 2))
 	add_child(top)
 	var spacer := Control.new()
@@ -63,7 +64,10 @@ func _build_party() -> void:
 		_mana[hunter_id] = mana
 		_effects[hunter_id] = effects
 		_portraits[hunter_id] = portrait
-		var card := UIKit.card(UIKit.vbox([UIKit.hbox([portrait, UIKit.label(runtime.display_name, &"MutedLabel", false)], 4), bar, mana, effects], 2))
+		var name_label := UIKit.label(runtime.display_name, &"HudSmallLabel", false)
+		name_label.clip_text = true
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		var card := UIKit.card(UIKit.vbox([UIKit.hbox([portrait, name_label], 4), bar, mana, effects], 2))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_party_box.add_child(card)
@@ -101,6 +105,11 @@ func _refresh() -> void:
 		if _portraits[hunter_id].downed != down:
 			_portraits[hunter_id].downed = down
 			_portraits[hunter_id].queue_redraw()
+		var hp_ratio := runtime.current_hp / maxf(bar.max_value, 1.0)
+		if hp_ratio < 0.25 and not down:
+			bar.modulate = Color("ff4d4d")
+		else:
+			bar.modulate = Color.WHITE
 
 
 ## One dot per status effect on the member's actor (D48 colours), rebuilt only when the set changes.

@@ -104,6 +104,22 @@ func test_trader_buys_what_the_village_cannot() -> void:
 	assert_eq(int(report["trader_gold"]), 10, "no Warehouse (no free slot): all to the trader")
 
 
+func test_trader_tax_credited_to_treasury() -> void:
+	_game.config.trader_tax_rate = 0.20  # 20% tax
+	_game.wallet.gold = 100
+	var initial_treasury: int = _game.wallet.gold
+	var purse := _hunter.purse
+	_game.buildings.remove(_game.buildings.find_first(&"warehouse").instance_id)
+	_regions.add_to_bag(_hunter, &"bone_dust", 2)  # 2 * 5g = 10g
+	var report := _regions.deposit(_hunter)
+	# 20% of 10g is 2g tax -> 8g to hunter, 2g to treasury
+	assert_eq(int(report["trader_gold"]), 8)
+	assert_eq(int(report["trader_tax"]), 2)
+	assert_eq(_hunter.purse, purse + 8)
+	assert_eq(_game.wallet.gold, initial_treasury + 2)
+	_game.config.trader_tax_rate = 0.0
+
+
 func test_rest_threshold_has_hysteresis() -> void:
 	_hunter.trait_ids.clear()  # personality moves the threshold (test_hunter_ai.gd)
 	var max_hp: float = _game.hunters.get_stat(_hunter, HunterService.MAX_HP)

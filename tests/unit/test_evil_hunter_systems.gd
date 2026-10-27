@@ -202,8 +202,10 @@ func test_quests_complete_and_pay_rewards() -> void:
 	assert_eq(completed, [&"hire_two"])
 	assert_eq(_game.quests.get_claimable_count(), 1)
 	var gold: int = _game.wallet.gold
+	var tickets: int = _game.wallet.summon_tickets
 	assert_true(_game.quests.claim(first))
 	assert_eq(_game.wallet.gold, gold + first.reward_gold)
+	assert_eq(_game.wallet.summon_tickets, tickets + first.reward_summon_tickets)
 	assert_false(_game.quests.claim(first), "only once")
 	assert_eq(_game.quests.get_claimed_count(), 1)
 	assert_false(_game.quests.get_active().any(func(q: QuestDefinition) -> bool: return q.id == &"hire_two"))

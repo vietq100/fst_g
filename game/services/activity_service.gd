@@ -29,6 +29,8 @@ var _accumulator := 0.0
 var _xp_carry: Dictionary[StringName, float] = {}
 ## Optional (set by GameManager): stamina / energy ticks and sleep / meal decisions.
 var needs: NeedsService
+## Optional (set by GameManager): tavern drink fees when socializing.
+var purses: PurseService
 
 
 func _init(registry: Node, hunters: HunterService, traits: TraitService, mood: MoodService,
@@ -152,6 +154,9 @@ func _tick_once(include_outside: bool = true) -> void:
 			SOCIALIZING:
 				_mood.change(hunter, definition.mood * rate)
 				socializing.append(hunter)
+				var drink_cost: int = _config.social_drink_cost if _config != null else 0
+				if purses != null and drink_cost > 0:
+					purses.pay_village(hunter, drink_cost)
 		if ticks % _config.activity_event_every_ticks == 0:
 			_mood.trait_event(hunter, hunter.activity)
 	_socialize(socializing)

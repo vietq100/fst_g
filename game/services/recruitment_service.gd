@@ -84,6 +84,25 @@ func get_ticket_cost() -> int:
 	return config.summon_ticket_cost if config != null else DEFAULT_TICKET_COST
 
 
+func get_ticket_gold_price() -> int:
+	return config.ticket_gold_price if config != null else 300
+
+
+func can_buy_ticket() -> String:
+	var price := get_ticket_gold_price()
+	if not _wallet.can_spend(price):
+		return Loc.t("err.gate.short_gold_for_ticket", {"gold": price})
+	return ""
+
+
+func buy_ticket() -> bool:
+	var price := get_ticket_gold_price()
+	if not _wallet.spend(price):
+		return false
+	_wallet.add_tickets(1)
+	return true
+
+
 func has_active_room() -> bool:
 	return _hunters.count_active() < get_active_cap()
 

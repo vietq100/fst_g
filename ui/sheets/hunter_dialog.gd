@@ -31,7 +31,7 @@ func _build(content: VBoxContainer) -> void:
 	var star_box := UIKit.vbox([stars, UIKit.label(Loc.t("ui.hunter.reincarnation", {"count": runtime.reincarnations}), &"HudSmallLabel", false)], 0)
 	var purse := UIKit.hbox([PixelIcons.rect(&"coin", 2), UIKit.label("%d" % runtime.purse, &"HudLabel", false)], 4)
 	var purse_panel := PanelContainer.new()
-	purse_panel.theme_type_variation = &"HudBubble"
+	purse_panel.theme_type_variation = &"Chip"
 	purse_panel.add_child(purse)
 	purse_panel.size_flags_horizontal = Control.SIZE_SHRINK_END
 	content.add_child(UIKit.hbox([star_box, purse_panel], 6))
@@ -97,7 +97,7 @@ func _paper_doll() -> Control:
 			if gm.equipment.equip(runtime, picks[slot]).is_empty():
 				count += 1
 		get_tree().call_group(&"ui_root", &"toast",
-			Loc.t("ui.hunter.equip_best_done", {"count": count}) if count > 0 else Loc.t("ui.hunter.equip_best_none"), false), &"")
+			Loc.t("ui.hunter.equip_best_done", {"count": count}) if count > 0 else Loc.t("ui.hunter.equip_best_none"), false), &"PrimaryButton")
 	return UIKit.vbox([row, best], 6)
 
 
@@ -118,7 +118,12 @@ func _slot(slot: StringName) -> Control:
 		else:
 			get_tree().call_group(&"ui_root", &"open_equip_picker", runtime, slot))
 	if item == null:
-		panel.modulate = Color(1, 1, 1, 0.45)
+		var empty_box := StyleBoxFlat.new()
+		empty_box.bg_color = Color("10131d", 0.75)
+		empty_box.border_color = Color("38415c", 0.6)
+		empty_box.set_border_width_all(1)
+		empty_box.set_corner_radius_all(5)
+		panel.add_theme_stylebox_override(&"panel", empty_box)
 		var hint := UIKit.label(EquipmentService.slot_label(slot), &"MutedLabel", false)
 		hint.add_theme_font_size_override(&"font_size", GameTheme.SMALL_SIZE)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

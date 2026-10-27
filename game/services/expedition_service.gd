@@ -179,6 +179,12 @@ func complete() -> void:
 		return
 	var definition := get_current_definition()
 	current_run.gold_granted = current_run.stash_gold + definition.completion_bonus_gold
+	var tickets := definition.completion_bonus_summon_tickets
+	if current_run.is_first_clear:
+		tickets += definition.first_clear_bonus_summon_tickets
+	if tickets > 0:
+		current_run.tickets_granted = tickets
+		_wallet.add_tickets(tickets)
 	_grant_items(1.0)
 	if current_run.is_first_clear:
 		for flag in definition.first_clear_flags:

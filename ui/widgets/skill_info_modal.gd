@@ -26,7 +26,7 @@ func _ready() -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed:
-			queue_free())
+			_dismiss())
 	add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -39,6 +39,18 @@ func _ready() -> void:
 	var body := UIKit.vbox([], 8)
 	frame.add_child(body)
 	_build(body)
+	dim.modulate.a = 0.0
+	frame.modulate.a = 0.0
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(dim, ^"modulate:a", 1.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(frame, ^"modulate:a", 1.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _dismiss() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(self, ^"modulate:a", 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(queue_free)
 
 
 func _build(body: VBoxContainer) -> void:
@@ -105,7 +117,7 @@ func _build(body: VBoxContainer) -> void:
 		actions.add_child(button)
 	if actions.get_child_count() > 0:
 		body.add_child(actions)
-	var close := UIKit.button(Loc.t("ui.common.close"), queue_free, &"")
+	var close := UIKit.button(Loc.t("ui.common.close"), _dismiss, &"")
 	close.custom_minimum_size = Vector2(150, 46)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.add_theme_font_size_override(&"font_size", 18)

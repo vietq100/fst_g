@@ -28,10 +28,11 @@ func _build(content: VBoxContainer) -> void:
 			UIKit.label(Loc.t("ui.build.entry", {"name": definition.display_name, "gold": definition.build_cost})),
 			UIKit.label(BuildingSheet.describe(building_id), &"MutedLabel"),
 		], 2)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if not reason.is_empty():
 			info.add_child(UIKit.label(reason, &"WarningLabel"))
 		var place := UIKit.button(Loc.t("ui.build.place"), func() -> void: build_requested.emit(building_id), &"PrimaryButton", reason)
 		place.size_flags_horizontal = Control.SIZE_SHRINK_END
-		place.custom_minimum_size.x = 64
+		place.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 		var thumb := BuildingThumb.new().setup(building_id, definition.footprint, 1, THUMB_SIDE, not reason.is_empty())
-		content.add_child(UIKit.card(UIKit.hbox([thumb, info, place])))
+		content.add_child(UIKit.card(UIKit.hbox([thumb, info, place], 8)))

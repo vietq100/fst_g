@@ -149,6 +149,9 @@ func blocks_point(point: Vector2) -> bool:
 
 func open_sheet(sheet: Sheet) -> void:
 	close_sheet()
+	for child in _sheet_area.get_children():
+		if child is Sheet:
+			child.queue_free()
 	_sheet = sheet
 	sheet.closed.connect(close_sheet)
 	sheet.open_requested.connect(open_sheet)
@@ -157,6 +160,13 @@ func open_sheet(sheet: Sheet) -> void:
 	_sheet_area.add_child(sheet)
 	_layout_sheet()
 	_highlight_nav()
+	# Slide-up and fade-in entrance transition
+	var target_top := sheet.offset_top
+	sheet.offset_top = target_top + 28.0
+	sheet.modulate.a = 0.0
+	var tween := sheet.create_tween().set_parallel(true)
+	tween.tween_property(sheet, ^"modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(sheet, ^"offset_top", target_top, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 ## Item details over everything (D64); the open sheet stays.
@@ -200,10 +210,19 @@ func open_equip_picker(hunter: HunterRuntime, slot: StringName) -> void:
 
 func close_sheet() -> void:
 	if _sheet != null and is_instance_valid(_sheet):
-		_sheet.queue_free()
-	_sheet = null
-	_highlight_nav()
-	sheet_cover_changed.emit(0.0)
+		var closing := _sheet
+		_sheet = null
+		_highlight_nav()
+		sheet_cover_changed.emit(0.0)
+		closing.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var tween := closing.create_tween().set_parallel(true)
+		tween.tween_property(closing, ^"modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_property(closing, ^"offset_top", closing.offset_top + 24.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.chain().tween_callback(closing.queue_free)
+	else:
+		_sheet = null
+		_highlight_nav()
+		sheet_cover_changed.emit(0.0)
 
 
 ## The camera has wandered off the Town: the "Town" button turns gold to offer the way back.

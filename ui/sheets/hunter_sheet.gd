@@ -64,7 +64,7 @@ func _build(content: VBoxContainer) -> void:
 	var portrait := HunterPortrait.new().setup(runtime, gm.equipment)
 	portrait.custom_minimum_size = Vector2(64, 64)
 	content.add_child(UIKit.hbox([portrait, header], 8))
-	content.add_child(UIKit.button(Loc.t("ui.hunter.follow"), func() -> void: follow_requested.emit(runtime.unique_id), &"",
+	content.add_child(UIKit.button(Loc.t("ui.hunter.follow"), func() -> void: follow_requested.emit(runtime.unique_id), &"Button",
 		"" if runtime.expedition_id == &"" or GameManager.expeditions.is_running() else Loc.t("ui.hunter.not_on_map")))
 	_build_needs_and_purse(content)
 	_build_equipment(content)
@@ -168,10 +168,10 @@ func _build_needs_and_purse(content: VBoxContainer) -> void:
 	var take_amount := runtime.purse
 	var give := UIKit.button(Loc.t("ui.hunter.give", {"amount": GIVE_STEP, "received": purses.get_received(GIVE_STEP)}), func() -> void:
 		run_action(purses.give(runtime, GIVE_STEP), Loc.t("ui.hunter.gave", {"gold": purses.get_received(GIVE_STEP), "name": runtime.display_name})),
-		&"", purses.can_give(runtime, GIVE_STEP))
+		&"Button", purses.can_give(runtime, GIVE_STEP))
 	var take := UIKit.button(Loc.t("ui.hunter.take_all", {"received": purses.get_received(take_amount)}), func() -> void:
 		run_action(purses.take(runtime, take_amount), Loc.t("ui.hunter.treasury_gain", {"gold": purses.get_received(take_amount)})),
-		&"", purses.can_take(runtime, take_amount))
+		&"Button", purses.can_take(runtime, take_amount))
 	for button: Button in [give, take]:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size.x = 0
@@ -203,7 +203,7 @@ func _build_duty(content: VBoxContainer) -> void:
 		elif duty == HunterRuntime.STAY_IN_TOWN:
 			text = Loc.t("ui.hunter.duty_stay")
 		var button := UIKit.button(text, func() -> void: run_action(regions.set_duty(runtime, duty)),
-			&"PrimaryButton" if runtime.duty == duty else &"")
+			&"PrimaryButton" if runtime.duty == duty else &"Button")
 		_fit_button(button)
 		row.add_child(button)
 	content.add_child(row)
@@ -224,9 +224,9 @@ func _build_equipment(content: VBoxContainer) -> void:
 		if item != null:
 			label.add_theme_color_override(&"font_color", RarityColors.of(item.rarity))
 		var unequip := UIKit.button(Loc.t("ui.common.remove"), func() -> void:
-			run_action(equipment.unequip(runtime, slot)), &"", "" if item != null else Loc.t("ui.hunter.nothing_equipped"))
+			run_action(equipment.unequip(runtime, slot)), &"DangerButton" if item != null else &"Button", "" if item != null else Loc.t("ui.hunter.nothing_equipped"))
 		unequip.size_flags_horizontal = Control.SIZE_SHRINK_END
-		unequip.custom_minimum_size.x = 72
+		unequip.custom_minimum_size = Vector2(72, GameTheme.TOUCH)
 		content.add_child(UIKit.hbox([label, unequip]))
 	# Stored items that fit: one button each.
 	var options := 0
@@ -277,10 +277,10 @@ func _build_look(content: VBoxContainer) -> void:
 func _stepper(text: String, change: Callable) -> HBoxContainer:
 	var back := UIKit.button(Loc.t("ui.common.previous"), func() -> void:
 		change.call(-1)
-		request_rebuild())
+		request_rebuild(), &"Button")
 	var forward := UIKit.button(Loc.t("ui.common.next"), func() -> void:
 		change.call(1)
-		request_rebuild())
+		request_rebuild(), &"Button")
 	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	forward.size_flags_horizontal = Control.SIZE_SHRINK_END
 	var label := UIKit.label(text)
@@ -320,7 +320,7 @@ func _build_activity(content: VBoxContainer) -> void:
 			[ActivityService.TRAINING, "ui.hunter.assign.train"], [ActivityService.SOCIALIZING, "ui.hunter.assign.social"]]:
 		var selected: bool = runtime.assigned_activity == option[0]
 		var button := UIKit.button(Loc.t(option[1]), func() -> void: run_action(activities.set_assignment(runtime, option[0])),
-			&"SelectedButton" if selected else &"")
+			&"SelectedButton" if selected else &"Button")
 		_fit_button(button)
 		row.add_child(button)
 	content.add_child(row)

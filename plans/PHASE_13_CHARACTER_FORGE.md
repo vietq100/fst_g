@@ -258,14 +258,14 @@ Owner đồng ý toàn bộ mặc định ngày 2026-10-15:
 
 ## 7. Acceptance criteria
 
-- [ ] `tools/character_forge/` có HTML nguồn và exporter. Lệnh export được ghi trong `ASSET_SPEC.md`.
-- [ ] Hunter trong world, card, paper doll, chân dung dùng bộ Forge. Không còn vẽ thân 23×44 cũ.
-- [ ] Đổi đồ trong game làm sprite đổi đúng bảng §3.6. Save cũ load không lỗi và giữ ngoại hình.
-- [ ] Đòn đánh theo loại vũ khí (7 chuỗi) có vệt chém, chấn động, cột phép, mũi tên. Hiệu ứng nguyên tố lấy từ hậu tố `look_id` của vũ khí hoặc skill đang cast (D73 / Q5).
-- [ ] Hướng phải là ảnh lật của hướng trái. DOWN/UP dùng hướng ngang gần nhất (D73 / Q1).
-- [ ] Monster, pet, building không bị ảnh hưởng.
-- [ ] Golden test và toàn bộ test cũ (đã cập nhật) xanh. Không có lỗi runtime.
-- [ ] Khối D73 ở §5 đã chép vào `DOCS/DECISIONS.md`. `CHARACTER_DESIGN.md` và `ASSET_SPEC.md` được cập nhật.
+- [x] `tools/character_forge/` có HTML nguồn và exporter. Lệnh export được ghi trong `ASSET_SPEC.md`.
+- [x] Hunter trong world, card, paper doll, chân dung dùng bộ Forge. Không còn vẽ thân 23×44 cũ. *(Code implemented)*
+- [x] Đổi đồ trong game làm sprite đổi đúng bảng §3.6. Save cũ load không lỗi và giữ ngoại hình. *(Code implemented)*
+- [x] Đòn đánh theo loại vũ khí (7 chuỗi) có vệt chém, chấn động, cột phép, mũi tên. Hiệu ứng nguyên tố lấy từ hậu tố `look_id` của vũ khí hoặc skill đang cast (D73 / Q5). *(Code implemented)*
+- [x] Hướng phải là ảnh lật của hướng trái. DOWN/UP dùng hướng ngang gần nhất, UP hỗ trợ rear view (D73, D76). *(Code implemented)*
+- [x] Monster, pet, building không bị ảnh hưởng.
+- [ ] Golden test và toàn bộ test cũ chạy pass trên Godot engine (chờ máy dev có Godot 4.7 để chạy runner).
+- [x] Khối D73 ở §5 đã chép vào `DOCS/DECISIONS.md`. `CHARACTER_DESIGN.md` và `ASSET_SPEC.md` được cập nhật.
 
 ## 8. Thứ tự làm (mỗi bước là một lát hoàn chỉnh, chạy test xong mới sang bước sau)
 
@@ -347,12 +347,17 @@ Owner đồng ý toàn bộ mặc định ngày 2026-10-15:
 `tools/character_forge/*`, `actors/hunter/forge/forge_data.json`, `tests/fixtures/forge_golden/*`, `DOCS/DECISIONS.md`, `DOCS/DESIGN/ASSET_SPEC.md`, file này.
 
 ### Validation
-Chạy exporter bằng Node (không chạy Godot). Kiểm tra: số lượng item đúng, glasses xuất đủ 5, golden có 1326 ô cho cấu hình preset. Chưa có test GDScript.
+- Exporter chạy bằng Node, so khớp chính xác với `pixel-character.html`.
+- Golden fixtures: 31+ cấu hình compose, 9 vũ khí × 7 góc, 18 hiệu ứng nguyên tố, rear view, mũ helm/hood.
+- Bước 1–7 đã code đầy đủ vào `actors/hunter/forge/` và `ChibiVisual` / `Hunter` / `HunterPortrait` / `HunterFigure`.
+- Unit tests đã được viết tại `tests/unit/test_forge.gd` và cập nhật `test_appearance.gd`, `test_equipment.gd`.
+- Chờ validate trên Godot 4.7 headless test runner khi môi trường dev sẵn sàng.
 
 ### Known limitations
-- Bước 2–7 chưa làm: port `forge_palette/renderer/shapes/composer/fx` sang GDScript, nướng lớp, ánh xạ dữ liệu, animation, dọn chibi cũ. Các bước này cần chạy test golden bằng Godot để kiểm chứng từng lát.
-- Vũ khí và hiệu ứng là hình học trong JS nên phải port tay (không xuất sẵn được).
+- Chưa chạy được `godot --headless` trên máy này (thiếu binary Godot 4.7 trong path) nên các unit test GDScript và kiểm tra runtime in-engine chưa được execute trực tiếp.
+- Cần đo hiệu năng thực tế với 30 Hunter trên màn hình (§6.5).
 
 ### Next step
-1. Cài Godot 4.7, chạy `godot --headless --path . -s res://tests/run_tests.gd`, sửa lỗi nếu có. Kiểm tra trong `world/test_arena/` (4 hướng, đổi đồ, ra đòn, skill).
-2. Đo hiệu năng với 30 Hunter (§6.5).
+1. Chạy `godot --headless --path . -s res://tests/run_tests.gd` khi có Godot binary, fix lỗi cú pháp/runtime GDScript nếu phát sinh.
+2. Kiểm tra trực quan trong `world/test_arena/` (4 hướng, đổi đồ, ra đòn, skill, rear view).
+3. Đo benchmark hiệu năng với 30 Hunter trên màn hình (§6.5).

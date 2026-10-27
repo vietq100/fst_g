@@ -17,4 +17,5 @@ enum Kind { BUILDING, TOWN_LEVEL, HUNTERS, FLAG, REINCARNATIONS, DIFFICULTY, HUN
 ## Needed amount (level, count).
 @export var amount: int = 1
 @export var reward_gold: int = 0
+@export var reward_summon_tickets: int = 0
 @export var reward_items: Array[ItemAmount] = []

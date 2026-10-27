@@ -11,8 +11,10 @@ func _init(sheet_title: String, lines: PackedStringArray) -> void:
 
 
 func _build(content: VBoxContainer) -> void:
+	var list := UIKit.vbox([], 6)
 	for line in _lines:
-		content.add_child(UIKit.label(line))
+		list.add_child(UIKit.label(line))
+	content.add_child(UIKit.card(list))
 	content.add_child(UIKit.button(Loc.t("ui.common.ok"), func() -> void: closed.emit(), &"PrimaryButton"))
 
 

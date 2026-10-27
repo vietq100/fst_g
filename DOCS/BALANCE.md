@@ -91,10 +91,17 @@ Averages (built from the data at load, `StatGradeService`):
 | Number | Value | Where |
 |---|---|---|
 | Tickets per summon | 1 | `GameConfig.summon_ticket_cost` |
-| Tickets of a new village | 1000 (owner test value; release value to be set with the ticket sources) | `GameConfig.start_summon_tickets` |
+| Tickets of a new village | 20 (release balance) | `GameConfig.start_summon_tickets` |
+| Ticket gold purchase price | 300 gold | `GameConfig.ticket_gold_price` |
 | Hunters awake at once | 24, never above the Town Hall capacity | `GameConfig.active_hunter_cap` |
 | Sleepers on the Hibernation Mount | 100 | `GameConfig.hibernation_cap` |
 | Summoned tier | rolled with `Tier.HUNTER_WEIGHTS` (D60) | `HunterService.generate_candidate` |
+
+Ticket sources:
+- **Dungeons / Expeditions**: 5 tickets on first clear, 1 ticket on repeat clear (`completion_bonus_summon_tickets`, `first_clear_bonus_summon_tickets`).
+- **Weekly Boss**: 5 tickets per defeat (`WeeklyBossService.BONUS_TICKETS`).
+- **Quests**: 1–5 tickets on milestone achievements (hire Hunters, clear forest, upgrade Town Hall, reach level 20/50, reincarnate).
+- **Gate purchase**: 300 gold per ticket from the town treasury (`RecruitmentService.buy_ticket`).
 
 A sleeper costs nothing (no food, no bed) and gains nothing (no XP, no mood). Waking needs an active slot and a free bed.
 
@@ -175,7 +182,19 @@ Drops:
 | Temple | revival 180 s | 300 gold + 2 Dark Essence | revival 120 s |
 | Warehouse | 40 slots | 250 gold + 5 Iron Ore | 80 slots |
 
-Town Hall Lv3 (post-MVP reference): 1500 gold + 30 Iron Ore + 3 Dark Essence → capacity 8, level cap 30.
+Town Hall progression (Lv 1–10, D70):
+| Level | Upgrade Cost | Capacity | Hunter Level Cap |
+|---|---|---|---|
+| Lv 1 | — (starting building) | 3 | 10 |
+| Lv 2 | 500 gold + 10 Iron Ore (requires first boss clear) | 5 | 20 |
+| Lv 3 | 1,500 gold + 20 Iron Ore + 10 Beast Fang | 8 | 30 |
+| Lv 4 | 4,000 gold + 40 Iron Ore + 8 Dark Essence | 12 | 40 |
+| Lv 5 | 10,000 gold + 20 Dark Essence + 20 Bone Dust | 16 | 50 |
+| Lv 6 | 20,000 gold + 40 Dark Essence + 30 Bone Dust + 30 Beast Fang | 20 | 60 |
+| Lv 7 | 35,000 gold + 60 Dark Essence + 40 Iron Ore | 22 | 70 |
+| Lv 8 | 55,000 gold + 80 Dark Essence + 50 Bone Dust + 40 Beast Fang | 24 | 80 |
+| Lv 9 | 80,000 gold + 100 Dark Essence + 60 Iron Ore + 50 Bone Dust | 24 | 90 |
+| Lv 10 | 120,000 gold + 150 Dark Essence + 80 Bone Dust + 60 Beast Fang | 24 | 100 |
 
 Temple speed-up: 20 gold per remaining started minute.
 
@@ -202,6 +221,12 @@ Recipes (crafted by the chief; output goes to the Warehouse):
 | Hospital Lv2 | Healing Potion | 1 Wild Herb + 1 Bone Dust | 1 | heals 70% max HP | 25 |
 
 New village: 6 Meat Stew in stock.
+
+Town revenue balancing (Phase 12):
+- **Trader tax**: 15% tax taken by the town treasury on surplus materials sold to passing traders (`GameConfig.trader_tax_rate`).
+- **Tavern drinks**: 2 gold paid to the treasury by Hunters during social activities (`GameConfig.social_drink_cost`).
+- **Weapon repairs**: Blacksmith collects `worn points × (1 + tier)` gold when Hunters repair their gear (D64).
+- **Dungeon & Weekly boss bonus**: 50–1500 gold awarded directly to the treasury on clear/defeat.
 
 ## Equipment
 | Item | Rarity | Slot | Modifiers | Source / recipe | Sell |

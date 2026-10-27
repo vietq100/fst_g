@@ -150,6 +150,8 @@ func test_boss_first_clear_loot_goes_to_stash_then_inventory() -> void:
 	assert_eq(_inventory.count(&"iron_ore"), 5)
 	assert_eq(_inventory.count(&"dark_essence"), 2)
 	assert_eq(_service.current_run.items_granted.get(&"beast_fang"), 3)
+	assert_eq(_service.current_run.tickets_granted, 6, "1 completion + 5 first-clear")
+	assert_eq(_wallet.summon_tickets, 6)
 
 
 func test_failure_keeps_half_of_items_rounded_down() -> void:

@@ -133,6 +133,8 @@ func claim(quest: QuestDefinition) -> bool:
 		return false
 	_claimed[quest.id] = true
 	_wallet.add(quest.reward_gold)
+	if quest.reward_summon_tickets > 0:
+		_wallet.add_tickets(quest.reward_summon_tickets)
 	for entry in quest.reward_items:
 		_inventory.add_item(entry.item_id, entry.quantity)
 	quest_claimed.emit(quest)

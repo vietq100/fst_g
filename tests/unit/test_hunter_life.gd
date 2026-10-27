@@ -218,6 +218,20 @@ func test_socializing_builds_bonds() -> void:
 	assert_almost_eq(a.mood, minf(mood_before + 5.0, 100.0))
 
 
+func test_socializing_pays_tavern_drink_fee() -> void:
+	var wallet := WalletService.new()
+	var purses := PurseService.new(wallet, _config)
+	_activities.purses = purses
+	_config.social_drink_cost = 2
+	var a := _hunter()
+	a.purse = 10
+	_activities.set_assignment(a, ActivityService.SOCIALIZING)
+	_activities.tick(10.0)
+	assert_eq(a.purse, 8)
+	assert_eq(wallet.gold, 2)
+	_config.social_drink_cost = 0
+
+
 func test_shared_expeditions_and_party_bonus() -> void:
 	var a := _hunter()
 	var b := _hunter()

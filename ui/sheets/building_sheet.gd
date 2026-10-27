@@ -164,7 +164,7 @@ func _build_placement(content: VBoxContainer, buildings: BuildingService, defini
 		var error := buildings.remove(instance_id)
 		run_action(error, Loc.t("ui.building.removed", {"name": definition.display_name}))
 		if error.is_empty():
-			closed.emit(), &"" if not _confirm_remove else &"PrimaryButton", remove_reason)
+			closed.emit(), &"DangerButton" if _confirm_remove else &"Button", remove_reason)
 	content.add_child(UIKit.hbox([move, remove]))
 
 

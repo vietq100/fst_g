@@ -33,11 +33,22 @@ func setup(hunter: HunterRuntime, _equipment: EquipmentService) -> HunterPortrai
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
-	draw_rect(rect, BACKGROUND)
+	var plate := StyleBoxFlat.new()
+	plate.bg_color = BACKGROUND
+	plate.border_color = accent.darkened(0.3)
+	plate.set_border_width_all(1)
+	plate.border_width_bottom = 2
+	plate.set_corner_radius_all(5)
+	plate.shadow_color = Color(0, 0, 0, 0.45)
+	plate.shadow_size = 2
+	plate.shadow_offset = Vector2(0, 1)
+	draw_style_box(plate, rect)
+
 	# Backdrop: accent-tinted vignette with a soft light behind the head.
 	draw_rect(rect.grow(-2.0), accent.darkened(0.55))
 	draw_circle(Vector2(size.x * 0.5, size.y * 0.42), minf(size.x, size.y) * 0.36, Color(accent.lightened(0.25), 0.35))
-	draw_rect(Rect2(Vector2(2, size.y * 0.72), Vector2(size.x - 4, size.y * 0.28 - 2)), Color(0, 0, 0, 0.2))
+	draw_rect(Rect2(Vector2(2, size.y * 0.72), Vector2(size.x - 4, size.y * 0.28 - 2)), Color(0, 0, 0, 0.25))
+
 	if _figure != null:
 		var crop := ForgeLook.PORTRAIT
 		var zoom := maxi(1, floori(minf(size.x / crop.size.x, size.y / crop.size.y)))
@@ -45,11 +56,20 @@ func _draw() -> void:
 		# Bottom-aligned so the shoulders sit on the frame.
 		var origin := Vector2(floorf((size.x - shown.x) * 0.5), size.y - shown.y - 2.0).floor()
 		_figure.draw(self, origin - crop.position * zoom, false, zoom)
-	draw_rect(rect, BACKGROUND, false, 2.0)
-	draw_rect(rect.grow(-2.0), accent.lightened(0.1), false, 1.0)
+
+	# Gilded inner rim
+	var rim := StyleBoxFlat.new()
+	rim.draw_center = false
+	rim.border_color = Color(accent.lightened(0.25), 0.75)
+	rim.set_border_width_all(1)
+	rim.set_corner_radius_all(5)
+	draw_style_box(rim, rect.grow(-1.0))
+
 	if downed:
 		var center := size * 0.5
 		var unit := size.y / 40.0
-		draw_rect(rect, Color(0.1, 0.1, 0.12, 0.55))
-		draw_line(center + Vector2(-6, -6) * unit, center + Vector2(6, 6) * unit, GameTheme.DANGER, 2.0)
-		draw_line(center + Vector2(6, -6) * unit, center + Vector2(-6, 6) * unit, GameTheme.DANGER, 2.0)
+		draw_rect(rect, Color(0.12, 0.05, 0.05, 0.65))
+		draw_line(center + Vector2(-7, -7) * unit, center + Vector2(7, 7) * unit, Color("090b0f"), 3.0)
+		draw_line(center + Vector2(7, -7) * unit, center + Vector2(-7, 7) * unit, Color("090b0f"), 3.0)
+		draw_line(center + Vector2(-7, -7) * unit, center + Vector2(7, 7) * unit, GameTheme.DANGER, 2.0)
+		draw_line(center + Vector2(7, -7) * unit, center + Vector2(-7, 7) * unit, GameTheme.DANGER, 2.0)
