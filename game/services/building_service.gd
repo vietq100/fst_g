@@ -31,6 +31,10 @@ const RESTAURANT := &"restaurant"
 const MARKET := &"market"
 ## Hunter versus Hunter fights (ARENA_SYSTEM.md); effect `colosseum_format` = team size unlocked.
 const COLOSSEUM := &"colosseum"
+## Monuments and decorations
+const HERO_MONUMENT := &"hero_monument"
+const TOWN_FOUNTAIN := &"town_fountain"
+const ARCANE_LAMP := &"arcane_lamp"
 
 ## Effect keys used by code. Values live in data.
 const HUNTER_CAPACITY := &"hunter_capacity"
@@ -49,6 +53,10 @@ const FOOD_BONUS := &"food_bonus"
 const COLOSSEUM_FORMAT := &"colosseum_format"
 ## Market: share of an item's price the treasury pays when it buys loot (D63).
 const BUY_PRICE := &"buy_price"
+## Town Monuments & Decorations
+const TOWN_EXP_BONUS := &"town_exp_bonus"
+const MOOD_AURA := &"mood_aura"
+const NIGHT_SPEED := &"night_speed"
 
 ## Share of the build cost refunded on removal (BALANCE.md → Building placement).
 const REFUND_RATIO := 0.5

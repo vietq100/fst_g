@@ -111,7 +111,8 @@ func _slot(slot: StringName) -> Control:
 	# Tapping a worn item opens its details; an empty slot opens the picker (D66). Both are
 	# modals over this dialog.
 	panel.gui_input.connect(func(event: InputEvent) -> void:
-		if slot == &"" or not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+		var is_tap := (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+		if slot == &"" or not is_tap:
 			return
 		if item != null:
 			get_tree().call_group(&"ui_root", &"open_item_info", item, instance_id)

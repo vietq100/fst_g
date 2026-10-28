@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ActivityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/activity_definition.gd" id="1_activity"]
+
+[resource]
+script = ExtResource("1_activity")
+id = &"gathering"
+display_name = "activity.gathering.name"
+location_id = &"quarry"
+player_assignable = true
+tick_seconds = 10.0
+hp_percent = 0.02
+mood = 1.5
+xp = 0.5
+bond = 0.0

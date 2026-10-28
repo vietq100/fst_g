@@ -74,6 +74,12 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 			scaled.value = modifier.value * (1.0 + ENHANCE_BONUS * enhance)
 			scaled.condition = modifier.condition
 			modifiers.append(scaled)
+		# Slotted runestones
+		var sockets: Array = _inventory.get_sockets(instance_id)
+		for rune_id: StringName in sockets:
+			var rune := _registry.find_def(&"item", rune_id) as ItemDefinition
+			if rune != null:
+				modifiers.append_array(rune.modifiers)
 	return modifiers
 
 

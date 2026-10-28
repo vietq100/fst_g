@@ -22,6 +22,8 @@ var _equipped: Dictionary[StringName, StringName] = {}
 var _enhance: Dictionary[StringName, int] = {}
 ## Durability lost per weapon instance (D64); missing = like new.
 var _wear: Dictionary[StringName, int] = {}
+## Slotted runestones per equipment instance: instance_id -> Array[StringName].
+var _sockets: Dictionary[StringName, Array] = {}
 var _next_instance := 1
 
 
@@ -113,6 +115,39 @@ func set_enhance(instance_id: StringName, level: int) -> void:
 	else:
 		_enhance[instance_id] = level
 	inventory_changed.emit()
+
+
+func get_sockets(instance_id: StringName) -> Array:
+	return _sockets.get(instance_id, [])
+
+
+func max_sockets(item_def: ItemDefinition) -> int:
+	if item_def == null:
+		return 0
+	if item_def.rarity >= Tier.Level.UR:
+		return 2
+	elif item_def.rarity >= Tier.Level.SR:
+		return 1
+	return 0
+
+
+func can_socket(instance_id: StringName, rune_id: StringName, item_def: ItemDefinition) -> bool:
+	if not _instances.has(instance_id) or not has(rune_id):
+		return false
+	return get_sockets(instance_id).size() < max_sockets(item_def)
+
+
+func socket_rune(instance_id: StringName, rune_id: StringName, item_def: ItemDefinition) -> bool:
+	if not can_socket(instance_id, rune_id, item_def):
+		return false
+	if not remove(rune_id, 1):
+		return false
+	var current: Array = get_sockets(instance_id).duplicate()
+	current.append(rune_id)
+	_sockets[instance_id] = current
+	inventory_changed.emit()
+	return true
+
 
 
 ## Stack count for materials, number of stored instances for equipment.
@@ -223,6 +258,7 @@ func to_dict() -> Dictionary:
 		"next_instance": _next_instance,
 		"enhance": _enhance.duplicate(),
 		"wear": _wear.duplicate(),
+		"sockets": _sockets.duplicate(),
 	}
 
 
@@ -233,6 +269,7 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 	_equipped.clear()
 	_enhance.clear()
 	_wear.clear()
+	_sockets.clear()
 	var stacks: Dictionary = data.get("stacks", {})
 	for item_id in stacks:
 		var item := _get_item(StringName(item_id))
@@ -261,6 +298,11 @@ func from_dict(data: Dictionary, warnings: PackedStringArray) -> void:
 		for instance_id in wear:
 			if _instances.has(StringName(instance_id)) and int(wear[instance_id]) > 0:
 				_wear[StringName(instance_id)] = int(wear[instance_id])
+	var saved_sockets: Variant = data.get("sockets", {})
+	if saved_sockets is Dictionary:
+		for instance_id in saved_sockets:
+			if _instances.has(StringName(instance_id)) and saved_sockets[instance_id] is Array:
+				_sockets[StringName(instance_id)] = Array(saved_sockets[instance_id]).duplicate()
 	_next_instance = maxi(int(data.get("next_instance", 1)), _instances.size() + 1)
 	inventory_changed.emit()
 

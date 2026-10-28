@@ -8,6 +8,8 @@ signal expedition_started(run: ExpeditionRun)
 ## `index` == enemy_groups.size() is the boss section.
 signal section_started(run: ExpeditionRun, index: int)
 signal expedition_finished(run: ExpeditionRun)
+signal fleet_b_started(expedition_id: StringName, party_ids: Array)
+signal fleet_b_finished(expedition_id: StringName, gold: int, items: Dictionary)
 ## SaveManager listens (Phase 9, DECISIONS.md D21).
 signal autosave_requested(reason: StringName)
 
@@ -16,7 +18,10 @@ signal autosave_requested(reason: StringName)
 var downed_handler: Callable
 ## Monster loadout rolls and drops (set by GameManager).
 var regions: RegionService
+var bestiary: BestiaryService
+var bounties: BountyService
 var current_run: ExpeditionRun
+var fleet_b_run: Dictionary = {}
 
 var _registry: Node
 var _hunters: HunterService
@@ -128,6 +133,10 @@ func record_kill(enemy: EnemyDefinition, loadout: MonsterLoadout = null, tier: i
 	if not is_running() or enemy == null:
 		return reward
 	current_run.kills += 1
+	if bestiary != null:
+		bestiary.record_kill(enemy.id)
+	if bounties != null:
+		bounties.record_kill(enemy.id, enemy.is_boss)
 	reward.gold = _rng.randi_range(enemy.gold_min, enemy.gold_max)
 	# A monster that carried a loadout drops what it carried (stash, collected automatically, D5).
 	var carried: Dictionary[StringName, int] = {}
@@ -162,6 +171,8 @@ func record_kill(enemy: EnemyDefinition, loadout: MonsterLoadout = null, tier: i
 		var gained := _hunters.add_xp(hunter, enemy.xp_reward, cap)
 		if gained > 0:
 			current_run.levels_gained[hunter.unique_id] = current_run.levels_gained.get(hunter.unique_id, 0) + gained
+		if enemy.is_boss:
+			hunter.record_chronicle("chronicle.boss_defeated", enemy.display_name)
 	return reward
 
 
@@ -276,4 +287,79 @@ func _set_party_state(state: HunterRuntime.LifecycleState) -> void:
 	for hunter in _party():
 		if not current_run.downed_ids.has(hunter.unique_id):
 			_hunters.set_lifecycle_state(hunter, state)
+
+
+# --- Fleet B (Secondary Auto-Dispatch) -------------------------------------------------------------
+
+func is_fleet_b_running() -> bool:
+	return not fleet_b_run.is_empty() and bool(fleet_b_run.get("active", false))
+
+
+func can_dispatch_fleet_b(party_ids: Array, expedition_id: StringName) -> String:
+	if is_fleet_b_running():
+		return Loc.t("err.expedition.fleet_b_busy")
+	if _progress.town_level < 7:
+		return Loc.t("err.expedition.fleet_b_town_level")
+	var def := get_definition(expedition_id)
+	if def == null:
+		return Loc.t("err.expedition.unknown")
+	if not _first_clear_done(def):
+		return Loc.t("err.expedition.not_cleared")
+	if party_ids.is_empty():
+		return Loc.t("err.expedition.no_party")
+	for h_id in party_ids:
+		var h := _hunters.get_hunter(StringName(h_id))
+		if h == null or h.state != HunterRuntime.LifecycleState.AVAILABLE or h.injured:
+			return Loc.t("err.expedition.hunter_unavailable")
+	return ""
+
+
+func dispatch_fleet_b(party_ids: Array, expedition_id: StringName, duration: float = 120.0) -> bool:
+	if not can_dispatch_fleet_b(party_ids, expedition_id).is_empty():
+		return false
+	fleet_b_run = {
+		"active": true,
+		"expedition_id": expedition_id,
+		"party_ids": party_ids.duplicate(),
+		"duration": duration,
+		"remaining": duration,
+	}
+	for h_id in party_ids:
+		var h := _hunters.get_hunter(StringName(h_id))
+		if h != null:
+			_hunters.set_lifecycle_state(h, HunterRuntime.LifecycleState.ASSIGNED)
+	fleet_b_started.emit(expedition_id, party_ids)
+	return true
+
+
+func tick_fleet_b(delta: float) -> void:
+	if not is_fleet_b_running():
+		return
+	fleet_b_run["remaining"] = maxf(float(fleet_b_run.get("remaining", 0.0)) - delta, 0.0)
+	if fleet_b_run["remaining"] <= 0.0:
+		_finish_fleet_b()
+
+
+func _finish_fleet_b() -> void:
+	var exp_id: StringName = fleet_b_run.get("expedition_id", &"")
+	var party_ids: Array = fleet_b_run.get("party_ids", [])
+	var def := get_definition(exp_id)
+	var gold := 0
+	var items: Dictionary = {}
+	if def != null:
+		gold = def.completion_bonus_gold
+		items = _loot.roll(def.repeat_clear_loot_table_id)
+		_wallet.add(gold)
+		for item_id in items:
+			_inventory.add_item(item_id, items[item_id])
+	for h_id in party_ids:
+		var h := _hunters.get_hunter(StringName(h_id))
+		if h != null:
+			h.stamina = maxf(h.stamina - 20.0, 0.0)
+			_hunters.add_xp(h, 80, _stats.level_cap(_progress.town_level))
+			_hunters.set_lifecycle_state(h, HunterRuntime.LifecycleState.AVAILABLE)
+	fleet_b_run.clear()
+	fleet_b_finished.emit(exp_id, gold, items)
+	autosave_requested.emit(&"fleet_b_finished")
+
 

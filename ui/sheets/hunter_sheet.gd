@@ -60,6 +60,10 @@ func _build(content: VBoxContainer) -> void:
 		UIKit.label(_status_text(), &"AccentLabel"),
 		UIKit.label(_talent_text(), &"MutedLabel"),
 		UIKit.label(_skills_text(), &"MutedLabel"),
+		UIKit.hbox([
+			UIKit.label(Loc.t("ui.hunter.title_label", {"title": _title_text()}), &"AccentLabel"),
+			UIKit.button(Loc.t("ui.hunter.title_cycle"), _cycle_title, &"SmallButton") if runtime.unlocked_titles.size() > 1 else Control.new()
+		], 6),
 	], 3)
 	var portrait := HunterPortrait.new().setup(runtime, gm.equipment)
 	portrait.custom_minimum_size = Vector2(64, 64)
@@ -95,6 +99,22 @@ static func activity_label(activity_id: StringName) -> String:
 		return Loc.t(key)
 	var task_key := "ui.hunter.task.%s" % activity_id
 	return Loc.t(task_key) if Loc.has_key(task_key) else ""
+
+
+func _title_text() -> String:
+	if runtime.equipped_title == &"":
+		return Loc.t("ui.hunter.title_none")
+	var key := "hunter.title.%s" % runtime.equipped_title
+	return Loc.t(key) if Loc.has_key(key) else String(runtime.equipped_title).capitalize()
+
+
+func _cycle_title() -> void:
+	if runtime.unlocked_titles.is_empty():
+		return
+	var idx := runtime.unlocked_titles.find(runtime.equipped_title)
+	var next_idx := (idx + 1) % runtime.unlocked_titles.size()
+	GameManager.hunters.equip_title(runtime, runtime.unlocked_titles[next_idx])
+	rebuild()
 
 
 func _skills_text() -> String:
@@ -317,7 +337,8 @@ func _build_activity(content: VBoxContainer) -> void:
 	content.add_child(UIKit.label(Loc.t(doing_key, {"activity": activity_label(runtime.activity)}), &"AccentLabel"))
 	var row := _button_grid(2)
 	for option in [[&"", "ui.hunter.assign.auto"], [ActivityService.RESTING, "ui.hunter.assign.rest"],
-			[ActivityService.TRAINING, "ui.hunter.assign.train"], [ActivityService.SOCIALIZING, "ui.hunter.assign.social"]]:
+			[ActivityService.TRAINING, "ui.hunter.assign.train"], [ActivityService.SOCIALIZING, "ui.hunter.assign.social"],
+			[ActivityService.GATHERING, "ui.hunter.assign.gather"]]:
 		var selected: bool = runtime.assigned_activity == option[0]
 		var button := UIKit.button(Loc.t(option[1]), func() -> void: run_action(activities.set_assignment(runtime, option[0])),
 			&"SelectedButton" if selected else &"Button")
@@ -355,12 +376,27 @@ func _build_bonds_and_history(content: VBoxContainer) -> void:
 		var partner := gm.hunters.get_hunter(partner_id)
 		if partner == null:
 			continue
-		var bonded := gm.bonds.is_bonded(runtime.unique_id, partner_id)
-		content.add_child(UIKit.bar(bonds[partner_id], DataRegistry.config.bond_max, &"MoodBar",
-			Loc.t("ui.hunter.bond_bonded", {"name": partner.display_name}) if bonded else partner.display_name))
+		var m := gm.bonds.get_milestone(runtime.unique_id, partner_id)
+		var label_text := partner.display_name
+		if m == 2:
+			label_text = Loc.t("ui.hunter.bond_milestone_2", {"name": partner.display_name})
+		elif m == 1:
+			label_text = Loc.t("ui.hunter.bond_milestone_1", {"name": partner.display_name})
+		content.add_child(UIKit.bar(bonds[partner_id], DataRegistry.config.bond_max, &"MoodBar", label_text))
 	var history := runtime.history
 	content.add_child(UIKit.label(Loc.t("ui.hunter.history"), &"AccentLabel"))
 	content.add_child(UIKit.label(Loc.t("ui.hunter.history_line", {
 		"day": int(history.get(HunterRuntime.RECRUIT_DAY, 1)), "won": int(history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0)),
 		"lost": int(history.get(HunterRuntime.EXPEDITIONS_FAILED, 0)), "bosses": int(history.get(HunterRuntime.BOSSES_DEFEATED, 0)),
 		"injured": int(history.get(HunterRuntime.TIMES_INJURED, 0))}), &"MutedLabel"))
+
+	# Chronicle & Deeds
+	if not runtime.chronicle.is_empty():
+		content.add_child(UIKit.label(Loc.t("ui.hunter.chronicle"), &"AccentLabel"))
+		var chronicle_box := UIKit.vbox([], 2)
+		var entries := runtime.chronicle.slice(-6)
+		entries.reverse()
+		for entry in entries:
+			var text := Loc.t(entry.get("key", ""), {"detail": entry.get("details", "")})
+			chronicle_box.add_child(UIKit.label("📜 " + text, &"MutedLabel"))
+		content.add_child(UIKit.card(chronicle_box))

@@ -11,6 +11,7 @@ enum State { LOW, NORMAL, HIGH }
 var _hunters: HunterService
 var _traits: TraitService
 var _config: GameConfig
+var buildings: BuildingService
 
 
 func _init(hunters: HunterService, traits: TraitService, config: GameConfig) -> void:
@@ -43,6 +44,10 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 func change(hunter: HunterRuntime, amount: float) -> void:
 	if is_zero_approx(amount):
 		return
+	if amount > 0.0 and buildings != null:
+		var bonus: float = buildings.get_effect(BuildingService.TOWN_FOUNTAIN, BuildingService.MOOD_AURA, 0.0)
+		if bonus > 0.0:
+			amount *= (1.0 + bonus)
 	var before := get_state(hunter)
 	hunter.mood = clampf(hunter.mood + amount, 0.0, _config.mood_max)
 	mood_changed.emit(hunter, hunter.mood)

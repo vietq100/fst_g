@@ -333,6 +333,14 @@ func open_quests() -> void:
 	open_sheet(QuestSheet.new())
 
 
+func open_bounties() -> void:
+	open_sheet(BountySheet.new())
+
+
+func open_bestiary() -> void:
+	open_sheet(BestiarySheet.new())
+
+
 func _refresh_quest_badge() -> void:
 	_refresh_resources()
 
@@ -661,7 +669,8 @@ func _build_overlays() -> void:
 	quest_card.theme_type_variation = &"QuestCard"
 	quest_card.mouse_filter = Control.MOUSE_FILTER_STOP
 	quest_card.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var is_tap := (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+		if is_tap:
 			open_quests())
 	_quest_box = UIKit.vbox([], 3)
 	_quest_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -865,6 +874,6 @@ func _apply_safe_area() -> void:
 		margins = Vector4(safe.position.x, safe.position.y, window.x - safe.end.x, window.y - safe.end.y)
 		margins = Vector4(margins.x * scale.x, margins.y * scale.y, margins.z * scale.x, margins.w * scale.y)
 	_safe.add_theme_constant_override(&"margin_left", int(maxf(margins.x, 0.0)))
-	_safe.add_theme_constant_override(&"margin_top", int(maxf(margins.y, 0.0)))
+	_safe.add_theme_constant_override(&"margin_top", int(maxf(margins.y, 8.0) if OS.has_feature("mobile") else margins.y))
 	_safe.add_theme_constant_override(&"margin_right", int(maxf(margins.z, 0.0)))
-	_safe.add_theme_constant_override(&"margin_bottom", int(maxf(margins.w, 0.0)))
+	_safe.add_theme_constant_override(&"margin_bottom", int(maxf(margins.w, 4.0) if OS.has_feature("mobile") else margins.w))

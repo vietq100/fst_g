@@ -22,6 +22,7 @@ signal actor_healed(source: Actor, target: Actor, amount: float)
 
 var _stats: StatService
 var _rng: RandomNumberGenerator
+var bestiary: BestiaryService
 
 
 func _init(stats: StatService, rng: RandomNumberGenerator) -> void:
@@ -42,6 +43,10 @@ func resolve_attack(attacker: Actor, target: Actor) -> float:
 	var is_critical := _stats.roll_critical(attack.critical_chance, _rng)
 	if is_critical:
 		damage = _stats.apply_critical(damage, attack.critical_damage)
+	if bestiary != null and target.is_in_group(Enemy.GROUP) and target.get("definition") != null:
+		var bonus := bestiary.get_damage_bonus(target.definition.id)
+		if bonus > 0.0:
+			damage *= (1.0 + bonus)
 	damage = maxf(damage * attack.damage_dealt * defense.damage_taken, 1.0)
 	var applied := _deal_damage(target, damage)
 	damage_dealt.emit(attacker, target, applied, is_critical)
@@ -72,6 +77,10 @@ func resolve_skill_hit(attacker: Actor, target: Actor, raw_attack: float, bonus_
 	var is_critical := _stats.roll_critical(minf(attack.critical_chance + bonus_crit, 1.0), _rng)
 	if is_critical:
 		damage = _stats.apply_critical(damage, attack.critical_damage + bonus_crit_damage)
+	if bestiary != null and target.is_in_group(Enemy.GROUP) and target.get("definition") != null:
+		var bonus := bestiary.get_damage_bonus(target.definition.id)
+		if bonus > 0.0:
+			damage *= (1.0 + bonus)
 	damage = maxf(damage * multiplier * attack.damage_dealt * defense.damage_taken, 1.0)
 	var applied := _deal_damage(target, damage)
 	damage_dealt.emit(attacker, target, applied, is_critical)

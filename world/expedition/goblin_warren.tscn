@@ -1,0 +1,112 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://world/expedition/expedition_scene.gd" id="1_scene"]
+[ext_resource type="Script" path="res://world/expedition/cave_dungeon_ground.gd" id="2_ground"]
+[ext_resource type="Script" path="res://world/vfx/combat_feedback.gd" id="3_feedback"]
+[ext_resource type="Script" path="res://world/expedition/expedition_camera.gd" id="4_camera"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_cave"]
+outlines = Array[PackedVector2Array]([PackedVector2Array(16, 96, 344, 96, 344, 1424, 16, 1424)])
+parsed_geometry_type = 1
+source_geometry_mode = 1
+source_geometry_group_name = &"navigation_obstacles"
+agent_radius = 7.0
+
+[node name="GoblinWarren" type="Node2D"]
+script = ExtResource("1_scene")
+
+[node name="Ground" type="Node2D" parent="."]
+script = ExtResource("2_ground")
+trail = PackedVector2Array(180, 1400, 180, 1290, 175, 1070, 200, 840, 160, 630, 180, 430, 180, 330, 180, 120)
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_cave")
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Props" type="Node2D" parent="World"]
+y_sort_enabled = true
+
+[node name="Actors" type="Node2D" parent="World"]
+y_sort_enabled = true
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="HunterSpawn" type="Marker2D" parent="Markers"]
+position = Vector2(180, 1370)
+
+[node name="Sections" type="Node2D" parent="Markers"]
+
+[node name="Entrance" type="Marker2D" parent="Markers/Sections"]
+position = Vector2(180, 1290)
+
+[node name="Spawn0" type="Marker2D" parent="Markers/Sections/Entrance"]
+position = Vector2(-45, -100)
+
+[node name="Spawn1" type="Marker2D" parent="Markers/Sections/Entrance"]
+position = Vector2(50, -100)
+
+[node name="Spawn2" type="Marker2D" parent="Markers/Sections/Entrance"]
+position = Vector2(0, -135)
+
+[node name="Clearing" type="Marker2D" parent="Markers/Sections"]
+position = Vector2(175, 1070)
+
+[node name="Spawn0" type="Marker2D" parent="Markers/Sections/Clearing"]
+position = Vector2(-55, -110)
+
+[node name="Spawn1" type="Marker2D" parent="Markers/Sections/Clearing"]
+position = Vector2(65, -110)
+
+[node name="Spawn2" type="Marker2D" parent="Markers/Sections/Clearing"]
+position = Vector2(-25, -145)
+
+[node name="Spawn3" type="Marker2D" parent="Markers/Sections/Clearing"]
+position = Vector2(35, -145)
+
+[node name="EnemyArea" type="Marker2D" parent="Markers/Sections"]
+position = Vector2(200, 840)
+
+[node name="Spawn0" type="Marker2D" parent="Markers/Sections/EnemyArea"]
+position = Vector2(-50, -110)
+
+[node name="Spawn1" type="Marker2D" parent="Markers/Sections/EnemyArea"]
+position = Vector2(50, -110)
+
+[node name="Spawn2" type="Marker2D" parent="Markers/Sections/EnemyArea"]
+position = Vector2(0, -135)
+
+[node name="Spawn3" type="Marker2D" parent="Markers/Sections/EnemyArea"]
+position = Vector2(0, -180)
+
+[node name="DeeperCave" type="Marker2D" parent="Markers/Sections"]
+position = Vector2(160, 630)
+
+[node name="Spawn0" type="Marker2D" parent="Markers/Sections/DeeperCave"]
+position = Vector2(-50, -105)
+
+[node name="Spawn1" type="Marker2D" parent="Markers/Sections/DeeperCave"]
+position = Vector2(55, -105)
+
+[node name="Spawn2" type="Marker2D" parent="Markers/Sections/DeeperCave"]
+position = Vector2(-20, -140)
+
+[node name="Spawn3" type="Marker2D" parent="Markers/Sections/DeeperCave"]
+position = Vector2(35, -150)
+
+[node name="BossRally" type="Marker2D" parent="Markers"]
+position = Vector2(180, 420)
+
+[node name="BossSpawn" type="Marker2D" parent="Markers"]
+position = Vector2(180, 290)
+
+[node name="Exit" type="Marker2D" parent="Markers"]
+position = Vector2(180, 130)
+
+[node name="CombatFeedback" type="Node2D" parent="."]
+script = ExtResource("3_feedback")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(180, 1300)
+script = ExtResource("4_camera")

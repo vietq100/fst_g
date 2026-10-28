@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/crypt_lord/crypt_lord.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"crypt_lord"
+tags = Array[StringName]([&"undead", &"boss"])
+display_name = "enemy.crypt_lord.name"
+is_boss = true
+tier = 4
+hp = 2800.0
+attack = 48.0
+defense = 20.0
+attack_speed = 0.6
+move_speed = 45.0
+critical_chance = 0.1
+critical_damage = 1.6
+attack_range = 32.0
+hit_radius = 14.0
+xp_reward = 450
+gold_min = 320
+gold_max = 380
+actor_scene = ExtResource("2_scene")
+can_equip = true
+weapon_pool = Array[StringName]([&"ember_staff", &"shadow_blade"])
+armor_pool = Array[StringName]([&"shadow_armor", &"steel_armor"])
+accessory_pool = Array[StringName]([&"viking_helm", &"ruby_ring", &"shadow_ring"])
+skill_slots = 4
+meat_min = 0
+meat_max = 0

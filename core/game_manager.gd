@@ -48,6 +48,9 @@ var arena: ArenaService
 var weekly_boss: WeeklyBossService
 var class_skills: ClassSkillService
 var barber: BarberService
+var town_events: TownEventService
+var bounties: BountyService
+var bestiary: BestiaryService
 
 
 func _ready() -> void:
@@ -103,10 +106,24 @@ func build(data_registry: Node) -> void:
 	weekly_boss = WeeklyBossService.new(registry, world, hunters, wallet, inventory)
 	class_skills = ClassSkillService.new(registry, hunters, config, rng)
 	barber = BarberService.new(hunters, wallet, config)
+	town_events = TownEventService.new(hunters, rng)
+	bestiary = BestiaryService.new()
+	bounties = BountyService.new(registry, wallet, inventory, progress, rng)
+	combat.bestiary = bestiary
+	expeditions.bestiary = bestiary
+	expeditions.bounties = bounties
 	recruitment.corpses = corpses
+	hunters.buildings = buildings
+	mood.buildings = buildings
 	equipment.buildings = buildings
 	equipment.purses = purses
 	equipment.wallet = wallet
+	arena.wallet = wallet
+	arena.inventory = inventory
+	town_events.wallet = wallet
+	town_events.inventory = inventory
+	activities.inventory = inventory
+	activities.bounties = bounties
 	_connect_services()
 
 
@@ -123,6 +140,8 @@ func _connect_services() -> void:
 	expeditions.expedition_finished.connect(func(run: ExpeditionRun) -> void:
 		mood.on_expedition_finished(run, expeditions.get_definition(run.expedition_id))
 		bonds.on_expedition_finished(run)
+		if bounties != null:
+			bounties.record_expedition(run.expedition_id)
 		recruitment.refresh_candidates())
 	expeditions.downed_handler = func(hunter: HunterRuntime, expedition_id: StringName) -> void:
 		var definition := expeditions.get_definition(expedition_id)
@@ -149,7 +168,7 @@ func _connect_services() -> void:
 	reincarnation.reincarnated.connect(refresh_quests)
 	reincarnation.difficulty_changed.connect(refresh_quests)
 	for service in [expeditions, buildings, recruitment, crafting, reincarnation, academy, forge, trading, quests, class_skills,
-			barber]:
+			barber, bounties, bestiary]:
 		service.autosave_requested.connect(autosave_requested.emit)
 
 
@@ -181,6 +200,8 @@ func reset_to_new_game() -> void:
 	trading.from_dict([])
 	quests.from_dict({})
 	weekly_boss.from_dict({})
+	bounties.from_dict({})
+	bestiary.from_dict({})
 	buildings.reset()
 	start_new_game()
 
@@ -197,6 +218,11 @@ func advance_town_time(seconds: float, offline: bool = false) -> void:
 		return
 	temple.tick(seconds)
 	activities.tick(seconds, not offline)
+	if town_events != null:
+		town_events.tick(seconds)
+	if bounties != null:
+		bounties.tick(seconds)
+	expeditions.tick_fleet_b(seconds)
 	progress.advance(seconds, registry.config.day_length_seconds)
 
 

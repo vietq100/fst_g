@@ -13,6 +13,7 @@ const TRAINING := &"training"
 const RECOVERING := &"recovering"
 const SLEEPING := &"sleeping"
 const EATING := &"eating"
+const GATHERING := &"gathering"
 ## Out in a region (the Hunter brain's task, also "returning"); needs drain as active.
 const HUNTING := HunterRuntime.HUNTING
 
@@ -31,6 +32,8 @@ var _xp_carry: Dictionary[StringName, float] = {}
 var needs: NeedsService
 ## Optional (set by GameManager): tavern drink fees when socializing.
 var purses: PurseService
+var inventory: InventoryService
+var bounties: BountyService
 
 
 func _init(registry: Node, hunters: HunterService, traits: TraitService, mood: MoodService,
@@ -157,6 +160,22 @@ func _tick_once(include_outside: bool = true) -> void:
 				var drink_cost: int = _config.social_drink_cost if _config != null else 0
 				if purses != null and drink_cost > 0:
 					purses.pay_village(hunter, drink_cost)
+			GATHERING:
+				_mood.change(hunter, definition.mood * rate)
+				if inventory != null and ticks % 3 == 0:
+					var roll := randf()
+					var item_id := &"iron_ore"
+					if roll < 0.40:
+						item_id = &"iron_ore"
+					elif roll < 0.70:
+						item_id = &"wild_herb"
+					elif roll < 0.90:
+						item_id = &"bone_dust"
+					else:
+						item_id = &"beast_fang"
+					inventory.add_item(item_id, 1)
+					if bounties != null:
+						bounties.record_gather(item_id, 1)
 		if ticks % _config.activity_event_every_ticks == 0:
 			_mood.trait_event(hunter, hunter.activity)
 	_socialize(socializing)

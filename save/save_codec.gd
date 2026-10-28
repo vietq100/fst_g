@@ -28,6 +28,7 @@ static func capture(game: Node) -> Dictionary:
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"gold": game.wallet.gold,
 		"summon_tickets": game.wallet.summon_tickets,
+		"arena_tokens": game.wallet.arena_tokens,
 		"progress": game.progress.to_dict(),
 		"buildings": game.buildings.to_dict(),
 		"hunters": hunters,
@@ -37,6 +38,10 @@ static func capture(game: Node) -> Dictionary:
 		"trading": game.trading.to_dict(),
 		"quests": game.quests.to_dict(),
 		"weekly_boss": game.weekly_boss.to_dict(),
+		"arena": game.arena.to_dict(),
+		"town_events": game.town_events.to_dict(),
+		"bounties": game.bounties.to_dict(),
+		"bestiary": game.bestiary.to_dict(),
 		"activity_time": game.activities.get_accumulator(),
 	}
 
@@ -50,6 +55,7 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 	game.corpses.clear()
 	game.wallet.gold = maxi(int(data.get("gold", 0)), 0)
 	game.wallet.summon_tickets = maxi(int(data.get("summon_tickets", 0)), 0)
+	game.wallet.arena_tokens = maxi(int(data.get("arena_tokens", 0)), 0)
 	game.progress.from_dict(_section(data, "progress", warnings))
 	var buildings := _section(data, "buildings", warnings)
 	if buildings.has("instances"):
@@ -80,6 +86,10 @@ static func restore(game: Node, data: Dictionary, warnings: PackedStringArray) -
 	game.trading.from_dict(data.get("trading", []))
 	game.quests.from_dict(data.get("quests", {}))
 	game.weekly_boss.from_dict(data.get("weekly_boss", {}))
+	game.arena.from_dict(_section(data, "arena", warnings))
+	game.town_events.from_dict(_section(data, "town_events", warnings))
+	game.bounties.from_dict(_section(data, "bounties", warnings))
+	game.bestiary.from_dict(_section(data, "bestiary", warnings))
 	game.activities.set_accumulator(float(data.get("activity_time", 0.0)))
 	# Buildings were restored before the Hunters: hand out beds now (old saves have none).
 	game.housing.assign_beds()

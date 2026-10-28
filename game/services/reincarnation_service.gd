@@ -73,6 +73,7 @@ func reincarnate(hunter: HunterRuntime) -> bool:
 	hunter.stamina = _config.needs_max
 	hunter.energy = _config.needs_max
 	hunter.current_hp = _hunters.get_stat(hunter, HunterService.MAX_HP)
+	hunter.record_chronicle("chronicle.reincarnated", str(hunter.reincarnations))
 	_progress.total_reincarnations += 1
 	_hunters.hunter_changed.emit(hunter)
 	reincarnated.emit(hunter)

@@ -28,7 +28,10 @@ func setup(skill: GameDefinition, options: Dictionary = {}, badge: String = "") 
 
 
 func _gui_input(event: InputEvent) -> void:
-	if _skill != null and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if _skill == null:
+		return
+	var is_tap := (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	if is_tap:
 		accept_event()
 		get_tree().call_group(&"ui_root", &"open_skill_info", _skill, _options)
 

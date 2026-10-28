@@ -5,6 +5,7 @@ extends RefCounted
 ## party get an attack bonus.
 
 signal bond_changed(a_id: StringName, b_id: StringName, value: float)
+signal milestone_reached(a_id: StringName, b_id: StringName, level: int)
 
 var _hunters: HunterService
 var _config: GameConfig
@@ -32,22 +33,37 @@ func is_bonded(a_id: StringName, b_id: StringName) -> bool:
 	return a_id != b_id and get_value(a_id, b_id) >= _config.bond_max
 
 
+func get_milestone(a_id: StringName, b_id: StringName) -> int:
+	var val := get_value(a_id, b_id)
+	if val >= _config.bond_max:
+		return 2
+	elif val >= _config.bond_max * 0.5:
+		return 1
+	return 0
+
+
 func add(a_id: StringName, b_id: StringName, amount: float) -> void:
 	if a_id == b_id or amount <= 0.0:
 		return
 	var key := _key(a_id, b_id)
-	var value := minf(_values.get(key, 0.0) + amount, _config.bond_max)
-	if is_equal_approx(value, _values.get(key, 0.0)):
+	var old_val := _values.get(key, 0.0)
+	var old_m := get_milestone(a_id, b_id)
+	var value := minf(old_val + amount, _config.bond_max)
+	if is_equal_approx(value, old_val):
 		return
-	var was_bonded := is_bonded(a_id, b_id)
 	_values[key] = value
 	bond_changed.emit(a_id, b_id, value)
-	if not was_bonded and is_bonded(a_id, b_id):
-		# The party attack bonus depends on bonds.
-		for hunter_id in [a_id, b_id]:
-			var hunter := _hunters.get_hunter(hunter_id)
-			if hunter != null:
-				_hunters.notify_changed(hunter)
+	var new_m := get_milestone(a_id, b_id)
+	if new_m > old_m:
+		milestone_reached.emit(a_id, b_id, new_m)
+		var h_a := _hunters.get_hunter(a_id)
+		var h_b := _hunters.get_hunter(b_id)
+		if h_a != null and h_b != null:
+			var deed_key := "chronicle.bond_oath" if new_m == 2 else "chronicle.bond_comrade"
+			h_a.record_chronicle(deed_key, h_b.display_name)
+			h_b.record_chronicle(deed_key, h_a.display_name)
+			_hunters.notify_changed(h_a)
+			_hunters.notify_changed(h_b)
 
 
 ## Hunter id -> bond value for every partner with a non-zero bond.
@@ -68,14 +84,40 @@ func get_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
 	party.assign(_party_provider.call())
 	if not party.has(hunter.unique_id):
 		return modifiers
+	var highest_milestone := 0
 	for partner_id in party:
-		if is_bonded(hunter.unique_id, partner_id):
-			var modifier := StatModifier.new()
-			modifier.stat = HunterService.ATTACK
-			modifier.type = StatModifier.Type.PERCENT
-			modifier.value = _config.bonded_attack_bonus
-			modifiers.append(modifier)
-			break
+		if partner_id == hunter.unique_id:
+			continue
+		var m := get_milestone(hunter.unique_id, partner_id)
+		if m > highest_milestone:
+			highest_milestone = m
+
+	if highest_milestone >= 1:
+		var atk := StatModifier.new()
+		atk.stat = HunterService.ATTACK
+		atk.type = StatModifier.Type.PERCENT
+		atk.value = _config.bonded_attack_bonus if highest_milestone == 2 else (_config.bonded_attack_bonus * 0.5)
+		modifiers.append(atk)
+
+		var spd := StatModifier.new()
+		spd.stat = HunterService.MOVE_SPEED
+		spd.type = StatModifier.Type.PERCENT
+		spd.value = 0.05
+		modifiers.append(spd)
+
+	if highest_milestone >= 2:
+		var hp := StatModifier.new()
+		hp.stat = HunterService.MAX_HP
+		hp.type = StatModifier.Type.PERCENT
+		hp.value = 0.10
+		modifiers.append(hp)
+
+		var def := StatModifier.new()
+		def.stat = HunterService.DEFENSE
+		def.type = StatModifier.Type.PERCENT
+		def.value = 0.05
+		modifiers.append(def)
+
 	return modifiers
 
 

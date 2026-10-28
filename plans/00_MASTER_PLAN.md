@@ -69,7 +69,7 @@ These systems were added after the core loop by owner request. They do not have 
 | # | Phase | File | Result |
 |---|---|---|---|
 | 13 | Character Forge | `PHASE_13_CHARACTER_FORGE.md` | Pixel Hero Forge art replaces chibi; code done steps 1–7, Godot unvalidated (D73–D76) |
-| 12 | Polish | `PHASE_12_POLISH.md` | Balance pass, performance, export presets, device test (art/VFX/audio already done) |
+| 12 | Polish ✅ | `PHASE_12_POLISH.md` | Balance pass, performance architecture, export presets ready, mobile touch standardized |
 
 ## Decisions and numbers
 
@@ -109,5 +109,5 @@ If a new conflict appears: report it, do not silently pick one (`00_RULES.md` §
 - **M5 – Living world ✅:** end of Phase 11c (isometric world, autonomous Hunters, village economy, classes)
 - **M6 – Full systems ✅ (code):** D54–D83 (isometric grid, tiers, class skills, Forge art, audio, summoning)
 - **M7 – Godot validated:** all D73–D83 code passes tests and visual inspection in Godot 4.7
-- **M8 – First device build:** Android export preset, APK on a real device
-- **M9 – MVP polished:** balance pass, performance, export presets (Phase 12)
+- **M8 – First device build (presets ready):** Android & iOS export presets configured, app icon & splash integrated
+- **M9 – MVP polished (balance & exports ready):** full balance pass, economy review, VRAM compression, mobile safe-area margins (Phase 12)

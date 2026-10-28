@@ -48,12 +48,49 @@ var _hunters: Dictionary[StringName, HunterRuntime] = {}
 var _next_id := 1
 ## Callables `func(hunter: HunterRuntime) -> Array[StatModifier]`.
 var _modifier_sources: Array[Callable] = []
+var buildings: BuildingService
 
+
+## Achievement Titles
+const TITLE_GOBLIN_SLAYER := &"goblin_slayer"
+const TITLE_UNDYING := &"undying"
+const TITLE_ARENA_CHAMPION := &"arena_champion"
+const TITLE_MASTER_GATHERER := &"master_gatherer"
+const TITLE_VETERAN := &"veteran"
+
+const TITLE_MODIFIERS: Dictionary[StringName, Dictionary] = {
+	TITLE_GOBLIN_SLAYER: {
+		"stat": ATTACK,
+		"type": StatModifier.Type.PERCENT,
+		"value": 0.08,
+	},
+	TITLE_UNDYING: {
+		"stat": MAX_HP,
+		"type": StatModifier.Type.PERCENT,
+		"value": 0.12,
+	},
+	TITLE_ARENA_CHAMPION: {
+		"stat": CRITICAL_CHANCE,
+		"type": StatModifier.Type.FLAT,
+		"value": 0.05,
+	},
+	TITLE_MASTER_GATHERER: {
+		"stat": MOVE_SPEED,
+		"type": StatModifier.Type.PERCENT,
+		"value": 0.10,
+	},
+	TITLE_VETERAN: {
+		"stat": DEFENSE,
+		"type": StatModifier.Type.PERCENT,
+		"value": 0.08,
+	},
+}
 
 func _init(registry: Node, stats: StatService, config: GameConfig) -> void:
 	_registry = registry
 	_stats = stats
 	_config = config
+	add_modifier_source(_get_title_modifiers)
 
 
 ## Registers a provider of stat modifiers for a Hunter (equipment, traits, mood, bonds).
@@ -238,6 +275,10 @@ func set_level(hunter: HunterRuntime, level: int) -> void:
 func add_xp(hunter: HunterRuntime, amount: int, level_cap: int) -> int:
 	if amount <= 0:
 		return 0
+	if buildings != null:
+		var bonus: float = buildings.get_effect(BuildingService.HERO_MONUMENT, BuildingService.TOWN_EXP_BONUS, 0.0)
+		if bonus > 0.0:
+			amount = roundi(amount * (1.0 + bonus))
 	hunter.xp += maxi(roundi(amount * get_stat(hunter, XP_GAIN)), 0)
 	var gained := 0
 	while hunter.level < level_cap and hunter.xp >= _stats.required_xp(hunter.level):
@@ -250,9 +291,59 @@ func add_xp(hunter: HunterRuntime, amount: int, level_cap: int) -> int:
 			healed = minf(max_hp * _config.level_up_heal_ratio, max_hp - hunter.current_hp)
 			hunter.current_hp += healed
 		hunter_leveled_up.emit(hunter, hunter.level, healed)
+		if hunter.level in [10, 20, 50, 100]:
+			hunter.record_chronicle("chronicle.level_milestone", str(hunter.level))
 	if gained > 0:
+		check_titles(hunter)
 		hunter_changed.emit(hunter)
 	return gained
+
+
+func _get_title_modifiers(hunter: HunterRuntime) -> Array[StatModifier]:
+	var result: Array[StatModifier] = []
+	if hunter.equipped_title == &"":
+		return result
+	if TITLE_MODIFIERS.has(hunter.equipped_title):
+		var info: Dictionary = TITLE_MODIFIERS[hunter.equipped_title]
+		result.append(StatModifier.new(info.stat, info.type, info.value))
+	return result
+
+
+## Checks and unlocks achievement titles based on history and progression.
+func check_titles(hunter: HunterRuntime) -> Array[StringName]:
+	var newly_unlocked: Array[StringName] = []
+	if hunter.history.get(HunterRuntime.BOSSES_DEFEATED, 0) >= 3 or hunter.history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0) >= 15:
+		if not hunter.unlocked_titles.has(TITLE_GOBLIN_SLAYER):
+			hunter.unlocked_titles.append(TITLE_GOBLIN_SLAYER)
+			newly_unlocked.append(TITLE_GOBLIN_SLAYER)
+	if hunter.history.get(HunterRuntime.TIMES_INJURED, 0) >= 3 or hunter.history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0) >= 20:
+		if not hunter.unlocked_titles.has(TITLE_UNDYING):
+			hunter.unlocked_titles.append(TITLE_UNDYING)
+			newly_unlocked.append(TITLE_UNDYING)
+	if hunter.history.get(&"arena_wins", 0) >= 5 or hunter.reincarnations >= 1:
+		if not hunter.unlocked_titles.has(TITLE_ARENA_CHAMPION):
+			hunter.unlocked_titles.append(TITLE_ARENA_CHAMPION)
+			newly_unlocked.append(TITLE_ARENA_CHAMPION)
+	if hunter.history.get(HunterRuntime.ACTIVITY_TICKS, 0) >= 30:
+		if not hunter.unlocked_titles.has(TITLE_MASTER_GATHERER):
+			hunter.unlocked_titles.append(TITLE_MASTER_GATHERER)
+			newly_unlocked.append(TITLE_MASTER_GATHERER)
+	if hunter.level >= 15 or hunter.history.get(HunterRuntime.EXPEDITIONS_COMPLETED, 0) >= 15:
+		if not hunter.unlocked_titles.has(TITLE_VETERAN):
+			hunter.unlocked_titles.append(TITLE_VETERAN)
+			newly_unlocked.append(TITLE_VETERAN)
+	if hunter.equipped_title == &"" and not hunter.unlocked_titles.is_empty():
+		hunter.equipped_title = hunter.unlocked_titles[0]
+		notify_changed(hunter)
+	return newly_unlocked
+
+
+func equip_title(hunter: HunterRuntime, title_id: StringName) -> bool:
+	if title_id != &"" and not hunter.unlocked_titles.has(title_id):
+		return false
+	hunter.equipped_title = title_id
+	notify_changed(hunter)
+	return true
 
 
 func set_lifecycle_state(hunter: HunterRuntime, state: HunterRuntime.LifecycleState) -> void:

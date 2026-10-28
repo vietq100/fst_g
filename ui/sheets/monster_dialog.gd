@@ -56,6 +56,9 @@ func _build(content: VBoxContainer) -> void:
 		var boss := UIKit.label(Loc.t("ui.monster.boss"), &"WarningLabel", false)
 		boss.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		content.add_child(boss)
+	var bestiary_btn := UIKit.button(Loc.t("ui.bestiary.open_btn"), func() -> void: open_requested.emit(BestiarySheet.new()), &"SmallButton")
+	bestiary_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	content.add_child(bestiary_btn)
 	content.add_child(_paper_doll())
 	if _alive():
 		content.add_child(UIKit.bar(enemy.health.current_health, enemy.health.max_health, &"HpBar",

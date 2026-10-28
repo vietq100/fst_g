@@ -49,6 +49,21 @@ func _build(content: VBoxContainer) -> void:
 	content.add_child(UIKit.button(Loc.t("ui.expedition.walk"), func() -> void:
 		depart_requested.emit(expedition_id, _party.duplicate()), &"PrimaryButton", reason))
 
+	if gm.progress.town_level >= 7:
+		var fleet_b_status := ""
+		if gm.expeditions.is_fleet_b_running():
+			fleet_b_status = Loc.t("ui.expedition.fleet_b_running", {"seconds": roundi(float(gm.expeditions.fleet_b_run.get("remaining", 0.0)))})
+		var b_reason := gm.expeditions.can_dispatch_fleet_b(_party, expedition_id)
+		var btn_label := fleet_b_status if not fleet_b_status.is_empty() else Loc.t("ui.expedition.dispatch_btn")
+		var b_btn := UIKit.button(btn_label, func() -> void:
+			if gm.expeditions.dispatch_fleet_b(_party, expedition_id):
+				toast_requested.emit(Loc.t("ui.expedition.squad_b_dispatched"), false)
+				request_rebuild()
+			else:
+				toast_requested.emit(b_reason, true)
+		, &"Button", b_reason if fleet_b_status.is_empty() else fleet_b_status)
+		content.add_child(b_btn)
+
 
 func _member_row(runtime: HunterRuntime) -> Control:
 	var gm := GameManager

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/definitions/enemy_definition.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://actors/enemies/goblin_warlord/goblin_warlord.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"goblin_warlord"
+tags = Array[StringName]([&"humanoid", &"boss"])
+display_name = "enemy.goblin_warlord.name"
+is_boss = true
+tier = 3
+hp = 1600.0
+attack = 36.0
+defense = 14.0
+attack_speed = 0.65
+move_speed = 50.0
+critical_chance = 0.05
+critical_damage = 1.5
+attack_range = 28.0
+hit_radius = 12.0
+xp_reward = 280
+gold_min = 200
+gold_max = 240
+actor_scene = ExtResource("2_scene")
+can_equip = true
+weapon_pool = Array[StringName]([&"battle_axe", &"steel_sword"])
+armor_pool = Array[StringName]([&"steel_armor", &"chainmail_armor"])
+accessory_pool = Array[StringName]([&"cowboy_hat", &"iron_ring"])
+skill_slots = 3
+meat_min = 0
+meat_max = 0

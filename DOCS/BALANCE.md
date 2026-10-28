@@ -117,6 +117,13 @@ Regions are 36 × 36 tiles; population caps were doubled with the map (4× the a
 Monster level L scales HP/ATK/DEF by `1 + 0.12 × (L − 1)` and XP/gold by `1 + 0.10 × (L − 1)`.
 Aggro range 90 px; monsters leash back to their spawn after 220 px.
 
+### Region Progression & Gear Expectations
+| Region | Target Hunter Lv | Expected Gear | Hunter Benchmark Stats | Primary Risk |
+|---|---|---|---|---|
+| Dark Forest | Lv 1–4 | Starter (Rusty Weapon + Leather Armor) | HP 120–156, ATK 14–20, DEF 6–9 | Wolves swarm low-HP Hunters |
+| Goblin Cave | Lv 5–8 | Uncommon (Iron Weapon + Iron Armor / Cowboy Hat) | HP 180–220, ATK 22–30, DEF 11–16 | Goblin criticals + Wolf speed |
+| Ancient Ruins | Lv 9–15 | Rare (Fang Blade/Ember Staff, Viking Helm, Goggles) | HP 240–320, ATK 32–45, DEF 18–26 | Skeleton high defense (DEF 6+) & ATK |
+
 ## Needs (D31) — per 10 s tick
 | Need | Change |
 |---|---|
@@ -171,6 +178,13 @@ Drops:
   3. Enemy area: 3 Goblin + 1 Wolf
   4. Deeper forest (stronger group): 2 Goblin + 2 Wolf
   5. Boss arena: Forest Guardian
+
+### Dungeon Progression & Gear Expectations
+| Dungeon | Recommended Lv | Party Size | Expected Gear | Boss Benchmark |
+|---|---|---|---|---|
+| Forest Guardian's Grove | Lv 4+ | 3–4 Hunters | Mixed Starter / Iron Gear + Bandages | Forest Guardian (HP 900, ATK 28, DEF 10) |
+| Goblin Warren (upcoming) | Lv 10+ | 4 Hunters | Full Iron / Rare Gear + Potions | Goblin Warlord |
+| Ruined Sanctum (upcoming) | Lv 16+ | 4 Hunters | Rare / Tier SR+ Gear | Crypt Lord |
 
 ## Buildings
 | Building | Lv1 effect | Lv2 cost | Lv2 effect |

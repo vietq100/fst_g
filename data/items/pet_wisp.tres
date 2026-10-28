@@ -5,14 +5,14 @@
 
 [sub_resource type="Resource" id="StatModifier_0"]
 script = ExtResource("2_mod")
-stat = &"attack"
-value = 4.0
+stat = &"critical_chance"
+value = 0.08
 
 [sub_resource type="Resource" id="StatModifier_1"]
 script = ExtResource("2_mod")
-stat = &"xp_gain"
-value = 0.05
+stat = &"attack_speed"
 type = 1
+value = 0.1
 
 [resource]
 script = ExtResource("1_item")
@@ -22,8 +22,8 @@ item_type = 6
 rarity = 4
 stackable = false
 max_stack = 1
-sell_price = 200
+sell_price = 220
 equipment_slot = 10
 modifiers = Array[ExtResource("2_mod")]([SubResource("StatModifier_0"), SubResource("StatModifier_1")])
-tint = Color(0.62, 0.84, 1.0, 1)
+tint = Color(0.624, 0.839, 1.0, 1)
 look_id = &"wisp"

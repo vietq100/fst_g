@@ -12,7 +12,11 @@ func _watch() -> Array:
 func _build(content: VBoxContainer) -> void:
 	var quests := GameManager.quests
 	set_title(Loc.t("ui.quest.title"))
-	content.add_child(UIKit.label(Loc.t("ui.quest.done", {"done": quests.get_claimed_count(), "total": quests.get_all().size()}), &"MutedLabel"))
+	var top_row := UIKit.hbox([
+		UIKit.label(Loc.t("ui.quest.done", {"done": quests.get_claimed_count(), "total": quests.get_all().size()}), &"MutedLabel"),
+		UIKit.button(Loc.t("ui.bounty.open_btn"), func() -> void: open_requested.emit(BountySheet.new()), &"SmallButton"),
+	], 8)
+	content.add_child(top_row)
 	var active := quests.get_active()
 	if active.is_empty():
 		content.add_child(UIKit.label(Loc.t("ui.quest.all_done"), &"AccentLabel"))

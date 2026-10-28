@@ -25,7 +25,7 @@ func _ready() -> void:
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed:
+		if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed:
 			_dismiss())
 	add_child(dim)
 	var center := CenterContainer.new()

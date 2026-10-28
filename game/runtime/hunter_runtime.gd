@@ -48,6 +48,22 @@ var activity: StringName
 ## Player choice; empty = automatic (DECISIONS.md D14).
 var assigned_activity: StringName
 var history: Dictionary[StringName, int] = {}
+## Notable deeds and chronicle entries: [{"key": String, "details": String, "time": int}]
+var chronicle: Array[Dictionary] = []
+## Dynamic Hunter achievement title (e.g. &"goblin_slayer", &"undying", &"veteran").
+var equipped_title: StringName = &""
+var unlocked_titles: Array[StringName] = []
+
+
+func record_chronicle(event_key: String, details: String = "") -> void:
+	chronicle.append({
+		"key": event_key,
+		"details": details,
+		"time": int(Time.get_unix_time_from_system()),
+	})
+	if chronicle.size() > 50:
+		chronicle.pop_front()
+
 
 var state: LifecycleState = LifecycleState.AVAILABLE
 var expedition_id: StringName
@@ -136,6 +152,9 @@ func to_dict() -> Dictionary:
 		"skill_swap_points": skill_swap_points,
 		"skill_point_level": skill_point_level,
 		"current_mana": current_mana,
+		"chronicle": chronicle.duplicate(),
+		"equipped_title": equipped_title,
+		"unlocked_titles": unlocked_titles.duplicate(),
 	}
 
 
@@ -220,4 +239,14 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 	# Missing (saves before D70): 1, so ClassSkillService.sync_points grants the earned points.
 	hunter.skill_point_level = maxi(int(data.get("skill_point_level", 1)), 1)
 	hunter.current_mana = maxf(float(data.get("current_mana", 0.0)), 0.0)
+	var saved_chronicle: Variant = data.get("chronicle", [])
+	if saved_chronicle is Array:
+		for entry in saved_chronicle:
+			if entry is Dictionary:
+				hunter.chronicle.append(entry.duplicate())
+	hunter.equipped_title = StringName(str(data.get("equipped_title", "")))
+	var saved_titles: Variant = data.get("unlocked_titles", [])
+	if saved_titles is Array:
+		for t in saved_titles:
+			hunter.unlocked_titles.append(StringName(str(t)))
 	return hunter

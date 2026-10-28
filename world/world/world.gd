@@ -50,6 +50,7 @@ var world: WorldService
 var _navigation: NavigationRegion2D
 var _ground: Node2D
 var _day_night: DayNight
+var _weather: WeatherLayer
 var _audio: AudioFeedback
 var _entities: Node2D
 var _buildings_root: Node2D
@@ -153,6 +154,9 @@ func _build_scene() -> void:
 	_day_night.name = "DayNight"
 	add_child(_day_night)
 	_day_night.setup(world)
+	_weather = WeatherLayer.new()
+	_weather.name = "WeatherLayer"
+	add_child(_weather)
 	RenderingServer.set_default_clear_color(Color("12394a"))
 	_navigation = NavigationRegion2D.new()
 	_navigation.name = "NavigationRegion2D"

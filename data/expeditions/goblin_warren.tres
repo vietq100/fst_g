@@ -1,13 +1,74 @@
-[gd_resource type="Resource" script_class="ExpeditionDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ExpeditionDefinition" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://game/definitions/expedition_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://game/definitions/enemy_group.gd" id="2_group"]
+[ext_resource type="Script" path="res://game/definitions/enemy_spawn.gd" id="3_spawn"]
+[ext_resource type="PackedScene" path="res://world/expedition/goblin_warren.tscn" id="4_scene"]
+
+[sub_resource type="Resource" id="EnemySpawn_0_0"]
+script = ExtResource("3_spawn")
+enemy_id = &"goblin"
+count = 3
+
+[sub_resource type="Resource" id="EnemyGroup_0"]
+script = ExtResource("2_group")
+section_id = &"entrance"
+spawns = Array[ExtResource("3_spawn")]([SubResource("EnemySpawn_0_0")])
+
+[sub_resource type="Resource" id="EnemySpawn_1_0"]
+script = ExtResource("3_spawn")
+enemy_id = &"goblin"
+count = 3
+
+[sub_resource type="Resource" id="EnemySpawn_1_1"]
+script = ExtResource("3_spawn")
+enemy_id = &"wolf"
+count = 1
+
+[sub_resource type="Resource" id="EnemyGroup_1"]
+script = ExtResource("2_group")
+section_id = &"clearing"
+spawns = Array[ExtResource("3_spawn")]([SubResource("EnemySpawn_1_0"), SubResource("EnemySpawn_1_1")])
+
+[sub_resource type="Resource" id="EnemySpawn_2_0"]
+script = ExtResource("3_spawn")
+enemy_id = &"goblin"
+count = 4
+
+[sub_resource type="Resource" id="EnemyGroup_2"]
+script = ExtResource("2_group")
+section_id = &"enemy_area"
+spawns = Array[ExtResource("3_spawn")]([SubResource("EnemySpawn_2_0")])
+
+[sub_resource type="Resource" id="EnemySpawn_3_0"]
+script = ExtResource("3_spawn")
+enemy_id = &"goblin"
+count = 3
+
+[sub_resource type="Resource" id="EnemySpawn_3_1"]
+script = ExtResource("3_spawn")
+enemy_id = &"wolf"
+count = 2
+
+[sub_resource type="Resource" id="EnemyGroup_3"]
+script = ExtResource("2_group")
+section_id = &"deeper_cave"
+spawns = Array[ExtResource("3_spawn")]([SubResource("EnemySpawn_3_0"), SubResource("EnemySpawn_3_1")])
 
 [resource]
 script = ExtResource("1_def")
 id = &"goblin_warren"
 display_name = "expedition.goblin_warren.name"
 recommended_level = 10
-unlock_flag = &"coming_later"
+enemy_groups = Array[ExtResource("2_group")]([SubResource("EnemyGroup_0"), SubResource("EnemyGroup_1"), SubResource("EnemyGroup_2"), SubResource("EnemyGroup_3")])
+boss_id = &"goblin_warlord"
+completion_bonus_gold = 100
+completion_bonus_summon_tickets = 1
+first_clear_bonus_summon_tickets = 5
+first_clear_loot_table_id = &"goblin_warlord_first"
+repeat_clear_loot_table_id = &"goblin_warlord_repeat"
+first_clear_flags = Array[StringName]([&"goblin_warren_clear"])
+scene = ExtResource("4_scene")
 region_id = &"goblin_cave"
 entrance_tile = Vector2i(58, 78)
-locked = true
+locked = false

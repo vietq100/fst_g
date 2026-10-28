@@ -1,4 +1,8 @@
 {
+ "activity.gathering.name": {
+  "en": "Gathering",
+  "vi": "Thu thập"
+ },
  "activity.recovering.name": {
   "en": "Recovering",
   "vi": "Hồi phục"
@@ -15,9 +19,133 @@
   "en": "Training",
   "vi": "Luyện tập"
  },
+ "bestiary.abyss_warden.lore": {
+  "en": "Otherworldly titan forged in cosmic void, testing the ultimate limits of mortal hunters.",
+  "vi": "Cự nhân vực sâu vô tận, thử thách giới hạn tột cùng của mọi thợ săn phàm trần."
+ },
+ "bestiary.abyss_warden.name": {
+  "en": "Abyss Warden",
+  "vi": "Hộ Vệ Vực Thẳm"
+ },
+ "bestiary.abyss_warden.weakness": {
+  "en": "True Damage / Pure Energy",
+  "vi": "Sát Thương Chuẩn / Năng Lượng Thuần Khiết"
+ },
+ "bestiary.crypt_lord.lore": {
+  "en": "Lich monarch dormant beneath the ruined sanctum, commanding decaying specters.",
+  "vi": "Vị vua Lich ngự trị dưới thánh địa đổ nát, hiệu triệu các u hồn thối rữa."
+ },
+ "bestiary.crypt_lord.name": {
+  "en": "Crypt Lord",
+  "vi": "Chúa Tể Hầm Mộ"
+ },
+ "bestiary.crypt_lord.weakness": {
+  "en": "Holy Radiance / Fire",
+  "vi": "Thánh Quang / Hỏa Thiêu"
+ },
+ "bestiary.forest_guardian.lore": {
+  "en": "An ancient colossal treant defending the sacred heart of the primeval woods.",
+  "vi": "Mộc nhân cổ đại khổng lồ bảo vệ trái tim linh thiêng của khu rừng nguyên sinh."
+ },
+ "bestiary.forest_guardian.name": {
+  "en": "Forest Guardian",
+  "vi": "Hộ Vệ Rừng Sâu"
+ },
+ "bestiary.forest_guardian.weakness": {
+  "en": "Flame / Axe Strikes",
+  "vi": "Ngọn Lửa / Nhát Rìu"
+ },
+ "bestiary.goblin.lore": {
+  "en": "Cunning scavengers that travel in packs, hoarding stolen trinkets and crude weapons.",
+  "vi": "Kẻ săn mồi quỷ quyệt đi theo bầy đàn, tích trữ kim loại chắp vá và vũ khí thô sơ."
+ },
+ "bestiary.goblin.name": {
+  "en": "Goblin",
+  "vi": "Yêu Tinh Goblin"
+ },
+ "bestiary.goblin.weakness": {
+  "en": "Stun / Heavy Impact",
+  "vi": "Choáng / Đòn Nặng"
+ },
+ "bestiary.goblin_warlord.lore": {
+  "en": "Brutal chieftain armed with jagged bone cleavers, commanding the warren horde.",
+  "vi": "Thủ lĩnh bạo chúa mang song đao xương răng cưa, chỉ huy toàn bộ quân đoàn hang ổ."
+ },
+ "bestiary.goblin_warlord.name": {
+  "en": "Goblin Warlord",
+  "vi": "Đại Tướng Goblin"
+ },
+ "bestiary.goblin_warlord.weakness": {
+  "en": "Frost / Disarm",
+  "vi": "Băng Giá / Tước Khí"
+ },
+ "bestiary.skeleton.lore": {
+  "en": "Reanimated remnants of ancient warriors bound by dark curses.",
+  "vi": "Hài cốt chiến binh cổ đại bị hồi sinh và trói buộc bởi ma thuật hắc ám."
+ },
+ "bestiary.skeleton.name": {
+  "en": "Skeleton",
+  "vi": "Bộ Xương Quỷ"
+ },
+ "bestiary.skeleton.weakness": {
+  "en": "Blunt / Holy Magic",
+  "vi": "Chùy Đập / Thánh Thuật"
+ },
+ "bestiary.slime.lore": {
+  "en": "A gelatinous creature inhabiting damp caves and forests. Absorbs nutrients through its skin.",
+  "vi": "Sinh vật dạng chất nhầy sống trong hang động ẩm ướt. Hấp thu dưỡng chất qua màng bọc."
+ },
+ "bestiary.slime.name": {
+  "en": "Slime",
+  "vi": "Thạch Nhầy"
+ },
+ "bestiary.slime.weakness": {
+  "en": "Fire / Slashing",
+  "vi": "Hỏa / Chém"
+ },
+ "bestiary.wolf.lore": {
+  "en": "Fierce predators stalking misty outskirts. Fast and relentless in coordinated packs.",
+  "vi": "Dã thú hung dữ rình rập vùng ngoại vi mù sương. Nhanh nhẹn và phối hợp săn bầy tàn nhẫn."
+ },
+ "bestiary.wolf.name": {
+  "en": "Dire Wolf",
+  "vi": "Sói Hoang Dã"
+ },
+ "bestiary.wolf.weakness": {
+  "en": "Piercing / Traps",
+  "vi": "Đâm / Cạm bẫy"
+ },
+ "bounty.target.boss": {
+  "en": "Dungeon Bosses",
+  "vi": "Thủ Lĩnh Hầm Ngục"
+ },
+ "bounty.target.expedition": {
+  "en": "Dungeon Expeditions",
+  "vi": "Thám Hiểm Ngục Tối"
+ },
+ "bounty.target.gather": {
+  "en": "Town Gathering",
+  "vi": "Thu Lượm Thị Trấn"
+ },
+ "bounty.target.goblin": {
+  "en": "Goblins",
+  "vi": "Yêu tinh Goblin"
+ },
+ "bounty.target.skeleton": {
+  "en": "Skeletons",
+  "vi": "Bộ xương Quỷ"
+ },
+ "bounty.target.slime": {
+  "en": "Slimes",
+  "vi": "Quái Thạch Nhầy"
+ },
  "building.academy.name": {
   "en": "Academy",
   "vi": "Học Viện"
+ },
+ "building.arcane_lamp.name": {
+  "en": "Arcane Lamp",
+  "vi": "Đèn Ma Thuật"
  },
  "building.blacksmith.name": {
   "en": "Blacksmith",
@@ -30,6 +158,10 @@
  "building.forge.name": {
   "en": "Enhancement Forge",
   "vi": "Lò Cường Hóa"
+ },
+ "building.hero_monument.name": {
+  "en": "Hero Monument",
+  "vi": "Tượng Đài Anh Hùng"
  },
  "building.hospital.name": {
   "en": "Hospital",
@@ -63,6 +195,10 @@
   "en": "Temple",
   "vi": "Đền Thờ"
  },
+ "building.town_fountain.name": {
+  "en": "Town Fountain",
+  "vi": "Đài Phun Nước Thị Trấn"
+ },
  "building.town_hall.name": {
   "en": "Town Hall",
   "vi": "Tòa Thị Chính"
@@ -74,6 +210,30 @@
  "building.warehouse.name": {
   "en": "Warehouse",
   "vi": "Nhà Kho"
+ },
+ "chronicle.blood_moon_defense": {
+  "en": "Defended settlement during Blood Moon!",
+  "vi": "Bảo vệ thị trấn trong đêm Huyết Nguyệt!"
+ },
+ "chronicle.bond_comrade": {
+  "en": "Became Comrades with {detail}",
+  "vi": "Kết thành Đồng Đội với {detail}"
+ },
+ "chronicle.bond_oath": {
+  "en": "Swore an Eternal Oath with {detail}",
+  "vi": "Lập Thề Ước Vĩnh Cửu với {detail}"
+ },
+ "chronicle.boss_defeated": {
+  "en": "Vanquished boss {detail}",
+  "vi": "Hạ gục trùm {detail}"
+ },
+ "chronicle.level_milestone": {
+  "en": "Reached Level {detail}",
+  "vi": "Đạt Cấp Độ {detail}"
+ },
+ "chronicle.reincarnated": {
+  "en": "Reincarnated (Gen {detail})",
+  "vi": "Chuyển sinh (Đời {detail})"
  },
  "class.assassin.name": {
   "en": "Assassin",
@@ -1231,6 +1391,10 @@
   "en": "Whirlwind",
   "vi": "Xoáy Kiếm"
  },
+ "enemy.crypt_lord.name": {
+  "en": "Crypt Lord",
+  "vi": "Lãnh Chúa Hầm Mộ"
+ },
  "enemy.forest_guardian.name": {
   "en": "Forest Guardian",
   "vi": "Hộ Vệ Rừng"
@@ -1238,6 +1402,10 @@
  "enemy.goblin.name": {
   "en": "Goblin",
   "vi": "Goblin"
+ },
+ "enemy.goblin_warlord.name": {
+  "en": "Goblin Warlord",
+  "vi": "Chúa Tể Goblin"
  },
  "enemy.skeleton.name": {
   "en": "Skeleton",
@@ -1495,9 +1663,21 @@
   "en": "Hunter listed twice",
   "vi": "Hunter bị chọn hai lần"
  },
+ "err.expedition.fleet_b_busy": {
+  "en": "Squad B is currently on an expedition!",
+  "vi": "Đội B hiện đang đi thám hiểm!"
+ },
+ "err.expedition.fleet_b_town_level": {
+  "en": "Town Hall Lv 7 required to unlock Squad B!",
+  "vi": "Cần Tòa Thị Chính Cấp 7 để mở khóa Đội B!"
+ },
  "err.expedition.locked": {
   "en": "{expedition} is locked",
   "vi": "{expedition} chưa mở khóa"
+ },
+ "err.expedition.not_cleared": {
+  "en": "Clear this dungeon once before auto-dispatching Squad B!",
+  "vi": "Cần vượt ải ít nhất 1 lần để phái cử Đội B!"
  },
  "err.expedition.party_size": {
   "en": "Party needs 1–{max} Hunters",
@@ -1538,6 +1718,22 @@
  "err.gate.short_gold_for_ticket": {
   "en": "Needs {gold} gold for a ticket",
   "vi": "Cần {gold} vàng để mua thẻ"
+ },
+ "err.hibernate.already": {
+  "en": "Already asleep on the Mount",
+  "vi": "Đã đang ngủ đông"
+ },
+ "err.hibernate.asleep": {
+  "en": "{name} is asleep on the Mount",
+  "vi": "{name} đang ngủ đông"
+ },
+ "err.hibernate.awake": {
+  "en": "Not asleep",
+  "vi": "Không ở trạng thái ngủ đông"
+ },
+ "err.hibernate.mount_full": {
+  "en": "The Mount holds {max} sleepers",
+  "vi": "Núi chỉ chứa {max} Hunter ngủ đông"
  },
  "err.market.missing": {
   "en": "Build a Market to buy loot into the Warehouse",
@@ -1639,6 +1835,14 @@
   "en": "Nothing to repair",
   "vi": "Không cần sửa"
  },
+ "err.summon.everything_full": {
+  "en": "Village ({active}) and Mount ({asleep}) are both full",
+  "vi": "Làng ({active}) và Núi ({asleep}) đều đã đầy"
+ },
+ "err.summon.no_tickets": {
+  "en": "Needs {tickets} summoning ticket(s)",
+  "vi": "Cần {tickets} thẻ triệu hồi"
+ },
  "err.supply.no_food": {
   "en": "No food in the Tavern",
   "vi": "Quán Rượu hết đồ ăn"
@@ -1727,6 +1931,66 @@
   "en": "Stay in town",
   "vi": "Ở lại thị trấn"
  },
+ "grade.average.name": {
+  "en": "Average",
+  "vi": "Trung bình"
+ },
+ "grade.elite.name": {
+  "en": "Elite",
+  "vi": "Tinh anh"
+ },
+ "grade.excellent.name": {
+  "en": "Excellent",
+  "vi": "Xuất sắc"
+ },
+ "grade.fine.name": {
+  "en": "Fine",
+  "vi": "Tốt"
+ },
+ "grade.good.name": {
+  "en": "Good",
+  "vi": "Khá"
+ },
+ "grade.legendary.name": {
+  "en": "Legendary",
+  "vi": "Huyền thoại"
+ },
+ "grade.plain.name": {
+  "en": "Plain",
+  "vi": "Thường"
+ },
+ "grade.poor.name": {
+  "en": "Poor",
+  "vi": "Yếu kém"
+ },
+ "grade.strong.name": {
+  "en": "Strong",
+  "vi": "Mạnh"
+ },
+ "grade.supreme.name": {
+  "en": "Supreme",
+  "vi": "Tuyệt phẩm"
+ },
+ "hunter.title.arena_champion": {
+  "en": "Arena Champion",
+  "vi": "Quán Quân Đấu Trường"
+ },
+ "hunter.title.goblin_slayer": {
+  "en": "Goblin Slayer",
+  "vi": "Dũng Sĩ Diệt Yêu Tinh"
+ },
+ "hunter.title.master_gatherer": {
+  "en": "Master Gatherer",
+  "vi": "Bậc Thầy Thu Lượm"
+ },
+ "hunter.title.undying": {
+  "en": "The Undying",
+  "vi": "Bất Tử Giả"
+ },
+ "hunter.title.veteran": {
+  "en": "Veteran Hunter",
+  "vi": "Thợ Săn Kì Cựu"
+ },
  "item.bandage.name": {
   "en": "Bandage",
   "vi": "Băng Gạc"
@@ -1738,6 +2002,10 @@
  "item.beast_fang.name": {
   "en": "Beast Fang",
   "vi": "Nanh Thú"
+ },
+ "item.beast_feast.name": {
+  "en": "Beast Feast",
+  "vi": "Đại Tiệc Quái Thú"
  },
  "item.bone_amulet.name": {
   "en": "Bone Amulet",
@@ -1855,6 +2123,10 @@
   "en": "Meat Stew",
   "vi": "Thịt Hầm"
  },
+ "item.mist_elixir.name": {
+  "en": "Mist Elixir",
+  "vi": "Thuốc Tiên Sương Mù"
+ },
  "item.monster_meat.name": {
   "en": "Monster Meat",
   "vi": "Thịt Quái"
@@ -1872,24 +2144,28 @@
   "vi": "Gậy Sồi"
  },
  "item.pet_chick.name": {
-  "en": "Chick",
-  "vi": "Gà Con"
+  "en": "Golden Chick",
+  "vi": "Gà Con Hoàng Kim"
  },
  "item.pet_pup.name": {
-  "en": "Pup",
-  "vi": "Cún Con"
+  "en": "Loyal Pup",
+  "vi": "Cún Trung Thành"
  },
  "item.pet_slime.name": {
   "en": "Pet Slime",
-  "vi": "Pet Slime"
+  "vi": "Slime Cưng"
  },
  "item.pet_teddy.name": {
   "en": "Teddy",
   "vi": "Gấu Bông"
  },
  "item.pet_wisp.name": {
-  "en": "Wisp",
-  "vi": "Ma Trơi"
+  "en": "Spirit Wisp",
+  "vi": "Tinh Linh Đom Đóm"
+ },
+ "item.potion_clarity.name": {
+  "en": "Potion of Clarity",
+  "vi": "Thần Dược Tĩnh Tâm"
  },
  "item.raw_meat.name": {
   "en": "Raw Meat",
@@ -1906,6 +2182,22 @@
  "item.ruby_ring.name": {
   "en": "Ruby Ring",
   "vi": "Nhẫn Hồng Ngọc"
+ },
+ "item.rune_emerald.name": {
+  "en": "Emerald Rune",
+  "vi": "Cổ Ngữ Lục Bảo"
+ },
+ "item.rune_ruby.name": {
+  "en": "Ruby Rune",
+  "vi": "Cổ Ngữ Hồng Ngọc"
+ },
+ "item.rune_sapphire.name": {
+  "en": "Sapphire Rune",
+  "vi": "Cổ Ngữ Lam Ngọc"
+ },
+ "item.rune_topaz.name": {
+  "en": "Topaz Rune",
+  "vi": "Cổ Ngữ Hoàng Ngọc"
  },
  "item.rusty_dagger.name": {
   "en": "Rusty Dagger",
@@ -1983,6 +2275,14 @@
   "en": "Wizard Hat",
   "vi": "Mũ Phù Thủy"
  },
+ "loot.crypt_lord_first.name": {
+  "en": "Crypt Lord (First Clear)",
+  "vi": "Lãnh Chúa Hầm Mộ (Lần đầu)"
+ },
+ "loot.crypt_lord_repeat.name": {
+  "en": "Crypt Lord (Repeat)",
+  "vi": "Lãnh Chúa Hầm Mộ (Lặp lại)"
+ },
  "loot.forest_guardian_first.name": {
   "en": "Forest Guardian First",
   "vi": "Hộ Vệ Rừng (lần đầu)"
@@ -1994,6 +2294,14 @@
  "loot.goblin.name": {
   "en": "Goblin",
   "vi": "Goblin"
+ },
+ "loot.goblin_warlord_first.name": {
+  "en": "Goblin Warlord (First Clear)",
+  "vi": "Chúa Tể Goblin (Lần đầu)"
+ },
+ "loot.goblin_warlord_repeat.name": {
+  "en": "Goblin Warlord (Repeat)",
+  "vi": "Chúa Tể Goblin (Lặp lại)"
  },
  "loot.skeleton.name": {
   "en": "Skeleton",
@@ -2595,6 +2903,14 @@
   "en": "Reborn",
   "vi": "Tái Sinh"
  },
+ "quest.town_hall_10.desc": {
+  "en": "Upgrade the Town Hall to level 10.",
+  "vi": "Nâng cấp Tòa Thị Chính lên level 10."
+ },
+ "quest.town_hall_10.name": {
+  "en": "Town Hall Lv 10",
+  "vi": "Tòa Thị Chính Lv 10"
+ },
  "quest.town_hall_2.desc": {
   "en": "Upgrade the Town Hall to level 2.",
   "vi": "Nâng cấp Tòa Thị Chính lên level 2."
@@ -2627,14 +2943,6 @@
   "en": "Town Hall Lv 7",
   "vi": "Tòa Thị Chính Lv 7"
  },
- "quest.town_hall_10.desc": {
-  "en": "Upgrade the Town Hall to level 10.",
-  "vi": "Nâng cấp Tòa Thị Chính lên level 10."
- },
- "quest.town_hall_10.name": {
-  "en": "Town Hall Lv 10",
-  "vi": "Tòa Thị Chính Lv 10"
- },
  "quest.trading_post.desc": {
   "en": "Build a Trading Post.",
   "vi": "Xây Trạm Giao Thương."
@@ -2658,6 +2966,10 @@
  "recipe.battle_axe.name": {
   "en": "Battle Axe",
   "vi": "Rìu Chiến"
+ },
+ "recipe.beast_feast.name": {
+  "en": "Beast Feast",
+  "vi": "Đại Tiệc Quái Thú"
  },
  "recipe.bone_amulet.name": {
   "en": "Bone Amulet",
@@ -2755,6 +3067,10 @@
   "en": "Meat Stew",
   "vi": "Thịt Hầm"
  },
+ "recipe.mist_elixir.name": {
+  "en": "Mist Elixir",
+  "vi": "Thuốc Tiên Sương Mù"
+ },
  "recipe.monster_steak.name": {
   "en": "Monster Steak",
   "vi": "Bít Tết Thịt Quái"
@@ -2782,6 +3098,10 @@
  "recipe.pet_teddy.name": {
   "en": "Teddy",
   "vi": "Gấu Bông"
+ },
+ "recipe.potion_clarity.name": {
+  "en": "Potion of Clarity",
+  "vi": "Thần Dược Tĩnh Tâm"
  },
  "recipe.round_glasses.name": {
   "en": "Round Glasses",
@@ -3231,6 +3551,10 @@
   "en": "{name} has fallen",
   "vi": "{name} đã gục ngã"
  },
+ "toast.root.grade_up": {
+  "en": "{name} now grades {grade}",
+  "vi": "{name} đạt bậc {grade}"
+ },
  "toast.root.quest_done": {
   "en": "Quest done: {quest} — claim your reward",
   "vi": "Xong nhiệm vụ: {quest} — hãy nhận thưởng"
@@ -3246,10 +3570,6 @@
  "toast.root.recovered": {
   "en": "{name} is back on their feet",
   "vi": "{name} đã hồi phục"
- },
- "toast.root.grade_up": {
-  "en": "{name} now grades {grade}",
-  "vi": "{name} đạt bậc {grade}"
  },
  "toast.root.recruited": {
   "en": "{name} joined the roster",
@@ -3363,6 +3683,18 @@
   "en": "Swift",
   "vi": "Nhanh Nhẹn"
  },
+ "ui.arena.bought_failed": {
+  "en": "Not enough arena tokens!",
+  "vi": "Không đủ token đấu trường!"
+ },
+ "ui.arena.bought_success": {
+  "en": "Purchased successfully!",
+  "vi": "Đã đổi thưởng thành công!"
+ },
+ "ui.arena.buy_item": {
+  "en": "{cost} Tokens",
+  "vi": "{cost} Token"
+ },
  "ui.arena.close": {
   "en": "Back to town",
   "vi": "Về thị trấn"
@@ -3394,6 +3726,14 @@
  "ui.arena.no_partner": {
   "en": "You need another Hunter for a friendly match.",
   "vi": "Cần thêm một Hunter khác để đấu giao hữu."
+ },
+ "ui.arena.no_tickets": {
+  "en": "No arena tickets left for today!",
+  "vi": "Đã hết vé đấu trường hôm nay!"
+ },
+ "ui.arena.refill_btn": {
+  "en": "Refill (20g)",
+  "vi": "Mua vé (20v)"
  },
  "ui.arena.refresh": {
   "en": "New rivals",
@@ -3427,6 +3767,10 @@
   "en": "{name} · Lv {level} · {class}\n{tier} · power {power}",
   "vi": "{name} · Cấp {level} · {class}\n{tier} · sức mạnh {power}"
  },
+ "ui.arena.rival_squad": {
+  "en": "Rival Gladiator Squad",
+  "vi": "Đội Đấu Sĩ Đối Thủ"
+ },
  "ui.arena.rival_stronger": {
   "en": "Stronger",
   "vi": "Mạnh hơn"
@@ -3451,6 +3795,34 @@
   "en": "×{speed}",
   "vi": "×{speed}"
  },
+ "ui.arena.squad_need_more": {
+  "en": "Need at least {count} ready Hunters for this format!",
+  "vi": "Cần ít nhất {count} Hunter sẵn sàng cho thể thức này!"
+ },
+ "ui.arena.squad_power": {
+  "en": "Squad Power: {power}",
+  "vi": "Lực chiến đội: {power}"
+ },
+ "ui.arena.tab_1v1": {
+  "en": "1 vs 1",
+  "vi": "1 vs 1"
+ },
+ "ui.arena.tab_4v4": {
+  "en": "4 vs 4",
+  "vi": "4 vs 4"
+ },
+ "ui.arena.tab_6v6": {
+  "en": "6 vs 6",
+  "vi": "6 vs 6"
+ },
+ "ui.arena.tab_shop": {
+  "en": "Token Shop",
+  "vi": "Cửa Hàng Token"
+ },
+ "ui.arena.tickets": {
+  "en": "Tickets: {count}/5",
+  "vi": "Vé đấu: {count}/5"
+ },
  "ui.arena.timer": {
   "en": "{seconds}s",
   "vi": "{seconds} giây"
@@ -3459,9 +3831,49 @@
   "en": "Colosseum",
   "vi": "Đấu Trường"
  },
+ "ui.arena.tokens": {
+  "en": "Tokens: {count}",
+  "vi": "Token: {count}"
+ },
  "ui.arena.your_fighter": {
   "en": "Your fighter",
   "vi": "Chiến binh của bạn"
+ },
+ "ui.bestiary.bonus_t2": {
+  "en": "★ Mastery II: +3% Damage vs species",
+  "vi": "★ Tinh Thông II: +3% Sát thương lên loài này"
+ },
+ "ui.bestiary.bonus_t3": {
+  "en": "★ Mastery III: +7% Damage & +10% Drop Chance",
+  "vi": "★ Tinh Thông III: +7% Sát thương & +10% Tỉ lệ rớt đồ"
+ },
+ "ui.bestiary.boss_tag": {
+  "en": "BOSS",
+  "vi": "TRÙM"
+ },
+ "ui.bestiary.kills_count": {
+  "en": "{count} defeated",
+  "vi": "Đã tiêu diệt: {count}"
+ },
+ "ui.bestiary.locked_lore": {
+  "en": "Defeat {needed} to unlock species lore.",
+  "vi": "Hạ gục {needed} con để mở khóa truyền thuyết loài."
+ },
+ "ui.bestiary.open_btn": {
+  "en": "Bestiary",
+  "vi": "Sách Quái Vật"
+ },
+ "ui.bestiary.subtitle": {
+  "en": "Master monster knowledge to unlock weakness insights and combat damage bonuses.",
+  "vi": "Nắm vững tri thức về quái vật để mở khóa điểm yếu và gia tăng sát thương chiến đấu."
+ },
+ "ui.bestiary.title": {
+  "en": "Bestiary",
+  "vi": "Bách Khoa Quái Vật"
+ },
+ "ui.bestiary.weakness_label": {
+  "en": "Weakness: {weakness}",
+  "vi": "Điểm yếu: {weakness}"
  },
  "ui.boss.assigned": {
   "en": "Hunters assigned: {count}",
@@ -3526,6 +3938,58 @@
  "ui.boss.title": {
   "en": "Weekly Boss",
   "vi": "Boss tuần"
+ },
+ "ui.bounty.claim_btn": {
+  "en": "Claim",
+  "vi": "Nhận Thưởng"
+ },
+ "ui.bounty.claim_success": {
+  "en": "Claimed: {reward}!",
+  "vi": "Đã nhận: {reward}!"
+ },
+ "ui.bounty.claimed_btn": {
+  "en": "Claimed",
+  "vi": "Đã Nhận"
+ },
+ "ui.bounty.contract_title": {
+  "en": "{target} ({count})",
+  "vi": "{target} ({count})"
+ },
+ "ui.bounty.none": {
+  "en": "No active bounties.",
+  "vi": "Không có tiền thưởng nào."
+ },
+ "ui.bounty.not_ready": {
+  "en": "Objectives not completed yet.",
+  "vi": "Chưa hoàn thành mục tiêu."
+ },
+ "ui.bounty.open_btn": {
+  "en": "Bounties",
+  "vi": "Tiền Thưởng"
+ },
+ "ui.bounty.refresh_btn": {
+  "en": "New Contracts",
+  "vi": "Hợp Đồng Mới"
+ },
+ "ui.bounty.refresh_in": {
+  "en": "Refreshes in {time}",
+  "vi": "Làm mới sau {time}"
+ },
+ "ui.bounty.refreshed": {
+  "en": "Bounties refreshed!",
+  "vi": "Đã làm mới bảng tiền thưởng!"
+ },
+ "ui.bounty.reward_line": {
+  "en": "Reward: {reward}",
+  "vi": "Phần thưởng: {reward}"
+ },
+ "ui.bounty.tickets": {
+  "en": "{count}× Summon Tickets",
+  "vi": "{count}× Vé chiêu mộ"
+ },
+ "ui.bounty.title": {
+  "en": "Bounty Board",
+  "vi": "Bảng Tiền Thưởng"
  },
  "ui.build.beds_note": {
   "en": "Beds {used} / {total} used. Tap a spot in the Town to place, then confirm.",
@@ -4083,53 +4547,13 @@
   "en": "{gold} g",
   "vi": "{gold} g"
  },
- "ui.common.info": {
-  "en": "Info",
-  "vi": "Thông Tin"
- },
- "grade.poor.name": {
-  "en": "Poor",
-  "vi": "Yếu kém"
- },
- "grade.plain.name": {
-  "en": "Plain",
-  "vi": "Thường"
- },
- "grade.average.name": {
-  "en": "Average",
-  "vi": "Trung bình"
- },
- "grade.good.name": {
-  "en": "Good",
-  "vi": "Khá"
- },
- "grade.fine.name": {
-  "en": "Fine",
-  "vi": "Tốt"
- },
- "grade.strong.name": {
-  "en": "Strong",
-  "vi": "Mạnh"
- },
- "grade.excellent.name": {
-  "en": "Excellent",
-  "vi": "Xuất sắc"
- },
- "grade.elite.name": {
-  "en": "Elite",
-  "vi": "Tinh anh"
- },
- "grade.legendary.name": {
-  "en": "Legendary",
-  "vi": "Huyền thoại"
- },
- "grade.supreme.name": {
-  "en": "Supreme",
-  "vi": "Tuyệt phẩm"
- },
  "ui.common.grade": {
   "en": "Grade: {grade}",
   "vi": "Đánh giá: {grade}"
+ },
+ "ui.common.info": {
+  "en": "Info",
+  "vi": "Thông Tin"
  },
  "ui.common.level_class": {
   "en": "Lv.{level} {class}",
@@ -4175,33 +4599,33 @@
   "en": "Dev -",
   "vi": "Dev -"
  },
- "ui.equip_slot.empty": {
-  "en": "Nothing in this slot.",
-  "vi": "Ô này đang trống."
- },
- "ui.equip_slot.compare_up": {
-  "en": "\u25b2 +{delta}% vs worn",
-  "vi": "\u25b2 +{delta}% so v\u1edbi \u0111ang m\u1eb7c"
- },
- "ui.equip_slot.compare_down": {
-  "en": "\u25bc {delta}% vs worn",
-  "vi": "\u25bc {delta}% so v\u1edbi \u0111ang m\u1eb7c"
- },
- "ui.equip_slot.compare_same": {
-  "en": "= same as worn",
-  "vi": "= nh\u01b0 m\u00f3n \u0111ang m\u1eb7c"
- },
- "ui.equip_slot.compare_new": {
-  "en": "slot is empty",
-  "vi": "\u00f4 \u0111ang tr\u1ed1ng"
- },
- "ui.equip_slot.compare_broken": {
-  "en": "\u25b2 worn piece is broken",
-  "vi": "\u25b2 món đang mặc đã hỏng"
- },
  "ui.equip_slot.broken": {
   "en": "broken, no bonus",
   "vi": "hỏng, mất bonus"
+ },
+ "ui.equip_slot.compare_broken": {
+  "en": "▲ worn piece is broken",
+  "vi": "▲ món đang mặc đã hỏng"
+ },
+ "ui.equip_slot.compare_down": {
+  "en": "▼ {delta}% vs worn",
+  "vi": "▼ {delta}% so với đang mặc"
+ },
+ "ui.equip_slot.compare_new": {
+  "en": "slot is empty",
+  "vi": "ô đang trống"
+ },
+ "ui.equip_slot.compare_same": {
+  "en": "= same as worn",
+  "vi": "= như món đang mặc"
+ },
+ "ui.equip_slot.compare_up": {
+  "en": "▲ +{delta}% vs worn",
+  "vi": "▲ +{delta}% so với đang mặc"
+ },
+ "ui.equip_slot.empty": {
+  "en": "Nothing in this slot.",
+  "vi": "Ô này đang trống."
  },
  "ui.equip_slot.equip": {
   "en": "Equip",
@@ -4235,6 +4659,10 @@
   "en": "Busy",
   "vi": "Đang bận"
  },
+ "ui.expedition.dispatch_btn": {
+  "en": "Auto-Dispatch Squad B",
+  "vi": "Phái Cử Tự Động Đội B"
+ },
  "ui.expedition.enemies": {
   "en": "Enemies: {enemies}\nBoss: {boss}",
   "vi": "Kẻ địch: {enemies}\nBoss: {boss}"
@@ -4250,6 +4678,10 @@
  "ui.expedition.fallen_note": {
   "en": "Fallen members come out as bodies at the entrance and are carried home.",
   "vi": "Thành viên gục ngã sẽ nằm ở lối vào và được khiêng về."
+ },
+ "ui.expedition.fleet_b_running": {
+  "en": "Squad B Exploring ({seconds}s)...",
+  "vi": "Đội B Đang Thám Hiểm ({seconds}s)..."
  },
  "ui.expedition.in_party": {
   "en": "In party",
@@ -4299,6 +4731,10 @@
   "en": "Sealed — this dungeon opens in a later update.",
   "vi": "Bị phong ấn — Dungeon này sẽ mở ở bản cập nhật sau."
  },
+ "ui.expedition.squad_b_dispatched": {
+  "en": "Squad B dispatched into the dungeon!",
+  "vi": "Đã phái cử Đội B vào phó bản!"
+ },
  "ui.expedition.walk": {
   "en": "Walk to the entrance",
   "vi": "Đi tới lối vào"
@@ -4335,6 +4771,14 @@
   "en": "Found: {gold} gold · {items} items · {kills} defeated",
   "vi": "Thu được: {gold} vàng · {items} món · hạ {kills}"
  },
+ "ui.gate.arrivals": {
+  "en": "Just arrived",
+  "vi": "Vừa đến"
+ },
+ "ui.gate.buy_ticket": {
+  "en": "Buy Ticket ({gold}g)",
+  "vi": "Mua Thẻ ({gold} vàng)"
+ },
  "ui.gate.candidate_stat": {
   "en": "{name} {value}",
   "vi": "{name} {value}"
@@ -4343,129 +4787,9 @@
   "en": "Awake {active}/{active_max} · asleep {asleep}/{asleep_max} · free beds {beds}",
   "vi": "Đang hoạt động {active}/{active_max} · ngủ đông {asleep}/{asleep_max} · giường trống {beds}"
  },
- "ui.gate.summon_title": {
-  "en": "Summoning",
-  "vi": "Triệu hồi"
- },
- "ui.gate.tickets": {
-  "en": "Summoning tickets: {count}",
-  "vi": "Thẻ triệu hồi: {count}"
- },
- "ui.gate.buy_ticket": {
-  "en": "Buy Ticket ({gold}g)",
-  "vi": "Mua Thẻ ({gold} vàng)"
- },
  "ui.gate.effects_toggle": {
   "en": "Reveal cards (swipe)",
   "vi": "Hiệu ứng lật thẻ (vuốt)"
- },
- "ui.summon.title": {
-  "en": "Summoning",
-  "vi": "Triệu hồi"
- },
- "ui.summon.swipe_hint": {
-  "en": "Swipe the card away to reveal the one beneath",
-  "vi": "Vuốt thẻ ra để lật thẻ bên dưới"
- },
- "ui.summon.skip": {
-  "en": "Skip",
-  "vi": "Bỏ qua"
- },
- "ui.summon.finish": {
-  "en": "Done",
-  "vi": "Hoàn tất"
- },
- "ui.summon.summary_title": {
-  "en": "{count} Hunters answered the call",
-  "vi": "{count} Hunter đã đến"
- },
- "ui.summon.tap_detail": {
-  "en": "Tap a card for details",
-  "vi": "Chạm thẻ để xem chi tiết"
- },
- "ui.summon.confirm": {
-  "en": "Confirm",
-  "vi": "Xác nhận"
- },
- "ui.summon.back": {
-  "en": "Back",
-  "vi": "Quay lại"
- },
- "ui.summon.traits": {
-  "en": "Traits: {traits}",
-  "vi": "Tính cách: {traits}"
- },
- "ui.summon.talent": {
-  "en": "Talent: {talent}",
-  "vi": "Thiên phú: {talent}"
- },
- "ui.summon.no_talent": {
-  "en": "No talent",
-  "vi": "Không có thiên phú"
- },
- "ui.summon.cover": {
-  "en": "Hunter Gate",
-  "vi": "Cổng Hunter"
- },
- "ui.summon.arrival_village": {
-  "en": "Will walk into the village",
-  "vi": "Sẽ vào làng"
- },
- "ui.summon.arrival_mount": {
-  "en": "Will sleep on the Hibernation Mount",
-  "vi": "Sẽ sang Núi Ngủ Đông"
- },
- "ui.gate.summon_times": {
-  "en": "×{count}",
-  "vi": "×{count}"
- },
- "ui.gate.summon_note": {
-  "en": "A newcomer walks into the village and takes a bed.",
-  "vi": "Hunter mới sẽ đi vào làng và nhận giường."
- },
- "ui.gate.summon_note_asleep": {
-  "en": "The village is full: newcomers cross the bridge to sleep on the Hibernation Mount.",
-  "vi": "Làng đã đầy: Hunter mới sẽ qua cầu sang Núi Ngủ Đông."
- },
- "ui.gate.arrivals": {
-  "en": "Just arrived",
-  "vi": "Vừa đến"
- },
- "ui.gate.summoned": {
-  "en": "{count} Hunters answered the call ({asleep} to the Mount)",
-  "vi": "{count} Hunter đã đến ({asleep} sang Núi Ngủ Đông)"
- },
- "ui.gate.went_village": {
-  "en": "→ village",
-  "vi": "→ vào làng"
- },
- "ui.gate.went_asleep": {
-  "en": "→ Hibernation Mount",
-  "vi": "→ Núi Ngủ Đông"
- },
- "err.summon.no_tickets": {
-  "en": "Needs {tickets} summoning ticket(s)",
-  "vi": "Cần {tickets} thẻ triệu hồi"
- },
- "err.summon.everything_full": {
-  "en": "Village ({active}) and Mount ({asleep}) are both full",
-  "vi": "Làng ({active}) và Núi ({asleep}) đều đã đầy"
- },
- "err.hibernate.already": {
-  "en": "Already asleep on the Mount",
-  "vi": "Đã đang ngủ đông"
- },
- "err.hibernate.awake": {
-  "en": "Not asleep",
-  "vi": "Không ở trạng thái ngủ đông"
- },
- "err.hibernate.asleep": {
-  "en": "{name} is asleep on the Mount",
-  "vi": "{name} đang ngủ đông"
- },
- "err.hibernate.mount_full": {
-  "en": "The Mount holds {max} sleepers",
-  "vi": "Núi chỉ chứa {max} Hunter ngủ đông"
  },
  "ui.gate.expel": {
   "en": "Expel",
@@ -4507,6 +4831,30 @@
   "en": "Hunters {count} / {max}  ·  free beds {beds}",
   "vi": "Hunter {count} / {max}  ·  giường trống {beds}"
  },
+ "ui.gate.summon_note": {
+  "en": "A newcomer walks into the village and takes a bed.",
+  "vi": "Hunter mới sẽ đi vào làng và nhận giường."
+ },
+ "ui.gate.summon_note_asleep": {
+  "en": "The village is full: newcomers cross the bridge to sleep on the Hibernation Mount.",
+  "vi": "Làng đã đầy: Hunter mới sẽ qua cầu sang Núi Ngủ Đông."
+ },
+ "ui.gate.summon_times": {
+  "en": "×{count}",
+  "vi": "×{count}"
+ },
+ "ui.gate.summon_title": {
+  "en": "Summoning",
+  "vi": "Triệu hồi"
+ },
+ "ui.gate.summoned": {
+  "en": "{count} Hunters answered the call ({asleep} to the Mount)",
+  "vi": "{count} Hunter đã đến ({asleep} sang Núi Ngủ Đông)"
+ },
+ "ui.gate.tickets": {
+  "en": "Summoning tickets: {count}",
+  "vi": "Thẻ triệu hồi: {count}"
+ },
  "ui.gate.title": {
   "en": "Hunter Gate",
   "vi": "Cổng Hunter"
@@ -4515,6 +4863,14 @@
   "en": "Hunters waiting",
   "vi": "Hunter đang chờ"
  },
+ "ui.gate.went_asleep": {
+  "en": "→ Hibernation Mount",
+  "vi": "→ Núi Ngủ Đông"
+ },
+ "ui.gate.went_village": {
+  "en": "→ village",
+  "vi": "→ vào làng"
+ },
  "ui.hud.defeat": {
   "en": "DEFEAT",
   "vi": "THẤT BẠI"
@@ -4522,22 +4878,6 @@
  "ui.hud.victory": {
   "en": "VICTORY",
   "vi": "CHIẾN THẮNG"
- },
- "ui.hunter.equip_best": {
-  "en": "Wear best gear",
-  "vi": "Mặc đồ tốt nhất"
- },
- "ui.hunter.equip_best_done": {
-  "en": "{count} pieces put on",
-  "vi": "Đã mặc {count} món"
- },
- "ui.hunter.equip_best_none": {
-  "en": "Nothing in store beats what is worn",
-  "vi": "Trong kho không có món nào tốt hơn"
- },
- "ui.hunter.dps": {
-  "en": "DPS",
-  "vi": "DPS"
  },
  "ui.hunter.academy_hint": {
   "en": "Build an Academy (Town Hall Lv 3) to train skills and learn traits.",
@@ -4558,6 +4898,10 @@
  "ui.hunter.assign.auto": {
   "en": "Auto",
   "vi": "Tự động"
+ },
+ "ui.hunter.assign.gather": {
+  "en": "Gather",
+  "vi": "Thu thập"
  },
  "ui.hunter.assign.rest": {
   "en": "Rest",
@@ -4600,12 +4944,24 @@
   "vi": "Đã bán {count} món được {gold} g"
  },
  "ui.hunter.bond_bonded": {
-  "en": "{name} — bonded (+5% ATK together)",
-  "vi": "{name} — đã gắn bó (+5% ATK khi đi cùng)"
+  "en": "{name} — bonded",
+  "vi": "{name} — đã gắn bó"
+ },
+ "ui.hunter.bond_milestone_1": {
+  "en": "{name} · Comrades (+5% ATK, +5% SPD)",
+  "vi": "{name} · Đồng đội (+5% ATK, +5% SPD)"
+ },
+ "ui.hunter.bond_milestone_2": {
+  "en": "{name} · Sworn Oath (+15% ATK, +10% HP)",
+  "vi": "{name} · Thề ước (+15% ATK, +10% HP)"
  },
  "ui.hunter.bonds": {
-  "en": "Bonds",
-  "vi": "Gắn bó"
+  "en": "Bonds & Comradeship",
+  "vi": "Mối Quan Hệ & Gắn Bó"
+ },
+ "ui.hunter.chronicle": {
+  "en": "Chronicle & Deeds",
+  "vi": "Biên Niên Sử & Chiến Công"
  },
  "ui.hunter.crit": {
   "en": "CRIT",
@@ -4618,6 +4974,10 @@
  "ui.hunter.doing_auto": {
   "en": "Doing: {activity} (automatic)",
   "vi": "Đang làm: {activity} (tự động)"
+ },
+ "ui.hunter.dps": {
+  "en": "DPS",
+  "vi": "DPS"
  },
  "ui.hunter.duty": {
   "en": "Duty: {duty}",
@@ -4674,6 +5034,18 @@
  "ui.hunter.energy_starving": {
   "en": "Energy {value} — starving",
   "vi": "Năng lượng {value} — đói lả"
+ },
+ "ui.hunter.equip_best": {
+  "en": "Wear best gear",
+  "vi": "Mặc đồ tốt nhất"
+ },
+ "ui.hunter.equip_best_done": {
+  "en": "{count} pieces put on",
+  "vi": "Đã mặc {count} món"
+ },
+ "ui.hunter.equip_best_none": {
+  "en": "Nothing in store beats what is worn",
+  "vi": "Trong kho không có món nào tốt hơn"
  },
  "ui.hunter.equip_option": {
   "en": "{slot}: equip {item} ({mods})",
@@ -4959,6 +5331,18 @@
   "en": "Returning",
   "vi": "Đang về"
  },
+ "ui.hunter.title_cycle": {
+  "en": "Switch",
+  "vi": "Đổi"
+ },
+ "ui.hunter.title_label": {
+  "en": "Title: {title}",
+  "vi": "Danh hiệu: {title}"
+ },
+ "ui.hunter.title_none": {
+  "en": "No Title",
+  "vi": "Chưa có danh hiệu"
+ },
  "ui.hunter.treasury_gain": {
   "en": "Treasury +{gold} gold",
   "vi": "Kho bạc +{gold} vàng"
@@ -4970,6 +5354,10 @@
  "ui.hunter.xp_short": {
   "en": "XP {current}/{max}",
   "vi": "XP {current}/{max}"
+ },
+ "ui.hunters.asleep_title": {
+  "en": "Asleep on the Mount ({count}/{max})",
+  "vi": "Ngủ đông ({count}/{max})"
  },
  "ui.hunters.everyone": {
   "en": "Everyone: {duty}",
@@ -4991,85 +5379,17 @@
   "en": "Find on the map",
   "vi": "Tìm trên bản đồ"
  },
- "ui.hunters.asleep_title": {
-  "en": "Asleep on the Mount ({count}/{max})",
-  "vi": "Ngủ đông ({count}/{max})"
- },
- "ui.hunters.status.asleep": {
-  "en": "Hibernating",
-  "vi": "Ngủ đông"
- },
- "ui.mount.title": {
-  "en": "Hibernation Mount",
-  "vi": "Núi Ngủ Đông"
- },
- "ui.mount.counts": {
-  "en": "Awake {active}/{active_max} · asleep {asleep}/{asleep_max} · free beds {beds}",
-  "vi": "Đang hoạt động {active}/{active_max} · ngủ đông {asleep}/{asleep_max} · giường trống {beds}"
- },
- "ui.mount.note": {
-  "en": "Sleepers need nothing and earn nothing. Wake one when a slot and a bed are free, or pick an awake Hunter and swap.",
-  "vi": "Hunter ngủ đông không ăn, không tốn gì nhưng cũng không lên cấp. Đánh thức khi còn chỗ và giường, hoặc chọn một Hunter đang hoạt động để đổi chỗ."
- },
- "ui.mount.asleep": {
-  "en": "Asleep ({count})",
-  "vi": "Đang ngủ đông ({count})"
- },
- "ui.mount.nobody_asleep": {
-  "en": "Nobody is sleeping here.",
-  "vi": "Chưa có ai ngủ đông."
- },
- "ui.mount.awake": {
-  "en": "Awake in the village ({count})",
-  "vi": "Đang hoạt động ({count})"
- },
- "ui.mount.swap_hint": {
-  "en": "{name} will swap with the sleeper you pick.",
-  "vi": "{name} sẽ đổi chỗ với Hunter ngủ đông bạn chọn."
- },
- "ui.mount.wake": {
-  "en": "Wake",
-  "vi": "Đánh thức"
- },
- "ui.mount.sleep": {
-  "en": "Sleep",
-  "vi": "Cho ngủ"
- },
- "ui.mount.pick_swap": {
-  "en": "Swap…",
-  "vi": "Đổi…"
- },
- "ui.mount.swap": {
-  "en": "Swap",
-  "vi": "Đổi chỗ"
- },
- "ui.mount.woke": {
-  "en": "{name} wakes and walks back to the village",
-  "vi": "{name} tỉnh dậy, đi về làng"
- },
- "ui.mount.slept": {
-  "en": "{name} walks to the Mount to sleep",
-  "vi": "{name} đi sang Núi Ngủ Đông"
- },
- "ui.mount.swapped": {
-  "en": "{a} and {b} trade places",
-  "vi": "{a} và {b} đổi chỗ cho nhau"
- },
- "world.mount.plaque": {
-  "en": "Hibernation Mount",
-  "vi": "Núi Ngủ Đông"
- },
  "ui.hunters.sort": {
   "en": "Sort: {mode}",
   "vi": "Xếp: {mode}"
  },
- "ui.hunters.sort_mode.grade": {
-  "en": "Grade",
-  "vi": "Đánh giá"
- },
  "ui.hunters.sort_mode.class": {
   "en": "Class",
   "vi": "Nghề"
+ },
+ "ui.hunters.sort_mode.grade": {
+  "en": "Grade",
+  "vi": "Đánh giá"
  },
  "ui.hunters.sort_mode.level": {
   "en": "Level",
@@ -5078,6 +5398,10 @@
  "ui.hunters.sort_mode.name": {
   "en": "Name",
   "vi": "Tên"
+ },
+ "ui.hunters.status.asleep": {
+  "en": "Hibernating",
+  "vi": "Ngủ đông"
  },
  "ui.hunters.status.fallen": {
   "en": "Fallen",
@@ -5495,6 +5819,62 @@
   "en": "Skills",
   "vi": "Kỹ năng"
  },
+ "ui.mount.asleep": {
+  "en": "Asleep ({count})",
+  "vi": "Đang ngủ đông ({count})"
+ },
+ "ui.mount.awake": {
+  "en": "Awake in the village ({count})",
+  "vi": "Đang hoạt động ({count})"
+ },
+ "ui.mount.counts": {
+  "en": "Awake {active}/{active_max} · asleep {asleep}/{asleep_max} · free beds {beds}",
+  "vi": "Đang hoạt động {active}/{active_max} · ngủ đông {asleep}/{asleep_max} · giường trống {beds}"
+ },
+ "ui.mount.nobody_asleep": {
+  "en": "Nobody is sleeping here.",
+  "vi": "Chưa có ai ngủ đông."
+ },
+ "ui.mount.note": {
+  "en": "Sleepers need nothing and earn nothing. Wake one when a slot and a bed are free, or pick an awake Hunter and swap.",
+  "vi": "Hunter ngủ đông không ăn, không tốn gì nhưng cũng không lên cấp. Đánh thức khi còn chỗ và giường, hoặc chọn một Hunter đang hoạt động để đổi chỗ."
+ },
+ "ui.mount.pick_swap": {
+  "en": "Swap…",
+  "vi": "Đổi…"
+ },
+ "ui.mount.sleep": {
+  "en": "Sleep",
+  "vi": "Cho ngủ"
+ },
+ "ui.mount.slept": {
+  "en": "{name} walks to the Mount to sleep",
+  "vi": "{name} đi sang Núi Ngủ Đông"
+ },
+ "ui.mount.swap": {
+  "en": "Swap",
+  "vi": "Đổi chỗ"
+ },
+ "ui.mount.swap_hint": {
+  "en": "{name} will swap with the sleeper you pick.",
+  "vi": "{name} sẽ đổi chỗ với Hunter ngủ đông bạn chọn."
+ },
+ "ui.mount.swapped": {
+  "en": "{a} and {b} trade places",
+  "vi": "{a} và {b} đổi chỗ cho nhau"
+ },
+ "ui.mount.title": {
+  "en": "Hibernation Mount",
+  "vi": "Núi Ngủ Đông"
+ },
+ "ui.mount.wake": {
+  "en": "Wake",
+  "vi": "Đánh thức"
+ },
+ "ui.mount.woke": {
+  "en": "{name} wakes and walks back to the village",
+  "vi": "{name} tỉnh dậy, đi về làng"
+ },
  "ui.nav.construct": {
   "en": "Construct",
   "vi": "Xây dựng"
@@ -5647,6 +6027,10 @@
   "en": "Quest",
   "vi": "Nhiệm vụ"
  },
+ "ui.root.repeat_count": {
+  "en": "{text} ×{count}",
+  "vi": "{text} ×{count}"
+ },
  "ui.root.tip_portal": {
   "en": "Portal",
   "vi": "Cổng luân hồi"
@@ -5658,10 +6042,6 @@
  "ui.root.tip_recruit": {
   "en": "Recruit",
   "vi": "Tuyển Hunter"
- },
- "ui.root.repeat_count": {
-  "en": "{text} ×{count}",
-  "vi": "{text} ×{count}"
  },
  "ui.root.town": {
   "en": "Town",
@@ -5678,6 +6058,10 @@
  "ui.settings.changed": {
   "en": "Language: {language}",
   "vi": "Ngôn ngữ: {language}"
+ },
+ "ui.settings.display": {
+  "en": "Display",
+  "vi": "Hiển thị"
  },
  "ui.settings.language": {
   "en": "Language",
@@ -5698,10 +6082,6 @@
  "ui.settings.profile": {
   "en": "Profile",
   "vi": "Hồ sơ"
- },
- "ui.settings.display": {
-  "en": "Display",
-  "vi": "Hiển thị"
  },
  "ui.settings.screen_shake": {
   "en": "Screen shake",
@@ -5782,6 +6162,78 @@
  "ui.skill.type": {
   "en": "Type",
   "vi": "Loại"
+ },
+ "ui.summon.arrival_mount": {
+  "en": "Will sleep on the Hibernation Mount",
+  "vi": "Sẽ sang Núi Ngủ Đông"
+ },
+ "ui.summon.arrival_village": {
+  "en": "Will walk into the village",
+  "vi": "Sẽ vào làng"
+ },
+ "ui.summon.back": {
+  "en": "Back",
+  "vi": "Quay lại"
+ },
+ "ui.summon.confirm": {
+  "en": "Confirm",
+  "vi": "Xác nhận"
+ },
+ "ui.summon.cover": {
+  "en": "Hunter Gate",
+  "vi": "Cổng Hunter"
+ },
+ "ui.summon.finish": {
+  "en": "Done",
+  "vi": "Hoàn tất"
+ },
+ "ui.summon.no_talent": {
+  "en": "No talent",
+  "vi": "Không có thiên phú"
+ },
+ "ui.summon.skip": {
+  "en": "Skip",
+  "vi": "Bỏ qua"
+ },
+ "ui.summon.summary_title": {
+  "en": "{count} Hunters answered the call",
+  "vi": "{count} Hunter đã đến"
+ },
+ "ui.summon.swipe_hint": {
+  "en": "Swipe the card away to reveal the one beneath",
+  "vi": "Vuốt thẻ ra để lật thẻ bên dưới"
+ },
+ "ui.summon.talent": {
+  "en": "Talent: {talent}",
+  "vi": "Thiên phú: {talent}"
+ },
+ "ui.summon.tap_detail": {
+  "en": "Tap a card for details",
+  "vi": "Chạm thẻ để xem chi tiết"
+ },
+ "ui.summon.title": {
+  "en": "Summoning",
+  "vi": "Triệu hồi"
+ },
+ "ui.summon.traits": {
+  "en": "Traits: {traits}",
+  "vi": "Tính cách: {traits}"
+ },
+ "ui.town_event.blood_moon_repelled": {
+  "en": "Invasion repelled! Town rewards granted.",
+  "vi": "Đã đẩy lùi cuộc xâm lăng! Nhận thưởng bảo vệ làng."
+ },
+ "ui.town_event.blood_moon_title": {
+  "en": "Blood Moon Invasion!",
+  "vi": "Huyết Nguyệt Xâm Lăng!"
+ },
+ "ui.town_event.caravan_title": {
+  "en": "Wandering Caravan Arrived!",
+  "vi": "Thương Đoàn Ghé Thăm!"
+ },
+ "ui.town_event.festival_title": {
+  "en": "Village Festival in Progress!",
+  "vi": "Lễ Hội Làng Đang Diễn Ra!"
  },
  "world.arena.cleanse": {
   "en": "Cleanse",
@@ -5958,6 +6410,10 @@
  "world.gate.plaque": {
   "en": "Hunter Gate",
   "vi": "Cổng Hunter"
+ },
+ "world.mount.plaque": {
+  "en": "Hibernation Mount",
+  "vi": "Núi Ngủ Đông"
  },
  "world.placement.build": {
   "en": "Build {name}",

@@ -50,6 +50,11 @@ func _build(content: VBoxContainer) -> void:
 	shake.custom_minimum_size.y = GameTheme.TOUCH
 	shake.toggled.connect(func(enabled: bool) -> void: SettingsStore.set_screen_shake(enabled))
 	content.add_child(shake)
+	content.add_child(UIKit.separator())
+	var ver := str(ProjectSettings.get_setting("application/config/version", "0.1.0"))
+	var version_label := UIKit.label("v" + ver, &"MutedLabel", false)
+	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(version_label)
 
 
 ## "Name [slider]" for a bus; changes apply and save at once (0 mutes).
