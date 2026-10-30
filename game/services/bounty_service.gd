@@ -252,6 +252,12 @@ func from_dict(data: Dictionary) -> void:
 	if list is Array:
 		for item in list:
 			if item is Dictionary:
-				_bounties.append(item.duplicate())
+				var b: Dictionary = item.duplicate()
+				b["progress"] = int(b.get("progress", 0))
+				b["required"] = int(b.get("required", 1))
+				b["reward_gold"] = int(b.get("reward_gold", 0))
+				b["reward_tickets"] = int(b.get("reward_tickets", 0))
+				b["reward_item_count"] = int(b.get("reward_item_count", 0))
+				_bounties.append(b)
 	if _bounties.is_empty():
 		refresh_bounties()

@@ -140,7 +140,7 @@ func can_socket(instance_id: StringName, rune_id: StringName, item_def: ItemDefi
 func socket_rune(instance_id: StringName, rune_id: StringName, item_def: ItemDefinition) -> bool:
 	if not can_socket(instance_id, rune_id, item_def):
 		return false
-	if not remove(rune_id, 1):
+	if not remove_item(rune_id, 1):
 		return false
 	var current: Array = get_sockets(instance_id).duplicate()
 	current.append(rune_id)

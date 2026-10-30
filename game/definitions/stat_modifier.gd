@@ -12,3 +12,10 @@ enum Type { FLAT, PERCENT }
 ## Optional tag that must be active for this modifier to apply, e.g. &"vs_boss".
 ## Empty means always active.
 @export var condition: StringName
+
+
+func _init(p_stat: StringName = &"", p_type: Type = Type.FLAT, p_value: float = 0.0, p_condition: StringName = &"") -> void:
+	stat = p_stat
+	type = p_type
+	value = p_value
+	condition = p_condition

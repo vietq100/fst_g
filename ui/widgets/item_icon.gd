@@ -37,7 +37,7 @@ func setup(item: ItemDefinition, side: float = 28.0, badge: String = "", instanc
 func _gui_input(event: InputEvent) -> void:
 	if _item == null:
 		return
-	var is_tap := (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	var is_tap: bool = (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
 	if is_tap:
 		accept_event()
 		get_tree().call_group(&"ui_root", &"open_item_info", _item, _instance)

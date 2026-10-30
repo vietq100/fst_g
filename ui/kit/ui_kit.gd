@@ -103,6 +103,14 @@ static func separator() -> HSeparator:
 	return node
 
 
+static func spacer() -> Control:
+	var control := Control.new()
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	control.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return control
+
+
 static func format_duration(seconds: float) -> String:
 	var total := maxi(int(ceilf(seconds)), 0)
 	if total >= 3600:

@@ -44,7 +44,7 @@ func resolve_attack(attacker: Actor, target: Actor) -> float:
 	if is_critical:
 		damage = _stats.apply_critical(damage, attack.critical_damage)
 	if bestiary != null and target.is_in_group(Enemy.GROUP) and target.get("definition") != null:
-		var bonus := bestiary.get_damage_bonus(target.definition.id)
+		var bonus: float = bestiary.get_damage_bonus(target.definition.id)
 		if bonus > 0.0:
 			damage *= (1.0 + bonus)
 	damage = maxf(damage * attack.damage_dealt * defense.damage_taken, 1.0)
@@ -78,7 +78,7 @@ func resolve_skill_hit(attacker: Actor, target: Actor, raw_attack: float, bonus_
 	if is_critical:
 		damage = _stats.apply_critical(damage, attack.critical_damage + bonus_crit_damage)
 	if bestiary != null and target.is_in_group(Enemy.GROUP) and target.get("definition") != null:
-		var bonus := bestiary.get_damage_bonus(target.definition.id)
+		var bonus: float = bestiary.get_damage_bonus(target.definition.id)
 		if bonus > 0.0:
 			damage *= (1.0 + bonus)
 	damage = maxf(damage * multiplier * attack.damage_dealt * defense.damage_taken, 1.0)

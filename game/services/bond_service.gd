@@ -46,7 +46,7 @@ func add(a_id: StringName, b_id: StringName, amount: float) -> void:
 	if a_id == b_id or amount <= 0.0:
 		return
 	var key := _key(a_id, b_id)
-	var old_val := _values.get(key, 0.0)
+	var old_val: float = _values.get(key, 0.0)
 	var old_m := get_milestone(a_id, b_id)
 	var value := minf(old_val + amount, _config.bond_max)
 	if is_equal_approx(value, old_val):

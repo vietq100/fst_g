@@ -39,11 +39,11 @@ func _build(content: VBoxContainer) -> void:
 		var title_label := UIKit.label(header_text, &"AccentLabel" if stars > 0 else &"")
 		var kills_label := UIKit.label(Loc.t("ui.bestiary.kills_count", {"count": kills}), &"MutedLabel")
 
-		var next_target := th[0]
+		var next_target: int = int(th[0])
 		if stars == 1:
-			next_target = th[1]
+			next_target = int(th[1])
 		elif stars >= 2:
-			next_target = th[2]
+			next_target = int(th[2])
 
 		var progress_bar := UIKit.bar(kills, next_target, &"XpBar", "%d / %d" % [kills, next_target])
 

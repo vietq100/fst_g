@@ -114,7 +114,7 @@ func _cycle_title() -> void:
 	var idx := runtime.unlocked_titles.find(runtime.equipped_title)
 	var next_idx := (idx + 1) % runtime.unlocked_titles.size()
 	GameManager.hunters.equip_title(runtime, runtime.unlocked_titles[next_idx])
-	rebuild()
+	request_rebuild()
 
 
 func _skills_text() -> String:

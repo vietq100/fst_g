@@ -243,7 +243,9 @@ static func from_dict(data: Dictionary) -> HunterRuntime:
 	if saved_chronicle is Array:
 		for entry in saved_chronicle:
 			if entry is Dictionary:
-				hunter.chronicle.append(entry.duplicate())
+				var c: Dictionary = entry.duplicate()
+				c["time"] = int(c.get("time", 0))
+				hunter.chronicle.append(c)
 	hunter.equipped_title = StringName(str(data.get("equipped_title", "")))
 	var saved_titles: Variant = data.get("unlocked_titles", [])
 	if saved_titles is Array:

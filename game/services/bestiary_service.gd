@@ -93,7 +93,7 @@ func record_kill(monster_id: StringName) -> void:
 	if monster_id == &"":
 		return
 	var old_stars := get_mastery_stars(monster_id)
-	var new_kills := _kills.get(monster_id, 0) + 1
+	var new_kills: int = _kills.get(monster_id, 0) + 1
 	_kills[monster_id] = new_kills
 	kill_recorded.emit(monster_id, new_kills)
 	var new_stars := get_mastery_stars(monster_id)

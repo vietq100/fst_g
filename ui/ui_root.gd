@@ -669,7 +669,7 @@ func _build_overlays() -> void:
 	quest_card.theme_type_variation = &"QuestCard"
 	quest_card.mouse_filter = Control.MOUSE_FILTER_STOP
 	quest_card.gui_input.connect(func(event: InputEvent) -> void:
-		var is_tap := (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+		var is_tap: bool = (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
 		if is_tap:
 			open_quests())
 	_quest_box = UIKit.vbox([], 3)

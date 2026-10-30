@@ -18,7 +18,7 @@ func _build(content: VBoxContainer) -> void:
 		UIKit.label(timer_text, &"MutedLabel"),
 		UIKit.button(Loc.t("ui.bounty.refresh_btn"), func() -> void:
 			bounties.refresh_bounties(true)
-			toast(Loc.t("ui.bounty.refreshed")),
+			toast_requested.emit(Loc.t("ui.bounty.refreshed"), false),
 			&"SmallButton"),
 	], 8)
 	content.add_child(refresh_row)
@@ -55,7 +55,7 @@ func _build(content: VBoxContainer) -> void:
 			Loc.t("ui.bounty.claimed_btn") if claimed else Loc.t("ui.bounty.claim_btn"),
 			func() -> void:
 				if bounties.claim_bounty(b.id):
-					toast(Loc.t("ui.bounty.claim_success", {"reward": reward_str})),
+					toast_requested.emit(Loc.t("ui.bounty.claim_success", {"reward": reward_str}), false),
 			&"PrimaryButton",
 			"" if can_claim else Loc.t("ui.bounty.not_ready")
 		)
